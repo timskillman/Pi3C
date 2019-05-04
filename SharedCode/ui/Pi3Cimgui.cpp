@@ -90,12 +90,13 @@ Pi3Cmodel * Pi3Cimgui::findCreateImage(const std::string &str, const ButtonType 
 
 	if (type == TEXT) {
 		if (!currentFont) return nullptr;
-		SDL_Surface *ts = currentFont->textSurface(str);
-		ttex.get()->fromTextSurface(ts);
-		SDL_FreeSurface(ts);
+		ttex.reset(currentFont->textSurface(str));
+		//ttex.get()->fromTextSurface(ts);
+		//SDL_FreeSurface(ts);
 		//ttex = currentFont->asTexture(str, currentParams.textColour);
 	}
 	else {
+		//ttex->loadFromFile((texturePath + str).c_str());
 		ttex.reset(new Pi3Ctexture((texturePath + str).c_str(), true));
 	}
 	return createImageRect(str, ttex);
@@ -110,10 +111,10 @@ Pi3Cmodel * Pi3Cimgui::findCreateImage2(const std::string &str, const ButtonType
 
 	if (type == TEXT) {
 		if (!currentFont) return nullptr;
-		SDL_Surface *ts = currentFont->textSurface(str);
-		ttex.get()->fromTextSurface(ts);
-		SDL_FreeSurface(ts);
-		//ttex = currentFont->asTexture(str, currentParams.textColour);
+		//SDL_Surface *ts = currentFont->textSurface(str);
+		//ttex.get()->fromTextSurface(ts);
+		//SDL_FreeSurface(ts);
+		ttex = currentFont->asTexture(str, currentParams.textColour);
 	}
 	else {
 		ttex.reset(new Pi3Ctexture((texturePath + str).c_str(), true));
@@ -425,6 +426,8 @@ bool Pi3Cimgui::SliderH(const std::string &text, const double from, const double
 	nextPos.x = left+ slideWidth; pos.x = nextPos.x;
 	sameLine(0);
 	if (renderBackIcon("scrollRight.png", arrowWidth, mHeight) && mb && (value + step < too)) value += step;
+	sameLine(3);
+	
 	if (mouseTouchRect) somethingSelected = true;
 	return mouseTouchRect;
 }

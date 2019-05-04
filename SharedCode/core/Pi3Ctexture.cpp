@@ -45,16 +45,16 @@ void Pi3Ctexture::createColour(uint32_t col)
 
 }
 
-void Pi3Ctexture::create(uint32_t width, uint32_t height, uint32_t bpp)
+void Pi3Ctexture::create(uint32_t width, uint32_t height, uint32_t bytesPerPixel)
 {
 	textureID = 0;
 	this->width = width;
 	this->height = height;
-	this->bpp = bpp;
-	pitch = width*bpp;
+	this->bpp = bytesPerPixel;
+	pitch = width* bytesPerPixel;
 	size = height*pitch;
 	pixels = new uint8_t[size];
-	switch (bpp) {
+	switch (bytesPerPixel) {
 	//case 1: format = GL_ALPHA8; break; //RPi doesnt understand this
 	case 2: format = GL_RGB565; break;
 	case 3: format = GL_RGB; break;
@@ -62,45 +62,39 @@ void Pi3Ctexture::create(uint32_t width, uint32_t height, uint32_t bpp)
 	}
 }
 
-void Pi3Ctexture::fromSurface(SDL_Surface* Surface)
+void Pi3Ctexture::rawBlit(Pi3Crecti *src_rect, Pi3Ctexture *dest_tex, Pi3Crecti *dst_rect)
 {
-	//Convert surface format to 8bit, RGBA 32bit ...
-	SDL_Surface * convertedSurface = SDL_ConvertSurfaceFormat(Surface, SDL_PIXELFORMAT_RGBA32, 0);
+	/*	A VERY RAW blit that does no bounds checking
+		and ASSUMES the source rectangle is inside the
+		source texture, the destination rectangle is 
+		inside the destination texture and that both 
+		rectangles are exactly the same width else she'll BLOW!
+	*/
 
-	if (convertedSurface) {
-		width =		convertedSurface->w;
-		height =	convertedSurface->h;
-		pitch =		convertedSurface->pitch;
-		bpp =		convertedSurface->format->BytesPerPixel;
-		size =		height * pitch;
-		pixels =	new uint8_t[size];
-		if (pixels) {
-			memcpy(pixels, convertedSurface->pixels, size);
-			format = GL_RGBA;
-		}
-		SDL_FreeSurface(convertedSurface);
+	uint32_t sint = sizeof(uint32_t);
+	uint32_t dwidth = dst_rect->width * sint;								//Destination width (in bytes)
+	uint32_t dp = dst_rect->y * dest_tex->pitch + dst_rect->x * sint;		//Destination pointer start
+	uint32_t sp = src_rect->y* pitch + src_rect->x * sint;					//Source pointer start
+
+	for (uint32_t y = 0; y < dst_rect->height; y++)
+	{
+		memcpy(&dest_tex->pixels[dp], &pixels[sp], dwidth);
+		dp += dest_tex->pitch; sp += pitch;
 	}
 }
 
-void Pi3Ctexture::fromSurfaceXY(SDL_Surface* Surface, const int x, const int y)
+void Pi3Ctexture::fromSurface(SDL_Surface* Surface)
 {
-	//Convert surface format to 8bit, RGBA 32bit ...
-	int yh = Surface->h; 
-	if (yh+y >= height) yh = height-y;
-	int xw = Surface->w;
-	if (xw + x >= width) xw = width - x;
-	int xp = xw * 4;
-	for (int yy = 0; yy < yh; yy++) {
-		uint8_t * tpix = &pixels[x + (yy+y) * pitch];
-		uint8_t * spix = (uint8_t*)Surface->pixels;
-		memcpy(tpix, &spix[yy * Surface->pitch], xp);
+	//Convert surface format to RGBA 32bit ...
+	SDL_Surface * convertedSurface = SDL_ConvertSurfaceFormat(Surface, SDL_PIXELFORMAT_RGBA32, 0);
+	if (convertedSurface) {
+		fromTextSurface(convertedSurface);
+		SDL_FreeSurface(convertedSurface);
 	}
 }
 
 void Pi3Ctexture::fromTextSurface(SDL_Surface* Surface)
 {
-	//Convert surface format to 8bit, RGBA 32bit ...
-
 	if (Surface) {
 		width = Surface->w;
 		height = Surface->h;
@@ -115,6 +109,20 @@ void Pi3Ctexture::fromTextSurface(SDL_Surface* Surface)
 	}
 }
 
+//void Pi3Ctexture::fromSurfaceXY(SDL_Surface* Surface, const int x, const int y)
+//{
+//	int yh = Surface->h;
+//	if (yh + y >= height) yh = height - y;
+//	int xw = Surface->w;
+//	if (xw + x >= width) xw = width - x;
+//	int xp = xw * 4;
+//	for (int yy = 0; yy < yh; yy++) {
+//		uint8_t * tpix = &pixels[x + (yy + y) * pitch];
+//		uint8_t * spix = (uint8_t*)Surface->pixels;
+//		memcpy(tpix, &spix[yy * Surface->pitch], xp);
+//	}
+//}
+
 void Pi3Ctexture::loadFromFile(const char* file)
 {
 	textureID = 0;
@@ -126,6 +134,16 @@ void Pi3Ctexture::loadFromFile(const char* file)
 	if (Surface) {
 		fromSurface(Surface);
 		SDL_FreeSurface(Surface);
+	}
+}
+
+void Pi3Ctexture::saveAsPNG(const char* file)
+{
+	SDL_Surface *pngSurf = SDL_CreateRGBSurface(0, width, height, 32, 0x00ff0000, 0x0000ff00, 0x000000ff, 0xff000000);
+	if (pngSurf) {
+		memcpy(pngSurf->pixels, pixels, size);
+		IMG_SavePNG(pngSurf, file);
+		SDL_FreeSurface(pngSurf);
 	}
 }
 

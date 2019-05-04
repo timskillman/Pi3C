@@ -5,6 +5,7 @@
 #include <string>
 #include <memory>
 #include "Pi3Ctexture.h"
+#include "Pi3Cmaterial.h"
 
 class Pi3Cfont {
 public:
@@ -24,14 +25,17 @@ public:
 		int advance = 0;
 		uint16_t chr = 0;
 		Pi3Crect rect;
+		Pi3Crecti recti;
 		SDL_Rect sdlrect;
 		uint32_t sheetRef = 0;
 	};
 
 	struct fontSheet {
-		~fontSheet() { for (auto &v : sheet) SDL_FreeSurface(v);  }
+		//~fontSheet() {  //for (auto &v : sheet) SDL_FreeSurface(v); }
 
-		std::vector<SDL_Surface*> sheet;
+		Pi3Cmaterial sheetMaterial;
+		std::shared_ptr<Pi3Ctexture> sheet;
+		//std::vector<SDL_Surface*> sheet;
 		std::vector<fontSheetChar> chars;
 	};
 
@@ -42,7 +46,8 @@ public:
 
 	void createFontSheet(const uint32_t sheetWidth, const uint32_t sheetHeight);
 	void getStringSize(const std::string &text, int &w, int &h);
-	SDL_Surface * textSurface(const std::string &text);
+	Pi3Ctexture * textSurface(const std::string &text);
+	uint32_t textureRects(std::string &text, std::vector<float> &verts, const float wrapWidth);
 
 	TTF_Font * font = nullptr;
 

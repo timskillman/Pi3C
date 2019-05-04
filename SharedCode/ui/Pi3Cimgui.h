@@ -56,6 +56,12 @@ public:
 	Pi3Cpointi getPosition();
 	void movePosition(const int x, const int y);
 	void setFont(const std::string &fontName);
+
+	std::shared_ptr<Pi3Cfont> getFont(const std::string &fontName) {
+		auto &fi = fonts.find(fontName);
+		if (fi != fonts.end()) return fi->second;
+	}
+
 	void setSelectColour(const uint32_t selectColour) { this->currentParams.selectColour = selectColour; }
 	void setButtonColour(const uint32_t buttonColour) { this->currentParams.buttonColour = buttonColour; }
 	void setHighlightColour(const uint32_t buttonColour) { this->currentParams.highlightColour = currentParams.highlightColour; }

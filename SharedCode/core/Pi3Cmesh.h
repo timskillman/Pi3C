@@ -47,6 +47,17 @@ public:
 	enum vertRefs { v_x=0 ,v_y=1 ,v_z=2 ,n_x=3, n_y=4, n_z=5, v_u=6, v_v=7 };
 //  STRUCTS
 
+	struct vertVNU {
+		float vx;
+		float vy;
+		float vz;
+		float nx;
+		float ny;
+		float nz;
+		float ux;
+		float uy;
+	};
+
 	//struct meshHeader {
 		std::string name;
 		Pi3Cbbox3d bbox;

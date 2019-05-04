@@ -45,10 +45,13 @@ void Pi3Cfont::copyCharToSheet(fontSheetChar &ch, SDL_Surface* Surface, SDL_Surf
 	if (lastX + width > sheetWidth) {
 		lastX = 0;
 		if (lastY + maxHeight > sheetHeight) {
+			/*   This should not occur as we can't use multiple font images with a single mesh ... just raise error and make sheet big enough
+
 			uint32_t *pt = (uint32_t *)destSurface->pixels;
 			for (int32_t p = 0; p < destSurface->w*destSurface->h; p++) pt[p] = 0xffffff | (pt[p] & 0xff000000);
 			fontsheet.sheet.push_back(destSurface);
 			lastY = 0; maxHeight = height;
+			*/
 		} 
 		else 
 			lastY += maxHeight;
@@ -57,17 +60,18 @@ void Pi3Cfont::copyCharToSheet(fontSheetChar &ch, SDL_Surface* Surface, SDL_Surf
 	//positions of character image on sheet ...
 	ch.rect = Pi3Crect((float)lastX / sheetWidth, (float)lastY / sheetHeight, (float)width / sheetWidth, (float)height / sheetHeight);
 	ch.sdlrect.x = lastX; ch.sdlrect.y = lastY; ch.sdlrect.w = width; ch.sdlrect.h = height;
+	ch.recti.x = lastX; ch.recti.y = lastY; ch.recti.width = width; ch.recti.height = height;
 
 	//blit the character image to the sheet ...
 	SDL_BlitSurface(Surface, NULL, destSurface, &ch.sdlrect);
 
 	lastX += width;
-	ch.sheetRef = fontsheet.sheet.size();
+	ch.sheetRef = 0; //fontsheet.sheet.size();
 }
 
 void Pi3Cfont::createFontSheet(const uint32_t sheetWidth, const uint32_t sheetHeight)
 {
-	/* Create a font sheet with glpyh metrics */
+	/* Create a font sheet with glpyh metrics 0-255 range only for now */
 	char c[2] = { 0,0 };
 	int lastX = 0; int lastY = 0; int maxHeight = 0;
 	SDL_Color white{ 255, 255, 255 };
@@ -87,13 +91,21 @@ void Pi3Cfont::createFontSheet(const uint32_t sheetWidth, const uint32_t sheetHe
 		}
 	}
 
+	//make rgb surface white (or could be a colour) and retain alpha ...
 	uint32_t *pt = (uint32_t *)destSurface->pixels;
 	for (int32_t p = 0; p < destSurface->w*destSurface->h; p++) pt[p] = 0xffffff | (pt[p] & 0xff000000);
-	fontsheet.sheet.push_back(destSurface);
 
-	SDL_RWops *fo = SDL_RWFromFile("fontsheet.png", "wb");
-	IMG_SavePNG_RW(fontsheet.sheet[0], fo, 0);
-	SDL_RWclose(fo);
+	//Create texture and material ...
+	fontsheet.sheet.reset(new Pi3Ctexture());
+	fontsheet.sheet->fromTextSurface(destSurface);
+	fontsheet.sheet->upload(); //upload to GPU
+	fontsheet.sheetMaterial.texID = fontsheet.sheet->textureID;
+	fontsheet.sheetMaterial.SetColDiffuse(0xffffff);
+	fontsheet.sheetMaterial.alpha = 0.99f;
+	fontsheet.sheetMaterial.illum = 1; //non shaded illuminat
+
+	//fontsheet.sheet->saveAsPNG("textureSheet.png"); //debug
+	SDL_FreeSurface(destSurface);
 }
 
 void Pi3Cfont::getStringSize(const std::string &text, int &w, int &h)
@@ -106,20 +118,55 @@ void Pi3Cfont::getStringSize(const std::string &text, int &w, int &h)
 	}
 }
 
-SDL_Surface * Pi3Cfont::textSurface(const std::string &text)
+Pi3Ctexture * Pi3Cfont::textSurface(const std::string &text)
 {
 	int w, h;
 	getStringSize(text, w, h);
-	SDL_Surface *chSurface = SDL_CreateRGBSurface(0, w, h, 32, 0x000000ff, 0x0000ff00, 0x00ff0000, 0xff000000);
+	Pi3Ctexture *chtex = new Pi3Ctexture();
+	chtex->create(w, h, 4);
+	Pi3Crecti drect;
+	drect.x = 0; drect.y = 0;
 
-	SDL_Rect rect;
-	rect.x = 0; rect.y = 0;
 	for (auto &c : text) {
 		fontSheetChar &ch = fontsheet.chars[(uint8_t)c];
-		rect.w = ch.sdlrect.w; rect.h = ch.sdlrect.h;
-		SDL_BlitSurface(fontsheet.sheet[ch.sheetRef], &ch.sdlrect, chSurface, &rect);
-		rect.x += rect.w;
+		drect.width = ch.recti.width; drect.height = ch.recti.height;
+		fontsheet.sheet->rawBlit(&ch.recti, chtex, &drect);
+		drect.x += drect.width;
 	}
-	return chSurface;
+	return chtex;
 }
 
+#define CreateVerts(x,y,ux,uy)										\
+		verts[p] = x; verts[p + 1] = y; verts[p + 2] = -10.f;		\
+		verts[p + 3] = 0; verts[p + 4] = -1.f; verts[p + 5] = 0;	\
+		verts[p + 6] = ux; verts[p + 7] = uy;						\
+		p += stride;												\
+
+uint32_t Pi3Cfont::textureRects(std::string &text, std::vector<float> &verts, const float wrapWidth)
+{
+	/* Creates a letter sheet made of rectangles with UV mapping to render a font sheet
+	   Fun stuff could be done here such as warping the letter geometry etc.. */
+
+	uint32_t p = 0;
+	uint32_t stride = 8;
+	SDL_Rect rect;
+	float x = 0; float y = 0; float maxHeight = 0;
+	for (auto &c : text) {
+		fontSheetChar &ch = fontsheet.chars[(uint8_t)c];
+		float w = (float)ch.sdlrect.w; 
+		float h = (float)ch.sdlrect.h;
+		float ux = ch.rect.x; float uy = ch.rect.y;
+		float uw = ch.rect.width; float uh = ch.rect.height;
+
+		if (h > maxHeight) maxHeight = h;
+		if (x + w > wrapWidth) { x = 0; y += maxHeight; maxHeight = 0; }
+
+		//create top left, top right, bottom right, bottom left verts ...
+		CreateVerts(x, y, ux, uy);
+		CreateVerts(x + w, y, ux + uw, uy);
+		CreateVerts(x + w, y + h, ux + uw, uy + uh);
+		CreateVerts(x, y + h, ux, uy + uh);
+		x += w;
+	}
+	return p;	//return number of floats created
+}

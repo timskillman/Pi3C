@@ -58,25 +58,25 @@ public:
 
 	enum modelFlags { SELECTED = 1, DELETED = 2, VISIBLE = 4, TOUCHABLE = 8, GRIDLOCK = 16, NORMALLOCK = 32 };
 
-	struct modelParams {
-		std::string name;
-		Pi3Cresource *resource = nullptr;
-		Pi3Cmesh *mesh = nullptr;
-		uint32_t diffuseColour = 0xffffffff;
-		std::string path;
-		std::string modelfile;
-		std::string colliderfile;
-		std::function<void(float)> showProgressCB = nullptr;
-		bool asCollider = false;
-		bool reserveBuffer = false;
-		uint32_t bufferSize = 65535;
-		bool deleteVerts = false;
-		vec3f position = {};
-		vec3f rotate = {};
-	};
+	//struct modelParams {
+	//	std::string name;
+	//	Pi3Cresource *resource = nullptr;
+	//	Pi3Cmesh *mesh = nullptr;
+	//	uint32_t diffuseColour = 0xffffffff;
+	//	std::string path;
+	//	std::string modelfile;
+	//	std::string colliderfile;
+	//	std::function<void(float)> showProgressCB = nullptr;
+	//	bool asCollider = false;
+	//	bool reserveBuffer = false;
+	//	uint32_t bufferSize = 65535;
+	//	bool deleteVerts = false;
+	//	vec3f position = {};
+	//	vec3f rotate = {};
+	//};
 
-	Pi3Cmodel(const modelParams mp);
-	Pi3Cmodel() { init(); }
+	//Pi3Cmodel(const modelParams mp);
+	Pi3Cmodel() {}
 	Pi3Cmodel(Pi3Cresource *resource, Pi3Cmesh mesh, uint32_t diffuseColour = 0xffffffff, bool asCollider = false, bool reserveBuffer = false, uint32_t bufferSize = 65535);
 	Pi3Cmodel(Pi3Cresource *resource, std::string name, Pi3Cmesh mesh, uint32_t diffuseColour = 0xffffffff, bool asCollider = false, bool reserveBuffer = false, uint32_t bufferSize = 65535); //add mesh with name
 	Pi3Cmodel(Pi3Cresource *resource, std::string path, std::string modelfile, bool asCollider, std::function<void(float)> showProgressCB); //load model only
@@ -85,7 +85,7 @@ public:
 
 // Functions
 
-	void init(const std::string &name = "");
+	void init();
 	void create(Pi3Cresource *resource, Pi3Cmesh *mesh, uint32_t diffuseColour = 0xffffffff, bool asCollider = false, bool reserveBuffer = false, uint32_t bufferSize = 65535);
 	void render(Pi3Cresource *resource, Pi3Cshader &shader, const Pi3Cmatrix *parent_matrix = nullptr, Pi3Cmaterial *materialOverride = nullptr);
 	void renderBasic(Pi3Cresource *resource, Pi3Cshader &shader, const Pi3Cmatrix *parent_matrix = nullptr, Pi3Cmaterial *materialOverride = nullptr);
@@ -101,7 +101,7 @@ public:
 	void forceRect2D(Pi3Cresource *resource, const vec2f &pos, const vec2f &size);
 	void createRect2D(Pi3Cresource *resource, const vec2f &pos = vec2f(0, -1.f), const vec2f &size = vec2f(1.f, 1.f));
 	void updateRect2Duvs(Pi3Cresource *resource, const vec2f &uv1, const vec2f &uv2);
-	Pi3Cmodel textModel(Pi3Cresource *resource, const std::string &text);
+	void textModel(Pi3Cresource *resource, Pi3Cfont *font, std::string &text, const float wrapWidth);
 
 	Pi3Cmodel * append(Pi3Cmodel model, vec3f offset = vec3f(0, 0, 0), vec3f rotation = vec3f(0,0,0));
 	Pi3Cmodel * appendLOD(Pi3Cmodel model, float LODfrom, float LODtoo, vec3f offset = vec3f(0, 0, 0), vec3f rotation = vec3f(0, 0, 0));
@@ -116,25 +116,25 @@ public:
 // Variables
 
 	std::string name;				//model name (used for search)
-	int32_t meshRef;				//mesh reference to mesh in resources (-1 is no ref - nothing to render)
 
 	Pi3Cmatrix matrix;				//matrix used to transform mesh/group
 	Pi3Cmaterial material;			//used for rendering mesh - can be modified
-	int32_t materialRef;			//material reference of original material in resources
 
-	uint32_t flags;
+	uint32_t flags = 0;
+	int32_t meshRef = -1;			//mesh reference to mesh in resources (-1 is no ref - nothing to render)
+	int32_t materialRef = -1;		//material reference to original material in resource
 
-	bool visible;					//visible in scene
-	bool deleted;					//deleted from scene (useful for undo/redo)
-	bool touchable;					//model is displayed but not touchable
-	bool selected;					//model selected (useful for editing)
+	bool visible = true;			//visible in scene
+	bool deleted = false;			//deleted from scene (useful for undo/redo)
+	bool touchable = true;			//model is displayed but not touchable
+	bool selected = false;			//model selected (useful for editing)
 
-	int32_t choice;					//if set to value 0 and above, this option will choose which model in the group to render - the rest are ignored
+	int32_t choice = -1;			//if set to value 0 and above, this option will choose which model in the group to render - the rest are ignored
 
 	Pi3Cbbox3d bbox;				//bounding box of transformed meshes that model holds
 
-	float lodFrom;					//LOD works by rendering the model Reference of the group if the eye distance is greater than the lodDistance
-	float lodToo;					//If the eye distance is less than lodDistance, then render the group contents instead.
+	float lodFrom = 0;				//LOD works by rendering the model Reference of the group if the eye distance is greater than the lodDistance
+	float lodToo = 0;				//If the eye distance is less than lodDistance, then render the group contents instead.
 									//If lodToo == 0, then dont do LOD checking
 									//
 									//Note: if more than one mesh is required for Level 0 LOD (ie. furthest distance), 

@@ -204,11 +204,16 @@ void Pi3Cscene::setViewport2D(const Pi3Crecti &rect, const float znear, const fl
 
 bool Pi3Cscene::snapShot(const Pi3Crecti &rect, std::vector<uint8_t> &snapShot)
 {
+	//SDL_Surface *sshot = SDL_CreateRGBSurface(0, rect.width, rect.height, 32, 0x00ff0000, 0x0000ff00, 0x000000ff, 0xff000000);
+	//SDL_RenderReadPixels(renderer, NULL, SDL_PIXELFORMAT_ARGB8888, sshot->pixels, sshot->pitch);
+	//SDL_SaveBMP(sshot, "screenshot.bmp");
+	//SDL_FreeSurface(sshot);
+
 	try {
 		uint32_t size = (uint32_t)(rect.width*rect.height * 4);
 		if (snapShot.size() < size) snapShot.resize(size);
 		glViewport(rect.x, rect.y, rect.width, rect.height);
-		glReadBuffer(GL_COLOR_ATTACHMENT0);
+		//glReadBuffer(GL_COLOR_ATTACHMENT0);
 		glReadPixels(rect.x, rect.y, rect.width, rect.height, GL_RGBA, GL_UNSIGNED_BYTE, &snapShot[0]);
 		return true;
 	}

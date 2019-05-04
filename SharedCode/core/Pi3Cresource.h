@@ -85,6 +85,9 @@ public:
 	void addMusic(const char * path, const char * musicfile);
 	void addSound(const char * path, const char * soundfile);
 
+	std::vector<float> * getLetterVerts();
+	void uploadLetterVerts(uint32_t vertCount);
+
 	std::shared_ptr<Pi3Cfont> findFont(const std::string &ffont) { return findResource(fonts, ffont); }
 	std::shared_ptr<Pi3Cmusic> findMusic(const std::string &fmusic) { return findResource(music, fmusic); }
 	std::shared_ptr<Pi3Csound> findSound(const std::string &sound) { return findResource(sounds, sound); }
@@ -110,6 +113,7 @@ public:
 
 	int calls;
 	int32_t rectRef = -1;
+	int32_t letterSheetRef = -1;
 
 private:
 	

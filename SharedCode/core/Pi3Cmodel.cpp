@@ -1,25 +1,26 @@
 #include "Pi3Cmodel.h"
 #include "Pi3CfileOBJ.h"
 
-Pi3Cmodel::Pi3Cmodel(const modelParams mp)
-{
-	init(mp.name);
-	matrix.setMoveRotate(mp.position, mp.rotate);
-
-	if (mp.path != "") {
-		if (mp.modelfile != "") {
-			loadOBJfile(mp.resource, mp.path, mp.modelfile, mp.showProgressCB, false);
-		}
-		if (mp.colliderfile != "") {
-			Pi3Cmodel collider;
-			collider.loadOBJfile(mp.resource, mp.path, mp.colliderfile, mp.showProgressCB, true);
-			this->appendCollider(collider);
-		}
-	} 
-	else if (mp.mesh) {
-		create(mp.resource, mp.mesh, mp.diffuseColour, mp.deleteVerts, mp.reserveBuffer, mp.bufferSize);
-	}
-}
+//Pi3Cmodel::Pi3Cmodel(const modelParams mp)
+//{
+//	init();
+//	name = mp.name;
+//	matrix.setMoveRotate(mp.position, mp.rotate);
+//
+//	if (mp.path != "") {
+//		if (mp.modelfile != "") {
+//			loadOBJfile(mp.resource, mp.path, mp.modelfile, mp.showProgressCB, false);
+//		}
+//		if (mp.colliderfile != "") {
+//			Pi3Cmodel collider;
+//			collider.loadOBJfile(mp.resource, mp.path, mp.colliderfile, mp.showProgressCB, true);
+//			this->appendCollider(collider);
+//		}
+//	} 
+//	else if (mp.mesh) {
+//		create(mp.resource, mp.mesh, mp.diffuseColour, mp.deleteVerts, mp.reserveBuffer, mp.bufferSize);
+//	}
+//}
 
 Pi3Cmodel::Pi3Cmodel(Pi3Cresource *resource, Pi3Cmesh mesh, uint32_t diffuseColour, bool deleteVerts, bool reserveBuffer, uint32_t bufferSize)
 {
@@ -29,7 +30,7 @@ Pi3Cmodel::Pi3Cmodel(Pi3Cresource *resource, Pi3Cmesh mesh, uint32_t diffuseColo
 
 Pi3Cmodel::Pi3Cmodel(Pi3Cresource *resource, std::string name, Pi3Cmesh mesh, uint32_t diffuseColour, bool deleteVerts, bool reserveBuffer, uint32_t bufferSize)
 {
-	init(name);
+	init(); this->name = name;
 	create(resource, &mesh, diffuseColour, deleteVerts, reserveBuffer, bufferSize);
 }
 
@@ -63,12 +64,10 @@ void Pi3Cmodel::create(Pi3Cresource *resource, Pi3Cmesh *mesh, uint32_t diffuseC
 	bbox = resource->meshes[meshRef].bbox;
 }
 
-void Pi3Cmodel::init(const std::string &name)
+void Pi3Cmodel::init()
 {
-	this->name = name;
 	visible = true;
 	deleted = false;
-	//collider = false;
 	materialRef = -1;
 	meshRef = -1;
 	touchable = true;
@@ -424,39 +423,30 @@ void Pi3Cmodel::createRect2D(Pi3Cresource *resource, const vec2f &pos, const vec
 	}
 }
 
+#define addUV(ux,uy)					\
+	verts[p + Pi3Cmesh::v_u] = ux;		\
+	verts[p + Pi3Cmesh::v_v] = uy;		\
+	p += stride;						\
+
 void Pi3Cmodel::updateRect2Duvs(Pi3Cresource *resource, const vec2f &uv1, const vec2f &uv2)
 {
 	Pi3Cmesh *rect2D = &resource->meshes[resource->rectRef];
 	std::vector<float> &verts = resource->vertBuffer[rect2D->bufRef];
 	uint32_t p = 0;
 	uint32_t stride = rect2D->stride;
-	verts[p + Pi3Cmesh::v_u] = uv1.x;
-	verts[p + Pi3Cmesh::v_v] = uv1.y;
-	p += stride;
-	verts[p + Pi3Cmesh::v_u] = uv2.x;
-	verts[p + Pi3Cmesh::v_v] = uv1.y;
-	p += stride;
-	verts[p + Pi3Cmesh::v_u] = uv2.x;
-	verts[p + Pi3Cmesh::v_v] = uv2.y;
-	p += stride;
-	verts[p + Pi3Cmesh::v_u] = uv1.x;
-	verts[p + Pi3Cmesh::v_v] = uv2.y;
+	addUV(uv1.x, uv1.y);
+	addUV(uv2.x, uv1.y);
+	addUV(uv2.x, uv2.y);
+	addUV(uv1.x, uv2.y);
 	resource->updateGPUverts(rect2D->bufRef, rect2D->vertOffset*stride, rect2D->vertSize*stride, &verts);
 }
 
-Pi3Cmodel Pi3Cmodel::textModel(Pi3Cresource *resource, const std::string &text)
+void Pi3Cmodel::textModel(Pi3Cresource *resource, Pi3Cfont *font, std::string &text, const float wrapWidth)
 {
-	SDL_Surface *txSurface; // = textSurface(text);
-	//blit the rendered surface into the wordsheet (top left corner) ...
-	//SDL_BlitSurface(wordsheet, &ch.sdlrect, chSurface, &rect);
-
-	//Update the newly blitted sub-rectangle of the texture in the GPU ...
-
-	//create a new rectangle with same width and height as the words surface
-	Pi3Cmodel words;
-	//words.createRect2D(resource, vec2f(0, 0), vec2f((float)txSurface->w, (float)txSurface->h));
-	//update the UVs of the rectangle in the GPU ...
-	//words.updateRect2Duvs(resource, vec2f(0, 0), vec2f((float)txSurface->w / wordsheet->w, (float)txSurface->h / wordsheet->h));
-
-	return words;
+	std::vector<float> *verts = resource->getLetterVerts();				//get ptr to vertices from resource letterVerts
+	if (verts == nullptr) return;
+	uint32_t vertCount = font->textureRects(text, *verts, wrapWidth);	//generate verts from text	
+	resource->uploadLetterVerts(vertCount);								//upload updated verts to GPU
+	meshRef = resource->letterSheetRef;
+	material = font->fontsheet.sheetMaterial;
 }
