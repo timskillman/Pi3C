@@ -1,0 +1,25 @@
+# Max2Obj Version 4.0 Mar 10th, 2001
+#
+mtllib ./House.mtl
+g
+# object mudgrass to come ...
+#
+v  -38.000977 0 37.999004
+v  37.999023 0 37.999004
+v  -38.000977 0 -38.000996
+v  37.999023 0 -38.000996
+# 4 vertices
+
+vt  0.000122 0.25015 0.5
+vt  0.249872 0.25015 0.5
+vt  0.000122 0.4999 0.5
+vt  0.249872 0.4999 0.5
+# 4 texture vertices
+
+g mudgrass
+usemtl mudgrass
+f 3/3 1/1 4/4
+f 2/2 4/4 1/1
+# 2 faces
+
+g
