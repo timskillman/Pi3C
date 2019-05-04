@@ -1,0 +1,5 @@
+title:Castle Creator
+fullscreen:false
+screenWidth:800	
+screenHeight:600
+

@@ -28,19 +28,19 @@ Pi3Cmodel::Pi3Cmodel(Pi3Cresource *resource, Pi3Cmesh mesh, uint32_t diffuseColo
 	create(resource, &mesh, diffuseColour, deleteVerts, reserveBuffer, bufferSize);
 }
 
-Pi3Cmodel::Pi3Cmodel(Pi3Cresource *resource, std::string name, Pi3Cmesh mesh, uint32_t diffuseColour, bool deleteVerts, bool reserveBuffer, uint32_t bufferSize)
+Pi3Cmodel::Pi3Cmodel(Pi3Cresource *resource, const std::string &name, Pi3Cmesh mesh, uint32_t diffuseColour, bool deleteVerts, bool reserveBuffer, uint32_t bufferSize)
 {
 	init(); this->name = name;
 	create(resource, &mesh, diffuseColour, deleteVerts, reserveBuffer, bufferSize);
 }
 
-Pi3Cmodel::Pi3Cmodel(Pi3Cresource *resource, std::string path, std::string modelfile, bool asCollider, std::function<void(float)> showProgressCB)
+Pi3Cmodel::Pi3Cmodel(Pi3Cresource *resource, const std::string &path, const std::string &modelfile, const bool asCollider, std::function<void(float)> showProgressCB)
 {
 	init();
 	loadOBJfile(resource, path, modelfile, showProgressCB, asCollider);
 }
 
-Pi3Cmodel::Pi3Cmodel(Pi3Cresource *resource, std::string modelname, std::string path, std::string model, std::string collider, std::function<void(float)> showProgressCB)
+Pi3Cmodel::Pi3Cmodel(Pi3Cresource *resource, const std::string &modelname, const std::string &path, const std::string &model, const std::string &collider, std::function<void(float)> showProgressCB)
 {
 	init();
 	loadCollider(resource, path, model, collider, showProgressCB);
@@ -445,8 +445,13 @@ void Pi3Cmodel::textModel(Pi3Cresource *resource, Pi3Cfont *font, std::string &t
 {
 	std::vector<float> *verts = resource->getLetterVerts();				//get ptr to vertices from resource letterVerts
 	if (verts == nullptr) return;
-	uint32_t vertCount = font->textureRects(text, *verts, wrapWidth);	//generate verts from text	
+	Pi3Crect size;
+	uint32_t vertCount = font->textureRects(text, *verts, size, wrapWidth);	//generate verts from text	
 	resource->uploadLetterVerts(vertCount);								//upload updated verts to GPU
+	bbox.update(vec3f(size.x, size.y-size.height, 0));
+	bbox.update(vec3f(size.width, 0, 0));
+	matrix.Translate(vec3f(0, -size.height, 0));
 	meshRef = resource->letterSheetRef;
 	material = font->fontsheet.sheetMaterial;
+	material.rendermode = GL_TRIANGLES;
 }

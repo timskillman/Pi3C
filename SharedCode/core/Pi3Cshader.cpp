@@ -207,16 +207,16 @@ void Pi3Cshader::setMaterial(Pi3Cmaterial &mat)
 	else {
 		Setf(fogRangeRef, 1.f / (fogMaxDist - fogMinDist));
 	}
-	//Seti(illumRef, mat.illum);
-	//Set4f(specularRef, mat.colSpecular);
-	//Set4f(ambientRef, mat.colAmbient);
-	//Set4f(emissiveRef, mat.colEmissive); //vec4f(1.f, 0.4f, 0.0f, 1.f)); //, 
+
+	Set4f(specularRef, mat.colSpecular);
+	Set4f(ambientRef, mat.colAmbient);
+	Set4f(emissiveRef, mat.colEmissive); //vec4f(1.f, 0.4f, 0.0f, 1.f)); //, 
 	Seti(illuminationModelRef, mat.illum);
-	//Seti(reflectRef, mat.reflective);
+	Seti(reflectRef, mat.reflective);
 		
 	//Set diffuse colour
 	mat.colDiffuse.w = mat.alpha;
-	//if (mat.alpha == 1.0f) glDisable(GL_BLEND); else  glEnable(GL_BLEND);
+	if (mat.alpha == 1.0f) glDisable(GL_BLEND); else  glEnable(GL_BLEND);
 	Set4f(diffuseRef, mat.colDiffuse);
 		
 	if (mat.texRef>=0) { 

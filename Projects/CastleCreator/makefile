@@ -14,10 +14,7 @@ CPATH = $(UI_DIR)
 CPATH = $(HELPS_DIR)
 CPATH = $(TESS_DIR)
 
-GLES_DIR = /opt/vc/include
-CPATH = $(GLES_DIR)
-
-SRC_DIR:= $(SHARED_DIR) $(FILE_DIR) $(UI_DIR) $(HELPS_DIR) $(TESS_DIR) $(GLES_DIR) Source
+SRC_DIR:= $(SHARED_DIR) $(FILE_DIR) $(UI_DIR) $(HELPS_DIR) $(TESS_DIR) Source
 BUILD_DIR:= $(addprefix build/,$(SRC_DIR))
 
 SRC:= $(foreach sdir,$(SRC_DIR),$(wildcard $(sdir)/*.cpp $(sdir)/*.c))
@@ -33,9 +30,9 @@ endef
 
 .PHONY: all checkdirs clean
 
-all: checkdirs Modeller3D
+all: checkdirs CastleCreator
 
-Modeller3D: $(OBJ)
+CastleCreator: $(OBJ)
 	$(CC) $^ -o $@ $(CFLAGS) $(LDLIBS) $(LDFLAGS)
 	echo $(OBJ)
 

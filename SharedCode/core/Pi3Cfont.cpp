@@ -58,7 +58,7 @@ void Pi3Cfont::copyCharToSheet(fontSheetChar &ch, SDL_Surface* Surface, SDL_Surf
 	}
 
 	//positions of character image on sheet ...
-	ch.rect = Pi3Crect((float)lastX / sheetWidth, (float)lastY / sheetHeight, (float)width / sheetWidth, (float)height / sheetHeight);
+	ch.rect = Pi3Crect((float)lastX / sheetWidth, (float)(lastY+height) / sheetHeight, (float)width / sheetWidth, (float)height / sheetHeight);
 	ch.sdlrect.x = lastX; ch.sdlrect.y = lastY; ch.sdlrect.w = width; ch.sdlrect.h = height;
 	ch.recti.x = lastX; ch.recti.y = lastY; ch.recti.width = width; ch.recti.height = height;
 
@@ -100,11 +100,12 @@ void Pi3Cfont::createFontSheet(const uint32_t sheetWidth, const uint32_t sheetHe
 	fontsheet.sheet->fromTextSurface(destSurface);
 	fontsheet.sheet->upload(); //upload to GPU
 	fontsheet.sheetMaterial.texID = fontsheet.sheet->textureID;
+	fontsheet.sheetMaterial.texRef = 0; //need to validate rendering texture
 	fontsheet.sheetMaterial.SetColDiffuse(0xffffff);
 	fontsheet.sheetMaterial.alpha = 0.99f;
 	fontsheet.sheetMaterial.illum = 1; //non shaded illuminat
 
-	//fontsheet.sheet->saveAsPNG("textureSheet.png"); //debug
+	fontsheet.sheet->saveAsPNG("textureSheet.png"); //debug
 	SDL_FreeSurface(destSurface);
 }
 
@@ -139,10 +140,10 @@ Pi3Ctexture * Pi3Cfont::textSurface(const std::string &text)
 #define CreateVerts(x,y,ux,uy)										\
 		verts[p] = x; verts[p + 1] = y; verts[p + 2] = -10.f;		\
 		verts[p + 3] = 0; verts[p + 4] = -1.f; verts[p + 5] = 0;	\
-		verts[p + 6] = ux; verts[p + 7] = uy;						\
+		verts[p + 6] = ux; verts[p + 7] = 1.f-uy;						\
 		p += stride;												\
 
-uint32_t Pi3Cfont::textureRects(std::string &text, std::vector<float> &verts, const float wrapWidth)
+uint32_t Pi3Cfont::textureRects(std::string &text, std::vector<float> &verts, Pi3Crect &size, const float wrapWidth)
 {
 	/* Creates a letter sheet made of rectangles with UV mapping to render a font sheet
 	   Fun stuff could be done here such as warping the letter geometry etc.. */
@@ -152,21 +153,36 @@ uint32_t Pi3Cfont::textureRects(std::string &text, std::vector<float> &verts, co
 	SDL_Rect rect;
 	float x = 0; float y = 0; float maxHeight = 0;
 	for (auto &c : text) {
-		fontSheetChar &ch = fontsheet.chars[(uint8_t)c];
-		float w = (float)ch.sdlrect.w; 
-		float h = (float)ch.sdlrect.h;
-		float ux = ch.rect.x; float uy = ch.rect.y;
-		float uw = ch.rect.width; float uh = ch.rect.height;
+		if ((uint8_t)c == 10) {
+			x = 0; y -= maxHeight;
+		}
+		else {
+			fontSheetChar &ch = fontsheet.chars[(uint8_t)c];
+			float w = (float)ch.sdlrect.w;
+			float h = (float)ch.sdlrect.h;
+			float ux = ch.rect.x; float uy = ch.rect.y;
+			float uw = ch.rect.width; float uh = ch.rect.height;
 
-		if (h > maxHeight) maxHeight = h;
-		if (x + w > wrapWidth) { x = 0; y += maxHeight; maxHeight = 0; }
+			if (h > maxHeight) maxHeight = h;
+			if (x + w > wrapWidth) { x = 0; y -= maxHeight; maxHeight = 0; }
 
-		//create top left, top right, bottom right, bottom left verts ...
-		CreateVerts(x, y, ux, uy);
-		CreateVerts(x + w, y, ux + uw, uy);
-		CreateVerts(x + w, y + h, ux + uw, uy + uh);
-		CreateVerts(x, y + h, ux, uy + uh);
-		x += w;
+			//create top left, top right, bottom right, bottom left verts ...
+			CreateVerts(x, y, ux, uy);
+			CreateVerts(x + w, y + h, ux + uw, uy + uh);
+			CreateVerts(x + w, y, ux + uw, uy);
+			CreateVerts(x, y, ux, uy);
+			CreateVerts(x, y + h, ux, uy + uh);
+			CreateVerts(x + w, y + h, ux + uw, uy + uh);
+
+			//CreateVerts(x, y, ux, uy);
+			//CreateVerts(x, y + h, ux, uy + uh);
+			//CreateVerts(x + w, y + h, ux + uw, uy + uh);
+			//CreateVerts(x + w, y, ux + uw, uy);
+			if (p > 65520) break;
+			x += w;
+		}
 	}
+	size.x = 0; size.y = 0;
+	size.width = wrapWidth; size.height = y;
 	return p;	//return number of floats created
 }

@@ -78,9 +78,9 @@ public:
 	//Pi3Cmodel(const modelParams mp);
 	Pi3Cmodel() {}
 	Pi3Cmodel(Pi3Cresource *resource, Pi3Cmesh mesh, uint32_t diffuseColour = 0xffffffff, bool asCollider = false, bool reserveBuffer = false, uint32_t bufferSize = 65535);
-	Pi3Cmodel(Pi3Cresource *resource, std::string name, Pi3Cmesh mesh, uint32_t diffuseColour = 0xffffffff, bool asCollider = false, bool reserveBuffer = false, uint32_t bufferSize = 65535); //add mesh with name
-	Pi3Cmodel(Pi3Cresource *resource, std::string path, std::string modelfile, bool asCollider, std::function<void(float)> showProgressCB); //load model only
-	Pi3Cmodel(Pi3Cresource *resource, std::string modelname, std::string path, std::string model, std::string collider, std::function<void(float)> showProgressCB = nullptr); //load model and collider
+	Pi3Cmodel(Pi3Cresource *resource, const std::string &name, Pi3Cmesh mesh, uint32_t diffuseColour = 0xffffffff, bool asCollider = false, bool reserveBuffer = false, uint32_t bufferSize = 65535); //add mesh with name
+	Pi3Cmodel(Pi3Cresource *resource, const std::string &path, const  std::string &modelfile, const bool asCollider, std::function<void(float)> showProgressCB); //load model only
+	Pi3Cmodel(Pi3Cresource *resource, const std::string &modelname, const std::string &path, const std::string &model, const std::string &collider, std::function<void(float)> showProgressCB = nullptr); //load model and collider
 	~Pi3Cmodel() {}
 
 // Functions

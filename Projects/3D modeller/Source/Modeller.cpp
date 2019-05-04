@@ -450,6 +450,10 @@ void Modeller::handleIMGui()
 	gui.setButtonStyle(bsHeading);
 	static double v = 5;
 	gui.SliderH("Scroll", 0, 10, v, 300, 24);
+
+	Pi3Cmodel textHello;
+	std::string hello{ "Hello this is a long line of text!" };
+	textHello.textModel(resource, gui.getFont(guifonts[0]).get(), hello, 400);
 }
 
 void Modeller::renderScene(const viewInfo &view)

@@ -1,0 +1,51 @@
+title:Castle Creator
+screensize:1920 1080 800
+fullscreen:true
+fly:false
+lightpos:0.0 1.0 0.0
+startpos:10.0 -9.0 0.0
+rotate:0.0 1.57 0.0
+nearzfarz:1 30000.0
+avatarHeight:12.0
+avatarFallSpeed:3
+avatarWalkSpeed:1
+avatarRunSpeed:2
+fogColour:1 1 1
+fogFar:15000.0
+fogNear:100.0
+modelPath:../../Resources/models/Castle
+model:Buildings g RoundTower RoundTower.obj RoundTowerColl.obj 150 RoundTowerLoPoly.obj 10000
+model:Buildings g RoundTowerTall RoundTower2.obj RoundTower2Coll.obj 200 RoundTower2LoPoly2.obj 10000
+model:Buildings g SquareTower SquareTower1.obj SquareTower1Coll.obj 150 SquareTower1LoPoly.obj 10000
+model:Buildings g SquareTowerTall SquareTower2.obj SquareTower2Coll.obj 150 SquareTower2LoPoly.obj 10000
+model:Buildings g Dias Dias.obj DiasColl.obj 10000
+model:Buildings g Keep Keep.obj KeepColl.obj 150 KeepLoPoly.obj 10000
+model:Buildings g ShamblesTall Shambles.obj ShamblesColl.obj 200 ShamblesLoPoly.obj 500 ShamblesLoPoly2.obj 10000
+model:Buildings g Shambles Shambles2.obj Shambles2Coll.obj 200 Shambles2LoPoly.obj 10000
+model:Buildings g Wall Wall1.obj Wall1Coll.obj 10000
+model:Buildings g WallLeanTo WallLeanTo1.obj WallLeanTo1Coll.obj 10000
+model:Buildings g WallDiagonal WallDiag1.obj WallDiag1Coll.obj 10000
+model:Buildings g Gate Gate1.obj Gate1Coll.obj 10000
+model:Courtyard f Well WellStocks.obj WellStocksColl.obj 10000
+model:Courtyard f CattleStall CattleStall.obj CattleStallColl.obj 150 CattleStallLoPoly.obj 10000
+model:Ground g Grass grass.obj grass.obj 200 grass.obj 10000
+model:Ground g Mud muddyGrass.obj muddyGrass.obj 200 muddyGrass.obj 10000
+model:Ground g CrossRoad cobbleCross.obj cobbleCross.obj 200 cobbleCross.obj 10000
+model:Ground g RoadTee cobbleTee.obj cobbleTee.obj 200 cobbleTee.obj 10000
+model:Ground g Road cobbleRoad.obj cobbleRoad.obj 10000
+model:Ground g Corner cobbleCorner.obj cobbleCorner.obj 10000
+model:Ground g Landscape landscape.obj landscape.obj 10000
+model:Trees f AshTree AshTree.obj grass.obj 10000
+model:Courtyard f Cart cart.obj cartColl.obj 150 cartLoPoly.obj 10000
+model:Courtyard f Wagon wagon.obj wagonColl.obj 150 wagonLoPoly.obj 10000
+model:Furniture f TableBenches tableBenches.obj tableBenchesColl.obj 150 tableBenches.obj 10000
+model:Furniture f Table table.obj tableColl.obj 150 table.obj 10000
+model:Furniture f Chair chair.obj chairColl.obj 150 chair.obj 10000
+model:Furniture f GermanFlag flagGerman.obj flagGerman.obj 10000
+logo:maps/logo.png
+skyboxPath:../../Resources/models/skyboxes
+skybox:miramar.obj
+skyboxScale:15.0
+fontsPath:../../Resources/fonts/
+font1:NotoSans-Regular.ttf
+

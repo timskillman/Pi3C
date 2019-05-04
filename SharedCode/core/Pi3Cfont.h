@@ -47,7 +47,7 @@ public:
 	void createFontSheet(const uint32_t sheetWidth, const uint32_t sheetHeight);
 	void getStringSize(const std::string &text, int &w, int &h);
 	Pi3Ctexture * textSurface(const std::string &text);
-	uint32_t textureRects(std::string &text, std::vector<float> &verts, const float wrapWidth);
+	uint32_t textureRects(std::string &text, std::vector<float> &verts, Pi3Crect &size, const float wrapWidth);
 
 	TTF_Font * font = nullptr;
 

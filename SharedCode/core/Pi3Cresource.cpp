@@ -15,13 +15,14 @@ int32_t Pi3Cresource::createDefaultTexture(int32_t &texRef)
 
 	/* Creates a 1 pixel white texture
 	Can be recoloured by material colDiffuse */
-
 	std::shared_ptr<Pi3Ctexture> Texture;
 	Texture.reset(new Pi3Ctexture());
 	Texture->createColour(0xffffffff);
 	Texture->upload();
+
+	//keep texture - don't destroy it!
 	texRef = textures.size();
-	textures.push_back(Texture); //keep texture - don't destroy it!
+	textures.push_back(Texture); 
 
 	//Create a default 2D rectangle as a helper for creating a letter sheet (verts will dynamically change)
 	Pi3Cmesh lets = Pi3Cshapes::rect(vec2f(0, 0), vec2f(1.f, 1.f));
@@ -162,7 +163,6 @@ int32_t Pi3Cresource::addMesh(Pi3Cmesh &mesh, const bool deleteVerts, const bool
 		vertBuffer.emplace_back();
 		currentBuffer++;
 	}
-
 
 	return meshes.size() - 1;
 }
