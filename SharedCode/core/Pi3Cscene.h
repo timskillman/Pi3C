@@ -102,9 +102,9 @@ private:
 	Pi3Cmatrix projMatrix2D;
 
 	std::string errorStr;
-	int32_t currentShader;
-	float perspective;
-	uint32_t playerAvatarRef;		//selects which avatar is the current players avatar
+	int32_t currentShader = -1;
+	float perspective = 800.f;
+	uint32_t playerAvatarRef = 0;		//selects which avatar is the current players avatar
 
 	std::string getPathFile(const std::string &filepath) const;
 	void render(const float ticks, Pi3Cmatrix &projMatrix, Pi3Cmatrix &modelMatrix, std::vector<Pi3Cmodel> &models, Pi3Cmaterial *materialOverride);

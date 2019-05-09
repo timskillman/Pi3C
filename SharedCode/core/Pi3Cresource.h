@@ -44,20 +44,11 @@
 
 class Pi3Cresource {
 public:
-	Pi3Cresource(uint32_t stride = 8)
-	{ 
-		this->stride = stride; 
-		currentBuffer = -1;
-		lastVBO = -1;
-		startVBO = 0;
-		createDefaultMaterial();
-	}
+	Pi3Cresource() { }
 	
-	~Pi3Cresource()
-	{
-
-	}
+	~Pi3Cresource() { }
 	
+	void init(const uint32_t stride = 8);
 	void appendMesh(Pi3Cmesh mesh) { meshes.push_back(mesh); }
 	size_t meshCount() { return meshes.size(); }
 
@@ -68,16 +59,17 @@ public:
 	Pi3Cmaterial * defaultMaterial() { return &materials[0]; }
 
 	Pi3Ctexture* getTexture(int32_t ref) {
-		if (ref >= 0 && ref <= (int32_t)textures.size()) return textures[ref].get(); else return nullptr;
+		return (ref >= 0 && ref <= (int32_t)textures.size()) ? textures[ref].get() : nullptr;
 	}
 
-	int32_t addMesh(Pi3Cmesh &mesh, const bool deleteVerts = true, const bool dynamicBuffer = false, const uint32_t vertSize = 65535);		//returns mesh reference (or -1 if failed)
+	int32_t addMesh(Pi3Cmesh &mesh, const bool deleteVerts = true, const bool dynamicBuffer = false, const uint32_t vertSize = 128000);		//returns mesh reference (or -1 if failed)
 	
 	void uploadMeshesToGPU();
-	void updateGPUverts(const int VBO, const int vfrom, const int vsize, void * verts);
+	void updateGPUverts(const int VBO, const int vfrom, const int vsize, const std::vector<float> &verts);
 	void uploadGPUverts(const int bufref, const std::vector<float> &verts);
 	void setRenderBuffer(const int bufRef);
 	void renderMesh(const int meshRef, const GLenum rendermode = GL_TRIANGLES);
+	void renderText(const int meshRef, Pi3Cfont *font, std::string &text, const float wrapWidth);
 	int32_t touchMesh(const int meshRef, Pi3Ctouch &touch, const Pi3Cmatrix &tmat) const;
 	
 	int32_t addShader(const std::string &vertfile, const std::string &fragfile);
@@ -86,7 +78,7 @@ public:
 	void addSound(const char * path, const char * soundfile);
 
 	std::vector<float> * getLetterVerts();
-	void uploadLetterVerts(uint32_t vertCount);
+	void updateLetterVerts(uint32_t vertCount, const uint32_t vertOffset = 0);
 
 	std::shared_ptr<Pi3Cfont> findFont(const std::string &ffont) { return findResource(fonts, ffont); }
 	std::shared_ptr<Pi3Cmusic> findMusic(const std::string &fmusic) { return findResource(music, fmusic); }
@@ -107,13 +99,14 @@ public:
 	std::map<std::string, std::shared_ptr<Pi3Cmusic>> music;
 	std::map<std::string, std::shared_ptr<Pi3Csound>> sounds;
 
-	uint32_t vertCount;
-	int32_t currentBuffer;
-	uint32_t currentBufferSize;
+	uint32_t vertCount = 0;
+	int32_t currentBuffer = -1;
+	uint32_t currentBufferSize = 0;
 
 	int calls;
 	int32_t rectRef = -1;
 	int32_t letterSheetRef = -1;
+	int32_t lettersRef = -1;
 
 private:
 	
@@ -126,10 +119,12 @@ private:
 	}
 
 	void addMeshVerts(const Pi3Cmesh &mesh, std::vector<float> &newverts, const uint32_t to, const uint32_t size, const uint32_t vertsize, const bool deleteVerts);
+
 	GLuint VBOid[1000];
 	uint32_t stride;
-	int lastVBO;
-	int startVBO;
+	int lastVBO = -1;
+	int startVBO = 0;
+	bool uploaded = false;
 	std::string errorStr;
 };
 

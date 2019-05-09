@@ -71,4 +71,5 @@ private:
 	int height = 0;
 	int pitch = 0;
 	size_t size = 0;
+	bool uploaded = false;
 };

@@ -32,9 +32,9 @@ endef
 
 .PHONY: all checkdirs clean
 
-all: checkdirs CastleCreator
+all: checkdirs MDviewer
 
-CastleCreator: $(OBJ)
+MDviewer: $(OBJ)
 	$(CC) $^ -o $@ $(CFLAGS) $(LDLIBS) $(LDFLAGS)
 	echo $(OBJ)
 

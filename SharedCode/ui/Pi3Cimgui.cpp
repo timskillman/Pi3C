@@ -114,7 +114,8 @@ Pi3Cmodel * Pi3Cimgui::findCreateImage2(const std::string &str, const ButtonType
 		//SDL_Surface *ts = currentFont->textSurface(str);
 		//ttex.get()->fromTextSurface(ts);
 		//SDL_FreeSurface(ts);
-		ttex = currentFont->asTexture(str, currentParams.textColour);
+		ttex.reset(currentFont->textSurface(str));
+		//ttex = currentFont->asTexture(str, currentParams.textColour);
 	}
 	else {
 		ttex.reset(new Pi3Ctexture((texturePath + str).c_str(), true));
@@ -128,6 +129,22 @@ void Pi3Cimgui::NextPos()
 		nextPos = Pi3Cpointi(pos.x + size.x + currentParams.horizGap, pos.y);
 	else
 		nextPos = Pi3Cpointi(leftpos, pos.y - size.y - currentParams.vertGap); //next line
+}
+
+Pi3Cpointi Pi3Cimgui::calcImageSize(int tw, int th, const int minwidth, const int minheight)
+{
+	float aspect = (float)tw / (float)th;
+
+	//work out button minimum size ...
+	int mWidth = (minwidth == 0) ? currentParams.minWidth : minwidth; if (mWidth <= 0) mWidth = tw;
+	int mHeight = (minheight == 0) ? currentParams.minHeight : minheight; if (mHeight <= 0) mHeight = th;
+
+	//fit image into width/height of button (and retain image aspect ratio)...
+	int innerWidth = mWidth - currentParams.left - currentParams.right;
+	int innerHeight = mHeight - currentParams.top - currentParams.bottom;
+	if (tw > innerWidth) { tw = innerWidth; th = (int)((float)tw / aspect); }
+	if (th > innerHeight) { th = innerHeight; tw = (int)((float)th * aspect); }
+	return Pi3Cpointi(tw,th);
 }
 
 bool Pi3Cimgui::renderButton(Pi3Cmodel *drawObj, const int minwidth, const int minheight)
@@ -146,13 +163,14 @@ bool Pi3Cimgui::renderButton(Pi3Cmodel *drawObj, const int minwidth, const int m
 	int mWidth = (minwidth == 0) ? currentParams.minWidth : minwidth; if (mWidth <= 0) mWidth = tw;
 	int mHeight = (minheight == 0) ? currentParams.minHeight : minheight; if (mHeight <= 0) mHeight = th;
 	size = Pi3Cpointi(mWidth, mHeight);
-	bool mouseTouchRect = touched(size);
 
 	//fit image into width/height of button (and retain image aspect ratio)...
 	int slideWidth = mWidth - currentParams.left - currentParams.right;
 	int slideHeight = mHeight - currentParams.top - currentParams.bottom;
 	if (tw > slideWidth) { tw = slideWidth; th = (int)((float)tw / aspect); }
 	if (th > slideHeight) { th = slideHeight; tw = (int)((float)th * aspect); }
+
+	bool mouseTouchRect = touched(size);
 
 	//align image into button ...
 	float slx = (currentParams.justify == RIGHT) ? 1.f : (currentParams.justify == CENTRE) ? 0.5f : (currentParams.justify == LEFT) ? 0.f : currentParams.slideX;
@@ -166,7 +184,8 @@ bool Pi3Cimgui::renderButton(Pi3Cmodel *drawObj, const int minwidth, const int m
 	image.matrix.setz(zpos);
 	
 	rect.matrix.moveScaleXY((float)pos.x, (float)(pos.y-size.y), (float)size.x, (float)size.y);
-	rect.matrix.setz(zpos - 0.5f);
+	rect.matrix.setz(zpos - 0.5f); 
+	//rect.material.SetColDiffuse(currentParams.textColour);
 	setButtonBackground(rect, mouseTouchRect);
 
 	//render ...
@@ -277,14 +296,11 @@ bool Pi3Cimgui::renderIconImage(Pi3Cmodel *image, const int width, const int hei
 {
 	if (!image) return false;
 	pos = nextPos;
-	//if no width/height is given, then resize to width/height of image ...
-	int w = (width == 0) ? image->group[1].material.texWidth : width;
-	int h = (height == 0) ? image->group[1].material.texHeight : height;
-	size = Pi3Cpointi(w, h);
-
+	size = Pi3Cpointi(width, height);
+	Pi3Cpointi wh = calcImageSize(image->material.texWidth, image->material.texHeight, width, height);
 	bool mouseTouchRect = touched(size);
-	image->matrix.move(vec3f((float)pos.x, (float)(pos.y-size.y),zpos));
-	image->matrix.SetScales(vec3f((float)size.x, (float)size.y, 1.f));
+	image->matrix.move(vec3f((float)pos.x, (float)(pos.y-wh.y - currentParams.top),zpos));
+	image->matrix.SetScales(vec3f((float)wh.x, (float)wh.y, 1.f));
 	image->material.SetColDiffuse(colour);
 	image->renderBasic(resource, resource->shaders[0]);
 	NextPos();
@@ -294,6 +310,11 @@ bool Pi3Cimgui::renderIconImage(Pi3Cmodel *image, const int width, const int hei
 bool Pi3Cimgui::renderIcon(const std::string &str, const int minwidth, const int minheight)
 {
 	return renderIconImage(findCreateImage2(str, IMAGE), minwidth, minheight, currentParams.textColour);
+}
+
+bool Pi3Cimgui::renderText(const std::string &str, const int minwidth, const int minheight)
+{
+	return renderIconImage(findCreateImage2(str, TEXT), minwidth, minheight, currentParams.textColour);
 }
 
 bool Pi3Cimgui::renderBackIcon(const std::string &str, const int minwidth, const int minheight)
@@ -498,7 +519,11 @@ bool Pi3Cimgui::ListBox(const std::string &text, uint32_t &currentItem, const st
 	return false;
 }
 
-
+bool Pi3Cimgui::TextArea(std::string &text, const int minwidth, const int minheight)
+{
+	resource->renderText(resource->lettersRef, currentFont, text, minwidth);
+	return false;
+}
 
 void Pi3Cimgui::setPosition(const int x, const int y)
 { 
@@ -548,7 +573,7 @@ bool Pi3Cimgui::BeginMenu(const std::string &menuHeading)
 {
 	nextPos = menuNextItemPos;
 	leftpos = menuNextItemPos.x;
-	bool touch = ButtonText(menuHeading, false, 50, currentParams.minHeight);
+	bool touch = ButtonText(menuHeading, false, currentParams.minWidth, currentParams.minHeight);
 	menuNextItemPos = Pi3Cpointi(pos.x + size.x + currentParams.horizGap, pos.y);
 	if (touch) menuTouch = menuHeading;
 	return (menuTouch== menuHeading || (touch && window->mouse.LeftButton));
@@ -566,7 +591,8 @@ bool Pi3Cimgui::MenuItem(const std::string &menuItem, const std::string &itemHot
 	bool touch = ButtonText(menuItem, false, minWidth, currentParams.minHeight);
 	sameLine(0);
 	nextPos.x -= 70;
-	renderButton(findCreateImage(itemHotkey, TEXT), 70, 26);
+	renderText(itemHotkey,70, currentParams.minHeight);
+	//renderIcon("scrollLeft.png");
 	//bool touch2 = Button(itemHotkey, TEXT, 70.f);
 	nextLine(0);
 	bool clicked = (touch && window->mouse.LeftButton);

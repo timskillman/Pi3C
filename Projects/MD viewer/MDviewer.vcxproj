@@ -28,7 +28,7 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{86B9CF91-8738-B044-A7BF-A295F9323D12}</ProjectGuid>
-    <RootNamespace>CastleCreator</RootNamespace>
+    <RootNamespace>MDviewer</RootNamespace>
     <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -241,13 +241,13 @@
     <ClCompile Include="..\..\SharedCode\glutess\tess.c" />
     <ClCompile Include="..\..\SharedCode\glutess\tessellate.cpp" />
     <ClCompile Include="..\..\SharedCode\glutess\tessmono.c" />
+    <ClCompile Include="..\..\SharedCode\helpers\Pi3C.cpp" />
     <ClCompile Include="..\..\SharedCode\helpers\Pi3Cavatar.cpp" />
     <ClCompile Include="..\..\SharedCode\helpers\Pi3Chtml.cpp" />
     <ClCompile Include="..\..\SharedCode\helpers\Pi3Chumanoid.cpp" />
     <ClCompile Include="..\..\SharedCode\helpers\Pi3CloadOptions.cpp" />
     <ClCompile Include="..\..\SharedCode\ui\Pi3Cimgui.cpp" />
-    <ClCompile Include="Source\Editor.cpp" />
-    <ClCompile Include="Source\CastleCreator.cpp" />
+    <ClCompile Include="Source\MDviewer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\SharedCode\core\Pi3Cbbox3d.h" />
@@ -287,12 +287,12 @@
     <ClInclude Include="..\..\SharedCode\glutess\tess.h" />
     <ClInclude Include="..\..\SharedCode\glutess\tessellate.h" />
     <ClInclude Include="..\..\SharedCode\glutess\tessmono.h" />
+    <ClInclude Include="..\..\SharedCode\helpers\Pi3C.h" />
     <ClInclude Include="..\..\SharedCode\helpers\Pi3Cavatar.h" />
     <ClInclude Include="..\..\SharedCode\helpers\Pi3Chtml.h" />
     <ClInclude Include="..\..\SharedCode\helpers\Pi3Chumanoid.h" />
     <ClInclude Include="..\..\SharedCode\helpers\Pi3CloadOptions.h" />
     <ClInclude Include="..\..\SharedCode\ui\Pi3Cimgui.h" />
-    <ClInclude Include="Source\Editor.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\SharedCode\glutess\LICENSE" />

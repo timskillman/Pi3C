@@ -43,6 +43,7 @@ namespace Pi3Cshapes {
 	enum { FACE_FRONT, FACE_BACK, FACE_RIGHT, FACE_LEFT, FACE_TOP, FACE_BOTTOM };
 
 	Pi3Cmesh rect(const vec2f &pos, const vec2f &size, const vec2f &uvpos = vec2f(0.f, 0.f), const vec2f &uvsize = vec2f(1.f,1.f));
+	Pi3Cmesh rectLine(const vec2f &pos, const vec2f &size, const vec2f &uvpos = vec2f(0.f, 0.f), const vec2f &uvsize = vec2f(1.f, 1.f));
 	Pi3Cmesh plane(const vec3f &pos, const vec2f &size, const uint32_t xdivs, const uint32_t ydivs, int direction, const vec2f &uvsize = vec2f(1.f, 1.f));
 	Pi3Cmesh cuboid(const vec3f &pos, const vec3f &size, const int divx=1, const int divy=1, const int divz=1);
 	Pi3Cmesh lathe(std::string name, vec3f pos, std::vector<vec2f> &path, int sides= Pi3C_SIDES,

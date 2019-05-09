@@ -15,7 +15,7 @@ Pi3Ctexture::Pi3Ctexture(const char* file, bool _upload)
 
 Pi3Ctexture::~Pi3Ctexture()
 {
-	if (textureID != 0) glDeleteTextures(1, &textureID);
+	if (uploaded) glDeleteTextures(1, &textureID);
 	if (pixels) delete pixels;
 }
 
@@ -29,6 +29,7 @@ void Pi3Ctexture::init()
 	format = GL_RGBA;
 	pitch = 0;
 	size = 0;
+	uploaded = false;
 }
 
 void Pi3Ctexture::createColour(uint32_t col)
@@ -149,12 +150,13 @@ void Pi3Ctexture::saveAsPNG(const char* file)
 
 void Pi3Ctexture::upload()
 {
-	if (textureID == 0 && pixels) {
+	if (!uploaded && pixels) {
 		glGenTextures(1, &textureID);
 		glBindTexture(GL_TEXTURE_2D, textureID);
 		glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, pixels);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		uploaded = true;
 	}
 }
 

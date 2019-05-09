@@ -51,6 +51,23 @@ namespace Pi3Cshapes {
 		return rect;
 	}
 
+	Pi3Cmesh rectLine(const vec2f &pos, const vec2f &size, const vec2f &uvpos, const vec2f &uvsize)
+	{
+		Pi3Cmesh rect("rectline");
+		float *cols = nullptr;
+
+		vec3f n(0, -1.f, 0);
+		vec3f pos3(pos.x, pos.y, 0);
+		rect.addPackedVert(pos3 + vec3f(0, 0, DEPTH2D), n, uvpos, cols);
+		rect.addPackedVert(pos3 + vec3f(0, size.y, DEPTH2D), n, vec2f(uvpos.x, uvpos.y + uvsize.y), cols);
+		rect.addPackedVert(pos3 + vec3f(size.x, size.y, DEPTH2D), n, uvpos + uvsize, cols);
+		rect.addPackedVert(pos3 + vec3f(size.x, 0, DEPTH2D), n, vec2f(uvpos.x + uvsize.x, uvpos.y), cols);
+		rect.addPackedVert(pos3 + vec3f(0, 0, DEPTH2D), n, uvpos, cols);
+		rect.bbox.bboxFromVerts(rect.verts, 0, rect.vc, rect.stride);
+		rect.materialRef = 0;
+		return rect;
+	}
+
 	Pi3Cmesh plane(const vec3f &pos, const vec2f &size, const uint32_t xdivs, const uint32_t ydivs, int direction, const vec2f &uvsize)
 	{
 		Pi3Cmesh plane("Plane");

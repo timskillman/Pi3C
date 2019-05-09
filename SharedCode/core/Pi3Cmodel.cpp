@@ -89,7 +89,7 @@ void Pi3Cmodel::renderBasic(Pi3Cresource *resource, Pi3Cshader &shader, const Pi
 		Pi3Cmaterial *selectedMaterial = (materialOverride) ? materialOverride : &material;
 		shader.SetModelMatrix(matrix);
 		shader.setMaterial(*selectedMaterial);
-		resource->renderMesh(meshRef, material.rendermode);
+		resource->renderMesh(meshRef, (*selectedMaterial).rendermode);
 	}
 }
 
@@ -401,17 +401,6 @@ Pi3Cmodel* Pi3Cmodel::find(const std::string &name)
 	return nullptr;
 }
 
-void Pi3Cmodel::forceRect2D(Pi3Cresource *resource, const vec2f &pos, const vec2f &size)
-{
-	//Assumes that model is an X,Y rectangle!
-	if (meshRef < 0) return;
-	Pi3Cmesh *mesh = &resource->meshes[meshRef];
-	resource->updateGPUverts(mesh->bufRef, 
-		mesh->vertOffset*mesh->stride, 
-		mesh->vertSize*mesh->stride, 
-		&resource->vertBuffer[mesh->bufRef]);
-}
-
 void Pi3Cmodel::createRect2D(Pi3Cresource *resource, const vec2f &pos, const vec2f &size)
 {
 	if (resource->rectRef >= 0) {
@@ -423,35 +412,16 @@ void Pi3Cmodel::createRect2D(Pi3Cresource *resource, const vec2f &pos, const vec
 	}
 }
 
-#define addUV(ux,uy)					\
-	verts[p + Pi3Cmesh::v_u] = ux;		\
-	verts[p + Pi3Cmesh::v_v] = uy;		\
-	p += stride;						\
-
-void Pi3Cmodel::updateRect2Duvs(Pi3Cresource *resource, const vec2f &uv1, const vec2f &uv2)
-{
-	Pi3Cmesh *rect2D = &resource->meshes[resource->rectRef];
-	std::vector<float> &verts = resource->vertBuffer[rect2D->bufRef];
-	uint32_t p = 0;
-	uint32_t stride = rect2D->stride;
-	addUV(uv1.x, uv1.y);
-	addUV(uv2.x, uv1.y);
-	addUV(uv2.x, uv2.y);
-	addUV(uv1.x, uv2.y);
-	resource->updateGPUverts(rect2D->bufRef, rect2D->vertOffset*stride, rect2D->vertSize*stride, &verts);
-}
-
 void Pi3Cmodel::textModel(Pi3Cresource *resource, Pi3Cfont *font, std::string &text, const float wrapWidth)
 {
 	std::vector<float> *verts = resource->getLetterVerts();				//get ptr to vertices from resource letterVerts
 	if (verts == nullptr) return;
 	Pi3Crect size;
 	uint32_t vertCount = font->textureRects(text, *verts, size, wrapWidth);	//generate verts from text	
-	resource->uploadLetterVerts(vertCount);								//upload updated verts to GPU
+	resource->updateLetterVerts(vertCount);								//upload updated verts to GPU
 	bbox.update(vec3f(size.x, size.y-size.height, 0));
 	bbox.update(vec3f(size.width, 0, 0));
-	matrix.Translate(vec3f(0, -size.height, 0));
+	matrix.move(vec3f(0, -size.height, 0));
 	meshRef = resource->letterSheetRef;
 	material = font->fontsheet.sheetMaterial;
-	material.rendermode = GL_TRIANGLES;
 }

@@ -1,6 +1,11 @@
+#pragma once
+
 #include "Pi3Cwin.h"
-#include "Pi3CloadOptions.h"
-#include "Editor.h"
+#include "Pi3Cresource.h"
+#include "Pi3Cscene.h"
+#include "Pi3Cimgui.h"
+#include "Pi3Cmodel.h"
+#include <vector>
 
 // ==========================================================================
 // Pi3C Graphics Library Example - Castle Creator (by Tim Skillman)
@@ -28,55 +33,41 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 //
+// Dedicated to the One who changed my life in the most amazing ways ...
+// Jesus Christ, King of Kings and Lord of Lords :-)
 // =======================================================================
 
 
-int main(int argc, char *argv[])
-{
-	loadOptions opts("options.txt");
+class Pi3C {
+public:
+	Pi3C() {}
+	Pi3C(const char * title) { init(title); }
 
-    // Create and initialize a window
+	void init(const std::string &title);
+
+	Pi3Cmodel create_model_from_mesh(const Pi3Cmesh &mesh, const uint32_t colour = 0xffffff) { return Pi3Cmodel(&resource, mesh, colour); }
+	Pi3Cmodel create_model_from_text(std::string &text, const uint32_t width, const uint32_t colour = 0x303030);
+	uint32_t add_model_to_scene2D(const Pi3Cmodel &model) { return scene.append2D(model); }
+	uint32_t add_model_to_scene3D(const Pi3Cmodel &model) { return scene.append3D(model); }
+
+	bool is_running();
+	void do_events();
+	void clear_window() { window.clear(); }
+	void swap_buffers() { frames++; window.SwapBuffers(); }
+	float getAverageFPS();
+
 	Pi3Cwindow::options winopts;
-	winopts.title = opts.asString("title");
-	winopts.fullscreen = opts.asBool("fullscreen");
-	winopts.width = opts.asInt("screenWidth");
-	winopts.height = opts.asInt("screenHeight");
-	winopts.clearColour = 0x303030;
-	static Pi3Cwindow window(winopts);
-
-	Pi3CGL::showGLinfo();
-
-	// Setup Editor and Resources ...
+	static Pi3Cwindow window;
 	static Pi3Cresource resource;
-	resource.init();
-	Editor castleEditor(&resource, &window);
-	if (!castleEditor.initialised()) return 1;
+	Pi3Cscene scene;
 
-	castleEditor.loadModels("CastleModels.txt", "CastleScene.txt");
+	Pi3Cimgui gui;
+	std::vector<std::string> guifonts;
 
+	Pi3Cimgui::rectStyle bsMenu;
+
+private:
+	bool has_started = false;
 	uint32_t frames = 0;
-	uint32_t timer = SDL_GetTicks();
-
-	while (!window.hasquit())
-	{
-		castleEditor.handleKeys();
-		castleEditor.handleEvents();
-		castleEditor.touchScene();
-		castleEditor.tweens();
-		castleEditor.animate();
-
-		window.clear();
-		castleEditor.render();
-
-		frames++;
-		window.SwapBuffers();	
-	}
-
-	uint32_t ticks = SDL_GetTicks() - timer;
-	float avtime = (float)frames / ((float)ticks / 1000.f);
-	SDL_Log("Average FPS(%d, %d) = %f ", ticks, frames, avtime);
-
-	window.destroy();
-	return 0;
-}
-
+	uint32_t start_time = 0;
+};

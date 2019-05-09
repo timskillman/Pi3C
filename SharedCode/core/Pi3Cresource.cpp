@@ -1,11 +1,35 @@
 #include "Pi3Cresource.h"
 
+void Pi3Cresource::init(const uint32_t stride)
+{
+	this->stride = stride;
+	currentBuffer = -1;
+	lastVBO = -1;
+	startVBO = 0;
+	createDefaultMaterial();
+	uploaded = false;
+
+	//Create a default 2D rectangle as a helper for creating a letter sheet (verts will dynamically change)
+	Pi3Cmesh lets = Pi3Cshapes::rect(vec2f(0, 0), vec2f(1.f, 1.f));
+	lets.dynamic = true;
+	letterSheetRef = addMesh(lets, true, true,100000); //create a dynamic buffer for the lettersheet (page size)
+
+	//Create a default 2D rectangle as a helper for creating a letter sheet (verts will dynamically change)
+	lettersRef = addMesh(lets, true, true, 10000); //create a dynamic buffer for small temp lettersheet
+
+	//Create a default 2D rectangle as a helper for 2D GUI rendering 
+	Pi3Cmesh rect = Pi3Cshapes::rect(vec2f(0, 0), vec2f(1.f, 1.f));
+	rectRef = addMesh(rect);
+}
+
 void Pi3Cresource::createDefaultMaterial(const std::string &name)
 {
 	Pi3Cmaterial defmaterial;
 	defmaterial.texID = createDefaultTexture(defmaterial.texRef);
 	defmaterial.name = name;
 	defmaterial.texName = name;
+	defmaterial.texWidth = 1;
+	defmaterial.texHeight = 1;
 	materials.push_back(defmaterial);
 }
 
@@ -24,15 +48,6 @@ int32_t Pi3Cresource::createDefaultTexture(int32_t &texRef)
 	texRef = textures.size();
 	textures.push_back(Texture); 
 
-	//Create a default 2D rectangle as a helper for creating a letter sheet (verts will dynamically change)
-	Pi3Cmesh lets = Pi3Cshapes::rect(vec2f(0, 0), vec2f(1.f, 1.f));
-	lets.dynamic = true;
-	letterSheetRef = addMesh(lets, false, true); //create a dynamic buffer for the lettersheet (reserves a whole 65k buffer)
-
-	//Create a default 2D rectangle as a helper for 2D GUI rendering 
-	Pi3Cmesh rect = Pi3Cshapes::rect(vec2f(0, 0), vec2f(1.f, 1.f));
-	rectRef = addMesh(rect);
-
 	return Texture->textureID; //textures.size();
 }
 
@@ -43,12 +58,14 @@ std::vector<float> * Pi3Cresource::getLetterVerts()
 	return &vertBuffer[mesh.bufRef];
 }
 
-void Pi3Cresource::uploadLetterVerts(uint32_t vertCount)
+void Pi3Cresource::updateLetterVerts(uint32_t vertCount, const uint32_t vertOffset)
 {
-	if (letterSheetRef < 0) return;
 	Pi3Cmesh *mesh = &meshes[letterSheetRef];
+	if (letterSheetRef < 0 ) return; //|| (vertCount / mesh->stride) > vertBuffer[mesh->bufRef].size()
+	mesh->vc = vertCount;
 	mesh->vertSize = vertCount / mesh->stride;
-	updateGPUverts(mesh->bufRef, mesh->vertOffset*mesh->stride, vertCount, &vertBuffer[mesh->bufRef]);
+	mesh->vertOffset = vertOffset;
+	if (uploaded) updateGPUverts(mesh->bufRef, mesh->vertOffset*mesh->stride, vertCount, vertBuffer[mesh->bufRef]);
 }
 
 int32_t Pi3Cresource::addTexture(const std::shared_ptr<Pi3Ctexture> &Texture, int32_t &texRef)
@@ -148,8 +165,8 @@ int32_t Pi3Cresource::addMesh(Pi3Cmesh &mesh, const bool deleteVerts, const bool
 		meshes.emplace_back();
 		Pi3Cmesh &newmesh = meshes.back();
 		newmesh = mesh.clone(0, (deleteVerts) ? 0 : mesh.vc);
-		if (dynamicBuffer) mverts.resize(vertSize * mesh.stride); else mverts.resize(msz + mesh.vc);
-		memcpy(&mverts[msz], &mesh.verts[0], mesh.vc * sizeof(float));
+		mverts.resize((dynamicBuffer) ? vertSize * mesh.stride : msz + mesh.vc);
+		if (mesh.verts.size()>0) memcpy(&mverts[msz], &mesh.verts[0], mesh.vc * sizeof(float));
 		newmesh.vertOffset = msz / mesh.stride;
 		newmesh.vertSize = records;
 		newmesh.bufRef = currentBuffer;
@@ -193,6 +210,17 @@ void Pi3Cresource::setRenderBuffer(const int bufRef)
 	lastVBO = bufRef;
 }
 
+void Pi3Cresource::renderText(const int meshRef, Pi3Cfont *font, std::string &text, const float wrapWidth)
+{
+	//Text meshref's can only be used once per frame (otherwise using the same meshRef will simply overwrite the previous text)
+	std::vector<float> *verts = getLetterVerts();				//get ptr to vertices from resource letterVerts
+	if (verts == nullptr) return;
+	Pi3Crect size;
+	uint32_t vertCount = font->textureRects(text, *verts, size, wrapWidth);	//generate verts from text	
+	updateLetterVerts(vertCount);								//upload updated verts to GPU
+	renderMesh(meshRef, GL_TRIANGLES);
+}
+
 void Pi3Cresource::renderMesh(const int meshRef, const GLenum rendermode)
 {
 	setRenderBuffer(meshes[meshRef].bufRef);
@@ -226,6 +254,7 @@ void Pi3Cresource::uploadMeshesToGPU()
 	//now that geometries are uploaded, we must start with a fresh buffer for new geometry ...
 	currentBuffer = vs;
 	vertBuffer.emplace_back(); //create new empty buffer
+	uploaded = true;
 }
 
 void Pi3Cresource::uploadGPUverts(const int bufref, const std::vector<float> &verts)
@@ -234,10 +263,10 @@ void Pi3Cresource::uploadGPUverts(const int bufref, const std::vector<float> &ve
 	glBufferData(GL_ARRAY_BUFFER, verts.size()*sizeof(float), verts.data(), GL_DYNAMIC_DRAW);
 }
 
-void Pi3Cresource::updateGPUverts(const int bufref, const int vfrom, const int vsize, void * verts)
+void Pi3Cresource::updateGPUverts(const int bufref, const int vfrom, const int vsize, const std::vector<float> &verts)
 {
 	setRenderBuffer(bufref);
-	glBufferSubData(GL_ARRAY_BUFFER, vfrom * sizeof(float), vsize * sizeof(float), verts);
+	glBufferSubData(GL_ARRAY_BUFFER, vfrom * sizeof(float), vsize * sizeof(float), verts.data());
 }
 
 int32_t Pi3Cresource::addShader(const std::string &vertfile, const std::string &fragfile)

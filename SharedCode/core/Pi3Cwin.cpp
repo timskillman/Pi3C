@@ -15,11 +15,11 @@ Pi3Cwindow::Pi3Cwindow() {
 	quit = false;
 }
 
-Pi3Cwindow::Pi3Cwindow(const options &opts) : 
-	mWidth(opts.width), 
-	mHeight(opts.height) 
+
+void Pi3Cwindow::initOptions(const options &opts)
 {
-	
+	mWidth = opts.width;
+	mHeight = opts.height;
 	if (init(opts.title.c_str(), opts.width, opts.height, opts.sdlflags | ((opts.fullscreen) ? SDL_WINDOW_FULLSCREEN : 0), opts.antialiasLevel))
 	{
 

@@ -98,9 +98,7 @@ public:
 	int32_t addTexture(Pi3Cresource *resource, const std::string &txfile);
 	int32_t addTexture(Pi3Cresource *resource, const std::shared_ptr<Pi3Ctexture> &texture);
 	int32_t addPicture(Pi3Cresource *resource, const std::shared_ptr<Pi3Ctexture> &texture);
-	void forceRect2D(Pi3Cresource *resource, const vec2f &pos, const vec2f &size);
 	void createRect2D(Pi3Cresource *resource, const vec2f &pos = vec2f(0, -1.f), const vec2f &size = vec2f(1.f, 1.f));
-	void updateRect2Duvs(Pi3Cresource *resource, const vec2f &uv1, const vec2f &uv2);
 	void textModel(Pi3Cresource *resource, Pi3Cfont *font, std::string &text, const float wrapWidth);
 
 	Pi3Cmodel * append(Pi3Cmodel model, vec3f offset = vec3f(0, 0, 0), vec3f rotation = vec3f(0,0,0));

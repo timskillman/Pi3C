@@ -13,6 +13,7 @@
 class Pi3Cimgui {
 public:
 	Pi3Cimgui() {}
+	Pi3Cimgui(Pi3Cresource * resource, Pi3Cwindow *window) : resource(resource), window(window) {}
 	~Pi3Cimgui() {}
 
 	enum Alignment { LEFT, CENTRE, RIGHT, TOP, BOTTOM };
@@ -58,7 +59,7 @@ public:
 	void setFont(const std::string &fontName);
 
 	std::shared_ptr<Pi3Cfont> getFont(const std::string &fontName) {
-		auto &fi = fonts.find(fontName);
+		auto fi = fonts.find(fontName);
 		if (fi != fonts.end()) return fi->second;
 	}
 
@@ -90,6 +91,7 @@ public:
 	bool Container(const std::string &name, const int minwidth = 0, const int minheight = 0);
 	bool ContainerEnd(const std::string &name);
 	bool Text(const std::string &text);
+	bool TextArea(std::string &text, const int minwidth, const int minheight);
 	bool ButtonText(const std::string &text, const bool selected = false, const int minwidth = 0, const int minheight = 0);
 	bool ButtonImage(const std::string &img, const bool selected = false, const int minWidth = 0, const int minHeight = 0);
 	bool SliderH(const std::string &text, const double from, const double too, double &value, const int minwidth = 0, const int minheight = 0);
@@ -115,6 +117,7 @@ public:
 
 	bool renderRect(const int minwidth, const int minheight);
 	bool renderIcon(const std::string &str, const int minwidth = 0, const int minheight = 0);
+	bool renderText(const std::string &str, const int minwidth = 0, const int minheight = 0);
 	bool renderBackIcon(const std::string &str, const int minwidth = 0, const int minheight = 0);
 
 	bool somethingSelected = false;
@@ -126,6 +129,7 @@ private:
 	bool renderButton(Pi3Cmodel * drawObj, const int minwidth = 0, const int minheight = 0);
 	bool renderButton2(Pi3Cmodel *drawObj, const int minwidth = 0, const int minheight = 0);
 	void NextPos();
+	Pi3Cpointi calcImageSize(int tw, int th, const int minwidth, const int minheight);
 	void setButtonBackground(Pi3Cmodel &rect, const bool mouseTouchRect);
 	Pi3Cmodel * findCreateImage(const std::string &str, const ButtonType type);
 	Pi3Cmodel * findCreateImage2(const std::string &str, const ButtonType type);

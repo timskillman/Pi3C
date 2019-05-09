@@ -1,4 +1,6 @@
 #include "Pi3Cfont.h"
+#include "Pi3Ctextformat.h"
+#include "Pi3Chtml.h"
 
 Pi3Cfont::Pi3Cfont(const char * path, const char * fontfile, int ptsize) {
 	if (!font) {
@@ -65,8 +67,8 @@ void Pi3Cfont::copyCharToSheet(fontSheetChar &ch, SDL_Surface* Surface, SDL_Surf
 	//blit the character image to the sheet ...
 	SDL_BlitSurface(Surface, NULL, destSurface, &ch.sdlrect);
 
-	lastX += width;
-	ch.sheetRef = 0; //fontsheet.sheet.size();
+	lastX += width+1;	// add 1 for clean look
+	ch.sheetRef = 0;	//fontsheet.sheet.size();
 }
 
 void Pi3Cfont::createFontSheet(const uint32_t sheetWidth, const uint32_t sheetHeight)
@@ -101,7 +103,7 @@ void Pi3Cfont::createFontSheet(const uint32_t sheetWidth, const uint32_t sheetHe
 	fontsheet.sheet->upload(); //upload to GPU
 	fontsheet.sheetMaterial.texID = fontsheet.sheet->textureID;
 	fontsheet.sheetMaterial.texRef = 0; //need to validate rendering texture
-	fontsheet.sheetMaterial.SetColDiffuse(0xffffff);
+	fontsheet.sheetMaterial.SetColDiffuse(0xffffffff);
 	fontsheet.sheetMaterial.alpha = 0.99f;
 	fontsheet.sheetMaterial.illum = 1; //non shaded illuminat
 
@@ -137,11 +139,37 @@ Pi3Ctexture * Pi3Cfont::textSurface(const std::string &text)
 	return chtex;
 }
 
+void Pi3Cfont::formatVerts(std::vector<float> &verts, const float wrapWidth, const float linex, const float maxHeight, const uint32_t p, const uint32_t linep)
+{
+	uint32_t stride = 8;
+	uint32_t charsize = 6 * stride;
+	float xo = 0; float sxo = 0;
+	switch (format.justify) {
+	case Pi3CtextFormat::LEFT_JUSTIFY: break;
+	case Pi3CtextFormat::CENTER_JUSTIFY: xo = (wrapWidth - linex) / 2.f; break;
+	case Pi3CtextFormat::RIGHT_JUSTIFY: xo = (wrapWidth - linex); break;
+	case Pi3CtextFormat::FULL_JUSTIFY: 
+		if (linex/ wrapWidth > 0.7f) sxo = (wrapWidth - linex)/ (float)((p-linep)/charsize);
+		break;
+	}
+
+	for (uint32_t pp = linep; pp < p; pp += charsize) {
+		float ht = (maxHeight - (verts[pp + 1 + stride] - verts[pp + 1])); // -maxHeight;
+		for (uint32_t k = 0; k < 6; k++) {
+			verts[pp + k * stride] += xo;
+			verts[pp + 1 + k * stride] -= ht;
+		}
+		xo += sxo;
+	} 
+	if (format.endJustify) { format.justify = Pi3CtextFormat::LEFT_JUSTIFY; format.endJustify = false; }
+}
+
 #define CreateVerts(x,y,ux,uy)										\
 		verts[p] = x; verts[p + 1] = y; verts[p + 2] = -10.f;		\
 		verts[p + 3] = 0; verts[p + 4] = -1.f; verts[p + 5] = 0;	\
-		verts[p + 6] = ux; verts[p + 7] = 1.f-uy;						\
+		verts[p + 6] = ux; verts[p + 7] = 1.f-uy;					\
 		p += stride;												\
+
 
 uint32_t Pi3Cfont::textureRects(std::string &text, std::vector<float> &verts, Pi3Crect &size, const float wrapWidth)
 {
@@ -150,37 +178,69 @@ uint32_t Pi3Cfont::textureRects(std::string &text, std::vector<float> &verts, Pi
 
 	uint32_t p = 0;
 	uint32_t stride = 8;
+	uint32_t tsize = text.size();
 	SDL_Rect rect;
+	uint32_t spacep = 0;
+	uint32_t spacei = 0;
+	uint32_t linep = 0;
+	float linex = 0;
+	uint32_t charsize = 6 * stride; //size of character rectangle
+	format.justify = Pi3CtextFormat::FULL_JUSTIFY;
 	float x = 0; float y = 0; float maxHeight = 0;
-	for (auto &c : text) {
-		if ((uint8_t)c == 10) {
-			x = 0; y -= maxHeight;
+	uint32_t i = 0;
+
+	while (i<tsize) {
+
+		char c = text[i];
+		if (c == 10) {
+			formatVerts(verts, wrapWidth, x, maxHeight, p, linep);
+			linep = p;
+			x = 0; y -= maxHeight; maxHeight = 0; linex = x;
 		}
-		else {
-			fontSheetChar &ch = fontsheet.chars[(uint8_t)c];
-			float w = (float)ch.sdlrect.w;
-			float h = (float)ch.sdlrect.h;
-			float ux = ch.rect.x; float uy = ch.rect.y;
-			float uw = ch.rect.width; float uh = ch.rect.height;
+		else
+		{
+			switch (textReader) {
+			case RD_HTML: Pi3Chtml::readHTML(c, text, i, format); break;
+			case RD_MARKDOWN: break;
+			}
 
-			if (h > maxHeight) maxHeight = h;
-			if (x + w > wrapWidth) { x = 0; y -= maxHeight; maxHeight = 0; }
+			if (c > 0) {
+				fontSheetChar &ch = fontsheet.chars[(uint8_t)c];
+				float w = (float)ch.sdlrect.w * format.scale;
+				float h = (float)ch.sdlrect.h * format.scale;
+				float ux = ch.rect.x; float uy = ch.rect.y;
+				float uw = ch.rect.width; float uh = ch.rect.height;
 
-			//create top left, top right, bottom right, bottom left verts ...
-			CreateVerts(x, y, ux, uy);
-			CreateVerts(x + w, y + h, ux + uw, uy + uh);
-			CreateVerts(x + w, y, ux + uw, uy);
-			CreateVerts(x, y, ux, uy);
-			CreateVerts(x, y + h, ux, uy + uh);
-			CreateVerts(x + w, y + h, ux + uw, uy + uh);
+				if (h > maxHeight) maxHeight = h;
 
-			//CreateVerts(x, y, ux, uy);
-			//CreateVerts(x, y + h, ux, uy + uh);
-			//CreateVerts(x + w, y + h, ux + uw, uy + uh);
-			//CreateVerts(x + w, y, ux + uw, uy);
-			if (p > 65520) break;
-			x += w;
+				if (x + w > wrapWidth) { 
+					while (text[i++] == ' '); //ignore spaces
+					p = spacep; //wind back and overwrite word that overhangs wrapWidth
+					i = spacei; //point to beginning of word in text string
+					formatVerts(verts, wrapWidth, linex, maxHeight, p, linep);
+					x = 0; y -= maxHeight; maxHeight = 0; linex = x; linep = p;
+				}
+				else {
+					float yo = (format.scaleYoffset != 0) ? y+h * format.scaleYoffset : y;
+					CreateVerts(x, yo-h, ux, uy);
+					CreateVerts(x + w + format.italicSlant, yo, ux + uw, uy + uh);
+					CreateVerts(x + w, yo-h, ux + uw, uy);
+					CreateVerts(x, yo-h, ux, uy);
+					CreateVerts(x + format.italicSlant, yo, ux, uy + uh);
+					CreateVerts(x + w + format.italicSlant, yo, ux + uw, uy + uh);
+					x += w;
+
+					if (c == ' ') { //keep note of last space on line in case we word wrap
+						spacep = p;
+						spacei = i;
+						linex = x;
+					}
+				}
+			}
+
+
 		}
+		i++;
 	}
 	size.x = 0; size.y = 0;
 	size.width = wrapWidth; size.height = y;

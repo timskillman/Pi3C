@@ -42,6 +42,10 @@ class Pi3Cwindow {
 public:
 
 	struct options {
+
+		options() {}
+		options(const std::string &title) : title(title) {}
+
 		std::string title;				//Windows title
 		uint32_t sdlflags =				//SDL window flags
 			SDL_WINDOW_OPENGL |
@@ -57,7 +61,7 @@ public:
 		uint32_t depthSize = 16;		//Screen depth buffer (default 16)
 		bool doubleBuffer = 1;			//Double buffer (default 1)
 		bool alphaBlending = true;		//Alpha blending (default true)
-		uint32_t clearColour = 0;		//Screen clear colour (default 0 - black)
+		uint32_t clearColour = 0x505050;		//Screen clear colour (default 0 - black)
 	};
 
 	struct MouseParams {
@@ -89,8 +93,9 @@ public:
 	};
 
 	Pi3Cwindow();
-	Pi3Cwindow(const options &winopts);
+	Pi3Cwindow(const options &winopts) { initOptions(winopts); }
 
+	void initOptions(const options &opts);
 	bool init(const char * title, const int width, const int height, const uint32_t flags, const uint8_t samples);
 	void setCaption(const std::string &caption);
 	void destroy();

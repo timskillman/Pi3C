@@ -6,6 +6,7 @@
 #include <memory>
 #include "Pi3Ctexture.h"
 #include "Pi3Cmaterial.h"
+#include "Pi3Ctextformat.h"
 
 class Pi3Cfont {
 public:
@@ -39,6 +40,9 @@ public:
 		std::vector<fontSheetChar> chars;
 	};
 
+	enum textReaderType { RD_NONE, RD_HTML, RD_MARKDOWN };
+	textReaderType textReader = RD_HTML;
+
 	fontSheet fontsheet;
 
 	TTF_Font * open(const char * path, const char * fontfile, int ptsize);
@@ -52,10 +56,11 @@ public:
 	TTF_Font * font = nullptr;
 
 private:
+	void formatVerts(std::vector<float> &verts, const float wrapWidth, const float linex, const float maxHeight, const uint32_t p, const uint32_t linep);
 	void copyCharToSheet(fontSheetChar &ch, SDL_Surface* Surface, SDL_Surface* destSurface, int &lastX, int &lastY, int &maxHeight);
 
 	SDL_Color colour;
 	std::string name;
 	SDL_Surface * wordsheet;
-
+	Pi3CtextFormat format;
 };
