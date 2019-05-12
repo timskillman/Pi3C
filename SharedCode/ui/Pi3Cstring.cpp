@@ -84,3 +84,14 @@ void paramPair(const std::string &param, std::string &com, std::string &val)
 		val = param.substr(c + 1, param.size() - c - 1);
 	}
 }
+
+std::string loadString(const std::string &file)
+{
+	std::ifstream strfile(file.c_str(), std::ios::binary);
+	if (strfile) {
+		std::ostringstream os;
+		os << strfile.rdbuf();
+		return os.str();
+	}
+	return "";
+}

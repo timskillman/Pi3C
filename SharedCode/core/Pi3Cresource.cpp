@@ -68,6 +68,13 @@ void Pi3Cresource::updateLetterVerts(uint32_t vertCount, const uint32_t vertOffs
 	if (uploaded) updateGPUverts(mesh->bufRef, mesh->vertOffset*mesh->stride, vertCount, vertBuffer[mesh->bufRef]);
 }
 
+void Pi3Cresource::updateMesh(uint32_t meshRef)
+{
+	if (meshRef < 0) return;
+	Pi3Cmesh *mesh = &meshes[meshRef];
+	if (uploaded) updateGPUverts(mesh->bufRef, mesh->vertOffset*mesh->stride, mesh->vc, vertBuffer[mesh->bufRef]);
+}
+
 int32_t Pi3Cresource::addTexture(const std::shared_ptr<Pi3Ctexture> &Texture, int32_t &texRef)
 {
 	if (Texture.get() != nullptr) {

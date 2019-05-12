@@ -180,6 +180,8 @@ void Pi3Cscene::setFog(const uint32_t col, const float start, const float end, c
 
 void Pi3Cscene::setPerspective3D(const int32_t width, const int32_t height, const float pspmul, const float znear, const float zfar)
 {
+	nearz3D = znear;
+	farz3D = zfar;
 	perspective = pspmul;
 	projMatrix3D.SetPerspective(width, height, perspective,znear,zfar);
 }
@@ -199,7 +201,15 @@ void Pi3Cscene::setViewport2D(const Pi3Crecti &rect, const float znear, const fl
 {
 	//const float left, const float right, const float top, const float bottom
 	//glViewport(left, top, right-left, top-bottom);
+	nearz2D = znear;
+	farz2D = zfar;
 	projMatrix2D.SetOrtho(rect.x, rect.x+rect.width, rect.y + rect.height, rect.y, znear, zfar);
+}
+
+void Pi3Cscene::resize(const Pi3Crecti &rect)
+{
+	projMatrix3D.SetPerspective(rect.width, rect.height, perspective, nearz3D, farz3D);
+	projMatrix2D.SetOrtho(rect.x, rect.x + rect.width, rect.y + rect.height, rect.y, nearz2D, farz2D);
 }
 
 bool Pi3Cscene::snapShot(const Pi3Crecti &rect, std::vector<uint8_t> &snapShot)

@@ -3,10 +3,14 @@
 Pi3Cwindow Pi3C::window;
 Pi3Cresource Pi3C::resource;
 
-void Pi3C::init(const std::string &title) {
+void Pi3C::init(const std::string &title, const uint32_t width, const uint32_t height) {
+
 	winopts.title = title;
+	if (width > 0 && height > 0) {
+		winopts.width = width;
+		winopts.height = height;
+	}
 	window.initOptions(winopts);
-	//window.init(title.c_str(), winopts.width, winopts.height, winopts.sdlflags, winopts.antialiasLevel);
 
 	resource.init(); //resource.init must be called after window creation
 
@@ -21,7 +25,8 @@ void Pi3C::init(const std::string &title) {
 	scene.selectShader(basicShaderRef);
 
 	scene.setFog(0xffffff, 10000.f, 25000.f);
-	scene.setViewport2D(Pi3Crecti(0, 0, (float)window.getWidth(), (float)window.getHeight()), 0.1f, 2000.f);
+	scene.setViewport2D(Pi3Crecti(0, 0, window.getWidth(), window.getHeight()), 0.1f, 2000.f);
+	scene.setPerspective3D(window.getWidth(), window.getHeight(), 800.f, 1.f, 5000.f);
 
 	gui.init(&resource, &window);
 	guifonts.push_back(gui.addFont("../../Resources/fonts/", "NotoSans-Regular.ttf", 18));
@@ -46,6 +51,11 @@ Pi3Cmodel Pi3C::create_model_from_text(std::string &text, const uint32_t width, 
 	return textModel;
 }
 
+int32_t Pi3C::load_model(const std::string &path, const std::string &file)
+{
+	return scene.loadModelOBJ(path, file, nullptr);  // loadbarCallback);
+}
+
 bool Pi3C::is_running()
 {
 	if (!has_started) {
@@ -63,18 +73,39 @@ float Pi3C::getAverageFPS()
 	return (float)frames / ((float)ticks / 1000.f);
 }
 
-void Pi3C::do_events()
+void Pi3C::resize_window()
 {
-	while (window.event()) {
-		switch (window.ev.type)
-		{
-		case SDL_WINDOWEVENT:
-			switch (window.ev.window.event) {
-			case SDL_WINDOWEVENT_RESIZED:
-				scene.setViewport2D(Pi3Crecti(0, 0, (float)window.getWidth(), (float)window.getHeight()), 0.1f, 2000.f);
-				break;
-			}
+	scene.resize(Pi3Crecti(0, 0, (float)window.getWidth(), (float)window.getHeight()));
+}
+
+bool Pi3C::do_events()
+{
+	const uint8_t * keystate = SDL_GetKeyboardState(NULL);
+	if (keystate[SDL_SCANCODE_ESCAPE]) window.setquit(true);
+
+	//SDL_Delay(10);
+
+	if (!window.event()) return false;
+
+	switch (window.ev.type)
+	{
+	case SDL_WINDOWEVENT:
+		switch (window.ev.window.event) {
+		case SDL_WINDOWEVENT_RESIZED:
+			resize_window();
 			break;
 		}
+		break;
 	}
+	return true;
+
+}
+
+std::vector<std::string> Pi3C::get_dropfiles()
+{
+	std::vector<std::string> dropfiles;
+	char* dropfile = window.ev.drop.file;
+	dropfiles.push_back(dropfile);
+	SDL_free(dropfile);
+	return dropfiles;
 }

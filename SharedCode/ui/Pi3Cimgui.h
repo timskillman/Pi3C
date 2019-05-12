@@ -125,11 +125,11 @@ public:
 private:
 
 	bool touched(const Pi3Cpointi &size);
-	bool renderIconImage(Pi3Cmodel *drawObj, const int minwidth, const int minheight, const uint32_t colour);
+	bool renderIconImage(Pi3Cmodel *drawObj, const int minwidth, const int minheight, bool squash, const uint32_t colour);
 	bool renderButton(Pi3Cmodel * drawObj, const int minwidth = 0, const int minheight = 0);
 	bool renderButton2(Pi3Cmodel *drawObj, const int minwidth = 0, const int minheight = 0);
 	void NextPos();
-	Pi3Cpointi calcImageSize(int tw, int th, const int minwidth, const int minheight);
+	Pi3Cpointi calcImageSize(int tw, int th, const int minwidth, const int minheight, bool squash = false);
 	void setButtonBackground(Pi3Cmodel &rect, const bool mouseTouchRect);
 	Pi3Cmodel * findCreateImage(const std::string &str, const ButtonType type);
 	Pi3Cmodel * findCreateImage2(const std::string &str, const ButtonType type);

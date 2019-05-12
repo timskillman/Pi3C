@@ -17,6 +17,17 @@ void Pi3Cavatar::init(const avatarParams &p)
 	onground = false;
 }
 
+void Pi3Cavatar::moveKeys(const SDL_Scancode k_forward, const SDL_Scancode k_back, const SDL_Scancode k_left, const SDL_Scancode k_right, const SDL_Scancode k_up, const SDL_Scancode k_down)
+{
+	const Uint8 * keystate = SDL_GetKeyboardState(NULL);
+	if (keystate[k_forward]) forward();
+	if (keystate[k_back]) back();
+	if (keystate[k_left]) left();
+	if (keystate[k_right]) right();
+	if (keystate[k_up]) up();			//only when flying
+	if (keystate[k_down]) down();		//only when flying
+}
+
 void Pi3Cavatar::move(const float speed)
 {
 
@@ -44,14 +55,14 @@ void Pi3Cavatar::sideways(const float speed)
 void Pi3Cavatar::up() 
 {
 	if (newmove) { nextpos = pos; newmove = false; }
-	nextpos.y += ticks;
+	nextpos.y -= ticks;
 	moved = true;
 }
 
 void Pi3Cavatar::down() 
 {
 	if (newmove) { nextpos = pos; newmove = false; }
-	nextpos.y -= ticks;
+	nextpos.y += ticks;
 	moved = true;
 }
 

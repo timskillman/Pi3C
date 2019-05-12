@@ -62,11 +62,12 @@ public:
 		return (ref >= 0 && ref <= (int32_t)textures.size()) ? textures[ref].get() : nullptr;
 	}
 
-	int32_t addMesh(Pi3Cmesh &mesh, const bool deleteVerts = true, const bool dynamicBuffer = false, const uint32_t vertSize = 128000);		//returns mesh reference (or -1 if failed)
+	int32_t addMesh(Pi3Cmesh &mesh, const bool deleteVerts = true, const bool dynamicBuffer = false, const uint32_t vertSize = 1000000);		//returns mesh reference (or -1 if failed)
 	
 	void uploadMeshesToGPU();
 	void updateGPUverts(const int VBO, const int vfrom, const int vsize, const std::vector<float> &verts);
 	void uploadGPUverts(const int bufref, const std::vector<float> &verts);
+	void updateMesh(uint32_t meshRef);
 	void setRenderBuffer(const int bufRef);
 	void renderMesh(const int meshRef, const GLenum rendermode = GL_TRIANGLES);
 	void renderText(const int meshRef, Pi3Cfont *font, std::string &text, const float wrapWidth);

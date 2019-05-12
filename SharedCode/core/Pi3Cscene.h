@@ -43,8 +43,8 @@
 
 class Pi3Cscene {
 public:
-	Pi3Cscene() : perspective(800.f), currentShader(-1), resource(nullptr) { }
-	Pi3Cscene(Pi3Cresource *resource) : perspective(800.f), currentShader(-1) { this->resource = resource; }
+	Pi3Cscene() { }
+	Pi3Cscene(Pi3Cresource *resource) { this->resource = resource; }
 	~Pi3Cscene() {}
 	
 	Pi3Cresource *resource = nullptr; //Ptr to resources (set upon initialisation)
@@ -66,6 +66,7 @@ public:
 	bool snapShot(const Pi3Crecti &rect, std::vector<uint8_t> &snapShot);
 
 	Pi3Cmodel * getSubModel(const int32_t * groupRefs, const int32_t maxlevel);
+	Pi3Cmatrix * getModelMatrix() { return &modelMatrix3D; }
 
 	Pi3Ctouch touch3D(const vec3f &mousexy); // vec3f xy, Pi3Cmodel *&selgroup, Pi3Cmodel *&selmodel, int32_t &meshRef, int32_t &triref, vec3f &intersection);
 
@@ -81,6 +82,7 @@ public:
 	void setViewport(const Pi3Crecti &rect);
 	void setOrthographic3D(const Pi3Crecti &rect, const float zoom, const float znear, const float zfar);
 	void setViewport2D(const Pi3Crecti &rect, const float znear, const float zfar);
+	void resize(const Pi3Crecti &rect);
 
 	bool collide(const vec3f &pos, const vec3f &dir, const float radius) const;
 	float collideFloor(const vec3f &pos) const;
@@ -103,8 +105,14 @@ private:
 
 	std::string errorStr;
 	int32_t currentShader = -1;
-	float perspective = 800.f;
 	uint32_t playerAvatarRef = 0;		//selects which avatar is the current players avatar
+
+	float nearz2D = 0.1f;
+	float farz2D = 500.f;
+	float zoom = 1.f;
+	float nearz3D = 1.0f;
+	float farz3D = 5000.f;
+	float perspective = 800.f;
 
 	std::string getPathFile(const std::string &filepath) const;
 	void render(const float ticks, Pi3Cmatrix &projMatrix, Pi3Cmatrix &modelMatrix, std::vector<Pi3Cmodel> &models, Pi3Cmaterial *materialOverride);

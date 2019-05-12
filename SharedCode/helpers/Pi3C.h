@@ -41,21 +41,28 @@
 class Pi3C {
 public:
 	Pi3C() {}
-	Pi3C(const char * title) { init(title); }
+	Pi3C(const std::string &title, const uint32_t width = 0, const uint32_t height = 0) { init(title, width, height); }
 
-	void init(const std::string &title);
+	void init(const std::string &title, const uint32_t width = 0, const uint32_t height = 0);
 
 	Pi3Cmodel create_model_from_mesh(const Pi3Cmesh &mesh, const uint32_t colour = 0xffffff) { return Pi3Cmodel(&resource, mesh, colour); }
 	Pi3Cmodel create_model_from_text(std::string &text, const uint32_t width, const uint32_t colour = 0x303030);
-	uint32_t add_model_to_scene2D(const Pi3Cmodel &model) { return scene.append2D(model); }
-	uint32_t add_model_to_scene3D(const Pi3Cmodel &model) { return scene.append3D(model); }
+	int32_t load_model(const std::string &path, const std::string &file);
+	int32_t add_model_to_scene2D(const Pi3Cmodel &model) { return scene.append2D(model); }
+	int32_t add_model_to_scene3D(const Pi3Cmodel &model) { return scene.append3D(model); }
+
+	void render3D() { scene.render3D(window.getTicks()); }
+	void render2D() { scene.render2D(window.getTicks()); }
 
 	bool is_running();
-	void do_events();
+	bool do_events();
 	void clear_window() { window.clear(); }
+	void resize_window();
 	void swap_buffers() { frames++; window.SwapBuffers(); }
 	float getAverageFPS();
+	std::vector<std::string> get_dropfiles();
 
+	Pi3Cmodel * model(const uint32_t modelRef) { return &scene.models[modelRef]; }
 	Pi3Cwindow::options winopts;
 	static Pi3Cwindow window;
 	static Pi3Cresource resource;

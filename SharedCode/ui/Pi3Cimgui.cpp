@@ -131,21 +131,7 @@ void Pi3Cimgui::NextPos()
 		nextPos = Pi3Cpointi(leftpos, pos.y - size.y - currentParams.vertGap); //next line
 }
 
-Pi3Cpointi Pi3Cimgui::calcImageSize(int tw, int th, const int minwidth, const int minheight)
-{
-	float aspect = (float)tw / (float)th;
 
-	//work out button minimum size ...
-	int mWidth = (minwidth == 0) ? currentParams.minWidth : minwidth; if (mWidth <= 0) mWidth = tw;
-	int mHeight = (minheight == 0) ? currentParams.minHeight : minheight; if (mHeight <= 0) mHeight = th;
-
-	//fit image into width/height of button (and retain image aspect ratio)...
-	int innerWidth = mWidth - currentParams.left - currentParams.right;
-	int innerHeight = mHeight - currentParams.top - currentParams.bottom;
-	if (tw > innerWidth) { tw = innerWidth; th = (int)((float)tw / aspect); }
-	if (th > innerHeight) { th = innerHeight; tw = (int)((float)th * aspect); }
-	return Pi3Cpointi(tw,th);
-}
 
 bool Pi3Cimgui::renderButton(Pi3Cmodel *drawObj, const int minwidth, const int minheight)
 {
@@ -292,12 +278,29 @@ bool Pi3Cimgui::renderRect(const int width, const int height)
 	return mouseTouchRect;
 }
 
-bool Pi3Cimgui::renderIconImage(Pi3Cmodel *image, const int width, const int height, const uint32_t colour)
+Pi3Cpointi Pi3Cimgui::calcImageSize(int tw, int th, const int minwidth, const int minheight, bool squash)
+{
+	float aspect = (float)tw / (float)th;
+
+	//work out button minimum size ...
+	int mWidth = (minwidth == 0) ? currentParams.minWidth : minwidth; if (mWidth <= 0) mWidth = tw;
+	int mHeight = (minheight == 0) ? currentParams.minHeight : minheight; if (mHeight <= 0) mHeight = th;
+	if (squash) return Pi3Cpointi(mWidth, mHeight);
+
+	//fit image into width/height of button (and retain image aspect ratio)...
+	int innerWidth = mWidth - currentParams.left - currentParams.right;
+	int innerHeight = mHeight - currentParams.top - currentParams.bottom;
+	if (tw > innerWidth) { tw = innerWidth; th = (int)((float)tw / aspect); }
+	if (th > innerHeight) { th = innerHeight; tw = (int)((float)th * aspect); }
+	return Pi3Cpointi(tw, th);
+}
+
+bool Pi3Cimgui::renderIconImage(Pi3Cmodel *image, const int width, const int height, bool squash, const uint32_t colour)
 {
 	if (!image) return false;
 	pos = nextPos;
 	size = Pi3Cpointi(width, height);
-	Pi3Cpointi wh = calcImageSize(image->material.texWidth, image->material.texHeight, width, height);
+	Pi3Cpointi wh = calcImageSize(image->material.texWidth, image->material.texHeight, width, height, squash);
 	bool mouseTouchRect = touched(size);
 	image->matrix.move(vec3f((float)pos.x, (float)(pos.y-wh.y - currentParams.top),zpos));
 	image->matrix.SetScales(vec3f((float)wh.x, (float)wh.y, 1.f));
@@ -309,17 +312,17 @@ bool Pi3Cimgui::renderIconImage(Pi3Cmodel *image, const int width, const int hei
 
 bool Pi3Cimgui::renderIcon(const std::string &str, const int minwidth, const int minheight)
 {
-	return renderIconImage(findCreateImage2(str, IMAGE), minwidth, minheight, currentParams.textColour);
+	return renderIconImage(findCreateImage2(str, IMAGE), minwidth, minheight, true, currentParams.textColour);
 }
 
 bool Pi3Cimgui::renderText(const std::string &str, const int minwidth, const int minheight)
 {
-	return renderIconImage(findCreateImage2(str, TEXT), minwidth, minheight, currentParams.textColour);
+	return renderIconImage(findCreateImage2(str, TEXT), minwidth, minheight, false, currentParams.textColour);
 }
 
 bool Pi3Cimgui::renderBackIcon(const std::string &str, const int minwidth, const int minheight)
 {
-	return renderIconImage(findCreateImage2(str, IMAGE), minwidth, minheight, currentParams.buttonColour);
+	return renderIconImage(findCreateImage2(str, IMAGE), minwidth, minheight, true, currentParams.buttonColour);
 }
 
 bool Pi3Cimgui::touched(const Pi3Cpointi &size)

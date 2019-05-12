@@ -2,6 +2,7 @@
 
 #include "Pi3CGL.h"
 #include "Pi3Cvector.h"
+#include "Pi3Cmatrix.h"
 #include "Pi3Cbbox3d.h"
 #include "Pi3Ctouch.h"
 #include <string>
@@ -77,6 +78,9 @@ public:
 /// FUNCTIONS ...
 
 	void addPackedVert(const vec3f &position, const vec3f &normal, const vec2f &uv, const GLfloat *cols);
+	void addRectangle(std::vector<float> &verts, const vec3f &pos, const vec3f &size, const vec2f &uv, const vec2f &us);
+	void updateRectCoords(std::vector<float> &verts, const vec3f &pos, const vec3f &size);
+	void updateRectTransformCoords(std::vector<float> &verts, const vec3f &pos, const vec3f &size, const Pi3Cmatrix *scene_matrix, const vec2f &cent); //const vec2f &uv, const vec2f &us,
 
 	void offset(const vec3f pos, std::vector<float> &verts, const uint32_t start, const uint32_t size, const uint32_t stride = defaultStride);
 	void resize(const vec3f &pos, const vec3f &size, const std::vector<float> &mverts);

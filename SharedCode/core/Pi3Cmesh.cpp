@@ -39,6 +39,54 @@ void Pi3Cmesh::addPackedVert(const vec3f &position, const vec3f &normal, const v
 	}
 }
 
+#define CreateVerts(x,y,ux,uy)									\
+		verts[vc++] = x; verts[vc++] = y; verts[vc++] = -10.f;	\
+		verts[vc++] = 0; verts[vc++] = -1.f; verts[vc++] = 0;	\
+		verts[vc++] = ux; verts[vc++] = 1.f-uy;					\
+
+void Pi3Cmesh::addRectangle(std::vector<float> &verts, const vec3f &pos, const vec3f &size, const vec2f &uv, const vec2f &us)
+{
+	if (vc + stride*6 > verts.size()) verts.resize(vc + 1000);
+	CreateVerts(pos.x, pos.y - size.y, uv.x, uv.y + us.y);
+	CreateVerts(pos.x + size.x, pos.y, uv.x + us.x, uv.y );
+	CreateVerts(pos.x + size.x, pos.y - size.y, uv.x + us.x, uv.y + us.y);
+	CreateVerts(pos.x, pos.y - size.y, uv.x, uv.y + us.y);
+	CreateVerts(pos.x, pos.y, uv.x, uv.y);
+	CreateVerts(pos.x + size.x, pos.y, uv.x + us.x, uv.y);
+}
+
+#define updateCoords(x,y)					\
+		verts[vc] = x; verts[vc+1] = y; vc+=stride; 	\
+
+void Pi3Cmesh::updateRectCoords(std::vector<float> &verts, const vec3f &pos, const vec3f &size)
+{
+	//uint32_t st = stride - 1;
+	updateCoords(pos.x, pos.y - size.y);
+	updateCoords(pos.x + size.x, pos.y);
+	updateCoords(pos.x + size.x, pos.y - size.y);
+	updateCoords(pos.x, pos.y - size.y);
+	updateCoords(pos.x, pos.y);
+	updateCoords(pos.x + size.x, pos.y);
+}
+
+#define updateCoordsXYZ(x,y,z)						\
+		verts[vc] = x; verts[vc+1] = y; verts[vc+2] = z;	\
+		vc+=stride; 										\
+
+/* Transforms a 2D rect into 3D space with the effect of bill-boarding */
+void Pi3Cmesh::updateRectTransformCoords(std::vector<float> &verts, const vec3f &pos, const vec3f &size, const Pi3Cmatrix *scene_matrix, const vec2f &cent) //, const vec2f &uv, const vec2f &us
+{
+	//Transform pos into screen space ...
+	vec3f tpos = scene_matrix->transformVec(pos);
+	float w = 800.f / -tpos.z;
+	updateCoordsXYZ(tpos.x*w + cent.x, (tpos.y - size.y)*w + cent.y, -tpos.z); // , uv.x, uv.y);
+	updateCoordsXYZ((tpos.x + size.x)*w + cent.x, tpos.y*w + cent.y, -tpos.z); // , uv.x + us.x, uv.y + us.y);
+	updateCoordsXYZ((tpos.x + size.x)*w + cent.x, (tpos.y - size.y)*w + cent.y, -tpos.z); // , uv.x + us.x, uv.y);
+	updateCoordsXYZ(tpos.x*w + cent.x, (tpos.y - size.y)*w + cent.y, -tpos.z); // , uv.x, uv.y);
+	updateCoordsXYZ(tpos.x*w + cent.x, tpos.y*w + cent.y, -tpos.z); // , uv.x, uv.y + us.y);
+	updateCoordsXYZ((tpos.x + size.x)*w + cent.x, tpos.y*w + cent.y, -tpos.z); // , uv.x + us.x, uv.y + us.y);
+}
+
 //void Pi3Cmesh::addPackedHF(vec3f position, vec3f normal, vec2f uv, GLfloat *cols)
 //{
 //	if (vc + stride > verts.size()) verts.resize(vc + 10000);

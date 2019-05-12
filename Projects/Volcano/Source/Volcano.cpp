@@ -31,18 +31,81 @@
 // Jesus Christ, King of Kings and Lord of Lords :-)
 // =======================================================================
 
+class rock {
+public:
+
+	rock(vec2f pos) { create(pos); }
+
+	void create(const vec2f &pos) {
+		this->pos = pos;
+		dx = (float)(rand() % 1600) / 100.f - 8.f;
+		size = (float)(rand() % 60) + 20.f;
+		e = (float)(rand() % 100) / 100.f + 0.1f;
+		gravity = -(float)(rand() % 20) - 10.f;
+		dead = false;
+		//col = (rand() % 255) | ((rand() % 255) << 8) | ((rand() % 255) << 16) | ((rand() % 255) << 24) | (255<<24);
+	}
+
+	void animate(const float d)
+	{
+		if (dead) return;
+
+		pos += vec2f(dx, -gravity);
+		if (pos.y < d) {
+			if (std::fabs(gravity) < 1.0) {
+				e = 0;
+				pos.y = d;
+				gravity = 0;
+			}
+			gravity = -gravity * 0.5f;
+			pos.y -= gravity;
+		}
+
+		if (gravity == 0) {
+			dx = dx * -0.95f;
+			dead = (std::fabs(dx) < 0.1f);
+		}
+		
+		gravity = gravity + e;
+	}
+
+	vec2f pos;
+	float size = 1.f;
+	float dx = 0;
+	float e = 0.f;
+	float gravity = 0.f;
+	bool dead = false;
+	uint32_t vertoffset = 0;
+	uint32_t col = 0;
+
+};
 
 int main(int argc, char *argv[])
 {
-	Pi3C pi3c("Markdown Document Viewer");
+	Pi3C pi3c("Volcano");
+	pi3c.window.setClearColour(0x0);
 
-	std::string livetext = loadString("passage.txt");
+	std::vector<rock> boulders;
+	Pi3Cmesh rectMesh;
+	for (uint32_t r = 0; r < 10000; r++) {
+		rock boulder(vec2f(pi3c.window.getWidth()/2, 250.f));
+		boulder.vertoffset = rectMesh.vc;
+		boulders.push_back(boulder);
+		rectMesh.addRectangle(rectMesh.verts, vec3f(boulder.pos.x, boulder.pos.y, -5.f), vec3f(boulder.size, boulder.size, 0), vec2f((float)(rand() % 4)*0.25f , 0), vec2f(0.25f, 1.f));
+	}
+	rectMesh.vertSize = rectMesh.vc/ rectMesh.stride;
+	rectMesh.bbox.bboxFromVerts(rectMesh.verts, 0, rectMesh.vc, rectMesh.stride);
+	rectMesh.materialRef = 0;
+	int rectsMesh = pi3c.resource.addMesh(rectMesh, true, true);
+	Pi3Cmodel rectangles;
+	rectangles.meshRef = rectsMesh;
+	rectangles.addTexture(&pi3c.resource, "../../Resources/models/maps/lensflare2.png");
+	rectangles.material.illum = 1;
+	rectangles.material.alpha = 0.99f;
+	int rectsRef = pi3c.add_model_to_scene2D(rectangles);
 
-	float mediaWidth = 700;
-	float mediaHeight = 900;
-
-	Pi3Cmodel textmodel = pi3c.create_model_from_text(livetext, mediaWidth - 40, 0xff202020);
-	int textRef = pi3c.add_model_to_scene2D(textmodel);
+	//Pi3Cmodel textmodel = pi3c.create_model_from_text(livetext, mediaWidth - 40, 0xff202020);
+	//int textRef = pi3c.add_model_to_scene2D(textmodel);
 
 	Pi3Cimgui &gui = pi3c.gui;
 
@@ -51,6 +114,7 @@ int main(int argc, char *argv[])
 		pi3c.do_events();
 		pi3c.clear_window();
 
+		/*
 		gui.Begin();
 
 		//Menubar ...
@@ -81,9 +145,19 @@ int main(int argc, char *argv[])
 
 		gui.setPosition((pi3c.window.getWidth()-mediaWidth)/2, 40);
 		bool paperTouch = gui.renderRect(mediaWidth, mediaHeight);
+		*/
 
-		pi3c.scene.models2D[textRef].matrix.move(vec3f((pi3c.window.getWidth() - mediaWidth + 40) / 2, pi3c.window.getHeight()-40, -1.5));
-		//scene.models2D[textRef].textModel(&resource, gui.getFont(guifonts[0]).get(), livetext, 700); // +sin(rq)*800.f);
+		Pi3Cmesh &rm = pi3c.resource.meshes[rectsMesh];
+		std::vector<float> &verts = pi3c.resource.vertBuffer[rm.bufRef];
+		rm.vc = rm.vertOffset*rm.stride;
+		for (uint32_t r = 0; r < boulders.size(); r++) {
+			rock &boulder = boulders[r];
+			boulder.animate(0);
+			if (boulder.dead)
+				boulder.create(vec2f((float)(pi3c.window.getWidth() / 2), 100)); //(float)(rand() % 500)
+			rm.updateRectCoords(verts, vec3f(boulder.pos.x, boulder.pos.y, -5.f), vec3f(boulder.size, boulder.size, 0));
+		}
+		pi3c.resource.updateMesh(rectsMesh); //upload all the altered vertices for this mesh
 
 		pi3c.render2D();
 
