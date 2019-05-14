@@ -3,12 +3,13 @@
 Pi3Cwindow Pi3C::window;
 Pi3Cresource Pi3C::resource;
 
-void Pi3C::init(const std::string &title, const uint32_t width, const uint32_t height) {
+void Pi3C::init(const std::string &title, const uint32_t width, const uint32_t height, const bool fullscreen) {
 
 	winopts.title = title;
 	if (width > 0 && height > 0) {
 		winopts.width = width;
 		winopts.height = height;
+		winopts.fullscreen = fullscreen;
 	}
 	window.initOptions(winopts);
 
@@ -25,7 +26,7 @@ void Pi3C::init(const std::string &title, const uint32_t width, const uint32_t h
 	scene.selectShader(basicShaderRef);
 
 	scene.setFog(0xffffff, 10000.f, 25000.f);
-	scene.setViewport2D(Pi3Crecti(0, 0, window.getWidth(), window.getHeight()), 0.1f, 2000.f);
+	scene.setViewport2D(Pi3Crecti(0, 0, window.getWidth(), window.getHeight()), 0.1f, 4000.f);
 	scene.setPerspective3D(window.getWidth(), window.getHeight(), 800.f, 1.f, 5000.f);
 
 	gui.init(&resource, &window);
@@ -51,6 +52,30 @@ Pi3Cmodel Pi3C::create_model_from_text(std::string &text, const uint32_t width, 
 	return textModel;
 }
 
+void Pi3C::update_sprite_position(const uint32_t spritesRef, const uint32_t spriteRef, const float x, const float y)
+{
+	Pi3CspriteArray *rm = (Pi3CspriteArray*)(&resource.meshes[spritesRef]);
+	rm->updateSpriteCoords(resource.vertBuffer[rm->bufRef], spriteRef, x, y);
+}
+
+void Pi3C::update_sprite_rotated(const uint32_t spritesRef, const uint32_t spriteRef, const vec2f &pos, const vec2f &size, const float angle)
+{
+	Pi3CspriteArray *rm = (Pi3CspriteArray*)(&resource.meshes[spritesRef]);
+	rm->updateSpriteCoordsRotated(resource.vertBuffer[rm->bufRef], spriteRef, pos, size, angle);
+}
+
+void Pi3C::update_sprite_transform(const uint32_t spritesRef, const uint32_t spriteRef, const vec3f &pos, const vec2f &size, const Pi3Cmatrix *scene_matrix, const vec2f &cent)
+{
+	Pi3CspriteArray *rm = (Pi3CspriteArray*)(&resource.meshes[spritesRef]);
+	rm->updateSpriteTransformCoords(resource.vertBuffer[rm->bufRef], spriteRef, pos, size, scene_matrix, cent);
+}
+
+void Pi3C::update_sprite_billboard(const uint32_t spritesRef, const uint32_t spriteRef, const vec3f &pos, const vec2f &size, const vec3f &lookat)
+{
+	Pi3CspriteArray *rm = (Pi3CspriteArray*)(&resource.meshes[spritesRef]);
+	rm->updateSpriteBillboard(resource.vertBuffer[rm->bufRef], spriteRef, pos, size, lookat);
+}
+
 int32_t Pi3C::load_model(const std::string &path, const std::string &file)
 {
 	return scene.loadModelOBJ(path, file, nullptr);  // loadbarCallback);
@@ -63,7 +88,7 @@ bool Pi3C::is_running()
 		start_time = SDL_GetTicks();
 		has_started = true;
 	}
-
+	resource.calls = 0;
 	return !window.hasquit();
 }
 

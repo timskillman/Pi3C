@@ -1,11 +1,12 @@
 title:Scene Viewer
-fullscreen:false
-screenWidth:800	
-screenHeight:600
+fullscreen:true
+screenWidth:1920
+screenHeight:1080
 
-fly:false
+trees:3000
+fly:true
 lightpos:0.0 1.0 0.0
-startpos:0.0 0.0 0.0
+startpos:0.0 -1.8 0.0
 rotate:0.0 0.0 0.0
 perspective:800.0
 nearz:1.0

@@ -38,54 +38,20 @@
 //
 // =======================================================================
 
-class particle {
+class treeClass {
 public:
 
-	particle(vec3f pos) { create(pos); }
+	treeClass(vec3f pos) { create(pos); }
 
 	void create(const vec3f &pos) {
 		this->pos = pos;
-		dx = (float)(rand() % 1600) / 100.f - 8.f;
-		size = (float)(rand() % 12) + 4.f;
-		e = (float)(rand() % 100) / 100.f + 0.1f;
-		gravity = -(float)(rand() % 20) - 10.f;
-		dead = false;
-		col = (float)(rand() % 4);
-		//col = (rand() % 255) | ((rand() % 255) << 8) | ((rand() % 255) << 16) | ((rand() % 255) << 24) | (255<<24);
-	}
-
-	void animate(const float d)
-	{
-		if (dead) return;
-
-		pos += vec3f(dx, -gravity, 0);
-		if (pos.y < d) {
-			if (std::fabs(gravity) < 1.0) {
-				e = 0;
-				pos.y = d;
-				gravity = 0;
-			}
-			gravity = -gravity * 0.5f;
-			pos.y -= gravity;
-		}
-
-		if (gravity == 0) {
-			dx = dx * -0.95f;
-			dead = (std::fabs(dx) < 0.1f);
-		}
-
-		gravity = gravity + e;
+		size = (float)(rand() % 40) + 12.f;
+		treeType = rand() % 4;
 	}
 
 	vec3f pos;
 	float size = 1.f;
-	float dx = 0;
-	float e = 0.f;
-	float gravity = 0.f;
-	bool dead = false;
-	uint32_t vertoffset = 0;
-	float col = 0;
-
+	uint32_t treeType = 0;
 };
 
 
@@ -94,7 +60,7 @@ int main(int argc, char *argv[])
 	loadOptions opts("options.txt");
 	int screenWidth = opts.asInt("screenWidth");
 	int screenHeight = opts.asInt("screenHeight");
-	Pi3C pi3c(opts.asString("title"), screenWidth , screenHeight);
+	Pi3C pi3c(opts.asString("title"), screenWidth , screenHeight, opts.asBool("fullscreen"));
 
 	Pi3CGL::showGLinfo();
 
@@ -113,8 +79,8 @@ int main(int argc, char *argv[])
 
 	Pi3Cavatar player;
 	Pi3Cavatar::avatarParams avparams;
-	//avparams.movement = Pi3Cavatar::move_walk;
-	//avparams.position = opts.asVec3f("startpos");
+	avparams.movement = Pi3Cavatar::move_fly;
+	avparams.position = opts.asVec3f("startpos");
 	//avparams.rotation = opts.asVec3f("rotate");
 	//avparams.size = { 1.f, opts.asFloat("avatarHeight"), 1.f };
 	//avparams.walkSpeed = opts.asFloat("avatarWalkSpeed");
@@ -125,29 +91,29 @@ int main(int argc, char *argv[])
 	//Pi3Cmodel brush = pi3c.create_model_from_mesh(Pi3Cshapes::sphere(vec3f(0, 0, -10.f), 2.0f, 0.f, 10, 20), 0xff00ffff);
 	//brush.touchable = false;
 	//int brushref = pi3c.add_model_to_scene3D(brush);
-
-	std::vector<particle> flakes;
-	Pi3Cmesh rectMesh;
-	for (uint32_t r = 0; r < 5000; r++) {
-		particle flake(vec3f((float)(rand() % 500 - 250), 0, (float)(rand() % 500 - 250)));
-		flake.vertoffset = rectMesh.vc;
-		flakes.push_back(flake);
-		rectMesh.addRectangle(rectMesh.verts, flake.pos, vec3f(flake.size, flake.size, 0), vec2f((float)(rand() % 4)*0.25f, 0.f), vec2f(0.25f, 1.f));
+	
+	uint32_t treeNo = opts.asInt("trees");
+	std::vector<treeClass> trees;
+	Pi3CspriteArray sprites;
+	for (uint32_t r = 0; r < treeNo; r++) {
+		treeClass tree(vec3f((float)(rand() % 2000 - 1000), 0, (float)(rand() % 2000 - 1000)));
+		trees.push_back(tree);
+		sprites.addSprite(tree.pos, vec2f(tree.size, tree.size), vec2f((float)(tree.treeType)*0.25f, 0.f), vec2f(0.25f, 0.99f));
 	}
-	rectMesh.vertSize = rectMesh.vc / rectMesh.stride;
-	rectMesh.bbox.bboxFromVerts(rectMesh.verts, 0, rectMesh.vc, rectMesh.stride);
-	rectMesh.materialRef = 0;
-	int rectsMesh = pi3c.resource.addMesh(rectMesh, true, true);
+	int spritesRef = pi3c.resource.addMesh(sprites, true, true);
+
 	Pi3Cmodel rectangles;
-	rectangles.meshRef = rectsMesh;
+	rectangles.meshRef = spritesRef;
 	rectangles.addTexture(&pi3c.resource, "../../Resources/models/maps/tree.png");
 	rectangles.material.illum = 1;
 	rectangles.material.alpha = 1.f;
-	int rectsRef = pi3c.add_model_to_scene2D(rectangles);
+	int rectsRef = pi3c.add_model_to_scene3D(rectangles);
 
 	int skybox = pi3c.scene.loadModelOBJ(opts.asString("skyboxPath"), opts.asString("skybox"), 0); // loadbarCallback);
 	pi3c.scene.models[skybox].matrix.SetScale(opts.asFloat("skyboxScale"));
 	pi3c.scene.models[skybox].touchable = false;
+
+	int landRef = pi3c.load_model("../../Resources/models/Castle", "landscape.obj");
 
 	//int ship = pi3c.load_model("../../Resources/models/CargoBay", "CargoHoldBaked3.obj");
 
@@ -211,7 +177,7 @@ int main(int argc, char *argv[])
 			switch (pi3c.window.ev.type)
 			{
 			case SDL_TEXTINPUT:
-				SDL_Log("Key = %d", pi3c.window.ev.text.text);
+				//SDL_Log("Key = %d", pi3c.window.ev.text.text);
 				break;
 			case SDL_MOUSEMOTION:
 				if (pi3c.window.mouse.RightButton) {
@@ -241,18 +207,22 @@ int main(int argc, char *argv[])
 		pi3c.clear_window();
 	
 		//Render 3D scene ...
-		Pi3Cmesh &rm = pi3c.resource.meshes[rectsMesh];
-		std::vector<float> &verts = pi3c.resource.vertBuffer[rm.bufRef];
-		rm.vc = rm.vertOffset*rm.stride;
+		//Pi3Cmesh &rm = pi3c.resource.meshes[rectsMesh];
+		//std::vector<float> &verts = pi3c.resource.vertBuffer[rm.bufRef];
+		//rm.vc = rm.vertOffset*rm.stride;
+		pi3c.scene.setMatrix(player.getPosition(), vec3f(0, 0, 0), player.getRotation());
+
+
 		Pi3Cmatrix *mm = pi3c.scene.getModelMatrix();
 		vec2f cent(pi3c.window.getWidth() / 2, pi3c.window.getHeight() / 2);
 
-		for (uint32_t r = 0; r < flakes.size(); r++) {
-			particle &flake = flakes[r];
-			rm.updateRectTransformCoords(verts, flake.pos, vec3f(flake.size, flake.size, 0), mm, cent); //, vec2f(flake.col*0.25f, 0), vec2f(0.25f, 1.f)
+		for (uint32_t t = 0; t < trees.size(); t++) {
+			treeClass &tree = trees[t];
+			pi3c.update_sprite_billboard(spritesRef, t, tree.pos, vec2f(tree.size, tree.size), -player.getPosition()); //, vec2f(flake.col*0.25f, 0), vec2f(0.25f, 1.f)
 		}
 
-		/*
+		/*  Z-Sort alphas ... update_sprite_transform would need to include uv coords as sorting mixes these up
+
 		std::vector<std::pair<float, int32_t>> zflakes;
 
 		for (uint32_t r = 0; r < flakes.size(); r++) {
@@ -270,20 +240,19 @@ int main(int argc, char *argv[])
 
 		for (uint32_t r = 0; r < zflakes.size(); r++) {
 			particle &flake = flakes[zflakes[r].second];
-			rm.updateRectTransformCoords(verts, flake.pos, vec3f(flake.size, flake.size, 0), vec2f(flake.col*0.25f, 0), vec2f(0.25f, 1.f), mm,vec2f(pi3c.window.getWidth()/2, pi3c.window.getHeight()/2));
+			pi3c.update_sprite_transform(spritesRef, r, flake.pos, vec2f(flake.size, flake.size), vec2f(flake.col*0.25f, 0), vec2f(0.25f, 1.f), mm, cent);
 		}
 		*/
 
-		pi3c.resource.updateMesh(rectsMesh); //upload all the altered vertices for this mesh
+		pi3c.resource.updateMesh(spritesRef); //upload all the altered vertices for this mesh
+
 
 		pi3c.scene.setSun(0xffffff, vec3f(1000.f, 1000.f, -1000.f)); //transform sun position into scene
-		pi3c.scene.setMatrix(player.getPosition(), vec3f(0,0,0), player.getRotation());
-		//glDisable(GL_DEPTH_TEST);
 		pi3c.render3D();
-		//glEnable(GL_DEPTH_TEST);
 		
 		//Render 2D
-		pi3c.render2D();
+		//pi3c.render2D();
+
 
 		pi3c.swap_buffers();
 		

@@ -41,15 +41,22 @@
 class Pi3C {
 public:
 	Pi3C() {}
-	Pi3C(const std::string &title, const uint32_t width = 0, const uint32_t height = 0) { init(title, width, height); }
+	Pi3C(const std::string &title, const uint32_t width = 0, const uint32_t height = 0, const bool fullscreen = false) { init(title, width, height, fullscreen); }
 
-	void init(const std::string &title, const uint32_t width = 0, const uint32_t height = 0);
+	void init(const std::string &title, const uint32_t width = 0, const uint32_t height = 0, const bool fullscreen = false);
 
 	Pi3Cmodel create_model_from_mesh(const Pi3Cmesh &mesh, const uint32_t colour = 0xffffff) { return Pi3Cmodel(&resource, mesh, colour); }
 	Pi3Cmodel create_model_from_text(std::string &text, const uint32_t width, const uint32_t colour = 0x303030);
 	int32_t load_model(const std::string &path, const std::string &file);
 	int32_t add_model_to_scene2D(const Pi3Cmodel &model) { return scene.append2D(model); }
 	int32_t add_model_to_scene3D(const Pi3Cmodel &model) { return scene.append3D(model); }
+
+	std::vector<float> * getMeshVerts(const uint32_t meshRef) { return &resource.vertBuffer[resource.meshes[meshRef].bufRef]; }
+	uint32_t getMeshVertPtr(const uint32_t meshRef) { return resource.meshes[meshRef].vertOffset*resource.meshes[meshRef].stride; }
+	void update_sprite_position(const uint32_t spritesRef, const uint32_t spriteRef, const float x, const float y);
+	void update_sprite_rotated(const uint32_t spritesRef, const uint32_t spriteRef, const vec2f &pos, const vec2f &size, const float angle);
+	void update_sprite_transform(const uint32_t spritesRef, const uint32_t spriteRef, const vec3f &pos, const vec2f &size, const Pi3Cmatrix *scene_matrix, const vec2f &cent);
+	void update_sprite_billboard(const uint32_t spritesRef, const uint32_t spriteRef, const vec3f &pos, const vec2f &size, const vec3f &lookat);
 
 	void render3D() { scene.render3D(window.getTicks()); }
 	void render2D() { scene.render2D(window.getTicks()); }
@@ -63,6 +70,8 @@ public:
 	std::vector<std::string> get_dropfiles();
 
 	Pi3Cmodel * model(const uint32_t modelRef) { return &scene.models[modelRef]; }
+	Pi3CspriteArray * getSpriteArray(const uint32_t spriteArrayRef) { return (Pi3CspriteArray*)(&resource.meshes[spriteArrayRef]); }
+
 	Pi3Cwindow::options winopts;
 	static Pi3Cwindow window;
 	static Pi3Cresource resource;
@@ -77,4 +86,5 @@ private:
 	bool has_started = false;
 	uint32_t frames = 0;
 	uint32_t start_time = 0;
+	
 };

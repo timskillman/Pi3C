@@ -247,6 +247,7 @@
     <ClCompile Include="..\..\SharedCode\helpers\Pi3Chumanoid.cpp" />
     <ClCompile Include="..\..\SharedCode\helpers\Pi3CloadOptions.cpp" />
     <ClCompile Include="..\..\SharedCode\ui\Pi3Cimgui.cpp" />
+    <ClCompile Include="..\..\SharedCode\ui\Pi3Cstring.cpp" />
     <ClCompile Include="Source\MDviewer.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -293,6 +294,7 @@
     <ClInclude Include="..\..\SharedCode\helpers\Pi3Chumanoid.h" />
     <ClInclude Include="..\..\SharedCode\helpers\Pi3CloadOptions.h" />
     <ClInclude Include="..\..\SharedCode\ui\Pi3Cimgui.h" />
+    <ClInclude Include="..\..\SharedCode\ui\Pi3Cstring.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\SharedCode\glutess\LICENSE" />

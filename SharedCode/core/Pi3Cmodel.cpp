@@ -239,11 +239,11 @@ bool Pi3Cmodel::collide(const Pi3Cresource *resource, const Pi3Cmatrix &pmat, co
 }
 */
 
-bool Pi3Cmodel::collide(const Pi3Cresource *resource, const Pi3Cmatrix &pmat, const vec3f &pos, const vec3f &dir, const float radius) const
+bool Pi3Cmodel::collide(const Pi3Cresource *resource, const Pi3Cmatrix *parent_matrix, const vec3f &pos, const vec3f &dir, const float radius) const
 {
 	if (!visible || deleted) return false;
 
-	Pi3Cmatrix newmatrix = matrix * pmat;
+	Pi3Cmatrix newmatrix = (parent_matrix) ? matrix * *parent_matrix : matrix;
 
 	//check if model in LOD range (if not, return) ...
 	if (lodToo > 0) {
@@ -253,7 +253,7 @@ bool Pi3Cmodel::collide(const Pi3Cresource *resource, const Pi3Cmatrix &pmat, co
 
 	//render the group (or chosen group model if choice set) ...
 	if (choice >= 0 && choice < (int32_t)group.size()) {
-		if (group[choice].collide(resource, newmatrix, pos, dir, radius)) return true;
+		if (group[choice].collide(resource, &newmatrix, pos, dir, radius)) return true;
 	}
 	else {
 		for (auto &sg : group) {
@@ -264,7 +264,7 @@ bool Pi3Cmodel::collide(const Pi3Cresource *resource, const Pi3Cmatrix &pmat, co
 				}
 			}
 			else
-				if (sg.visible && !sg.deleted && sg.collide(resource, newmatrix, pos, dir, radius)) return true;
+				if (sg.visible && !sg.deleted && sg.collide(resource, &newmatrix, pos, dir, radius)) return true;
 		}
 	}
 
@@ -286,11 +286,11 @@ bool Pi3Cmodel::collideSub(const Pi3Cresource *resource, const Pi3Cmatrix &pmat,
 	return false;
 }
 
-float Pi3Cmodel::collideFloor(const Pi3Cresource *resource, const Pi3Cmatrix &pmat, const vec3f &pos, float &prevHeight) const
+float Pi3Cmodel::collideFloor(const Pi3Cresource *resource, const Pi3Cmatrix *parent_matrix, const vec3f &pos, float &prevHeight) const
 {
 	float ht = prevHeight;
 
-	Pi3Cmatrix newmatrix = matrix * pmat;
+	Pi3Cmatrix newmatrix = (parent_matrix) ? matrix * *parent_matrix : matrix;
 
 	//check if model in LOD range (if not, return) ...
 	if (lodToo > 0) {
@@ -300,7 +300,7 @@ float Pi3Cmodel::collideFloor(const Pi3Cresource *resource, const Pi3Cmatrix &pm
 
 	//render the group (or chosen group model if choice set) ...
 	if (choice >= 0 && choice < (int32_t)group.size()) {
-		if (group[choice].collideFloor(resource, newmatrix, pos, ht)) return ht;
+		if (group[choice].collideFloor(resource, &newmatrix, pos, ht)) return ht;
 	}
 	else {
 		for (auto &sg : group) {
@@ -310,7 +310,7 @@ float Pi3Cmodel::collideFloor(const Pi3Cresource *resource, const Pi3Cmatrix &pm
 				}
 			}
 			else
-				if (sg.visible && !sg.deleted) ht = sg.collideFloor(resource, newmatrix, pos, ht);
+				if (sg.visible && !sg.deleted) ht = sg.collideFloor(resource, &newmatrix, pos, ht);
 		}
 	}
 
@@ -348,13 +348,13 @@ float Pi3Cmodel::collideFloorSub(const Pi3Cresource *resource, const Pi3Cmatrix 
 	return 1e8f;
 }
 
-void Pi3Cmodel::touch(const Pi3Cresource *resource, const Pi3Cmatrix &parentMatrix, Pi3Ctouch &touch, const int32_t level)
+void Pi3Cmodel::touch(const Pi3Cresource *resource, const Pi3Cmatrix *parent_matrix, Pi3Ctouch &touch, const int32_t level)
 {
 	//reflects how render works ...
 
 	if (!touchable || !visible || deleted) return;
 
-	Pi3Cmatrix tmat = matrix * parentMatrix;
+	Pi3Cmatrix tmat = (parent_matrix) ? matrix * *parent_matrix : matrix;
 
 	if (lodToo > 0) {
 		float eyeDistance = tmat.position().length();
@@ -364,12 +364,12 @@ void Pi3Cmodel::touch(const Pi3Cresource *resource, const Pi3Cmatrix &parentMatr
 	//render the group (or chosen group model if choice set) ...
 	float dist = touch.prevDist;
 	if (choice >= 0 && choice < (int32_t)group.size()) {
-		group[choice].touch(resource, tmat, touch, level + 1);
+		group[choice].touch(resource, &tmat, touch, level + 1);
 		if (touch.prevDist < dist) { touch.groupRefs[level] = choice; dist = touch.prevDist; }
 	}
 	else {
 		for (size_t i = 0; i < group.size(); i++) {
-			group[i].touch(resource, tmat, touch, level + 1);
+			group[i].touch(resource, &tmat, touch, level + 1);
 			if (touch.prevDist < dist) {
 				touch.groupRefs[level] = (int32_t)i;
 				dist = touch.prevDist;

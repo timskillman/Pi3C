@@ -225,7 +225,7 @@ public:
 	inline vec3f unit() const // normalised to a length of 1
 	{
 		float l = length();
-		if (l == 0.0) return vec3f(0.0, 0.0, 0.0); //avoid divide by zero error
+		if (l == 0.0) return vec3f(0.f, 0.f, 0.f); //avoid divide by zero error
 		return vec3f(x / l, y / l, z / l);
 	}
 	

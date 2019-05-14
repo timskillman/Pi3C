@@ -91,10 +91,10 @@ public:
 	void renderBasic(Pi3Cresource *resource, Pi3Cshader &shader, const Pi3Cmatrix *parent_matrix = nullptr, Pi3Cmaterial *materialOverride = nullptr);
 	void appendMesh(Pi3Cresource *resource, Pi3Cmesh mesh, bool asCollider);
 	void loadOBJfile(Pi3Cresource *resource, std::string path, std::string modelfile, std::function<void(float)> showProgressCB, bool asCollider);
-	bool collide(const Pi3Cresource *resource, const Pi3Cmatrix &pmat, const vec3f &pos, const vec3f &dir, const float radius) const;
-	float collideFloor(const Pi3Cresource *resource, const Pi3Cmatrix &pmat, const vec3f &pos, float &prevHeight) const;
+	bool collide(const Pi3Cresource *resource, const Pi3Cmatrix *parent_matrix, const vec3f &pos, const vec3f &dir, const float radius) const;
+	float collideFloor(const Pi3Cresource *resource, const Pi3Cmatrix *parent_matrix, const vec3f &pos, float &prevHeight) const;
 	void loadCollider(Pi3Cresource *resource, std::string path, std::string model, std::string collider, std::function<void(float)> showProgressCB);
-	void touch(const Pi3Cresource *resource, const Pi3Cmatrix &parentMatrix, Pi3Ctouch &touch, const int32_t level);
+	void touch(const Pi3Cresource *resource, const Pi3Cmatrix *parent_matrix, Pi3Ctouch &touch, const int32_t level);
 	int32_t addTexture(Pi3Cresource *resource, const std::string &txfile);
 	int32_t addTexture(Pi3Cresource *resource, const std::shared_ptr<Pi3Ctexture> &texture);
 	int32_t addPicture(Pi3Cresource *resource, const std::shared_ptr<Pi3Ctexture> &texture);

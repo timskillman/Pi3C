@@ -179,7 +179,6 @@ uint32_t Pi3Cfont::textureRects(std::string &text, std::vector<float> &verts, Pi
 	uint32_t p = 0;
 	uint32_t stride = 8;
 	uint32_t tsize = text.size();
-	SDL_Rect rect;
 	uint32_t spacep = 0;
 	uint32_t spacei = 0;
 	uint32_t linep = 0;

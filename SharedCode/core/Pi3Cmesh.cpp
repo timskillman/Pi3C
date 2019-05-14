@@ -2,6 +2,7 @@
 #include "Pi3Ccollision.h"
 #include <algorithm>
 #include <unordered_set>
+#include <cmath>
 
 Pi3Cmesh::Pi3Cmesh(const std::string &name, const uint32_t stride) : name(name), stride(stride) {
 	reset();
@@ -39,73 +40,6 @@ void Pi3Cmesh::addPackedVert(const vec3f &position, const vec3f &normal, const v
 	}
 }
 
-#define CreateVerts(x,y,ux,uy)									\
-		verts[vc++] = x; verts[vc++] = y; verts[vc++] = -10.f;	\
-		verts[vc++] = 0; verts[vc++] = -1.f; verts[vc++] = 0;	\
-		verts[vc++] = ux; verts[vc++] = 1.f-uy;					\
-
-void Pi3Cmesh::addRectangle(std::vector<float> &verts, const vec3f &pos, const vec3f &size, const vec2f &uv, const vec2f &us)
-{
-	if (vc + stride*6 > verts.size()) verts.resize(vc + 1000);
-	CreateVerts(pos.x, pos.y - size.y, uv.x, uv.y + us.y);
-	CreateVerts(pos.x + size.x, pos.y, uv.x + us.x, uv.y );
-	CreateVerts(pos.x + size.x, pos.y - size.y, uv.x + us.x, uv.y + us.y);
-	CreateVerts(pos.x, pos.y - size.y, uv.x, uv.y + us.y);
-	CreateVerts(pos.x, pos.y, uv.x, uv.y);
-	CreateVerts(pos.x + size.x, pos.y, uv.x + us.x, uv.y);
-}
-
-#define updateCoords(x,y)					\
-		verts[vc] = x; verts[vc+1] = y; vc+=stride; 	\
-
-void Pi3Cmesh::updateRectCoords(std::vector<float> &verts, const vec3f &pos, const vec3f &size)
-{
-	//uint32_t st = stride - 1;
-	updateCoords(pos.x, pos.y - size.y);
-	updateCoords(pos.x + size.x, pos.y);
-	updateCoords(pos.x + size.x, pos.y - size.y);
-	updateCoords(pos.x, pos.y - size.y);
-	updateCoords(pos.x, pos.y);
-	updateCoords(pos.x + size.x, pos.y);
-}
-
-#define updateCoordsXYZ(x,y,z)						\
-		verts[vc] = x; verts[vc+1] = y; verts[vc+2] = z;	\
-		vc+=stride; 										\
-
-/* Transforms a 2D rect into 3D space with the effect of bill-boarding */
-void Pi3Cmesh::updateRectTransformCoords(std::vector<float> &verts, const vec3f &pos, const vec3f &size, const Pi3Cmatrix *scene_matrix, const vec2f &cent) //, const vec2f &uv, const vec2f &us
-{
-	//Transform pos into screen space ...
-	vec3f tpos = scene_matrix->transformVec(pos);
-	float w = 800.f / -tpos.z;
-	updateCoordsXYZ(tpos.x*w + cent.x, (tpos.y - size.y)*w + cent.y, -tpos.z); // , uv.x, uv.y);
-	updateCoordsXYZ((tpos.x + size.x)*w + cent.x, tpos.y*w + cent.y, -tpos.z); // , uv.x + us.x, uv.y + us.y);
-	updateCoordsXYZ((tpos.x + size.x)*w + cent.x, (tpos.y - size.y)*w + cent.y, -tpos.z); // , uv.x + us.x, uv.y);
-	updateCoordsXYZ(tpos.x*w + cent.x, (tpos.y - size.y)*w + cent.y, -tpos.z); // , uv.x, uv.y);
-	updateCoordsXYZ(tpos.x*w + cent.x, tpos.y*w + cent.y, -tpos.z); // , uv.x, uv.y + us.y);
-	updateCoordsXYZ((tpos.x + size.x)*w + cent.x, tpos.y*w + cent.y, -tpos.z); // , uv.x + us.x, uv.y + us.y);
-}
-
-//void Pi3Cmesh::addPackedHF(vec3f position, vec3f normal, vec2f uv, GLfloat *cols)
-//{
-//	if (vc + stride > verts.size()) verts.resize(vc + 10000);
-//	verts[vc++] = position.x;
-//	verts[vc++] = position.y;
-//	verts[vc++] = position.z;
-//	verts[vc++] = normal.x;
-//	verts[vc++] = normal.y;
-//	verts[vc++] = normal.z;
-//	verts[vc++] = uv.x;
-//	verts[vc++] = uv.y;
-//	if (cols && stride == 12) {
-//		verts[vc++] = cols[0];
-//		verts[vc++] = cols[1];
-//		verts[vc++] = cols[2];
-//		verts[vc++] = cols[3];
-//	}
-//}
-
 void Pi3Cmesh::offset(const vec3f pos, std::vector<float> &verts, const uint32_t start, const uint32_t size, const uint32_t stride)
 {
 	std::size_t st = start*stride;
@@ -138,6 +72,7 @@ void Pi3Cmesh::resize(const vec3f &pos, const vec3f &size, const std::vector<flo
 
 Pi3Cmesh Pi3Cmesh::clone(const uint32_t from, const uint32_t size) const
 {
+	/* we only want to partially clone some of the vertices */
 	Pi3Cmesh newmesh = *this;
 	newmesh.name = name;
 	newmesh.bbox = bbox;
@@ -176,7 +111,7 @@ int32_t Pi3Cmesh::touchPoint(Pi3Ctouch &touch, const Pi3Cmatrix &mtx, const std:
 {
 	/* Screen x,y touch is acheived by transforming each mesh triangle into 2D screen space,
 	   perform various 2D checks and then check if the equivalent transformed touch point lies within 
-	   the 3D triangle in world space.
+	   the 3D triangle in screen space.
 
 	   2D checks (such as bounds checking and back-face elimination) are faster than 3D checks
 	   and discard a triangle at the earliest opportunity to avoid unnecessary calculations.
@@ -283,26 +218,6 @@ namespace std
 		}
 	};
 }
-
-//void Pi3Cmesh::moveVertex(uint32_t tref, vec3f val, uint32_t &min, uint32_t &max)
-//{
-//	if (sharedIndexes.size() == 0) createSharedTriangleIndex();
-//	uint32_t p = (uint32_t)verts[tref+7];
-//	std::vector<uint32_t> sharedVerts = sharedIndexes[p];
-//	for (size_t i = 0; i < sharedVerts.size(); i++) {
-//		uint32_t q = sharedVerts[i];
-//		verts[q] = val.x;
-//		verts[q + 1] = val.y;
-//		verts[q + 2] = val.z;
-//		if (i == 0) {
-//			min = max = q;
-//		}
-//		else {
-//			if (q < min) min = q;
-//			if (q > max) max = q;
-//		}
-//	}
-//}
 
 void Pi3Cmesh::createSharedTriangleList(const std::vector<float> &mverts, std::vector<uint32_t> &vertindexes, std::vector<float> &newverts, std::vector<uint32_t> &uvindexes, std::vector<float> &newuvs, const float tolerance)
 {
@@ -437,4 +352,112 @@ void Pi3Cmesh::updateNormals(const uint32_t min, const uint32_t max)
 		memcpy(&verts[i + x2 + 3], &n, sf);
 		memcpy(&verts[i + x3 + 3], &n, sf);
 	}
+}
+
+
+
+#define CreateVerts(x,y,ux,uy)									\
+		verts[vc++] = x; verts[vc++] = y; verts[vc++] = pos.z;	\
+		verts[vc++] = 0; verts[vc++] = -1.f; verts[vc++] = 0;	\
+		verts[vc++] = ux; verts[vc++] = 0.99f-uy;					\
+
+void Pi3CspriteArray::addSprite(const vec3f &pos, const vec2f &size, const vec2f &uv, const vec2f &us)
+{
+	if (vc + stride * 6 > verts.size()) verts.resize(vc + 1000);
+	CreateVerts(pos.x, pos.y - size.y, uv.x, uv.y - us.y);
+	CreateVerts(pos.x + size.x, pos.y , uv.x + us.x, uv.y);
+	CreateVerts(pos.x + size.x, pos.y - size.y, uv.x + us.x, uv.y - us.y);
+	CreateVerts(pos.x, pos.y - size.y, uv.x, uv.y - us.y);
+	CreateVerts(pos.x, pos.y , uv.x, uv.y);
+	CreateVerts(pos.x + size.x, pos.y, uv.x + us.x, uv.y);
+
+	vertSize = vc / stride;
+	bbox.update(vec3f(pos.x, pos.y, -10.f));
+	bbox.update(vec3f(pos.x + size.x, pos.y + size.y, -10.f));
+}
+
+#define updateCoordsXY(x,y)								\
+		verts[p] = x; verts[p + 1] = y; p+=stride; 	\
+
+void Pi3CspriteArray::updateSpriteCoords(std::vector<float> &verts, const uint32_t spriteRef, const float x, const float y)
+{
+	uint32_t p = (vertOffset + spriteRef * 6) * stride;
+	float w = verts[p + stride] - verts[p];					//derive width and height from rectangle
+	float h = verts[p + stride + 1] - verts[p + 1];
+	updateCoordsXY(x, y - h);
+	updateCoordsXY(x + w, y);
+	updateCoordsXY(x + w, y - h);
+	updateCoordsXY(x, y - h);
+	updateCoordsXY(x, y);
+	updateCoordsXY(x + w, y);
+}
+
+#define updateRotateCoordsXY(a,b)								\
+		verts[p] = pos.x + a; verts[p + 1] = pos.y + b; p+=stride; 	\
+
+void Pi3CspriteArray::updateSpriteCoordsRotated(std::vector<float> &verts, const uint32_t spriteRef, const vec2f &pos, const vec2f &size, const float angle)
+{
+	uint32_t p = vertOffset * stride + spriteRef * stride * 6;
+	float hw = size.x * 0.5f;
+	float hh = size.y * 0.5f;
+	//float cx = pos.x + hw;
+	//float cy = pos.y + hh;
+
+	float ca = cos(angle);
+	float sa = sin(angle);
+	float ax = hw* ca - hh* sa;
+	float ay = hw * sa + hh* ca;
+
+
+	updateRotateCoordsXY(-ax, ay);
+	updateRotateCoordsXY(ax, -ay);
+	updateRotateCoordsXY(-ay, -ax);
+	updateRotateCoordsXY(-ax, ay);
+	updateRotateCoordsXY(ay, ax);
+	updateRotateCoordsXY(ax, -ay);
+}
+
+
+#define updateCoordsXYZ(x,y,z)							\
+		verts[p] = x; verts[p+1] = y; verts[p+2] = z;	\
+		p+=stride; 										\
+
+/* Transforms a 2D rect into 3D space with the effect of bill-boarding */
+void Pi3CspriteArray::updateSpriteTransformCoords(std::vector<float> &verts, const uint32_t spriteRef, const vec3f &pos, const vec2f &size, const Pi3Cmatrix *scene_matrix, const vec2f &cent) //, const vec2f &uv, const vec2f &us
+{
+	//Transform pos into screen space ...
+	uint32_t p = vertOffset * stride + spriteRef * stride * 6;
+
+	vec3f tpos = scene_matrix->transformVec(pos);
+	float hw = size.x * 0.5f;
+	//float hh = size.y * 0.5f;
+	float cx = cent.x, cy = cent.y;
+	float w = 800.f / tpos.z;
+	updateCoordsXYZ(cx - (tpos.x - hw)*w, cy - tpos.y*w, tpos.z); // , uv.x, uv.y);
+	updateCoordsXYZ(cx - (tpos.x + hw)*w, cy - (tpos.y + size.y)*w, tpos.z); // , uv.x + us.x, uv.y);
+	updateCoordsXYZ(cx - (tpos.x + hw)*w, cy - tpos.y*w, tpos.z); // , uv.x + us.x, uv.y + us.y);
+	updateCoordsXYZ(cx - (tpos.x - hw)*w, cy - tpos.y*w, tpos.z); // , uv.x, uv.y);
+	updateCoordsXYZ(cx - (tpos.x - hw)*w, cy - (tpos.y + size.y)*w, tpos.z); // , uv.x, uv.y + us.y);
+	updateCoordsXYZ(cx - (tpos.x + hw)*w, cy - (tpos.y + size.y)*w, tpos.z); // , uv.x + us.x, uv.y + us.y);
+}
+
+void Pi3CspriteArray::updateSpriteBillboard(std::vector<float> &verts, const uint32_t spriteRef, const vec3f &pos, const vec2f &size, const vec3f &lookat)
+{
+	//Transform pos into screen space ...
+	uint32_t p = vertOffset * stride + spriteRef * stride * 6;
+
+	float hw = size.x * 0.5f;
+	float hh = size.y * 0.5f;
+
+	float lx = lookat.x - pos.x;
+	float lz = lookat.z - pos.z;
+	float d = std::sqrt(lx*lx + lz*lz);
+	float ax = (lz/d)*hw, az = -(lx/d)*hw;
+
+	updateCoordsXYZ(pos.x - ax, pos.y, pos.z - az); // , uv.x, uv.y);
+	updateCoordsXYZ(pos.x + ax, (pos.y + size.y), pos.z + az); // , uv.x + us.x, uv.y);
+	updateCoordsXYZ(pos.x + ax, pos.y, pos.z + az); // , uv.x + us.x, uv.y + us.y);
+	updateCoordsXYZ(pos.x - ax, pos.y, pos.z - az); // , uv.x, uv.y);
+	updateCoordsXYZ(pos.x - ax, (pos.y + size.y), pos.z - az); // , uv.x, uv.y + us.y);
+	updateCoordsXYZ(pos.x + ax, (pos.y + size.y), pos.z + az); // , uv.x + us.x, uv.y + us.y);
 }

@@ -17,7 +17,7 @@ void Pi3Cscene::render3D(const float ticks, Pi3Cmaterial *materialOverride)
 
 void Pi3Cscene::render2D(const float ticks)
 {
-	glClear(GL_DEPTH_BUFFER_BIT);
+	//glClear(GL_DEPTH_BUFFER_BIT);
 	render(ticks, projMatrix2D, modelMatrix2D, models2D, nullptr);
 }
 
@@ -34,9 +34,8 @@ void Pi3Cscene::renderSkybox(const vec3f &pos, const int32_t skyboxref, const fl
 bool Pi3Cscene::collide(const vec3f &pos, const vec3f &dir, const float radius) const
 {
 	if (dir.isZero()) return false;
-	Pi3Cmatrix pmat;
 	for (const auto &model : models) {
-		if (model.collide(resource, pmat, pos, dir, radius)) return true;
+		if (model.collide(resource, nullptr, pos, dir, radius)) return true;
 	}
 	return false;
 }
@@ -44,9 +43,8 @@ bool Pi3Cscene::collide(const vec3f &pos, const vec3f &dir, const float radius) 
 float Pi3Cscene::collideFloor(const vec3f &pos) const
 {
 	float ht = 1e8f;  //start from way up high!
-	Pi3Cmatrix pmat;
 	for (const auto &model : models) {
-		ht = model.collideFloor(resource, pmat, pos, ht);
+		ht = model.collideFloor(resource, nullptr, pos, ht);
 	}
 	return ht; //and see where we land :)
 }
@@ -133,7 +131,7 @@ Pi3Ctouch Pi3Cscene::touch3D(const vec3f &mousexyz) // vec3f tp, Pi3Cmodel *&sel
 	int32_t level = 0;
 	float dist = 1e8f;
 	for (size_t i = 0; i < models.size(); i++) {
-		models[i].touch(resource, modelMatrix3D, touch, 1);
+		models[i].touch(resource, &modelMatrix3D, touch, 1);
 		if (touch.prevDist < dist) {
 			touch.groupRefs[0] = (int32_t)i; 
 			dist = touch.prevDist;

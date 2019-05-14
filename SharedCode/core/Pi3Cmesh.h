@@ -78,11 +78,8 @@ public:
 /// FUNCTIONS ...
 
 	void addPackedVert(const vec3f &position, const vec3f &normal, const vec2f &uv, const GLfloat *cols);
-	void addRectangle(std::vector<float> &verts, const vec3f &pos, const vec3f &size, const vec2f &uv, const vec2f &us);
-	void updateRectCoords(std::vector<float> &verts, const vec3f &pos, const vec3f &size);
-	void updateRectTransformCoords(std::vector<float> &verts, const vec3f &pos, const vec3f &size, const Pi3Cmatrix *scene_matrix, const vec2f &cent); //const vec2f &uv, const vec2f &us,
 
-	void offset(const vec3f pos, std::vector<float> &verts, const uint32_t start, const uint32_t size, const uint32_t stride = defaultStride);
+	void offset(const vec3f pos, std::vector<float> &verts, uint32_t start, const uint32_t size, const uint32_t stride = defaultStride);
 	void resize(const vec3f &pos, const vec3f &size, const std::vector<float> &mverts);
 	void reset();
 
@@ -121,6 +118,7 @@ private:
 		reset();
 		name = _name;
 		this->stride = stride;
+		materialRef = 0; //default material
 	}
 
 	float triArea(const vec3f &v1, const vec3f &v2, const vec3f &v3, float &maxLength) const;
@@ -128,3 +126,11 @@ private:
 };
 
 
+class Pi3CspriteArray : public Pi3Cmesh {
+public:
+	void addSprite(const vec3f &pos, const vec2f &size, const vec2f &uv, const vec2f &us);
+	void updateSpriteCoords(std::vector<float> &verts, const uint32_t spriteRef, const float x, const float y);
+	void updateSpriteCoordsRotated(std::vector<float> &verts, const uint32_t spriteRef, const vec2f &pos, const vec2f &size, const float angle);
+	void updateSpriteTransformCoords(std::vector<float> &verts, const uint32_t spriteRef, const vec3f &pos, const vec2f &size, const Pi3Cmatrix *scene_matrix, const vec2f &cent); //const vec2f &uv, const vec2f &us,
+	void updateSpriteBillboard(std::vector<float> &verts, const uint32_t spriteRef, const vec3f &pos, const vec2f &size, const vec3f &lookat);
+};

@@ -1,6 +1,6 @@
 CC = g++
 CFLAGS = -std=c++17 -Wall
-LDLIBS = -lGL -lSDL2_image -lSDL2_mixer -lSDL2_ttf 
+LDLIBS = -lGL -lSDL2_image -lSDL2_mixer -lSDL2_ttf
 LDFLAGS = $(shell sdl2-config --cflags --libs)
 
 SHARED_DIR:= ../../SharedCode/core
@@ -32,9 +32,9 @@ endef
 
 .PHONY: all checkdirs clean
 
-all: checkdirs Volcano
+all: checkdirs Forest
 
-Volcano: $(OBJ)
+Forest: $(OBJ)
 	$(CC) $^ -o $@ $(CFLAGS) $(LDLIBS) $(LDFLAGS)
 	echo $(OBJ)
 
