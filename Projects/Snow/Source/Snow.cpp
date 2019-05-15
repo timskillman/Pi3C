@@ -34,96 +34,67 @@
 #define fp 10
 #define fpd (1<<fp)
 
-class rock {
+class snow {
 public:
 
-	rock(const int32_t x, const int32_t y) { create(x, y); }
+	snow(const float x, const float y, const float z, const uint32_t size, const uint32_t flakeRef) { create(x, y, z, size, flakeRef); }
 
-	int32_t px = 0;
-	int32_t py = 0;
+	vec3f pos;
+	vec3f dir;
+	float speed = 1.f;
+
 	float size = 1.f;
-	int32_t dx = 0;
-	int32_t e = 0;
-	int32_t gravity = 0;
 	float angle = 0;
 	float angleinc = 0;
+	uint32_t life = 0;
 	bool dead = false;
-	//uint32_t col = 0;
+	uint32_t flakeRef = 0;
 
-	void create(const int32_t x, const int32_t y) {
-		px = x << fp;
-		py = y << fp;
-		dx = rand() % (fpd<<4) - (fpd<<3);
-		size = (float)(rand() % 60) + 7.f;
+	void create(const float x, const float y, const float z, const uint32_t size, const uint32_t flakeRef) {
+		speed = 0.0001f;
+		pos = vec3f(x, y, z);
+		dir = vec3f(0, -((rand()%100000)+10000), 0);
+		this->size = (float)size;// (float)(rand() % 20) + 3.f;
+		this->flakeRef = flakeRef;
+
 		angle = (float)(rand() % 628) / 100.f;
-		angleinc = (float)(rand() % 100) / 1000.f -0.05f;
-		e = rand() % fpd + (fpd>>3);
-		gravity = -(rand() % (20<<fp)) - (10<<fp);
+		angleinc = (float)(rand() % 1000 - 500) *speed;
+
+		life = 1000 + rand() % 10000;
 		dead = false;
-		//col = (rand() % 255) | ((rand() % 255) << 8) | ((rand() % 255) << 16) | ((rand() % 255) << 24) | (255<<24);
 	}
 
 	void animate(const float d)
 	{
-		if (dead) return;
-
-		px += dx;
-		py -= gravity;
-
-		if (py < d) {
-			if (gravity>-fpd && gravity < fpd) {
-				e = 0;
-				py = d;
-				gravity = 0;
-			}
-			gravity = -(gravity>>1);
-			py -= gravity;
-		}
-
-		if (gravity == 0) {
-			dx -= (dx>>7);
-			dead = (dx > -1024 && dx < 1024);
-		}
-		
+		pos += dir*speed;
+		dir.x += (rand() % 1000) - 500;
 		angle += angleinc;
-		gravity += e;
+		if (pos.y < d) dead = true;
 	}
-
 };
 
 int main(int argc, char *argv[])
 {
-	Pi3C pi3c("Volcano", 1920, 1080, true);
+	Pi3C pi3c("Snow", 1920, 1080, true);
 	pi3c.window.setClearColour(0x0);
 
-	std::vector<rock> boulders;
+	uint32_t bkg = pi3c.create_background("../../Resources/models/maps/snowpath.jpg");  // wintersnow (must be rendered before snowflakes)
+
+	std::vector<snow> snowParticles;
 	Pi3CspriteArray sprites;
-	for (uint32_t r = 0; r < 1000; r++) {
-		rock boulder(pi3c.window.getWidth()/2, 250);
-		boulders.push_back(boulder);
-		sprites.addSprite(
-			vec3f((float)(boulder.px>>fp), (float)(boulder.py>>fp), -10.f), 
-			vec2f(boulder.size, boulder.size), 
-			vec2f((float)(rand() % 4)*0.25f , 0), vec2f(0.25f, 1.f));
+	for (uint32_t r = 0; r < 2000; r++) {
+		snow flake(rand() % pi3c.window.getWidth(), pi3c.window.getHeight() + rand() % pi3c.window.getHeight(), -10.f, rand() % 18 + 2, rand() % 4);
+		snowParticles.push_back(flake);
+		sprites.addSprite(flake.pos, vec2f(flake.size, flake.size), vec2f((float)(flake.flakeRef)*0.25f, 0), vec2f(0.25f, 1.f));
 	}
 	int spritesRef = pi3c.resource.addMesh(sprites, true, true);
 
-	Pi3Cmodel rectangles;
-	rectangles.meshRef = spritesRef;
-	rectangles.addTexture(&pi3c.resource, "../../Resources/models/maps/lavarocks.png"); // snowflakes4 //lavarocks
-	rectangles.material.illum = 1;
-	rectangles.material.alpha = 0.99f;
-	int rectsRef = pi3c.add_model_to_scene2D(rectangles);
-
-	uint32_t bkg = pi3c.create_background("../../Resources/models/maps/Volcano.png");
-
-	uint32_t degsize = 360;
-	std::vector<int32_t> costable;
-	costable.resize(degsize);
-	float degrad = PI2 / (float)degsize;
-	for (size_t a = 0; a < degsize; a++) {
-		costable[a] = (uint32_t)(cos(degrad*(float)a) * 1000.f);
-	}
+	Pi3Cmodel snowflakeModel;
+	snowflakeModel.meshRef = spritesRef;
+	snowflakeModel.addTexture(&pi3c.resource, "../../Resources/models/maps/snowflakes4b.png");
+	snowflakeModel.material.illum = 1;
+	snowflakeModel.material.alpha = .99f;
+	int snowRef = pi3c.add_model_to_scene2D(snowflakeModel);
 
 	Pi3Cimgui &gui = pi3c.gui;
 
@@ -132,11 +103,11 @@ int main(int argc, char *argv[])
 		pi3c.do_events();
 		pi3c.clear_window();
 
-		for (uint32_t r = 0; r < boulders.size(); r++) {
-			rock &boulder = boulders[r];
-			boulder.animate(0);
-			if (boulder.dead) boulder.create(pi3c.window.getWidth() / 2, pi3c.window.getHeight() *0.41f);
-			pi3c.update_sprite_rotated(spritesRef, r, vec2f((float)(boulder.px >> fp), (float)(boulder.py >> fp)), vec2f(boulder.size, boulder.size), boulder.angle);
+		for (uint32_t r = 0; r < snowParticles.size(); r++) {
+			snow &flake = snowParticles[r];
+			flake.animate(0);
+			if (flake.dead) flake.create(rand() % pi3c.window.getWidth(), pi3c.window.getHeight()+100.f, -10.f, rand() % 18 + 2, rand() % 4);
+			pi3c.update_sprite_rotated(spritesRef, r, vec2f(flake.pos.x, flake.pos.y), vec2f(flake.size, flake.size), flake.angle);
 		}
 		pi3c.resource.updateMesh(spritesRef); //upload all the altered vertices for this mesh
 

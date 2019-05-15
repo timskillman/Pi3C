@@ -47,6 +47,8 @@ public:
 
 	Pi3Cmodel create_model_from_mesh(const Pi3Cmesh &mesh, const uint32_t colour = 0xffffff) { return Pi3Cmodel(&resource, mesh, colour); }
 	Pi3Cmodel create_model_from_text(std::string &text, const uint32_t width, const uint32_t colour = 0x303030);
+
+	uint32_t create_background(const std::string &path, const std::string &file = "");
 	int32_t load_model(const std::string &path, const std::string &file);
 	int32_t add_model_to_scene2D(const Pi3Cmodel &model) { return scene.append2D(model); }
 	int32_t add_model_to_scene3D(const Pi3Cmodel &model) { return scene.append3D(model); }

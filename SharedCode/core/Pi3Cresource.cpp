@@ -11,7 +11,6 @@ void Pi3Cresource::init(const uint32_t stride)
 
 	//Create a default 2D rectangle as a helper for creating a letter sheet (verts will dynamically change)
 	Pi3Cmesh lets = Pi3Cshapes::rect(vec2f(0, 0), vec2f(1.f, 1.f));
-	lets.dynamic = true;
 	letterSheetRef = addMesh(lets, true, true,100000); //create a dynamic buffer for the lettersheet (page size)
 
 	//Create a default 2D rectangle as a helper for creating a letter sheet (verts will dynamically change)
@@ -124,7 +123,7 @@ void Pi3Cresource::addMeshVerts(const Pi3Cmesh &mesh, std::vector<float> &newver
 	meshes.push_back(newmesh);
 }
 
-int32_t Pi3Cresource::addMesh(Pi3Cmesh &mesh, const bool deleteVerts, const bool dynamicBuffer, const uint32_t vertSize)
+int32_t Pi3Cresource::addMesh(Pi3Cmesh &mesh, const bool deleteVerts, const bool expandingBuffer, const uint32_t vertSize)
 { 
 	//SDL_Log("Creating verts buffer %d",currentBuffer);
 	if (currentBuffer<0) {
@@ -169,10 +168,15 @@ int32_t Pi3Cresource::addMesh(Pi3Cmesh &mesh, const bool deleteVerts, const bool
 	else 
 	{
 		//else copy mesh verts into existing buffer
+		if (expandingBuffer) {
+			mverts.resize(vertSize * mesh.stride); //make max number of verts available
+		}
+		else {
+			mverts.resize(msz + mesh.vc); //only increase to verts being used
+		}
 		meshes.emplace_back();
 		Pi3Cmesh &newmesh = meshes.back();
 		newmesh = mesh.clone(0, (deleteVerts) ? 0 : mesh.vc);
-		mverts.resize((dynamicBuffer) ? vertSize * mesh.stride : msz + mesh.vc);
 		if (mesh.verts.size()>0) memcpy(&mverts[msz], &mesh.verts[0], mesh.vc * sizeof(float));
 		newmesh.vertOffset = msz / mesh.stride;
 		newmesh.vertSize = records;
@@ -183,7 +187,7 @@ int32_t Pi3Cresource::addMesh(Pi3Cmesh &mesh, const bool deleteVerts, const bool
 	mesh.verts.resize(0); //free memory since these verts have been transferred
 
 	//If buffer is dynamic, then reserve max number of vertices and create another buffer
-	if (dynamicBuffer) {
+	if (expandingBuffer) {
 		vertBuffer.emplace_back();
 		currentBuffer++;
 	}
@@ -273,7 +277,7 @@ void Pi3Cresource::uploadGPUverts(const int bufref, const std::vector<float> &ve
 void Pi3Cresource::updateGPUverts(const int bufref, const int vfrom, const int vsize, const std::vector<float> &verts)
 {
 	setRenderBuffer(bufref);
-	glBufferSubData(GL_ARRAY_BUFFER, vfrom * sizeof(float), vsize * sizeof(float), verts.data());
+	glBufferSubData(GL_ARRAY_BUFFER, vfrom * sizeof(float), vsize * sizeof(float), &verts[vfrom * sizeof(float)]);
 }
 
 int32_t Pi3Cresource::addShader(const std::string &vertfile, const std::string &fragfile)

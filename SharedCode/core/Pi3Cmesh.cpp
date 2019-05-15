@@ -354,16 +354,14 @@ void Pi3Cmesh::updateNormals(const uint32_t min, const uint32_t max)
 	}
 }
 
-
-
 #define CreateVerts(x,y,ux,uy)									\
 		verts[vc++] = x; verts[vc++] = y; verts[vc++] = pos.z;	\
 		verts[vc++] = 0; verts[vc++] = -1.f; verts[vc++] = 0;	\
-		verts[vc++] = ux; verts[vc++] = 0.99f-uy;					\
+		verts[vc++] = ux; verts[vc++] = 0.9999f-uy;				\
 
 void Pi3CspriteArray::addSprite(const vec3f &pos, const vec2f &size, const vec2f &uv, const vec2f &us)
 {
-	if (vc + stride * 6 > verts.size()) verts.resize(vc + 1000);
+	if (vc + stride * 6 > verts.size()) verts.resize(vc + 48);
 	CreateVerts(pos.x, pos.y - size.y, uv.x, uv.y - us.y);
 	CreateVerts(pos.x + size.x, pos.y , uv.x + us.x, uv.y);
 	CreateVerts(pos.x + size.x, pos.y - size.y, uv.x + us.x, uv.y - us.y);
@@ -372,11 +370,11 @@ void Pi3CspriteArray::addSprite(const vec3f &pos, const vec2f &size, const vec2f
 	CreateVerts(pos.x + size.x, pos.y, uv.x + us.x, uv.y);
 
 	vertSize = vc / stride;
-	bbox.update(vec3f(pos.x, pos.y, -10.f));
-	bbox.update(vec3f(pos.x + size.x, pos.y + size.y, -10.f));
+	bbox.update(vec3f(pos.x, pos.y, pos.z));
+	bbox.update(vec3f(pos.x + size.x, pos.y + size.y, pos.z));
 }
 
-#define updateCoordsXY(x,y)								\
+#define updateCoordsXY(x,y)							\
 		verts[p] = x; verts[p + 1] = y; p+=stride; 	\
 
 void Pi3CspriteArray::updateSpriteCoords(std::vector<float> &verts, const uint32_t spriteRef, const float x, const float y)
@@ -447,12 +445,12 @@ void Pi3CspriteArray::updateSpriteBillboard(std::vector<float> &verts, const uin
 	uint32_t p = vertOffset * stride + spriteRef * stride * 6;
 
 	float hw = size.x * 0.5f;
-	float hh = size.y * 0.5f;
+	//float hh = size.y * 0.5f;
 
 	float lx = lookat.x - pos.x;
 	float lz = lookat.z - pos.z;
-	float d = std::sqrt(lx*lx + lz*lz);
-	float ax = (lz/d)*hw, az = -(lx/d)*hw;
+	float d = hw / std::sqrt(lx*lx + lz*lz);
+	float ax = lz*d, az = -lx*d;
 
 	updateCoordsXYZ(pos.x - ax, pos.y, pos.z - az); // , uv.x, uv.y);
 	updateCoordsXYZ(pos.x + ax, (pos.y + size.y), pos.z + az); // , uv.x + us.x, uv.y);

@@ -54,7 +54,7 @@ public:
 	void SetRotateYbit(const float &angle);
 	void SetRotateZbit(const float &angle);
 	void SetPerspective(const int width, const int height, const float pspmul, const float znear, const float zfar);
-	void SetOrtho(const float left, const float right, const float top, const float bottom, const float znear, const float zfar);
+	void SetOrtho(const int left, const int right, const int top, const int bottom, const float znear, const float zfar);
 	void Translate(const vec3f &offset);
 	void Translate(const float x, const float y, const float z);
 	void move(vec3f const &offset);

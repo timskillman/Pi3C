@@ -52,6 +52,20 @@ Pi3Cmodel Pi3C::create_model_from_text(std::string &text, const uint32_t width, 
 	return textModel;
 }
 
+uint32_t Pi3C::create_background(const std::string &path, const std::string &file)
+{
+	Pi3Cmodel background;
+
+	Pi3CspriteArray rect;
+	rect.addSprite(vec3f(0, window.getHeight(), -20.f), vec2f(window.getWidth(), window.getHeight()));
+	background.meshRef = resource.addMesh(rect);
+
+	background.addTexture(&resource, (file!="" && path!="") ? path+"/"+file : path);
+	background.material.illum = 1;
+	background.material.alpha = 1.f;
+	return add_model_to_scene2D(background);
+}
+
 void Pi3C::update_sprite_position(const uint32_t spritesRef, const uint32_t spriteRef, const float x, const float y)
 {
 	Pi3CspriteArray *rm = (Pi3CspriteArray*)(&resource.meshes[spritesRef]);

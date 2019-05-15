@@ -128,7 +128,7 @@ private:
 
 class Pi3CspriteArray : public Pi3Cmesh {
 public:
-	void addSprite(const vec3f &pos, const vec2f &size, const vec2f &uv, const vec2f &us);
+	void addSprite(const vec3f &pos, const vec2f &size, const vec2f &uv = vec2f(0,0), const vec2f &us = vec2f(1.f, 1.f));
 	void updateSpriteCoords(std::vector<float> &verts, const uint32_t spriteRef, const float x, const float y);
 	void updateSpriteCoordsRotated(std::vector<float> &verts, const uint32_t spriteRef, const vec2f &pos, const vec2f &size, const float angle);
 	void updateSpriteTransformCoords(std::vector<float> &verts, const uint32_t spriteRef, const vec3f &pos, const vec2f &size, const Pi3Cmatrix *scene_matrix, const vec2f &cent); //const vec2f &uv, const vec2f &us,

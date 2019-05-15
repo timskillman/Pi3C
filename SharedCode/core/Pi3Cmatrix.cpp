@@ -118,18 +118,18 @@ void Pi3Cmatrix::SetPerspective(const int width, const int height, const float p
 	identity = false;
 }
 
-void Pi3Cmatrix::SetOrtho(const float left, const float right, const float top, const float bottom, const float znear, const float zfar)
+void Pi3Cmatrix::SetOrtho(const int left, const int right, const int top, const int bottom, const float znear, const float zfar)
 {
-	float rl = right - left;
-	float tb = top - bottom;
+	float rl = (float)(right - left);
+	float tb = (float)(top - bottom);
 	float w = 2.f / rl;
 	float h = 2.f / tb;
 	float zn = -2.f / (zfar - znear);
 	matrix[m00] = w; matrix[m01] = 0; matrix[m02] = 0; matrix[m03] = 0;
 	matrix[m10] = 0; matrix[m11] = h; matrix[m12] = 0; matrix[m13] = 0;
 	matrix[m20] = 0; matrix[m21] = 0; matrix[m22] = zn; matrix[m23] = 0;
-	matrix[m30] = -(right + left) / rl;
-	matrix[m31] = -(top + bottom) / tb;
+	matrix[m30] = -(float)(right + left) / rl;
+	matrix[m31] = -(float)(top + bottom) / tb;
 	matrix[m32] = -(znear + zfar) / (zfar - znear); 
 	matrix[m33] = 1.f;
 	identity = false;
