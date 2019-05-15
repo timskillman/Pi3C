@@ -220,7 +220,7 @@ uint32_t Pi3Cfont::textureRects(std::string &text, std::vector<float> &verts, Pi
 					x = 0; y -= maxHeight; maxHeight = 0; linex = x; linep = p;
 				}
 				else {
-					float yo = (format.scaleYoffset != 0) ? y+h * format.scaleYoffset : y;
+					float yo = (format.scaleYoffset > 0.f) ? y+h * format.scaleYoffset : y;
 					CreateVerts(x, yo-h, ux, uy);
 					CreateVerts(x + w + format.italicSlant, yo, ux + uw, uy + uh);
 					CreateVerts(x + w, yo-h, ux + uw, uy);
@@ -242,6 +242,6 @@ uint32_t Pi3Cfont::textureRects(std::string &text, std::vector<float> &verts, Pi
 		i++;
 	}
 	size.x = 0; size.y = 0;
-	size.width = wrapWidth; size.height = y;
+	size.width = wrapWidth; size.height = y+ maxHeight;
 	return p;	//return number of floats created
 }

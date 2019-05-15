@@ -522,9 +522,15 @@ bool Pi3Cimgui::ListBox(const std::string &text, uint32_t &currentItem, const st
 	return false;
 }
 
+bool Pi3Cimgui::Text(std::string &text)
+{
+	resource->renderText(resource->lettersRef, currentFont, text, vec3f(pos.x, pos.y, zpos), 4000);
+	return false;
+}
+
 bool Pi3Cimgui::TextArea(std::string &text, const int minwidth, const int minheight)
 {
-	resource->renderText(resource->lettersRef, currentFont, text, minwidth);
+	resource->renderText(resource->lettersRef, currentFont, text, vec3f(pos.x, pos.y, zpos), minwidth);
 	return false;
 }
 

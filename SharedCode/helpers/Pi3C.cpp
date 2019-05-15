@@ -13,6 +13,9 @@ void Pi3C::init(const std::string &title, const uint32_t width, const uint32_t h
 	}
 	window.initOptions(winopts);
 
+	winw = window.getWidth();
+	winh = window.getHeight();
+
 	resource.init(); //resource.init must be called after window creation
 
 	// Setup shader ..
@@ -26,8 +29,8 @@ void Pi3C::init(const std::string &title, const uint32_t width, const uint32_t h
 	scene.selectShader(basicShaderRef);
 
 	scene.setFog(0xffffff, 10000.f, 25000.f);
-	scene.setViewport2D(Pi3Crecti(0, 0, window.getWidth(), window.getHeight()), 0.1f, 4000.f);
-	scene.setPerspective3D(window.getWidth(), window.getHeight(), 800.f, 1.f, 5000.f);
+	scene.setViewport2D(Pi3Crecti(0, 0, winw, winh), 0.1f, 4000.f);
+	scene.setPerspective3D(winw, winh, 800.f, 1.f, 5000.f);
 
 	gui.init(&resource, &window);
 	guifonts.push_back(gui.addFont("../../Resources/fonts/", "NotoSans-Regular.ttf", 18));
@@ -57,7 +60,7 @@ uint32_t Pi3C::create_background(const std::string &path, const std::string &fil
 	Pi3Cmodel background;
 
 	Pi3CspriteArray rect;
-	rect.addSprite(vec3f(0, window.getHeight(), -20.f), vec2f(window.getWidth(), window.getHeight()));
+	rect.addSprite(vec3f(0, winh, -20.f), vec2f(winw, winh));
 	background.meshRef = resource.addMesh(rect);
 
 	background.addTexture(&resource, (file!="" && path!="") ? path+"/"+file : path);
@@ -112,9 +115,22 @@ float Pi3C::getAverageFPS()
 	return (float)frames / ((float)ticks / 1000.f);
 }
 
+float Pi3C::getCurrentFPS()
+{
+	uint32_t ticks = SDL_GetTicks() - last_time;
+	if (ticks>1000) {
+		float currentFPS = (float)fps / ((float)ticks / 1000.f);
+		fps = 0; 
+		last_time = SDL_GetTicks();
+		lastFPS = currentFPS;
+	}
+	return lastFPS;
+}
+
 void Pi3C::resize_window()
 {
-	scene.resize(Pi3Crecti(0, 0, (float)window.getWidth(), (float)window.getHeight()));
+	winw = window.getWidth(); winh = window.getHeight();
+	scene.resize(Pi3Crecti(0, 0, (float)winw, (float)winh));
 }
 
 bool Pi3C::do_events()

@@ -70,7 +70,7 @@ public:
 	void updateMesh(uint32_t meshRef);
 	void setRenderBuffer(const int bufRef);
 	void renderMesh(const int meshRef, const GLenum rendermode = GL_TRIANGLES);
-	void renderText(const int meshRef, Pi3Cfont *font, std::string &text, const float wrapWidth);
+	void renderText(const int meshRef, Pi3Cfont *font, std::string &text, const vec3f &pos, const float wrapWidth);
 	int32_t touchMesh(const int meshRef, Pi3Ctouch &touch, const Pi3Cmatrix &tmat) const;
 	
 	int32_t addShader(const std::string &vertfile, const std::string &fragfile);
@@ -78,8 +78,8 @@ public:
 	void addMusic(const char * path, const char * musicfile);
 	void addSound(const char * path, const char * soundfile);
 
-	std::vector<float> * getLetterVerts();
-	void updateLetterVerts(uint32_t vertCount, const uint32_t vertOffset = 0);
+	std::vector<float> * getLetterVerts(const uint32_t meshRef);
+	void updateLetterVerts(const uint32_t meshRef, uint32_t vertCount, const uint32_t vertOffset = 0);
 
 	std::shared_ptr<Pi3Cfont> findFont(const std::string &ffont) { return findResource(fonts, ffont); }
 	std::shared_ptr<Pi3Cmusic> findMusic(const std::string &fmusic) { return findResource(music, fmusic); }

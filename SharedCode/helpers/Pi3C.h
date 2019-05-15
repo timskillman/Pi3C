@@ -67,8 +67,12 @@ public:
 	bool do_events();
 	void clear_window() { window.clear(); }
 	void resize_window();
-	void swap_buffers() { frames++; window.SwapBuffers(); }
+	void swap_buffers() { frames++; fps++; window.SwapBuffers(); }
 	float getAverageFPS();
+	float getCurrentFPS();
+	uint32_t width() { return winw; }
+	uint32_t height() { return winh; }
+
 	std::vector<std::string> get_dropfiles();
 
 	Pi3Cmodel * model(const uint32_t modelRef) { return &scene.models[modelRef]; }
@@ -87,6 +91,10 @@ public:
 private:
 	bool has_started = false;
 	uint32_t frames = 0;
+	uint32_t fps = 0;
 	uint32_t start_time = 0;
-	
+	uint32_t last_time = 0;
+	uint32_t lastFPS = 0;
+	uint32_t winw = 0;
+	uint32_t winh = 0;
 };

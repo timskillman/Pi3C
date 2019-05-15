@@ -37,7 +37,7 @@
 class snow {
 public:
 
-	snow(const float x, const float y, const float z, const uint32_t size, const uint32_t flakeRef) { create(x, y, z, size, flakeRef); }
+	snow(const vec3f &pos, const uint32_t size, const uint32_t flakeRef) { create(pos, size, flakeRef); }
 
 	vec3f pos;
 	vec3f dir;
@@ -50,10 +50,10 @@ public:
 	bool dead = false;
 	uint32_t flakeRef = 0;
 
-	void create(const float x, const float y, const float z, const uint32_t size, const uint32_t flakeRef) {
+	void create(const vec3f &pos, const uint32_t size, const uint32_t flakeRef) {
 		speed = 0.0001f;
-		pos = vec3f(x, y, z);
-		dir = vec3f(0, -((rand()%100000)+10000), 0);
+		this->pos = pos;
+		dir = vec3f(0, (float)-((rand()%100000)+10000), 0);
 		this->size = (float)size;// (float)(rand() % 20) + 3.f;
 		this->flakeRef = flakeRef;
 
@@ -73,6 +73,8 @@ public:
 	}
 };
 
+#define random_top vec3f((float)(rand() % pi3c.width()), (float)(pi3c.height() + rand() % pi3c.height() + 100), -10.f)
+
 int main(int argc, char *argv[])
 {
 	Pi3C pi3c("Snow", 1920, 1080, true);
@@ -83,7 +85,7 @@ int main(int argc, char *argv[])
 	std::vector<snow> snowParticles;
 	Pi3CspriteArray sprites;
 	for (uint32_t r = 0; r < 2000; r++) {
-		snow flake(rand() % pi3c.window.getWidth(), pi3c.window.getHeight() + rand() % pi3c.window.getHeight(), -10.f, rand() % 18 + 2, rand() % 4);
+		snow flake(random_top, rand() % 18 + 2, rand() % 4);
 		snowParticles.push_back(flake);
 		sprites.addSprite(flake.pos, vec2f(flake.size, flake.size), vec2f((float)(flake.flakeRef)*0.25f, 0), vec2f(0.25f, 1.f));
 	}
@@ -98,6 +100,8 @@ int main(int argc, char *argv[])
 
 	Pi3Cimgui &gui = pi3c.gui;
 
+	float fps = 20;
+
 	while (pi3c.is_running())
 	{
 		pi3c.do_events();
@@ -106,12 +110,15 @@ int main(int argc, char *argv[])
 		for (uint32_t r = 0; r < snowParticles.size(); r++) {
 			snow &flake = snowParticles[r];
 			flake.animate(0);
-			if (flake.dead) flake.create(rand() % pi3c.window.getWidth(), pi3c.window.getHeight()+100.f, -10.f, rand() % 18 + 2, rand() % 4);
+			if (flake.dead) flake.create(random_top, rand() % 18 + 2, rand() % 4);
 			pi3c.update_sprite_rotated(spritesRef, r, vec2f(flake.pos.x, flake.pos.y), vec2f(flake.size, flake.size), flake.angle);
 		}
 		pi3c.resource.updateMesh(spritesRef); //upload all the altered vertices for this mesh
 
 		pi3c.render2D();
+
+		gui.Begin();
+		gui.Text("FPS:" + std::to_string((int)pi3c.getCurrentFPS()));
 
 		pi3c.swap_buffers();
 	}

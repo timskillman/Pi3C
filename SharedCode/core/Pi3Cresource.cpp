@@ -11,7 +11,7 @@ void Pi3Cresource::init(const uint32_t stride)
 
 	//Create a default 2D rectangle as a helper for creating a letter sheet (verts will dynamically change)
 	Pi3Cmesh lets = Pi3Cshapes::rect(vec2f(0, 0), vec2f(1.f, 1.f));
-	letterSheetRef = addMesh(lets, true, true,100000); //create a dynamic buffer for the lettersheet (page size)
+	letterSheetRef = addMesh(lets, true, true, 100000); //create a dynamic buffer for the lettersheet (page size)
 
 	//Create a default 2D rectangle as a helper for creating a letter sheet (verts will dynamically change)
 	lettersRef = addMesh(lets, true, true, 10000); //create a dynamic buffer for small temp lettersheet
@@ -50,17 +50,17 @@ int32_t Pi3Cresource::createDefaultTexture(int32_t &texRef)
 	return Texture->textureID; //textures.size();
 }
 
-std::vector<float> * Pi3Cresource::getLetterVerts()
+std::vector<float> * Pi3Cresource::getLetterVerts(const uint32_t meshRef)
 {
-	if (letterSheetRef < 0) return nullptr;
-	Pi3Cmesh &mesh = meshes[letterSheetRef];
+	if (meshRef < 0) return nullptr;
+	Pi3Cmesh &mesh = meshes[meshRef];
 	return &vertBuffer[mesh.bufRef];
 }
 
-void Pi3Cresource::updateLetterVerts(uint32_t vertCount, const uint32_t vertOffset)
+void Pi3Cresource::updateLetterVerts(const uint32_t meshRef, uint32_t vertCount, const uint32_t vertOffset)
 {
-	Pi3Cmesh *mesh = &meshes[letterSheetRef];
-	if (letterSheetRef < 0 ) return; //|| (vertCount / mesh->stride) > vertBuffer[mesh->bufRef].size()
+	if (meshRef < 0) return; //|| (vertCount / mesh->stride) > vertBuffer[mesh->bufRef].size()
+	Pi3Cmesh *mesh = &meshes[meshRef];
 	mesh->vc = vertCount;
 	mesh->vertSize = vertCount / mesh->stride;
 	mesh->vertOffset = vertOffset;
@@ -221,14 +221,21 @@ void Pi3Cresource::setRenderBuffer(const int bufRef)
 	lastVBO = bufRef;
 }
 
-void Pi3Cresource::renderText(const int meshRef, Pi3Cfont *font, std::string &text, const float wrapWidth)
+void Pi3Cresource::renderText(const int meshRef, Pi3Cfont *font, std::string &text, const vec3f &pos, const float wrapWidth)
 {
 	//Text meshref's can only be used once per frame (otherwise using the same meshRef will simply overwrite the previous text)
-	std::vector<float> *verts = getLetterVerts();				//get ptr to vertices from resource letterVerts
+	std::vector<float> *verts = getLetterVerts(meshRef);				//get ptr to vertices from resource letterVerts
 	if (verts == nullptr) return;
 	Pi3Crect size;
 	uint32_t vertCount = font->textureRects(text, *verts, size, wrapWidth);	//generate verts from text	
-	updateLetterVerts(vertCount);								//upload updated verts to GPU
+	updateLetterVerts(meshRef, vertCount);								//upload updated verts to GPU
+
+	Pi3Cmatrix matrix;
+	matrix.move(pos);
+	//matrix.SetScales(vec3f((float)wh.x, (float)wh.y, 1.f));
+	shaders[0].SetModelMatrix(matrix);
+	shaders[0].setMaterial(font->fontsheet.sheetMaterial);
+
 	renderMesh(meshRef, GL_TRIANGLES);
 }
 
