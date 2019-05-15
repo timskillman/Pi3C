@@ -149,7 +149,7 @@ int main(int argc, char *argv[])
 
 	//pi3c.resource.uploadMeshesToGPU();
 
-	// Setup matrices for shader ..
+	Pi3Cimgui &gui = pi3c.gui;
 
 	while (pi3c.is_running())
 	{
@@ -213,8 +213,8 @@ int main(int argc, char *argv[])
 		pi3c.scene.setMatrix(player.getPosition(), vec3f(0, 0, 0), player.getRotation());
 
 
-		Pi3Cmatrix *mm = pi3c.scene.getModelMatrix();
-		vec2f cent(pi3c.window.getWidth() / 2, pi3c.window.getHeight() / 2);
+		//Pi3Cmatrix *mm = pi3c.scene.getModelMatrix();
+		//vec2f cent(pi3c.window.getWidth() / 2, pi3c.window.getHeight() / 2);
 
 		for (uint32_t t = 0; t < trees.size(); t++) {
 			treeClass &tree = trees[t];
@@ -251,8 +251,10 @@ int main(int argc, char *argv[])
 		pi3c.render3D();
 		
 		//Render 2D
-		//pi3c.render2D();
-
+		pi3c.render2D();
+		gui.Begin();
+		std::string fps = "FPS:" + std::to_string((int)pi3c.getCurrentFPS());
+		gui.Text(fps);
 
 		pi3c.swap_buffers();
 		

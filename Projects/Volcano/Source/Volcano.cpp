@@ -142,7 +142,8 @@ int main(int argc, char *argv[])
 
 		pi3c.render2D();
 		gui.Begin();
-		gui.Text("FPS:" + std::to_string((int)pi3c.getCurrentFPS()));
+		std::string fps = "FPS:" + std::to_string((int)pi3c.getCurrentFPS());
+		gui.Text(fps);
 
 		pi3c.swap_buffers();
 	}

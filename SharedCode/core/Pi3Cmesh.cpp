@@ -449,7 +449,7 @@ void Pi3CspriteArray::updateSpriteBillboard(std::vector<float> &verts, const uin
 
 	float lx = lookat.x - pos.x;
 	float lz = lookat.z - pos.z;
-	float d = hw / std::sqrt(lx*lx + lz*lz);
+	float d = hw / sqrtf(lx*lx + lz*lz);
 	float ax = lz*d, az = -lx*d;
 
 	updateCoordsXYZ(pos.x - ax, pos.y, pos.z - az); // , uv.x, uv.y);
