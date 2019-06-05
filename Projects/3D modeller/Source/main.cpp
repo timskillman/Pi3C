@@ -48,6 +48,7 @@ int main(int argc, char *argv[])
 
 	// Setup Editor and Resources ...
 	static Pi3Cresource resource;
+	resource.init();
 	Modeller modeller(&resource, &window);
 	if (!modeller.initialised()) return 1;
 
@@ -58,7 +59,7 @@ int main(int argc, char *argv[])
 
 	while (!window.hasquit())
 	{
-		//modeller.handleKeys();
+		modeller.handleKeys();
 		modeller.handleEvents();
 		modeller.touchScene();
 		//modeller.tweens();

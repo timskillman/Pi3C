@@ -1,0 +1,8 @@
+# Exported from 3D Builder
+
+newmtl rock
+Ka 1 1 1
+Kd 1 1 1
+Ks 1 1 1
+Ns 1000
+map_Kd maps/msurface.png

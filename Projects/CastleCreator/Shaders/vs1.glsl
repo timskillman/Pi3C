@@ -32,8 +32,7 @@ void main()
     // Transform position into model space
     vec3 Position = vec3(u_ModelMatrix * vec4(a_Position, 1.0));
 	vec3 Normal = normalize(vec3(u_ModelMatrix * vec4(a_Normal, 0.0)));
-	
-	vec3 lightVector = normalize(u_LightPos - Position); //for static sun position, u_LightPos must have been transformed into the scene beforehand
+	vec3 lightVector = normalize(u_LightPos - Position);
 
 	// Calc UV with animation offset
 	v_UV = vec2(a_UV.x, 1.0 - a_UV.y) + u_animoffset;
@@ -44,7 +43,7 @@ void main()
 
 	// Calc fog
 	vec4 emitColour = max(u_lightColour, u_emissiveColour);
-	float fogFactor = (Position.z - u_fogMaxDist) * u_fogRange;
+	float fogFactor = (Position.z + u_fogMaxDist) * u_fogRange; //  / (fogMaxDist-fogMinDist)
 	fogFactor = clamp(fogFactor, 0.0, 1.0);
 	//if (u_illuminationModel == 1) fogFactor = 1.0;
 	v_fogColour = vec4((u_fogColour * (1.0 - fogFactor)),0.0) * u_lightColour;
@@ -63,7 +62,7 @@ void main()
 		v_fogColour = v_fogColour + vec4(u_specularColour.rgb * pow(rDotV, 50.0), 0.0);
 	}
 	
-	v_diffuseColour = vec4((diffuseCol * fogFactor + ambcol).rgb, u_diffuseColour.a) ; //preserve alpha
+	v_diffuseColour = vec4((diffuseCol + ambcol).rgb * fogFactor, u_diffuseColour.a) ; //preserve alpha
 		
     gl_Position = u_ProjMatrix * vec4(Position, 1.0);
 }

@@ -1,25 +1,30 @@
 title:Forest flight
-fullscreen:false
-screenWidth:1280	
-screenHeight:1024
+fullscreen:true
+screenWidth:1440	
+screenHeight:900
 
 trees:1000
 fly:true
 lightpos:0.0 1.0 0.0
-startpos:0.0 -1.8 0.0
+startpos:0.0 -30 0.0
 rotate:0.0 0.0 0.0
 perspective:800.0
-nearz:1.0
+nearz:0.1
 farz:25000.0
 avatarHeight:12.0
 avatarFallSpeed:10
 avatarWalkSpeed:10
 avatarRunSpeed:20
 fogColour:0xc0c0c0
-fogFar:30000.0
-fogNear:3000.0
+fogFar:28000.0
+fogNear:25000.0
 modelPath:../../Resources/models/
 
+sound:Action Strike.ogg
+soundPath:../../Resources/music/Rafael Krux
+
+#Landscape selection: Mountains.obj, Castle/landscape.obj
+landscape:landscape.obj
 skyboxPath:../../Resources/models/skyboxes
 skybox:stormy2.obj
 skyboxScale:15.0

@@ -10,4 +10,8 @@
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
     <LocalDebuggerCommandArguments>options.txt</LocalDebuggerCommandArguments>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LocalDebuggerEnvironment>PATH=$(ProjectDir)\..\..\ThirdParty\\SDL_image\lib\x86;$(ProjectDir)\..\..\ThirdParty\\SDL2\lib\x86;$(ProjectDir)\..\..\ThirdParty\\SDL2_image\lib\x86;$(ProjectDir)\..\..\ThirdParty\SDL2_mixer\lib\x86;$(ProjectDir)\..\..\ThirdParty\glew\bin\Release\Win32;$(ProjectDir)\..\..\ThirdParty\SDL2_ttf\lib\x86</LocalDebuggerEnvironment>
+    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+  </PropertyGroup>
 </Project>

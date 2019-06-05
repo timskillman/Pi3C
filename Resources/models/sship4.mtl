@@ -1,0 +1,24 @@
+
+newmtl glow
+Kd 1 1 1
+Ks 1 1 1
+Ns 1000
+illum 0
+map_Kd maps/blueglow.png
+
+newmtl panels4
+Kd 1 1 1
+Ks 1 1 1
+Ns 1000
+map_Kd maps/panels4x.png
+
+newmtl glass
+Kd .5 .5 1
+Ks 1 1 1
+Ns 1000
+illum 2
+Tr 0.5
+
+
+
+

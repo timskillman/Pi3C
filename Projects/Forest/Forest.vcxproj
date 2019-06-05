@@ -29,6 +29,7 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{86B9CF91-8738-B044-A7BF-A295F9323D12}</ProjectGuid>
     <RootNamespace>ScreenRunner</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -40,7 +41,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
@@ -53,20 +54,20 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
@@ -223,6 +224,7 @@
     <ClCompile Include="..\..\SharedCode\core\Pi3Cscene.cpp" />
     <ClCompile Include="..\..\SharedCode\core\Pi3Cshader.cpp" />
     <ClCompile Include="..\..\SharedCode\core\Pi3Cshapes.cpp" />
+    <ClCompile Include="..\..\SharedCode\core\Pi3CspriteArray.cpp" />
     <ClCompile Include="..\..\SharedCode\core\Pi3Ctexture.cpp" />
     <ClCompile Include="..\..\SharedCode\core\Pi3Ctouch.cpp" />
     <ClCompile Include="..\..\SharedCode\core\Pi3Ctriangle.cpp" />
@@ -263,6 +265,7 @@
     <ClInclude Include="..\..\SharedCode\core\Pi3Cshader.h" />
     <ClInclude Include="..\..\SharedCode\core\Pi3Cshapes.h" />
     <ClInclude Include="..\..\SharedCode\core\Pi3Csound.h" />
+    <ClInclude Include="..\..\SharedCode\core\Pi3CspriteArray.h" />
     <ClInclude Include="..\..\SharedCode\core\Pi3Ctextformat.h" />
     <ClInclude Include="..\..\SharedCode\core\Pi3Ctexture.h" />
     <ClInclude Include="..\..\SharedCode\core\Pi3Ctouch.h" />

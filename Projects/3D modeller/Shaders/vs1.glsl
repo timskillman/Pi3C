@@ -16,11 +16,13 @@ uniform vec4 u_specularColour;
 uniform vec3 u_fogColour;
 uniform float u_fogMaxDist;
 uniform float u_fogRange;  	// effectively 1.0 / (fogMaxDist-fogMinDist)
+uniform float u_col32;		// a floating point representing RGB 
 
 attribute vec3 a_Position;
 attribute vec3 a_Normal;
 attribute vec2 a_UV;
- 
+attribute float a_Colour;
+
 varying vec2 v_UV;
 varying vec4 v_diffuseColour;
 varying vec4 v_fogColour;
@@ -32,8 +34,9 @@ void main()
     // Transform position into model space
     vec3 Position = vec3(u_ModelMatrix * vec4(a_Position, 1.0));
 	vec3 Normal = normalize(vec3(u_ModelMatrix * vec4(a_Normal, 0.0)));
+	vec3 lightVector = normalize(u_LightPos - Position);
 	
-	vec3 lightVector = normalize(u_LightPos - Position); //for static sun position, u_LightPos must have been transformed into the scene beforehand
+	vec4 col = vec4(fract(a_Colour), fract(a_Colour / 256.0), fract((floor(a_Colour / 256.0)) / 256.0), 1.0);
 
 	// Calc UV with animation offset
 	v_UV = vec2(a_UV.x, 1.0 - a_UV.y) + u_animoffset;
@@ -44,15 +47,15 @@ void main()
 
 	// Calc fog
 	vec4 emitColour = max(u_lightColour, u_emissiveColour);
-	float fogFactor = (Position.z - u_fogMaxDist) * u_fogRange;
+	float fogFactor = (Position.z + u_fogMaxDist) * u_fogRange; //  / (fogMaxDist-fogMinDist)
 	fogFactor = clamp(fogFactor, 0.0, 1.0);
 	//if (u_illuminationModel == 1) fogFactor = 1.0;
 	v_fogColour = vec4((u_fogColour * (1.0 - fogFactor)),0.0) * u_lightColour;
 	
 	// Calc lighting and specular and mix into fogColour
-	vec4 ambcol = vec4(0,0,0,0);
+	vec4 ambcol = u_ambientColour; //vec4(0,0,0,0);
 	//vec4 diffuseCol = vec4(u_diffuseColour.rgb * max(u_lightColour.rgb, u_emissiveColour.rgb*(1.0-fogFactor)), u_diffuseColour.a);
-	vec4 diffuseCol = u_diffuseColour * emitColour;
+	vec4 diffuseCol = u_diffuseColour * emitColour * col;
 
 	// apply shade and fog ...
 	if (u_illuminationModel == 2) {
@@ -63,7 +66,7 @@ void main()
 		v_fogColour = v_fogColour + vec4(u_specularColour.rgb * pow(rDotV, 50.0), 0.0);
 	}
 	
-	v_diffuseColour = vec4((diffuseCol * fogFactor + ambcol).rgb, u_diffuseColour.a) ; //preserve alpha
+	v_diffuseColour = vec4((diffuseCol + ambcol).rgb * fogFactor, u_diffuseColour.a) ; //preserve alpha
 		
     gl_Position = u_ProjMatrix * vec4(Position, 1.0);
 }

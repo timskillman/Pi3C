@@ -8,5 +8,5 @@ varying vec4 v_fogColour;		// Fog colour
 void main()
 {
 		vec4 col = texture2D(u_Texture, v_UV) * v_diffuseColour + v_fogColour;
-		if (col.a > 0.1) gl_FragColor = col; else discard;
+		if (col.a > 0.01) gl_FragColor = col; else discard;
 }

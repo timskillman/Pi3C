@@ -11,12 +11,12 @@
 #include <algorithm>
 
 // ==========================================================================
-// Forest example using the Skillman Media Raspberry Pi Graphics Library
+// Pi3C Graphics Library Example - Forest Flight (by Tim Skillman)
 // ==========================================================================
 //
 // The MIT License
 //
-// Copyright (c) 2018 Tim Skillman
+// Copyright (c) 2019 Tim Skillman
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -36,24 +36,84 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 //
+// Dedicated to the One who has blessed me beyond my dreams ...
+// Jesus Christ, King of Kings and Lord of Lords :-)
 // =======================================================================
 
-class treeClass {
-public:
+struct treeArray {
 
-	treeClass(vec3f pos) { create(pos); }
-
-	void create(const vec3f &pos) {
-		this->pos = pos;
-		size = (float)(rand() % 40) + 12.f;
-		treeType = rand() % 4;
+	void init(const uint32_t maxTreeTypes)
+	{
+		treeMesh.reset(new Pi3Cmesh);
+		treeTextureStep = 1.f / (float)maxTreeTypes;
 	}
 
-	vec3f pos;
-	float size = 1.f;
-	uint32_t treeType = 0;
+	void createTree(const vec3f &pos, const vec2f &size, const uint32_t type) {
+		positions.push_back(pos);
+		sizes.push_back(size);
+		treeTypes.push_back(type);
+		treeMesh->addRect(pos, size, vec2f((float)(type)*treeTextureStep, 0.f), vec2f(treeTextureStep, 0.99f));
+	}
+
+	std::unique_ptr<Pi3Cmesh> treeMesh;
+	std::vector<vec3f> positions;
+	std::vector<vec2f> sizes;
+	std::vector<uint32_t> treeTypes;
+	float treeTextureStep = 0.25f;		//usually four trees per texture - but needs setting
 };
 
+#define maxBolts 100
+
+class boltArray {
+public:
+
+	void init()
+	{
+		for (size_t i = 0; i < maxBolts; i++) {
+			//vec3f p1(pos.x + dir.y, pos.y, pos.z - dir.z);
+			//vec3f p2(pos.x + dir.y, pos.y, pos.z - dir.z);
+			//vec3f p3(pos.x + dir.y, pos.y, pos.z - dir.z);
+			//vec3f p4(pos.x + dir.y, pos.y, pos.z - dir.z);
+			//Pi3Cshapes::quad(p1, p2, p3, p4);
+		}
+	}
+
+	void fireBolt(const vec3f &pos, const vec3f &dir) {
+		if (count < maxBolts) {
+			this->pos[count] = pos;
+			this->dir[count] = dir;
+			this->life[count++] = 1000;
+
+		}
+	}
+
+	void updateBolt(const uint32_t b)
+	{
+		float dx = pos[b].z * width; float dy = -pos[b].x *width;
+
+	}
+
+	void animate()
+	{
+		for (uint32_t b = 0; b < count; b++) {
+			if (life[b] > 1000) {
+				pos[b] += dir[b];
+				life[b]--;
+				updateBolt(b);
+			}
+		}
+	}
+
+	std::unique_ptr<Pi3Cmesh> boltMesh;
+	vec3f pos[maxBolts];
+	vec3f dir[maxBolts];
+	int life[maxBolts]{ -1 };
+	float width = 1.f;
+	float length = 10.f;
+	int32_t count = -1;
+};
+
+float rnd(const uint32_t size) { return (float)(rand() % size); }
 
 int main(int argc, char *argv[])
 {
@@ -63,18 +123,6 @@ int main(int argc, char *argv[])
 	Pi3C pi3c(opts.asString("title"), screenWidth , screenHeight, opts.asBool("fullscreen"));
 
 	Pi3CGL::showGLinfo();
-
-
-	//Setup UI editor and attach functionality ...
-	//SMUIform editform("editor", &resource2D, &window, &shader);	//create a UI form and attach window (so it can draw itself)
-	//SMeditor editor(&editform, &scene, "editor.form", "ui/uimage_sm.png");		//create our editor class and attach the editor form and scene (so we can glue our UI and Scene elements together)
-
-	// Get the loading bar widget from the Editor so we can use it while loading models ...
-	//auto *loadingBar = static_cast<SMUIcontrols::loadingbar*>(editform.findControl("loadingBar"));
-	//auto loadbarCallback = loadingBar->getCallback(&window, &shader);
-
-	// Load models from modelFiles and upload vertex buffer object to GPU ..
-
 	
 
 	Pi3Cavatar player;
@@ -82,61 +130,83 @@ int main(int argc, char *argv[])
 	avparams.movement = Pi3Cavatar::move_fly;
 	avparams.position = opts.asVec3f("startpos");
 	//avparams.rotation = opts.asVec3f("rotate");
-	//avparams.size = { 1.f, opts.asFloat("avatarHeight"), 1.f };
-	//avparams.walkSpeed = opts.asFloat("avatarWalkSpeed");
-	//avparams.runSpeed = opts.asFloat("avatarRunSpeed");
-	//avparams.fallSpeed = opts.asFloat("avatarFallSpeed");
+	avparams.size = { 1.f, opts.asFloat("avatarHeight"), 1.f };
+	avparams.walkSpeed = opts.asFloat("avatarWalkSpeed");
+	avparams.runSpeed = opts.asFloat("avatarRunSpeed");
+	avparams.fallSpeed = opts.asFloat("avatarFallSpeed");
 	player.init(avparams);
-
-	//Pi3Cmodel brush = pi3c.create_model_from_mesh(Pi3Cshapes::sphere(vec3f(0, 0, -10.f), 2.0f, 0.f, 10, 20), 0xff00ffff);
-	//brush.touchable = false;
-	//int brushref = pi3c.add_model_to_scene3D(brush);
 	
-	uint32_t treeNo = opts.asInt("trees");
-	std::vector<treeClass> trees;
-	Pi3CspriteArray sprites;
-	for (uint32_t r = 0; r < treeNo; r++) {
-		treeClass tree(vec3f((float)(rand() % 2000 - 1000), 0, (float)(rand() % 2000 - 1000)));
-		trees.push_back(tree);
-		sprites.addSprite(tree.pos, vec2f(tree.size, tree.size), vec2f((float)(tree.treeType)*0.25f, 0.f), vec2f(0.25f, 0.99f));
-	}
-	int spritesRef = pi3c.resource.addMesh(sprites, true, true);
+	//Scatter trees in round clusters ...
+	uint32_t maxTrees = opts.asInt("trees");		//Get max number of trees from options file
+	uint32_t maxTreeTypes = 4;
 
-	Pi3Cmodel rectangles;
-	rectangles.meshRef = spritesRef;
-	rectangles.addTexture(&pi3c.resource, "../../Resources/models/maps/tree.png");
-	rectangles.material.illum = 1;
-	rectangles.material.alpha = 1.f;
-	int rectsRef = pi3c.add_model_to_scene3D(rectangles);
+	//Setup our tree array ...
+	treeArray trees;
+	trees.init(maxTreeTypes);
+
+	uint32_t tcount = 0;
+	uint32_t treetype = 0;
+	float landHeight = 0;
+	boltArray bolts;
+
+	while (tcount < maxTrees) {
+		
+		vec3f clusterCentre((float)(rand() % 4000 - 2000), 0, (float)(rand() % 4000 - 2000));	//Cluster centre ...
+		uint32_t clusterCount = tcount + rand() % 90 + 5;										//Tree count in this cluster
+
+		while (tcount < maxTrees && tcount < clusterCount) {
+
+			float radius = (float)(rand() % 400 - 200);											//radius
+			float angle = rnd(360) / PI2;														//random angle 0-360
+			vec3f pos = clusterCentre + vec3f(cos(angle)*radius, landHeight, sin(angle)*radius);//calc tree position 
+
+			float treesize = (float)(rand() % 40) + 10.f*(float)(treetype + 2);					//random tree size 10-50
+			vec2f size(treesize, treesize);
+
+			trees.createTree(pos, size, treetype);										
+
+			tcount++;
+
+		}
+		treetype = (treetype +1) % maxTreeTypes;	//simply cycle through tree types per cluster
+	}
+
+	Pi3Cmodel treesModel;
+	treesModel.meshRef = pi3c.resource.insertMesh(trees.treeMesh.get());
+	treesModel.addTexture(&pi3c.resource, "../../Resources/models/maps/redwoods.png");
+	treesModel.material.illum = 0;
+	treesModel.material.alpha = 1.f;
+	int treesModelRef = pi3c.add_model_to_scene3D(treesModel);
+
+	trees.treeMesh.reset();		//destroy the treeMesh in trees to free up memory
 
 	int skybox = pi3c.scene.loadModelOBJ(opts.asString("skyboxPath"), opts.asString("skybox"), 0); // loadbarCallback);
 	pi3c.scene.models[skybox].matrix.SetScale(opts.asFloat("skyboxScale"));
 	pi3c.scene.models[skybox].touchable = false;
 
-	int landRef = pi3c.load_model("../../Resources/models/Castle", "landscape.obj");
+	int landRef = pi3c.load_model("../../Resources/models", opts.asString("landscape"));
+	int airport = pi3c.load_model("../../Resources/models", "airport.obj", vec3f(-500,0,0));
 
-	//int ship = pi3c.load_model("../../Resources/models/CargoBay", "CargoHoldBaked3.obj");
+	int sship = pi3c.load_model("../../Resources/models", "sship3.obj"); //sship //EagleTransporter // NMSship
+	int cockpit = pi3c.load_model("../../Resources/models", "sshipCockpit2.obj"); //sship //EagleTransporter // NMSship
 
-	pi3c.scene.setFog(0xffffff, opts.asFloat("fogNear"), opts.asFloat("fogFar"));
+	int ship = sship;
+	Pi3Cbbox3d shipbox = pi3c.model(ship)->bbox;
+
+	pi3c.scene.setFog(opts.asHex("fogColour"), opts.asFloat("fogNear"), opts.asFloat("fogFar"));
 	pi3c.scene.setPerspective3D(screenWidth, screenHeight, opts.asFloat("perspective"), opts.asFloat("nearz"), opts.asFloat("farz"));
+	
 
-	//if (opts.logo != "") {
-	//	SDL_Log("Loading logo");
-	//	SMmodel logoModel(&resource, SMshapes::rect(vec2f(20, 20), vec2f(150, 80)), 0xffffffff);
-	//	//logoModel.material.SetAnimationSheet(16, 13, 200);
-	//	scene.append2D(logoModel, opts.modelPath+"/"+opts.logo);
-	//}
-
-	//Mix_Music *menuMusic = nullptr;
-	//if (opts.sound != "") {
-	//	if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0) {
-	//		SDL_Log("couldn't initialize mix, error: %s\n", Mix_GetError());
-	//	}
-	//	SDL_Log("Loading sound");
-	//	std::string spath = opts.soundPath + "/" + opts.sound;
-	//	menuMusic = Mix_LoadMUS(spath.c_str());
-	//	if (Mix_PlayingMusic() == 0) Mix_PlayMusic(menuMusic, -1);
-	//}
+	Mix_Music *menuMusic = nullptr;
+	if (opts.asString("sound") != "") {
+		if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0) {
+			SDL_Log("couldn't initialize mix, error: %s\n", Mix_GetError());
+		}
+		SDL_Log("Loading sound");
+		std::string spath = opts.asString("soundPath") + "/" + opts.asString("sound");
+		menuMusic = Mix_LoadMUS(spath.c_str());
+		if (Mix_PlayingMusic() == 0) Mix_PlayMusic(menuMusic, -1);
+	}
 
 	//for (size_t m = 0; m < opts.models.size(); m++) {
 	//	int32_t modelRef = pi3c.scene.loadModelOBJ(opts.modelPath, opts.models[m], nullptr); // loadbarCallback);
@@ -149,28 +219,65 @@ int main(int argc, char *argv[])
 
 	//pi3c.resource.uploadMeshesToGPU();
 
-	Pi3Cimgui &gui = pi3c.gui;
+	vec3f shipRot;
+	float rollDelta = 0;
+	float takeoff = 0;
+	float maxspeed = 30.f;
+	player.flyspeed = 0;
+
+	Pi3Cimgui &gui = pi3c.gui;	//expose gui object from pi3c
 
 	while (pi3c.is_running())
 	{
 		//process key presses ...
 
-		player.moveKeys(SDL_SCANCODE_W, SDL_SCANCODE_S, SDL_SCANCODE_A, SDL_SCANCODE_D, SDL_SCANCODE_R, SDL_SCANCODE_F);
+		//player.moveKeys(SDL_SCANCODE_W, SDL_SCANCODE_S, SDL_SCANCODE_A, SDL_SCANCODE_D, SDL_SCANCODE_R, SDL_SCANCODE_F);
 		const uint8_t *keystate = pi3c.window.getKeys();
 		player.run(keystate[SDL_SCANCODE_LSHIFT] || keystate[SDL_SCANCODE_RSHIFT]);
-		if (keystate[SDL_SCANCODE_W]) player.forward();
-		if (keystate[SDL_SCANCODE_S]) player.back();
-		if (keystate[SDL_SCANCODE_A]) player.left();
-		if (keystate[SDL_SCANCODE_D]) player.right();
+		if (keystate[SDL_SCANCODE_W])  player.flyspeed += 0.1f; // player.forward();
+		if (keystate[SDL_SCANCODE_S]) player.flyspeed -= 0.1f;  //player.back();
+		if (keystate[SDL_SCANCODE_Z] || keystate[SDL_SCANCODE_X]) {
+			//player.left();
+			float ldelta = (keystate[SDL_SCANCODE_Z]) ? 0.03f : -0.03f;
+			player.rotate(vec3f(0, ldelta, 0));
+			shipRot.y -= ldelta;
+			shipRot.z += ldelta*0.5f;
+		}
+		if (keystate[SDL_SCANCODE_SLASH] || keystate[SDL_SCANCODE_APOSTROPHE]) {
+			float ldelta = (keystate[SDL_SCANCODE_SLASH]) ? 0.02f : -0.02f;
+			player.rotate(vec3f(ldelta, 0, 0));
+			shipRot.x -= ldelta *0.5f;
+			//shipRot.y -= ldelta;
+			//shipRot.z += ldelta * 0.5f;
+		}
+		//if (keystate[SDL_SCANCODE_D]) player.right();
 		if (keystate[SDL_SCANCODE_R]) player.up();			//only when flying
 		if (keystate[SDL_SCANCODE_F]) player.down();		//only when flying
 		if (keystate[SDL_SCANCODE_SPACE]) player.jump();	//only when walking
 		if (keystate[SDL_SCANCODE_ESCAPE]) pi3c.window.setquit(true);
+		if (keystate[SDL_SCANCODE_C]) ship = cockpit; 
+		if (keystate[SDL_SCANCODE_V]) ship = sship;
+		//if (keystate[SDL_SCANCODE_SPACE]) player.flyspeed += 0.1f; // takeoff = 0.1f;
+		//if (keystate[SDL_SCANCODE_L]) player.flyspeed -= 0.1f; //takeoff = -0.1f;
+		if (keystate[SDL_SCANCODE_RETURN]) bolts.fireBolt(-player.getPosition(), player.getRotation());
+
+		if (takeoff != 0) {
+			player.flyspeed += takeoff;
+			if (player.flyspeed > maxspeed) takeoff = 0;
+			if (player.flyspeed < 0) {
+				takeoff = 0; player.flyspeed = 0;
+			}
+		}
+
+		pi3c.model(sship)->visible = (ship==sship);
+		pi3c.model(cockpit)->visible = (ship==cockpit);
 		player.updateAndCollide(&pi3c.scene, pi3c.window.getTicks());
 
 		// Centre skybox and other 'infinite' geometry around player...
-		//if (skybox >= 0) pi3c.scene.models[skybox].matrix.move(-player.getPosition());
+		if (skybox >= 0) pi3c.model(skybox)->move(-player.getPosition());
 
+		
+		//pi3c.model(eagle)->rotate(vec3f(0, player.getRotation().y, 0));
 		// process window events ...
 
 		while (pi3c.do_events()) {
@@ -180,8 +287,13 @@ int main(int argc, char *argv[])
 				//SDL_Log("Key = %d", pi3c.window.ev.text.text);
 				break;
 			case SDL_MOUSEMOTION:
+				//{
 				if (pi3c.window.mouse.RightButton) {
-					player.rotate(vec3f(pi3c.window.mouse.deltaXY.y / 300.f, -pi3c.window.mouse.deltaXY.x / 300.f, 0));
+					vec3f rotDelta(pi3c.window.mouse.deltaXY.y / 300.f, -pi3c.window.mouse.deltaXY.x / 300.f, 0);
+					player.rotate(rotDelta);
+					shipRot.y -= rotDelta.y;
+					shipRot.z += rotDelta.y; // *0.5f;
+					shipRot.x -= rotDelta.x; // *0.5f;
 				}
 				break;
 			case SDL_MOUSEWHEEL:
@@ -196,65 +308,36 @@ int main(int argc, char *argv[])
 					int32_t newmodel = pi3c.load_model("", file);
 					if (newmodel >= 0) {
 						pi3c.model(newmodel)->move(-player.getPosition());
-						pi3c.resource.uploadMeshesToGPU();
 					}
 				}
 				break;
 			}
 		}
 
+		Pi3Cmatrix rmat; rmat.rotate(-player.getRotation());
+
+		vec3f offset = (ship == cockpit) ? vec3f(0, 0, 0) : -rmat.transformRotateVec(vec3f(0, shipbox.height()*1.5f, shipbox.depth()*1.5f));
+		pi3c.model(ship)->move(-player.getPosition()+offset); // -rmat.transformRotateVec(vec3f(0, shipbox.height()*1.5f, shipbox.depth()*1.5f)));
+		pi3c.model(ship)->matrix.setRotate(shipRot);
+		if (shipRot.z != 0) shipRot.z *= 0.95f;			//dampened roll to 0
+		//if (shipRot.x != 0) shipRot.x *= 0.95f;			//dampened pitch to 0
+
 		//clear background ...
 		pi3c.clear_window();
 	
 		//Render 3D scene ...
-		//Pi3Cmesh &rm = pi3c.resource.meshes[rectsMesh];
-		//std::vector<float> &verts = pi3c.resource.vertBuffer[rm.bufRef];
-		//rm.vc = rm.vertOffset*rm.stride;
 		pi3c.scene.setMatrix(player.getPosition(), vec3f(0, 0, 0), player.getRotation());
 
+		treesModel.updateSpriteBillboard(&pi3c.resource, trees.positions, trees.sizes, -player.getPosition()); //, vec2f(flake.col*0.25f, 0), vec2f(0.25f, 1.f)
 
-		//Pi3Cmatrix *mm = pi3c.scene.getModelMatrix();
-		//vec2f cent(pi3c.window.getWidth() / 2, pi3c.window.getHeight() / 2);
-
-		for (uint32_t t = 0; t < trees.size(); t++) {
-			treeClass &tree = trees[t];
-			pi3c.update_sprite_billboard(spritesRef, t, tree.pos, vec2f(tree.size, tree.size), -player.getPosition()); //, vec2f(flake.col*0.25f, 0), vec2f(0.25f, 1.f)
-		}
-
-		/*  Z-Sort alphas ... update_sprite_transform would need to include uv coords as sorting mixes these up
-
-		std::vector<std::pair<float, int32_t>> zflakes;
-
-		for (uint32_t r = 0; r < flakes.size(); r++) {
-			particle &flake = flakes[r];
-			float z = mm->transformZ(flake.pos); if (z < 0) continue;
-			std::pair<float, int32_t> zflake{ z,r };
-			zflakes.push_back(zflake);
-
-			//flake.animate(0);
-			//if (flake.dead)
-			//	flake.create(vec3f((float)(pi3c.window.getWidth() / 2), (float)(rand() % 500), (float)(rand() % 500))); //(float)(rand() % 500)
-		}
-
-		std::sort(zflakes.begin(), zflakes.end(), [=](std::pair<float, int32_t>& a, std::pair<float, int32_t>& b) { return a.first > b.first; });
-
-		for (uint32_t r = 0; r < zflakes.size(); r++) {
-			particle &flake = flakes[zflakes[r].second];
-			pi3c.update_sprite_transform(spritesRef, r, flake.pos, vec2f(flake.size, flake.size), vec2f(flake.col*0.25f, 0), vec2f(0.25f, 1.f), mm, cent);
-		}
-		*/
-
-		pi3c.resource.updateMesh(spritesRef); //upload all the altered vertices for this mesh
-
-
-		pi3c.scene.setSun(0xffffff, vec3f(1000.f, 1000.f, -1000.f)); //transform sun position into scene
+		pi3c.scene.setSun(0xffffff, vec3f(5000.f, 5000.f, -5000.f)); //transform sun position into scene
 		pi3c.render3D();
 		
 		//Render 2D
 		pi3c.render2D();
 		gui.Begin();
 		std::string fps = "FPS:" + std::to_string((int)pi3c.getCurrentFPS());
-		gui.Text(fps);
+		gui.Text(fps, 0xff0000ff);
 
 		pi3c.swap_buffers();
 		

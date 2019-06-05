@@ -2,12 +2,12 @@
 #include "Pi3Cstring.h"
 
 // ==========================================================================
-// Pi3C Graphics Library Example - Castle Creator (by Tim Skillman)
+// Pi3C Graphics Library Example - Snow 2D example (by Tim Skillman)
 // ==========================================================================
 //
 // The MIT License
 //
-// Copyright (c) 2018 Tim Skillman
+// Copyright (c) 2019 Tim Skillman
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -27,49 +27,58 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 //
-// Dedicated to the One who changes my life in the most amazing ways ...
+// Dedicated to the One who has blessed me beyond my dreams ...
 // Jesus Christ, King of Kings and Lord of Lords :-)
 // =======================================================================
 
 #define fp 10
 #define fpd (1<<fp)
 
-class snow {
+
+class snowArray {
 public:
 
-	snow(const vec3f &pos, const uint32_t size, const uint32_t flakeRef) { create(pos, size, flakeRef); }
+	snowArray(uint32_t w, uint32_t h) : width(w), height(h) {}
 
-	vec3f pos;
-	vec3f dir;
-	float speed = 1.f;
+	float speed = 0.0001f;
+	uint32_t width = 0;
+	uint32_t height = 0;
 
-	float size = 1.f;
-	float angle = 0;
-	float angleinc = 0;
-	uint32_t life = 0;
-	bool dead = false;
-	uint32_t flakeRef = 0;
+	std::vector<vec3f> position;
+	std::vector<vec3f> dir;
+	std::vector<vec2f> sizes;
+	std::vector<uint32_t> flakeType;
+	std::vector<float> angle;
+	std::vector<float> angleinc;
 
-	void create(const vec3f &pos, const uint32_t size, const uint32_t flakeRef) {
-		speed = 0.0001f;
-		this->pos = pos;
-		dir = vec3f(0, (float)-((rand()%100000)+10000), 0);
-		this->size = (float)size;// (float)(rand() % 20) + 3.f;
-		this->flakeRef = flakeRef;
+	void update(const size_t ref, const vec3f &pos, const vec2f size, const uint32_t flakeRef)
+	{
+		position[ref] = pos;
+		dir[ref] = vec3f(0, (float)-((rand() % 100000) + 10000), 0);
+		sizes[ref] = size;
+		flakeType[ref] = flakeRef;
+		angle[ref] = (float)(rand() % 628) / 100.f;
+		angleinc[ref] = (float)(rand() % 1000 - 500) *speed;
+	}
 
-		angle = (float)(rand() % 628) / 100.f;
-		angleinc = (float)(rand() % 1000 - 500) *speed;
+	void create(const vec3f &pos, const vec2f size, const uint32_t flakeRef) {
+		position.push_back(pos);
+		dir.push_back(vec3f(0, (float)-((rand()%100000)+10000), 0));
+		sizes.push_back(size);
+		flakeType.push_back(flakeRef);
 
-		life = 1000 + rand() % 10000;
-		dead = false;
+		angle.push_back((float)(rand() % 628) / 100.f);
+		angleinc.push_back((float)(rand() % 1000 - 500) *speed);
 	}
 
 	void animate(const float d)
 	{
-		pos += dir*speed;
-		dir.x += (rand() % 1000) - 500;
-		angle += angleinc;
-		if (pos.y < d) dead = true;
+		for (uint32_t i = 0; i < position.size(); i++) {
+			position[i] += dir[i] * speed;
+			dir[i].x += (rand() % 1000) - 500;
+			angle[i] += angleinc[i];
+			if (position[i].y < d) update(i, vec3f((float)(rand() % width), (float)(height + rand() % height + 100), -10.f), sizes[i], rand() % 4); // dead[i] = true;
+		}
 	}
 };
 
@@ -77,22 +86,28 @@ public:
 
 int main(int argc, char *argv[])
 {
-	Pi3C pi3c("Snow", 1920, 1080, true);
+	Pi3C pi3c("Snow", 1920, 1080, false);
 	pi3c.window.setClearColour(0x0);
+	pi3c.scene.setFog(0x000000, 5000, 6000);
 
 	uint32_t bkg = pi3c.create_background("../../Resources/models/maps/snowpath.jpg");  // wintersnow (must be rendered before snowflakes)
 
-	std::vector<snow> snowParticles;
-	Pi3CspriteArray sprites;
-	for (uint32_t r = 0; r < 2000; r++) {
-		snow flake(random_top, rand() % 18 + 2, rand() % 4);
-		snowParticles.push_back(flake);
-		sprites.addSprite(flake.pos, vec2f(flake.size, flake.size), vec2f((float)(flake.flakeRef)*0.25f, 0), vec2f(0.25f, 1.f));
+	uint32_t r = 0;
+	uint32_t snowNo = 5000;
+	snowArray snow(pi3c.width(), pi3c.height());
+	Pi3Cmesh snowMesh;
+	while (r < snowNo) {
+		vec3f pos = random_top;
+		float flakesize = rand() % 8 + 2;
+		vec2f fsize = vec2f(flakesize, flakesize);
+		uint32_t type(rand() % 4);
+		snow.create(pos, fsize, type);
+		snowMesh.addRect(pos, fsize, vec2f((float)(type)*0.25f, 0.f), vec2f(0.25f, 0.99f));
+		r++;
 	}
-	int spritesRef = pi3c.resource.addMesh(sprites, true, true);
 
 	Pi3Cmodel snowflakeModel;
-	snowflakeModel.meshRef = spritesRef;
+	snowflakeModel.meshRef = pi3c.resource.insertMesh(&snowMesh);
 	snowflakeModel.addTexture(&pi3c.resource, "../../Resources/models/maps/snowflakes4b.png");
 	snowflakeModel.material.illum = 1;
 	snowflakeModel.material.alpha = .99f;
@@ -100,20 +115,13 @@ int main(int argc, char *argv[])
 
 	Pi3Cimgui &gui = pi3c.gui;
 
-	float fps = 20;
-
 	while (pi3c.is_running())
 	{
 		pi3c.do_events();
 		pi3c.clear_window();
 
-		for (uint32_t r = 0; r < snowParticles.size(); r++) {
-			snow &flake = snowParticles[r];
-			flake.animate(0);
-			if (flake.dead) flake.create(random_top, rand() % 18 + 2, rand() % 4);
-			pi3c.update_sprite_rotated(spritesRef, r, vec2f(flake.pos.x, flake.pos.y), vec2f(flake.size, flake.size), flake.angle);
-		}
-		pi3c.resource.updateMesh(spritesRef); //upload all the altered vertices for this mesh
+		snow.animate(0);
+		snowflakeModel.updateSpriteCoordsRotated(&pi3c.resource, snow.position, snow.sizes, snow.angle);
 
 		pi3c.render2D();
 
