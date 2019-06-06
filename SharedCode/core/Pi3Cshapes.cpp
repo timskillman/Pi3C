@@ -222,7 +222,6 @@ namespace Pi3Cshapes {
 
 		plane.bbox.bboxFromVerts(plane.verts, 0, plane.vc, plane.stride);
 		plane.materialRef = 0;
-		plane.dynamic = true;
 		return plane;
 	}
 
@@ -756,7 +755,7 @@ namespace Pi3Cshapes {
 
 		meshmap.bbox.bboxFromVerts(meshmap.verts, 0, meshmap.vc, meshmap.stride);
 		meshmap.materialRef = 0;
-		meshmap.dynamic = true;
+		//meshmap.dynamic = true;
 		return meshmap;
 	}
 

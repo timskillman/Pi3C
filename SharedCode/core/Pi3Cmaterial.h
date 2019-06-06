@@ -48,7 +48,7 @@ public:
 	void SetColSpecular(const uint8_t r, const uint8_t g, const uint8_t b, const uint8_t a);
 	void SetSpecularPower(const uint32_t s) { shininess = (float)s / 255.0f; }
 	void SetAlphaMode(const GLenum mode) { }
-	void SetCullMode(const int32_t cm) { cullmode = (cm == 1); }
+	void SetCullMode(const int32_t cm) { cullface = (cm == 1); }
 	void SetAnimationTexture(const float stepx, const float stepy);
 	void SetAnimationSheet(const int divx, const int divy, const int frames = 0);
 	void AnimateTexture(const float ticks = 1.f);
@@ -98,7 +98,7 @@ public:
 	float alphaTestValue;
 	int reflective;		//0.0 = no reflection, 1.0 = full reflection (currently only 0 or 1)
 
-	bool cullmode;
+	bool cullface = true;
 	GLenum rendermode;
 
 };

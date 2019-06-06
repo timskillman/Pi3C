@@ -174,15 +174,15 @@ std::vector<std::string> Pi3C::get_dropfiles()
 	return dropfiles;
 }
 
-int32_t Pi3C::add_spriteArray(Pi3CspriteArray &spritearray, const std::string &file)
-{
-	//spritearray.meshRef = resource.addMesh(spritearray.samesh, true, true);
-	spritearray.meshRef = resource.insertMesh(&spritearray.samesh);
-
-	Pi3Cmodel rectangles;
-	rectangles.meshRef = spritearray.meshRef;
-	rectangles.addTexture(&resource, file);
-	rectangles.material.illum = 1;
-	rectangles.material.alpha = 1.f;
-	return add_model_to_scene3D(rectangles);
-}
+//int32_t Pi3C::add_spriteArray(Pi3CspriteArray &spritearray, const std::string &file)
+//{
+//	//spritearray.meshRef = resource.addMesh(spritearray.samesh, true, true);
+//	spritearray.meshRef = resource.insertMesh(&spritearray.samesh);
+//
+//	Pi3Cmodel rectangles;
+//	rectangles.meshRef = spritearray.meshRef;
+//	rectangles.addTexture(&resource, file);
+//	rectangles.material.illum = 1;
+//	rectangles.material.alpha = 1.f;
+//	return add_model_to_scene3D(rectangles);
+//}

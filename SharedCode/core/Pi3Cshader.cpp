@@ -224,6 +224,7 @@ void Pi3Cshader::setMaterial(Pi3Cmaterial &mat)
 	if (mat.alpha == 1.0f) glDisable(GL_BLEND); else  glEnable(GL_BLEND);
 	Set4f(diffuseRef, mat.colDiffuse);
 		
+	if (mat.cullface) glEnable(GL_CULL_FACE); else glDisable(GL_CULL_FACE);
 	if (mat.texRef>=0) { 
 		//if (lastTex!=0) glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, mat.texID);

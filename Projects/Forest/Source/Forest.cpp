@@ -4,6 +4,7 @@
 #include "Pi3CfileOBJ.h"
 #include "Pi3CloadOptions.h"
 #include "Pi3Cavatar.h"
+#include "Pi3Cpopulate.h"
 
 #include <fstream>
 #include <sstream>
@@ -39,28 +40,6 @@
 // Dedicated to the One who has blessed me beyond my dreams ...
 // Jesus Christ, King of Kings and Lord of Lords :-)
 // =======================================================================
-
-struct treeArray {
-
-	void init(const uint32_t maxTreeTypes)
-	{
-		treeMesh.reset(new Pi3Cmesh);
-		treeTextureStep = 1.f / (float)maxTreeTypes;
-	}
-
-	void createTree(const vec3f &pos, const vec2f &size, const uint32_t type) {
-		positions.push_back(pos);
-		sizes.push_back(size);
-		treeTypes.push_back(type);
-		treeMesh->addRect(pos, size, vec2f((float)(type)*treeTextureStep, 0.f), vec2f(treeTextureStep, 0.99f));
-	}
-
-	std::unique_ptr<Pi3Cmesh> treeMesh;
-	std::vector<vec3f> positions;
-	std::vector<vec2f> sizes;
-	std::vector<uint32_t> treeTypes;
-	float treeTextureStep = 0.25f;		//usually four trees per texture - but needs setting
-};
 
 #define maxBolts 100
 
@@ -113,7 +92,7 @@ public:
 	int32_t count = -1;
 };
 
-float rnd(const uint32_t size) { return (float)(rand() % size); }
+//float rnd(const uint32_t size) { return (float)(rand() % size); }
 
 int main(int argc, char *argv[])
 {
@@ -124,7 +103,6 @@ int main(int argc, char *argv[])
 
 	Pi3CGL::showGLinfo();
 	
-
 	Pi3Cavatar player;
 	Pi3Cavatar::avatarParams avparams;
 	avparams.movement = Pi3Cavatar::move_fly;
@@ -136,55 +114,25 @@ int main(int argc, char *argv[])
 	avparams.fallSpeed = opts.asFloat("avatarFallSpeed");
 	player.init(avparams);
 	
+	int landRef = pi3c.load_model("../../Resources/models", opts.asString("landscape"));
+	pi3c.scene.models[landRef].asCollider = true;  //use this model as a collider
+
 	//Scatter trees in round clusters ...
 	uint32_t maxTrees = opts.asInt("trees");		//Get max number of trees from options file
 	uint32_t maxTreeTypes = 4;
 
 	//Setup our tree array ...
-	treeArray trees;
-	trees.init(maxTreeTypes);
-
-	uint32_t tcount = 0;
-	uint32_t treetype = 0;
-	float landHeight = 0;
-	boltArray bolts;
-
-	while (tcount < maxTrees) {
-		
-		vec3f clusterCentre((float)(rand() % 4000 - 2000), 0, (float)(rand() % 4000 - 2000));	//Cluster centre ...
-		uint32_t clusterCount = tcount + rand() % 90 + 5;										//Tree count in this cluster
-
-		while (tcount < maxTrees && tcount < clusterCount) {
-
-			float radius = (float)(rand() % 400 - 200);											//radius
-			float angle = rnd(360) / PI2;														//random angle 0-360
-			vec3f pos = clusterCentre + vec3f(cos(angle)*radius, landHeight, sin(angle)*radius);//calc tree position 
-
-			float treesize = (float)(rand() % 40) + 10.f*(float)(treetype + 2);					//random tree size 10-50
-			vec2f size(treesize, treesize);
-
-			trees.createTree(pos, size, treetype);										
-
-			tcount++;
-
-		}
-		treetype = (treetype +1) % maxTreeTypes;	//simply cycle through tree types per cluster
-	}
-
-	Pi3Cmodel treesModel;
-	treesModel.meshRef = pi3c.resource.insertMesh(trees.treeMesh.get());
-	treesModel.addTexture(&pi3c.resource, "../../Resources/models/maps/redwoods.png");
-	treesModel.material.illum = 0;
-	treesModel.material.alpha = 1.f;
+	Pi3Cpopulate trees;
+	Pi3Cmodel treesModel = trees.Populate(&pi3c.resource, maxTrees, pi3c.scene.models[landRef], "../../Resources/models/maps/redwoods.png", maxTreeTypes, 500.f);
 	int treesModelRef = pi3c.add_model_to_scene3D(treesModel);
 
-	trees.treeMesh.reset();		//destroy the treeMesh in trees to free up memory
+	boltArray bolts;
 
 	int skybox = pi3c.scene.loadModelOBJ(opts.asString("skyboxPath"), opts.asString("skybox"), 0); // loadbarCallback);
 	pi3c.scene.models[skybox].matrix.SetScale(opts.asFloat("skyboxScale"));
 	pi3c.scene.models[skybox].touchable = false;
 
-	int landRef = pi3c.load_model("../../Resources/models", opts.asString("landscape"));
+	
 	int airport = pi3c.load_model("../../Resources/models", "airport.obj", vec3f(-500,0,0));
 
 	int sship = pi3c.load_model("../../Resources/models", "sship3.obj"); //sship //EagleTransporter // NMSship
@@ -276,8 +224,6 @@ int main(int argc, char *argv[])
 		// Centre skybox and other 'infinite' geometry around player...
 		if (skybox >= 0) pi3c.model(skybox)->move(-player.getPosition());
 
-		
-		//pi3c.model(eagle)->rotate(vec3f(0, player.getRotation().y, 0));
 		// process window events ...
 
 		while (pi3c.do_events()) {
@@ -297,19 +243,8 @@ int main(int argc, char *argv[])
 				}
 				break;
 			case SDL_MOUSEWHEEL:
-				//modmtx.Translate(vec3f(0,0,-((float)window.mousewheel)*1.f));
-				//shader.SetMatrix4f(modmtxh, modmtx);
 				break;
 			case SDL_WINDOWEVENT:
-				break;
-			case SDL_DROPFILE:
-				std::string file = pi3c.get_dropfiles()[0];
-				if (file.substr(file.size() - 4, 4) == ".obj") {
-					int32_t newmodel = pi3c.load_model("", file);
-					if (newmodel >= 0) {
-						pi3c.model(newmodel)->move(-player.getPosition());
-					}
-				}
 				break;
 			}
 		}
@@ -317,7 +252,7 @@ int main(int argc, char *argv[])
 		Pi3Cmatrix rmat; rmat.rotate(-player.getRotation());
 
 		vec3f offset = (ship == cockpit) ? vec3f(0, 0, 0) : -rmat.transformRotateVec(vec3f(0, shipbox.height()*1.5f, shipbox.depth()*1.5f));
-		pi3c.model(ship)->move(-player.getPosition()+offset); // -rmat.transformRotateVec(vec3f(0, shipbox.height()*1.5f, shipbox.depth()*1.5f)));
+		pi3c.model(ship)->move(-player.getPosition()+offset);
 		pi3c.model(ship)->matrix.setRotate(shipRot);
 		if (shipRot.z != 0) shipRot.z *= 0.95f;			//dampened roll to 0
 		//if (shipRot.x != 0) shipRot.x *= 0.95f;			//dampened pitch to 0
@@ -328,7 +263,7 @@ int main(int argc, char *argv[])
 		//Render 3D scene ...
 		pi3c.scene.setMatrix(player.getPosition(), vec3f(0, 0, 0), player.getRotation());
 
-		treesModel.updateSpriteBillboard(&pi3c.resource, trees.positions, trees.sizes, -player.getPosition()); //, vec2f(flake.col*0.25f, 0), vec2f(0.25f, 1.f)
+		//treesModel.updateSpriteBillboard(&pi3c.resource, trees.positions, trees.sizes, -player.getPosition());
 
 		pi3c.scene.setSun(0xffffff, vec3f(5000.f, 5000.f, -5000.f)); //transform sun position into scene
 		pi3c.render3D();

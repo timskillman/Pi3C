@@ -122,10 +122,14 @@ int32_t Pi3Cresource::insertMesh(Pi3Cmesh * mesh, uint32_t maxsize)
 	}
 
 	//No buffers created yet? or, request is larger than current buffer?, then create one ...
+	bool vertsMoved = false;
 	if (cbuf < 0 || (mvsize + vertBufferPtr[cbuf]) > vertBuffer[cbuf].size()) {
 		if (cbuf>=0) SDL_Log("cbuf:%d, mvsize:%d + vertBufferPtr:%d, size=%d, maxsize = %d", cbuf, mvsize , vertBufferPtr[cbuf], vertBuffer[cbuf].size(), maxsize);
-		std::vector<float> newverts(maxsize);
-		vertBuffer.push_back(newverts);
+		//std::vector<float> newverts(maxsize);
+		mesh->verts.resize(maxsize);
+		vertBuffer.push_back(std::move(mesh->verts));
+		vertsMoved = true;
+		//vertBuffer.push_back(newverts);
 		vertBufferPtr.push_back(0);
 		currentBuffer++; cbuf = currentBuffer;
 
@@ -143,10 +147,12 @@ int32_t Pi3Cresource::insertMesh(Pi3Cmesh * mesh, uint32_t maxsize)
 		//Upload mesh verts into GPU ...
 		if (mvsize > 0) {
 			uint32_t vcbytes = mesh->vc * sizeof(float);	
-			memcpy(&mverts[bufferPtr], &mesh->verts[0], vcbytes);
-			glBindBuffer(GL_ARRAY_BUFFER, VBOid[cbuf]);
-			glBufferSubData(GL_ARRAY_BUFFER, bufferPtr * sizeof(float), vcbytes, &mverts[bufferPtr]); // &mesh->verts[0]);
-			mesh->verts.resize(0); //delete verts from original mesh as these have been stored and uploaded to GPU
+			if (!vertsMoved) {
+				memcpy(&mverts[bufferPtr], &mesh->verts[0], vcbytes);
+				mesh->verts.resize(0); //delete verts from original mesh as these have been stored and uploaded to GPU
+				glBindBuffer(GL_ARRAY_BUFFER, VBOid[cbuf]);
+				glBufferSubData(GL_ARRAY_BUFFER, bufferPtr * sizeof(float), vcbytes, &mverts[bufferPtr]); // This transfer requires vcbytes 
+			}
 		}
 		
 		//Push mesh into meshes store ...

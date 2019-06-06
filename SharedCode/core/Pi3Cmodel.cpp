@@ -288,7 +288,7 @@ bool Pi3Cmodel::collideSub(const Pi3Cresource *resource, const Pi3Cmatrix &pmat,
 	return false;
 }
 
-float Pi3Cmodel::collideFloor(const Pi3Cresource *resource, const Pi3Cmatrix *parent_matrix, const vec3f &pos, float &prevHeight) const
+float Pi3Cmodel::collideFloor(const Pi3Cresource *resource, const Pi3Cmatrix *parent_matrix, const vec3f &pos, float &prevHeight, const bool onehit) const
 {
 	float ht = prevHeight;
 
@@ -308,11 +308,17 @@ float Pi3Cmodel::collideFloor(const Pi3Cresource *resource, const Pi3Cmatrix *pa
 		for (auto &sg : group) {
 			if (sg.colliders.size() > 0) {
 				for (auto &collider : sg.colliders) {
-					ht = collider.collideFloorSub(resource, newmatrix, pos, prevHeight);
+					ht = collider.collideFloorSub(resource, newmatrix, pos, prevHeight, onehit);
 				}
 			}
 			else
-				if (sg.visible && !sg.deleted) ht = sg.collideFloor(resource, &newmatrix, pos, ht);
+			{
+				if (asCollider) {
+					ht = collideFloorSub(resource, newmatrix, pos, prevHeight, onehit);
+				}
+				else
+					if (sg.visible && !sg.deleted) ht = sg.collideFloor(resource, &newmatrix, pos, ht);
+			}
 		}
 	}
 
@@ -333,19 +339,19 @@ float Pi3Cmodel::collideFloor(const Pi3Cresource *resource, const Pi3Cmatrix *pa
 	return ht;
 }
 
-float Pi3Cmodel::collideFloorSub(const Pi3Cresource *resource, const Pi3Cmatrix &pmat, const vec3f &pos, float &prevHeight) const
+float Pi3Cmodel::collideFloorSub(const Pi3Cresource *resource, const Pi3Cmatrix &pmat, const vec3f &pos, float &prevHeight, const bool onehit) const
 {
 	//
 	if (group.size() > 0) {
 		Pi3Cmatrix tmat = matrix * pmat;
 		for (auto &sg : group) {
-			float ht = sg.collideFloorSub(resource, tmat, pos, prevHeight);
+			float ht = sg.collideFloorSub(resource, tmat, pos, prevHeight, onehit);
 			if (ht < 1e8f) return ht;
 		}
 	}
  
 	if (meshRef >= 0) 
-		return Pi3Ccollision::collideFloor(resource, meshRef, pmat, -pos, prevHeight);
+		return Pi3Ccollision::collideFloor(resource, meshRef, pmat, -pos, prevHeight, onehit);
 		
 	return 1e8f;
 }

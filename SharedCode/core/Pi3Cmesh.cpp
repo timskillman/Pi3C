@@ -83,7 +83,7 @@ Pi3Cmesh Pi3Cmesh::clone(const uint32_t from, const uint32_t size) const
 	newmesh.materialRef = materialRef;
 	newmesh.vc = vc;
 	newmesh.bufRef = bufRef;
-	newmesh.dynamic = dynamic;
+	//newmesh.dynamic = dynamic;
 	if (size > 0) {
 		if (size == verts.size()) {
 			newmesh.verts = verts;
@@ -356,7 +356,7 @@ void Pi3Cmesh::updateNormals(const uint32_t min, const uint32_t max)
 	}
 }
 
-#define CreateVerts(x,y,ux,uy)									\
+#define CreateVertsXY(x,y,ux,uy)									\
 		verts[vc++] = x; verts[vc++] = y; verts[vc++] = pos.z;	\
 		verts[vc++] = 0; verts[vc++] = -1.f; verts[vc++] = 0;	\
 		verts[vc++] = ux; verts[vc++] = 0.9999f-uy;				\
@@ -364,17 +364,47 @@ void Pi3Cmesh::updateNormals(const uint32_t min, const uint32_t max)
 
 void Pi3Cmesh::addRect(const vec3f &pos, const vec2f &size, const vec2f &uv, const vec2f &us)
 {
-	if (vc + stride * 6 > verts.size()) verts.resize(vc + 4800);
-	CreateVerts(pos.x, pos.y - size.y, uv.x, uv.y - us.y);
-	CreateVerts(pos.x + size.x, pos.y , uv.x + us.x, uv.y);
-	CreateVerts(pos.x + size.x, pos.y - size.y, uv.x + us.x, uv.y - us.y);
-	CreateVerts(pos.x, pos.y - size.y, uv.x, uv.y - us.y);
-	CreateVerts(pos.x, pos.y , uv.x, uv.y);
-	CreateVerts(pos.x + size.x, pos.y, uv.x + us.x, uv.y);
+	if (vc + stride * 6 > verts.size()) verts.resize(vc + stride * 6);
+	CreateVertsXY(pos.x, pos.y - size.y, uv.x, uv.y - us.y);
+	CreateVertsXY(pos.x + size.x, pos.y , uv.x + us.x, uv.y);
+	CreateVertsXY(pos.x + size.x, pos.y - size.y, uv.x + us.x, uv.y - us.y);
+	CreateVertsXY(pos.x, pos.y - size.y, uv.x, uv.y - us.y);
+	CreateVertsXY(pos.x, pos.y , uv.x, uv.y);
+	CreateVertsXY(pos.x + size.x, pos.y, uv.x + us.x, uv.y);
 
 	vertSize = vc / stride;
 	bbox.update(vec3f(pos.x, pos.y, pos.z));
 	bbox.update(vec3f(pos.x + size.x, pos.y + size.y, pos.z));
+}
+
+#define CreateVertsYZ(z,y,ux,uy)									\
+		verts[vc++] = pos.x; verts[vc++] = y; verts[vc++] = z;	\
+		verts[vc++] = 1.f; verts[vc++] = 0; verts[vc++] = 0;	\
+		verts[vc++] = ux; verts[vc++] = 0.9999f-uy;				\
+		verts[vc++] = 65535.996f;								\
+
+void Pi3Cmesh::addXshape(const vec3f& pos, const vec2f& size, const vec2f& uv, const vec2f& us)
+{
+	if (vc + stride * 12 > verts.size()) verts.resize(vc + stride * 12);
+	float hx = size.x / 2.f;
+
+	CreateVertsXY(pos.x - hx, pos.y - size.y, uv.x, uv.y - us.y);
+	CreateVertsXY(pos.x + hx, pos.y, uv.x + us.x, uv.y);
+	CreateVertsXY(pos.x + hx, pos.y - size.y, uv.x + us.x, uv.y - us.y);
+	CreateVertsXY(pos.x - hx, pos.y - size.y, uv.x, uv.y - us.y);
+	CreateVertsXY(pos.x - hx, pos.y, uv.x, uv.y);
+	CreateVertsXY(pos.x + hx, pos.y, uv.x + us.x, uv.y);
+
+	CreateVertsYZ(pos.z - hx, pos.y - size.y, uv.x, uv.y - us.y);
+	CreateVertsYZ(pos.z + hx, pos.y, uv.x + us.x, uv.y);
+	CreateVertsYZ(pos.z + hx, pos.y - size.y, uv.x + us.x, uv.y - us.y);
+	CreateVertsYZ(pos.z - hx, pos.y - size.y, uv.x, uv.y - us.y);
+	CreateVertsYZ(pos.z - hx, pos.y, uv.x, uv.y);
+	CreateVertsYZ(pos.z + hx, pos.y, uv.x + us.x, uv.y);
+
+	vertSize = vc / stride;
+	bbox.update(vec3f(pos.x, pos.y, pos.z));
+	bbox.update(vec3f(pos.x + size.x, pos.y + size.y, pos.z + size.x));
 }
 
 #define updateCoordsXY(x,y)							\
@@ -423,3 +453,85 @@ void Pi3Cmesh::updateRectCoordsPSP(std::vector<float> &verts, uint32_t &p, const
 	updateCoordsXYZ(cx - (x + ax)*w, cy - (y + sy)*w, z); // , uv.x + us.x, uv.y + us.y);
 }
 
+float Pi3Cmesh::checkColliderGrid(const vec3f &p, const Pi3Cmatrix &mtx, float prevHeight)
+{
+	/* Check if a point lies within a triangle bounds using the colliderGrid ...*/
+	float w = 9.999f / bbox.width();
+	float d = 9.999f / bbox.depth();
+
+	int xp = (int)((p.x - bbox.min.x) * w);
+	int zp = (int)((p.z - bbox.min.z) * d);
+	if (xp < 0 || xp>9 || zp < 0 || zp>9) return prevHeight;
+
+	std::vector<float> &vp = xgrid[xp][zp];
+
+	for (size_t v = 0; v < vp.size(); v += 9) {
+		if (p.x > vp[v] && p.x > vp[v + 3] && p.x > vp[v + 6]) continue;
+		if (p.x < vp[v] && p.x < vp[v + 3] && p.x < vp[v + 6]) continue;
+		if (p.z > vp[v + 2] && p.z > vp[v + 5] && p.z > vp[v + 8]) continue;
+		if (p.z < vp[v + 2] && p.z < vp[v + 5] && p.z < vp[v + 8]) continue;
+		
+		vec3f v1 = mtx.transformVec(vec3f(vp[v], vp[v + 1], vp[v + 2]));
+		vec3f v2 = mtx.transformVec(vec3f(vp[v + 3], vp[v + 4], vp[v + 5]));
+		vec3f v3 = mtx.transformVec(vec3f(vp[v + 6], vp[v + 7], vp[v + 8]));
+
+		float d1 = Pi3Ccollision::rayIntersectFloor(v2 - v1, v3 - v1, p - v1);
+		if (d1 > 0 && d1 < prevHeight) {
+			return d1;
+		}
+	}
+	return prevHeight; //none found
+}
+
+bool Pi3Cmesh::createColliderGrid()
+{
+	if (verts.size() < (5000*stride*3)) return false; //less than 1000 tris, then return
+
+	float w = 9.999f / bbox.width();
+	float d = 9.999f / bbox.depth();
+	float mx = bbox.min.x;
+	float mz = bbox.min.z;
+	uint32_t stride2 = stride * 2;
+
+	for (size_t v = 0; v < verts.size()- stride * 3; v += stride * 3)
+	{
+		int xp = (int)((verts[v] - mx) * w);
+		int zp = (int)((verts[v+2] - mz) * d);
+		xgrid[xp][zp].push_back(verts[v]);
+		xgrid[xp][zp].push_back(verts[v + 1]);
+		xgrid[xp][zp].push_back(verts[v + 2]);
+		xgrid[xp][zp].push_back(verts[v + stride]);
+		xgrid[xp][zp].push_back(verts[v + stride + 1]);
+		xgrid[xp][zp].push_back(verts[v + stride + 2]);
+		xgrid[xp][zp].push_back(verts[v + stride2]);
+		xgrid[xp][zp].push_back(verts[v + stride2 + 1]);
+		xgrid[xp][zp].push_back(verts[v + stride2 + 2]);
+		int xp2 = (int)((verts[v + stride] - mx) * w);
+		int zp2 = (int)((verts[v + stride + 2] - mz) * d);
+		if (xp2 != xp || zp2 != zp) {
+			xgrid[xp2][zp2].push_back(verts[v]);
+			xgrid[xp2][zp2].push_back(verts[v + 1]);
+			xgrid[xp2][zp2].push_back(verts[v + 2]);
+			xgrid[xp2][zp2].push_back(verts[v + stride]);
+			xgrid[xp2][zp2].push_back(verts[v + stride + 1]);
+			xgrid[xp2][zp2].push_back(verts[v + stride + 2]);
+			xgrid[xp2][zp2].push_back(verts[v + stride2]);
+			xgrid[xp2][zp2].push_back(verts[v + stride2 + 1]);
+			xgrid[xp2][zp2].push_back(verts[v + stride2 + 2]);
+		}
+		int xp3 = (int)((verts[v + stride2] - mx) * w);
+		int zp3 = (int)((verts[v + stride2 + 2] - mz) * d);
+		if ((xp3 != xp || zp3 != zp) && (xp3 != xp2 || zp3 != zp2)) {
+			xgrid[xp3][zp3].push_back(verts[v]);
+			xgrid[xp3][zp3].push_back(verts[v + 1]);
+			xgrid[xp3][zp3].push_back(verts[v + 2]);
+			xgrid[xp3][zp3].push_back(verts[v + stride]);
+			xgrid[xp3][zp3].push_back(verts[v + stride + 1]);
+			xgrid[xp3][zp3].push_back(verts[v + stride + 2]);
+			xgrid[xp3][zp3].push_back(verts[v + stride2]);
+			xgrid[xp3][zp3].push_back(verts[v + stride2 + 1]);
+			xgrid[xp3][zp3].push_back(verts[v + stride2 + 2]);
+		}
+	}
+	return true;
+}

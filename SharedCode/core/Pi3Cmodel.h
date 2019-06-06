@@ -92,7 +92,7 @@ public:
 	void appendMesh(Pi3Cresource *resource, Pi3Cmesh mesh, bool asCollider);
 	void loadOBJfile(Pi3Cresource *resource, std::string path, std::string modelfile, std::function<void(float)> showProgressCB, bool asCollider);
 	bool collide(const Pi3Cresource *resource, const Pi3Cmatrix *parent_matrix, const vec3f &pos, const vec3f &dir, const float radius) const;
-	float collideFloor(const Pi3Cresource *resource, const Pi3Cmatrix *parent_matrix, const vec3f &pos, float &prevHeight) const;
+	float collideFloor(const Pi3Cresource *resource, const Pi3Cmatrix *parent_matrix, const vec3f &pos, float &prevHeight, const bool onehit = false) const;
 	void loadCollider(Pi3Cresource *resource, std::string path, std::string model, std::string collider, std::function<void(float)> showProgressCB);
 	void touch(const Pi3Cresource *resource, const Pi3Cmatrix *parent_matrix, Pi3Ctouch &touch, const int32_t level);
 	int32_t addTexture(Pi3Cresource *resource, const std::string &txfile);
@@ -130,6 +130,7 @@ public:
 	bool deleted = false;			//deleted from scene (useful for undo/redo)
 	bool touchable = true;			//model is displayed but not touchable
 	bool selected = false;			//model selected (useful for editing)
+	bool asCollider = false;		//if true, then use this model as a collider as well as rendered
 
 	int32_t choice = -1;			//if set to value 0 and above, this option will choose which model in the group to render - the rest are ignored
 
@@ -148,7 +149,7 @@ public:
 private:
 
 	bool collideSub(const Pi3Cresource *resource, const Pi3Cmatrix &pmat, const vec3f &pos, const vec3f &dir, const float radius) const;
-	float collideFloorSub(const Pi3Cresource *resource, const Pi3Cmatrix &pmat, const vec3f &pos, float &prevHeight) const;
+	float collideFloorSub(const Pi3Cresource *resource, const Pi3Cmatrix &pmat, const vec3f &pos, float &prevHeight, const bool onehit) const;
 
 };
 

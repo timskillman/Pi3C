@@ -18,7 +18,7 @@ void Pi3Cmaterial::init(const std::string &name)
 	alphaTestValue = 0.f; //no test
 	texName = ""; 
 	texRef = -1; 
-	cullmode = 0; 
+	cullface = true; 
 	illum = 2; 
 	texID = 0;
 	texBumpName = ""; 

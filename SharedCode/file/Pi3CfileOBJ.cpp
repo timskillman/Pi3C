@@ -19,6 +19,7 @@ namespace Pi3CfileOBJ {
 		//SDL_Log("Meshes %d,%d,%d,%d,%d",resource->meshes.size(),resource->materials.size(),resource->textures.size(),resource->vertBuffer.size(),resource->currentBuffer);
 		mesh.mode = GL_TRIANGLES;
 		mesh.bbox.bboxFromVerts(mesh.verts, 0, mesh.vc, mesh.stride);
+		mesh.hasColliderGrid = mesh.createColliderGrid();
 		//int32_t i = resource->addMesh(mesh, !asCollider, false, 65535);
 		int32_t i = resource->insertMesh(&mesh);
 		//SDL_Log("Mesh %d: verts = %d,%d, material = %d", mesh.materialRef, mesh.vertOffset, mesh.vertSize, mesh.materialRef);

@@ -70,23 +70,23 @@ float Pi3Ccollision::planeIntersect(const vec3f &planeNormal, const vec3f &coord
 	return x;
 }
 
-float rayIntersectFloor(const vec3f &e1, const vec3f &e2, const vec3f &e3)
+float Pi3Ccollision::rayIntersectFloor(const vec3f &e1, const vec3f &e2, const vec3f &e3)
 {
 	/* Based on www.lighthouse3d.com/tutorials/ray-triangle-intersection */
 	/* Optimised with down vector (0,-1,0) */
 
-	float a = e1.x * -e2.z + e1.z * e2.x;
-	if (a > -0.00001f && a < 0.00001f) return 1e8f; //roughly zero
+	double a = (double)(e1.x * -e2.z + e1.z * e2.x);
+	if (a > -0.00001 && a < 0.00001) return 1e8f; //roughly zero
 
-	float f = 1.f / a;
-	float u = f * (e3.x * -e2.z + e3.z * e2.x);
-	if (u < 0.f || u > 1.f) return 1e8f;
+	double f = 1.f / a;
+	double u = f * ((double)(e3.x * -e2.z + e3.z * e2.x));
+	if (u < 0 || u > 1) return 1e8f;
 
 	vec3f q(e3.y * e1.z - e1.y * e3.z, e3.z * e1.x - e1.z * e3.x, e3.x * e1.y - e1.x * e3.y);
-	float v = f * -q.y;
-	if (v < 0.f || u + v > 1.f) return 1e8f;
+	double v = f * (double)(-q.y);
+	if (v < 0 || u + v > 1) return 1e8f;
 
-	return f * (e2.x * q.x + e2.y * q.y + e2.z * q.z);  //distance from pos to triangle intersection
+	return (float)(f * ((double)(e2.x * q.x + e2.y * q.y + e2.z * q.z)));  //distance from pos to triangle intersection
 }
 
 bool Pi3Ccollision::collideVector(const Pi3Cresource *resource, const uint32_t meshRef, const Pi3Cmatrix &mtx, const bool bounce, const vec3f &pos, const vec3f &dir)
@@ -123,12 +123,16 @@ bool Pi3Ccollision::collideVector(const Pi3Cresource *resource, const uint32_t m
 	return false;
 }
 
-float Pi3Ccollision::collideFloor(const Pi3Cresource *resource, const uint32_t meshRef, const Pi3Cmatrix &mtx, const vec3f &pos, float prevHeight)
+float Pi3Ccollision::collideFloor(const Pi3Cresource *resource, const uint32_t meshRef, const Pi3Cmatrix &mtx, const vec3f &pos, float prevHeight, const bool onehit)
 {
 	const Pi3Cmesh &mesh = resource->meshes[meshRef];
 	uint32_t p = mesh.vertOffset * mesh.stride;
 	const std::vector<float> &verts = resource->vertBuffer[mesh.bufRef];
 	uint32_t size = mesh.vertSize * mesh.stride;
+
+	if (mesh.hasColliderGrid) {
+		return const_cast<Pi3Cmesh*>(&mesh)->checkColliderGrid(pos, mtx, prevHeight);	//Naughty! But necessary :-)
+	}
 
 	//if (mesh.verts.size() == 0) return prevHeight;
 
@@ -142,7 +146,15 @@ float Pi3Ccollision::collideFloor(const Pi3Cresource *resource, const uint32_t m
 	uint32_t x2 = stride; uint32_t z2 = stride + 2;
 	uint32_t x3 = stride * 2; uint32_t z3 = stride * 2 + 2;
 
+	float px = pos.x;
+	float pz = pos.z;
+
 	for (size_t sp = p; sp < p + size - stride * 3; sp += stride * 3) {
+
+		//if (verts[sp] > px && verts[sp + x2] > px && verts[sp + x3] > px) continue;
+		//if (verts[sp] < px && verts[sp + x2] < px && verts[sp + x3] < px) continue;
+		//if (verts[sp+2] > pz && verts[sp + z2] > pz && verts[sp + z3] > pz) continue;
+		//if (verts[sp+2] < pz && verts[sp + z2] < pz && verts[sp + z3] < pz) continue;
 
 		v1 = mtx.transformVec(&verts[sp]);
 		v2 = mtx.transformVec(&verts[sp + x2]);
@@ -156,8 +168,10 @@ float Pi3Ccollision::collideFloor(const Pi3Cresource *resource, const uint32_t m
 
 		// OK - ray is in triangle footprint - check intersection...
 		float d1 = rayIntersectFloor(v2 - v1, v3 - v1, pos - v1);
-		if (d1 > 0 && d1 < prevHeight) 
+		if (d1 > 0 && d1 < prevHeight) {
+			if (onehit) return d1;
 			prevHeight = d1;
+		}
 	}
 
 	return prevHeight;

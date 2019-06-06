@@ -70,9 +70,7 @@ public:
 	int32_t materialRef;
 	uint32_t vc;
 	GLint bufRef;
-	float animval;											//Each tween must have the same number of vertices as the verts buffer since the verts buffer will hold the results
-	bool collisionMesh;		//if set, then this mesh is collision only
-	bool dynamic;			//if set, mesh can be modified in realtime and verts are not thrown away
+	float animval;			//Each tween must have the same number of vertices as the verts buffer since the verts buffer will hold the results
 //};
 
 /// FUNCTIONS ...
@@ -100,6 +98,7 @@ public:
 	void createSharedTriangleList(const std::vector<float> &verts, std::vector<uint32_t> &vertindexes, std::vector<float> &newverts, std::vector<uint32_t> &uvindexes, std::vector<float> &newuvs, const float tolerance = 0.0005f);
 	void createSharedTriangleList(VertsIndsUVs *in, VertsIndsUVs *out, const float tolerance = 0.0005f);
 	void addRect(const vec3f &pos, const vec2f &size, const vec2f &uv = vec2f(0, 0), const vec2f &us = vec2f(1.f, 1.f));
+	void addXshape(const vec3f& pos, const vec2f& size, const vec2f& uv = vec2f(0, 0), const vec2f& us = vec2f(1.f, 1.f));
 	void updateRectCoords2D(std::vector<float> &verts, uint32_t &p, const float x, const float y, const float w, const float h);
 	void updateRectCoordsBB(std::vector<float> &verts, uint32_t &p, const vec3f &pos, const float ax, const float az, const float sy);
 	void updateRectCoordsPSP(std::vector<float> &verts, uint32_t &p, const float x, const float y, const float z, const float cx, const float cy, const float ax, const float sy, const float w);
@@ -109,14 +108,17 @@ public:
 
 	void updateNormals(const uint32_t min, const uint32_t max);
 
+	bool hasColliderGrid = false;
+	float checkColliderGrid(const vec3f &p, const Pi3Cmatrix &mtx, float prevHeight);
+	bool createColliderGrid();
+
 	//bool collideVector(bool bounce, vec3f &pos, vec3f &dir);	//returns hit and modified pos, dir vectors
 	//float collideFloor(vec3f pos, float &prevHeight); 			//returns height above the floor
 
 /// VARIABLES ...
 
 	//meshHeader header;
-
-	std::vector< std::vector<uint32_t>> sharedIndexes;
+	std::vector<std::vector<uint32_t>> sharedIndexes;
 	std::vector<std::vector<float>> tweenverts;				//Holds tweening vertices for animating the mesh
 	std::vector<float> tweenlengths;
 
@@ -129,5 +131,8 @@ private:
 	}
 
 	float triArea(const vec3f &v1, const vec3f &v2, const vec3f &v3, float &maxLength) const;
+	
+	std::vector<float> xgrid[10][10]; //collider grid ... stores triangles grouped in a 10x10 area
+
 
 };
