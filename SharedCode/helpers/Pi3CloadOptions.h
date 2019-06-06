@@ -63,6 +63,14 @@ public:
 		return std::stoi(asString(id));
 	}
 
+	uint32_t asHex(std::string id) const
+	{
+		uint32_t v = 0;
+		std::stringstream ss(asString(id));
+		ss >> std::hex >> v;
+		return v;
+	}
+
 	float asFloat(std::string id) const
 	{
 		return std::stof(asString(id));

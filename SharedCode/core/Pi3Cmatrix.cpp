@@ -52,10 +52,10 @@ void Pi3Cmatrix::SetScales(const vec3f &scales)
 
 void Pi3Cmatrix::SetRotateX(const float &angle)
 {
-	matrix[m00] = 1.f; matrix[m01] = 0; matrix[m02] = 0; matrix[m03] = 0;
-	matrix[m10] = 0; matrix[m11] = cosf(angle); matrix[m12] = sinf(angle); matrix[m13] = 0;
-	matrix[m20] = 0; matrix[m21] = -sinf(angle); matrix[m22] = cosf(angle); matrix[m23] = 0.f;
-	matrix[m30] = 0; matrix[m31] = 0; matrix[m32] = 0; matrix[m33] = 1.f;
+	matrix[m00] = 1.f; matrix[m01] = 0; matrix[m02] = 0; //matrix[m03] = 0;
+	matrix[m10] = 0; matrix[m11] = cosf(angle); matrix[m12] = sinf(angle); //matrix[m13] = 0;
+	matrix[m20] = 0; matrix[m21] = -sinf(angle); matrix[m22] = cosf(angle); //matrix[m23] = 0.f;
+	//matrix[m30] = 0; matrix[m31] = 0; matrix[m32] = 0; matrix[m33] = 1.f;
 	identity = false;
 }
 
@@ -68,10 +68,10 @@ void Pi3Cmatrix::SetRotateXbit(const float &angle)
 
 void Pi3Cmatrix::SetRotateY(const float &angle)
 {
-	matrix[m00] = cosf(angle); matrix[m01] = 0; matrix[m02] = sinf(angle); matrix[m03] = 0;
-	matrix[m10] = 0; matrix[m11] = 1.f; matrix[m12] = 0; matrix[m13] = 0;
-	matrix[m20] = -sinf(angle); matrix[m21] = 0; matrix[m22] = cosf(angle); matrix[m23] = 0.f;
-	matrix[m30] = 0; matrix[m31] = 0; matrix[m32] = 0; matrix[m33] = 1.f;
+	matrix[m00] = cosf(angle); matrix[m01] = 0; matrix[m02] = sinf(angle); //matrix[m03] = 0;
+	matrix[m10] = 0; matrix[m11] = 1.f; matrix[m12] = 0; //matrix[m13] = 0;
+	matrix[m20] = -sinf(angle); matrix[m21] = 0; matrix[m22] = cosf(angle); //matrix[m23] = 0.f;
+	//matrix[m30] = 0; matrix[m31] = 0; matrix[m32] = 0; matrix[m33] = 1.f;
 	identity = false;
 }
 
@@ -84,10 +84,10 @@ void Pi3Cmatrix::SetRotateYbit(const float &angle)
 
 void Pi3Cmatrix::SetRotateZ(const float &angle)
 {
-	matrix[m00] = cosf(angle); matrix[m01] = sinf(angle); matrix[m02] = 0; matrix[m03] = 0;
-	matrix[m10] = -sinf(angle); matrix[m11] = cosf(angle); matrix[m12] = 0; matrix[m13] = 0;
-	matrix[m20] = 0; matrix[m21] = 0; matrix[m22] = 1.f; matrix[m23] = 0.f;
-	matrix[m30] = 0; matrix[m31] = 0; matrix[m32] = 0; matrix[m33] = 1.f;
+	matrix[m00] = cosf(angle); matrix[m01] = sinf(angle); matrix[m02] = 0; //matrix[m03] = 0;
+	matrix[m10] = -sinf(angle); matrix[m11] = cosf(angle); matrix[m12] = 0; //matrix[m13] = 0;
+	matrix[m20] = 0; matrix[m21] = 0; matrix[m22] = 1.f; //matrix[m23] = 0.f;
+	//matrix[m30] = 0; matrix[m31] = 0; matrix[m32] = 0; matrix[m33] = 1.f;
 	identity = false;
 }
 
@@ -118,18 +118,19 @@ void Pi3Cmatrix::SetPerspective(const int width, const int height, const float p
 	identity = false;
 }
 
-void Pi3Cmatrix::SetOrtho(const int left, const int right, const int top, const int bottom, const float znear, const float zfar)
+void Pi3Cmatrix::SetOrtho(const float left, const float right, const float top, const float bottom, const float znear, const float zfar, const float invert)
 {
-	float rl = (float)(right - left);
-	float tb = (float)(top - bottom);
-	float w = 2.f / rl;
-	float h = 2.f / tb;
+	//left,right,top,bottom need to be float - esp. for zoom function
+	float rl = right - left; 
+	float tb = top - bottom;
+	float w = invert * (2.f / rl);
+	float h = invert * (2.f / tb);
 	float zn = -2.f / (zfar - znear);
 	matrix[m00] = w; matrix[m01] = 0; matrix[m02] = 0; matrix[m03] = 0;
 	matrix[m10] = 0; matrix[m11] = h; matrix[m12] = 0; matrix[m13] = 0;
 	matrix[m20] = 0; matrix[m21] = 0; matrix[m22] = zn; matrix[m23] = 0;
-	matrix[m30] = -(float)(right + left) / rl;
-	matrix[m31] = -(float)(top + bottom) / tb;
+	matrix[m30] = -invert * (right + left) / rl;
+	matrix[m31] = -invert * (top + bottom) / tb;
 	matrix[m32] = -(znear + zfar) / (zfar - znear); 
 	matrix[m33] = 1.f;
 	identity = false;
@@ -182,7 +183,7 @@ void Pi3Cmatrix::moveScaleXY(const float x, const float y, const float scalex, c
 	identity = false;
 }
 
-void Pi3Cmatrix::setMoveRotate(vec3f const &offset, vec3f const &rotate, float const &sc) 
+void Pi3Cmatrix::setMoveRotate(const vec3f &offset, const vec3f &rotate, const float sc)
 {
 	Init();
 	Pi3Cmatrix rotymtx;
@@ -195,6 +196,16 @@ void Pi3Cmatrix::setMoveRotate(vec3f const &offset, vec3f const &rotate, float c
 	
 	*this = *this * rotymtx;
 	Translate(offset);
+	identity = false;
+}
+
+void Pi3Cmatrix::setModelMatrix(const vec3f &firstpos, const vec3f &thirdpos, const vec3f &rot)
+{
+	Pi3Cmatrix firstposmtx, thirdposmtx, rotmtx;
+	firstposmtx.Translate(firstpos);	//model position in world
+	thirdposmtx.Translate(thirdpos);	//third person position 
+	rotmtx.rotateMatrixXY(rot);
+	*this = firstposmtx * rotmtx * thirdposmtx;
 	identity = false;
 }
 
@@ -321,14 +332,50 @@ void Pi3Cmatrix::Init() {
 	identity = true;
 }
 
-void Pi3Cmatrix::rotateMatrixXY(const vec3f &rot)
+void Pi3Cmatrix::setRotateXY(const vec3f &rot)
 {
 	Pi3Cmatrix rotxmtx, rotymtx;
 	rotxmtx.SetRotateYbit(rot.y);
 	rotymtx.SetRotateXbit(rot.x);
 	*this = rotxmtx * rotymtx;
+}
+
+void Pi3Cmatrix::rotateMatrixXY(const vec3f &rot)
+{
+	Pi3Cmatrix rotXY;
+	rotXY.setRotateXY(rot);
+	*this = *this * rotXY;
 	identity = false;
 }
+
+void Pi3Cmatrix::setRotate(const vec3f &rot)
+{
+	vec3f m = position();
+	Init();
+	rotate(rot);
+	move(m);
+}
+
+void Pi3Cmatrix::rotate(const vec3f &rot)
+{
+	Pi3Cmatrix rotmtx;
+	if (rot.z != 0) rotmtx.SetRotateZbit(rot.z);
+
+	if (rot.x != 0) {
+		Pi3Cmatrix rotmtxx;
+		rotmtxx.SetRotateXbit(rot.x);
+		rotmtx = rotmtx * rotmtxx;
+	}
+
+	if (rot.y != 0) {
+		Pi3Cmatrix rotmtxy;
+		rotmtxy.SetRotateYbit(rot.y);
+		rotmtx = rotmtx * rotmtxy;
+	}
+	*this = *this * rotmtx;
+	identity = false;
+}
+
 
 //This code comes from GLU source with exception of float calcs ...
 

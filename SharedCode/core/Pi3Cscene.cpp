@@ -6,7 +6,8 @@ void Pi3Cscene::render(const float ticks, Pi3Cmatrix &projMatrix, Pi3Cmatrix &mo
 	resource->shaders[currentShader].ticks = ticks;
 	resource->shaders[currentShader].setProjectionMatrix(projMatrix);
 	for (auto &model : mods) {
-		model.render(resource, resource->shaders[currentShader], &modelMatrix, materialOverride);
+		Pi3Cmaterial *mat = (model.selected && materialOverride) ? &selectMaterial : materialOverride;
+		model.render(resource, resource->shaders[currentShader], &modelMatrix, mat);
 	}
 }
 
@@ -50,26 +51,28 @@ float Pi3Cscene::collideFloor(const vec3f &pos) const
 }
 
 
-std::string Pi3Cscene::getPathFile(const std::string &filepath) const
+std::string Pi3Cscene::getPathFile(std::string &file) const
 {
 	std::string path = "";
-	std::string fp = filepath;
+	std::string fp = file;
 	int i = fp.size() - 1;
 	while (i>0 && fp[i] != '\\' && fp[i] != '/') i--;
 	if (i > 0) {
 		path = fp.substr(0,i+1);
-		fp = fp.substr(i + 1, filepath.size() - i);
+		fp = fp.substr(i + 1, file.size() - i);
 	}
+	file = fp;
 	return path;
 }
 
 int32_t Pi3Cscene::loadModelOBJ(const std::string &path, const std::string &file, const std::function<void(float)> showProgressCB)
 {
 	if (file == "") return -1;
-	std::string newpath = (path == "") ? getPathFile(file) : path;
+	std::string newfile = file;
+	std::string newpath = (path == "") ? getPathFile(newfile) : path;
 	models.emplace_back();
 	Pi3Cmodel &model = models.back();
-	model.loadOBJfile(resource, newpath, file, showProgressCB, false);
+	model.loadOBJfile(resource, newpath, newfile, showProgressCB, false);
 	return models.size()-1;
 }
 
@@ -113,20 +116,19 @@ int32_t Pi3Cscene::append2D(Pi3Cmodel model, const std::string &txfile)
 
 void Pi3Cscene::setMatrix(const vec3f &firstpos, const vec3f &thirdpos, const vec3f &rot)
 {
-	Pi3Cmatrix firstposmtx, thirdposmtx, rotmtx;
-	rotmtx.rotateMatrixXY(rot);
-	firstposmtx.Translate(firstpos);	//model position in world
-	thirdposmtx.Translate(thirdpos);	//third person position 
-	modelMatrix3D = firstposmtx * rotmtx * thirdposmtx;
+	modelMatrix3D.setModelMatrix(firstpos, thirdpos, rot);
 }
 
-Pi3Ctouch Pi3Cscene::touch3D(const vec3f &mousexyz) // vec3f tp, Pi3Cmodel *&selgroup, Pi3Cmodel *&selmodel, int32_t &meshRef, int32_t &triref, vec3f &intersection)
+Pi3Ctouch Pi3Cscene::touch(const vec3f &mousexyz, const bool calcPerspective) // vec3f tp, Pi3Cmodel *&selgroup, Pi3Cmodel *&selmodel, int32_t &meshRef, int32_t &triref, vec3f &intersection)
 {
-	//float prevDist = 1e8f;
-
 	//calc ray position and direction from x,y screen coords and transform into model world space
 	Pi3Ctouch touch;
-	touch.calcRay(mousexyz, perspective);
+	if (calcPerspective) {
+		touch.calcRay(mousexyz, perspective);
+	}
+	else {
+		touch.calcRay(modelMatrix3D.transformRotateVec(mousexyz), 0);
+	}
 
 	int32_t level = 0;
 	float dist = 1e8f;
@@ -192,7 +194,9 @@ void Pi3Cscene::setViewport(const Pi3Crecti &rect)
 void Pi3Cscene::setOrthographic3D(const Pi3Crecti &rect, const float zoom, const float znear, const float zfar)
 {
 	//projMatrix3D.SetOrtho(rect.x, rect.x + rect.width, rect.y + rect.height, rect.y , znear, zfar);
-	projMatrix3D.SetOrtho((float)rect.width*zoom, (float)-rect.width*zoom, (float)-rect.height*zoom, (float)rect.height*zoom, znear, zfar);
+	//projMatrix3D.SetOrtho((int)(((float)rect.width)*zoom), (int)(((float)-rect.width)*zoom), (int)(((float)-rect.height)*zoom), (int)(((float)rect.height)*zoom), znear, zfar);
+	float izm = 1.f / zoom;
+	projMatrix3D.SetOrtho(rect.width * izm, -rect.width * izm, -rect.height * izm, rect.height * izm, znear, zfar, -1.f);
 }
 
 void Pi3Cscene::setViewport2D(const Pi3Crecti &rect, const float znear, const float zfar)
@@ -202,6 +206,10 @@ void Pi3Cscene::setViewport2D(const Pi3Crecti &rect, const float znear, const fl
 	nearz2D = znear;
 	farz2D = zfar;
 	projMatrix2D.SetOrtho(rect.x, rect.x+rect.width, rect.y + rect.height, rect.y, znear, zfar);
+	//vec3f res1 = projMatrix2D.transformVec(vec3f(0, 0, 0));
+	//vec3f res2 = projMatrix2D.transformVec(vec3f(400, 300, 0));
+	//vec3f res3 = projMatrix2D.transformVec(vec3f(800, 600, 0));
+	//SDL_Log("Proj2D = %f,%f,%f,  %f,%f,%f,  %f,%f,%f", res1.x, res1.y, res1.z, res2.x, res2.y, res2.z, res3.x, res3.y, res3.z);
 }
 
 void Pi3Cscene::resize(const Pi3Crecti &rect)
@@ -209,6 +217,12 @@ void Pi3Cscene::resize(const Pi3Crecti &rect)
 	projMatrix3D.SetPerspective(rect.width, rect.height, perspective, nearz3D, farz3D);
 	projMatrix2D.SetOrtho(rect.x, rect.x + rect.width, rect.y + rect.height, rect.y, nearz2D, farz2D);
 }
+
+//void Pi3Cscene::deleteSelection()
+//{
+//	undos.deleteSelections(models);
+//	for (auto &model : models) if (model.selected) model.deleted = true;
+//}
 
 bool Pi3Cscene::snapShot(const Pi3Crecti &rect, std::vector<uint8_t> &snapShot)
 {

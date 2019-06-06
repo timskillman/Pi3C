@@ -5,10 +5,11 @@
 #include "Pi3Cscene.h"
 #include "Pi3Cimgui.h"
 #include "Pi3Cmodel.h"
+#include "Pi3CspriteArray.h"
 #include <vector>
 
 // ==========================================================================
-// Pi3C Graphics Library Example - Castle Creator (by Tim Skillman)
+// Pi3C Graphics Library - Pi3C wrapper (by Tim Skillman)
 // ==========================================================================
 //
 // The MIT License
@@ -33,7 +34,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 //
-// Dedicated to the One who changed my life in the most amazing ways ...
+// Dedicated to the One who has blessed me beyond my dreams ...
 // Jesus Christ, King of Kings and Lord of Lords :-)
 // =======================================================================
 
@@ -49,16 +50,17 @@ public:
 	Pi3Cmodel create_model_from_text(std::string &text, const uint32_t width, const uint32_t colour = 0x303030);
 
 	uint32_t create_background(const std::string &path, const std::string &file = "");
-	int32_t load_model(const std::string &path, const std::string &file);
+	int32_t load_model(const std::string &path, const std::string &file, const vec3f &pos = vec3f(0,0,0));
 	int32_t add_model_to_scene2D(const Pi3Cmodel &model) { return scene.append2D(model); }
 	int32_t add_model_to_scene3D(const Pi3Cmodel &model) { return scene.append3D(model); }
+	int32_t add_spriteArray(Pi3CspriteArray &spritearray, const std::string &file = "");
 
 	std::vector<float> * getMeshVerts(const uint32_t meshRef) { return &resource.vertBuffer[resource.meshes[meshRef].bufRef]; }
 	uint32_t getMeshVertPtr(const uint32_t meshRef) { return resource.meshes[meshRef].vertOffset*resource.meshes[meshRef].stride; }
-	void update_sprite_position(const uint32_t spritesRef, const uint32_t spriteRef, const float x, const float y);
-	void update_sprite_rotated(const uint32_t spritesRef, const uint32_t spriteRef, const vec2f &pos, const vec2f &size, const float angle);
-	void update_sprite_transform(const uint32_t spritesRef, const uint32_t spriteRef, const vec3f &pos, const vec2f &size, const Pi3Cmatrix *scene_matrix, const vec2f &cent);
-	void update_sprite_billboard(const uint32_t spritesRef, const uint32_t spriteRef, const vec3f &pos, const vec2f &size, const vec3f &lookat);
+	//void update_sprite_position(const uint32_t spritesRef, const uint32_t spriteRef, const float x, const float y);
+	//void update_sprite_rotated(const uint32_t spritesRef, const uint32_t spriteRef, const vec2f &pos, const vec2f &size, const float angle);
+	//void update_sprite_transform(const uint32_t spritesRef, const uint32_t spriteRef, const vec3f &pos, const vec2f &size, const Pi3Cmatrix *scene_matrix, const vec2f &cent);
+	//void update_sprite_billboards(const uint32_t spritesRef, const uint32_t spriteRef, const uint32_t count, const vec3f &lookat);
 
 	void render3D() { scene.render3D(window.getTicks()); }
 	void render2D() { scene.render2D(window.getTicks()); }

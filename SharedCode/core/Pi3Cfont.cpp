@@ -133,15 +133,16 @@ Pi3Ctexture * Pi3Cfont::textSurface(const std::string &text)
 	for (auto &c : text) {
 		fontSheetChar &ch = fontsheet.chars[(uint8_t)c];
 		drect.width = ch.recti.width; drect.height = ch.recti.height;
-		fontsheet.sheet->rawBlit(&ch.recti, chtex, &drect);
+		//fontsheet.sheet->rawBlit2(&ch.recti, chtex, &drect);
+		fontsheet.sheet->blit(&ch.recti, chtex, &drect);
 		drect.x += drect.width;
 	}
 	return chtex;
 }
 
-void Pi3Cfont::formatVerts(std::vector<float> &verts, const float wrapWidth, const float linex, const float maxHeight, const uint32_t p, const uint32_t linep)
+void Pi3Cfont::formatVerts(std::vector<float> &verts, const float wrapWidth, const float linex, const float maxHeight, const uint32_t p, const uint32_t linep, const uint32_t stride)
 {
-	uint32_t stride = 8;
+	//uint32_t stride = 9;
 	uint32_t charsize = 6 * stride;
 	float xo = 0; float sxo = 0;
 	switch (format.justify) {
@@ -171,13 +172,13 @@ void Pi3Cfont::formatVerts(std::vector<float> &verts, const float wrapWidth, con
 		p += stride;												\
 
 
-uint32_t Pi3Cfont::textureRects(std::string &text, std::vector<float> &verts, Pi3Crect &size, const float wrapWidth)
+uint32_t Pi3Cfont::textureRects(std::string &text, std::vector<float> &verts, Pi3Crect &size, const float wrapWidth, const uint32_t stride)
 {
 	/* Creates a letter sheet made of rectangles with UV mapping to render a font sheet
 	   Fun stuff could be done here such as warping the letter geometry etc.. */
 
 	uint32_t p = 0;
-	uint32_t stride = 8;
+	//uint32_t stride = 9;
 	uint32_t tsize = text.size();
 	uint32_t spacep = 0;
 	uint32_t spacei = 0;
@@ -192,7 +193,7 @@ uint32_t Pi3Cfont::textureRects(std::string &text, std::vector<float> &verts, Pi
 
 		char c = text[i];
 		if (c == 10) {
-			formatVerts(verts, wrapWidth, x, maxHeight, p, linep);
+			formatVerts(verts, wrapWidth, x, maxHeight, p, linep, stride);
 			linep = p;
 			x = 0; y -= maxHeight; maxHeight = 0; linex = x;
 		}
@@ -216,7 +217,7 @@ uint32_t Pi3Cfont::textureRects(std::string &text, std::vector<float> &verts, Pi
 					while (text[i++] == ' '); //ignore spaces
 					p = spacep; //wind back and overwrite word that overhangs wrapWidth
 					i = spacei; //point to beginning of word in text string
-					formatVerts(verts, wrapWidth, linex, maxHeight, p, linep);
+					formatVerts(verts, wrapWidth, linex, maxHeight, p, linep, stride);
 					x = 0; y -= maxHeight; maxHeight = 0; linex = x; linep = p;
 				}
 				else {

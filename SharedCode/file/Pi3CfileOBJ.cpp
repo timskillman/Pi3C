@@ -19,7 +19,8 @@ namespace Pi3CfileOBJ {
 		//SDL_Log("Meshes %d,%d,%d,%d,%d",resource->meshes.size(),resource->materials.size(),resource->textures.size(),resource->vertBuffer.size(),resource->currentBuffer);
 		mesh.mode = GL_TRIANGLES;
 		mesh.bbox.bboxFromVerts(mesh.verts, 0, mesh.vc, mesh.stride);
-		int32_t i = resource->addMesh(mesh, !asCollider, false, 65535);
+		//int32_t i = resource->addMesh(mesh, !asCollider, false, 65535);
+		int32_t i = resource->insertMesh(&mesh);
 		//SDL_Log("Mesh %d: verts = %d,%d, material = %d", mesh.materialRef, mesh.vertOffset, mesh.vertSize, mesh.materialRef);
 	}
 	
@@ -39,6 +40,17 @@ namespace Pi3CfileOBJ {
 		}
 
 		resource->materials.push_back(objmat);
+	}
+
+	std::string formatFileString(const std::string &file)
+	{
+		std::string f = file;
+		int i = f.find("\\");
+		while (i >= 0) {
+			f = f.substr(0, i) + "/" + f.substr(i + 1, f.size() - 1);
+			i = f.find("\\");
+		}
+		return f;
 	}
 
 	void getMatLib(const std::string &path, const std::string &name, Pi3Cresource* resource)
@@ -138,7 +150,8 @@ namespace Pi3CfileOBJ {
 		bool readFaces = false;
 		int readType = 0;
 
-		const std::string gpath = (path.size() > 0 && *(path.end() - 1) != '/') ? path + "/" : path;
+		std::string gpath = formatFileString(path);
+		gpath = (gpath.size() > 0 && *(gpath.end() - 1) != '/') ? gpath + "/" : gpath;
 		const std::string filepath = gpath + filename;
 
 		std::string line;
@@ -159,6 +172,7 @@ namespace Pi3CfileOBJ {
 
 		int32_t materialfound = -1;
 		GLfloat * cols = NULL; //[4] = { 0.2f, 0.2f, 1.f, 1.f };
+		uint32_t col = 0xffffffff;
 		uint32_t tri = 0;
 
 		uint32_t tm = SDL_GetTicks();
@@ -246,9 +260,9 @@ namespace Pi3CfileOBJ {
 								&v[9], &v[10], &v[11], &v[12], &v[13], &v[14], &v[15], &v[16], &v[17],
 								&v[18], &v[19], &v[20], &v[21], &v[22], &v[23], &v[24], &v[25], &v[26]);
 							for (int32_t i = 0; i < (c-6); i += 3) {
-								mesh.addPackedVert(temp_vertices[v[i + 6] - 1], temp_normals[v[i + 8] - 1], temp_uvs[v[i + 7] - 1], cols);
-								mesh.addPackedVert(temp_vertices[v[i + 3] - 1], temp_normals[v[i + 5] - 1], temp_uvs[v[i + 4] - 1], cols);
-								mesh.addPackedVert(temp_vertices[v[0] - 1], temp_normals[v[2] - 1], temp_uvs[v[1] - 1], cols);
+								mesh.addPackedVert(temp_vertices[v[i + 6] - 1], temp_normals[v[i + 8] - 1], temp_uvs[v[i + 7] - 1], col);
+								mesh.addPackedVert(temp_vertices[v[i + 3] - 1], temp_normals[v[i + 5] - 1], temp_uvs[v[i + 4] - 1], col);
+								mesh.addPackedVert(temp_vertices[v[0] - 1], temp_normals[v[2] - 1], temp_uvs[v[1] - 1], col);
 								tri++;
 							}
 							break;
@@ -258,9 +272,9 @@ namespace Pi3CfileOBJ {
 								&v[6], &v[7], &v[8], &v[9], &v[10], &v[11],
 								&v[12], &v[13], &v[14], &v[15], &v[16], &v[17]);
 							for (int32_t i = 0; i < (c-4); i += 2) {
-								mesh.addPackedVert(temp_vertices[v[i + 4] - 1], temp_normals[v[i + 5] - 1], vec2f(0, 0), cols);
-								mesh.addPackedVert(temp_vertices[v[i + 2] - 1], temp_normals[v[i + 3] - 1], vec2f(1.f, 0), cols);
-								mesh.addPackedVert(temp_vertices[v[0] - 1], temp_normals[v[1] - 1], vec2f(0, 1.f), cols);
+								mesh.addPackedVert(temp_vertices[v[i + 4] - 1], temp_normals[v[i + 5] - 1], vec2f(0, 0), col);
+								mesh.addPackedVert(temp_vertices[v[i + 2] - 1], temp_normals[v[i + 3] - 1], vec2f(1.f, 0), col);
+								mesh.addPackedVert(temp_vertices[v[0] - 1], temp_normals[v[1] - 1], vec2f(0, 1.f), col);
 								tri++;
 							}
 							tri++;
@@ -269,9 +283,9 @@ namespace Pi3CfileOBJ {
 							c = sscanf(vals.c_str(), "%d %d %d %d %d %d %d %d %d", &v[0], &v[1], &v[2], &v[3], &v[4], &v[5], &v[6], &v[7], &v[8]); //contains vertices only
 							normal = temp_vertices[v[0] - 1].trinormal(temp_vertices[v[1] - 1], temp_vertices[v[2] - 1]); //create a surface normal
 							for (int32_t i = 0; i < (c-2); i++) {
-								mesh.addPackedVert(temp_vertices[v[i + 2] - 1], normal, vec2f(0, 0), cols);
-								mesh.addPackedVert(temp_vertices[v[i + 1] - 1], normal, vec2f(1.f, 0), cols);
-								mesh.addPackedVert(temp_vertices[v[0] - 1], normal, vec2f(0, 1.f), cols);
+								mesh.addPackedVert(temp_vertices[v[i + 2] - 1], normal, vec2f(0, 0), col);
+								mesh.addPackedVert(temp_vertices[v[i + 1] - 1], normal, vec2f(1.f, 0), col);
+								mesh.addPackedVert(temp_vertices[v[0] - 1], normal, vec2f(0, 1.f), col);
 								tri++;
 							}
 							tri++;
@@ -283,9 +297,9 @@ namespace Pi3CfileOBJ {
 								&v[12], &v[13], &v[14], &v[15], &v[16], &v[17]);
 							normal = temp_vertices[v[0] - 1].trinormal(temp_vertices[v[2] - 1], temp_vertices[v[4] - 1]); //create a surface normal
 							for (int32_t i = 0; i < (c-4); i += 2) {
-								mesh.addPackedVert(temp_vertices[v[i + 4] - 1], normal, temp_uvs[v[i + 5] - 1], cols);
-								mesh.addPackedVert(temp_vertices[v[i + 2] - 1], normal, temp_uvs[v[i + 3] - 1], cols);
-								mesh.addPackedVert(temp_vertices[v[0] - 1], normal, temp_uvs[v[1] - 1], cols);
+								mesh.addPackedVert(temp_vertices[v[i + 4] - 1], normal, temp_uvs[v[i + 5] - 1], col);
+								mesh.addPackedVert(temp_vertices[v[i + 2] - 1], normal, temp_uvs[v[i + 3] - 1], col);
+								mesh.addPackedVert(temp_vertices[v[0] - 1], normal, temp_uvs[v[1] - 1], col);
 								tri++;
 							}
 							tri++;

@@ -33,6 +33,8 @@ bool Pi3Cshader::CreateShaderProgram(const GLuint &vertexShader, const GLuint &f
 	glBindAttribLocation(program, 0, "a_Position");
 	glBindAttribLocation(program, 1, "a_Normal");
 	glBindAttribLocation(program, 2, "a_UV");
+	glBindAttribLocation(program, 3, "a_Colour");
+	stride = DEFAULT_STRIDE;
 
 	glLinkProgram(program); //linking
 
@@ -138,8 +140,10 @@ GLint Pi3Cshader::setTexture(const char * uni, GLint texLoc)
 void Pi3Cshader::setFog(float minDist, float maxDist, vec3f colour) 
 {
 	Set3f(fogColourRef, colour);
-	Setf(fogRangeRef, 1.f / (-minDist + maxDist));
-	Setf(fogMaxRef, -maxDist);
+	Setf(fogRangeRef, 1.f / (maxDist- minDist));
+	Setf(fogMaxRef, maxDist);
+	fogMaxDist = maxDist;
+	fogMinDist = minDist;
 }
 
 void Pi3Cshader::setSun(vec3f sundir, uint32_t suncol)
@@ -207,6 +211,7 @@ void Pi3Cshader::setMaterial(Pi3Cmaterial &mat)
 	else {
 		Setf(fogRangeRef, 1.f / (fogMaxDist - fogMinDist));
 	}
+	Setf(fogMaxRef, fogMaxDist);
 
 	Set4f(specularRef, mat.colSpecular);
 	Set4f(ambientRef, mat.colAmbient);

@@ -22,16 +22,16 @@
 //	}
 //}
 
-Pi3Cmodel::Pi3Cmodel(Pi3Cresource *resource, Pi3Cmesh mesh, uint32_t diffuseColour, bool deleteVerts, bool reserveBuffer, uint32_t bufferSize)
+Pi3Cmodel::Pi3Cmodel(Pi3Cresource *resource, Pi3Cmesh mesh, uint32_t diffuseColour)
 {
 	init();
-	create(resource, &mesh, diffuseColour, deleteVerts, reserveBuffer, bufferSize);
+	create(resource, &mesh, diffuseColour);
 }
 
-Pi3Cmodel::Pi3Cmodel(Pi3Cresource *resource, const std::string &name, Pi3Cmesh mesh, uint32_t diffuseColour, bool deleteVerts, bool reserveBuffer, uint32_t bufferSize)
+Pi3Cmodel::Pi3Cmodel(Pi3Cresource *resource, const std::string &name, Pi3Cmesh mesh, uint32_t diffuseColour)
 {
 	init(); this->name = name;
-	create(resource, &mesh, diffuseColour, deleteVerts, reserveBuffer, bufferSize);
+	create(resource, &mesh, diffuseColour);
 }
 
 Pi3Cmodel::Pi3Cmodel(Pi3Cresource *resource, const std::string &path, const std::string &modelfile, const bool asCollider, std::function<void(float)> showProgressCB)
@@ -56,9 +56,10 @@ void Pi3Cmodel::loadCollider(Pi3Cresource *resource, std::string path, std::stri
 	}
 }
 
-void Pi3Cmodel::create(Pi3Cresource *resource, Pi3Cmesh *mesh, uint32_t diffuseColour, bool deleteVerts, bool reserveBuffer, uint32_t bufferSize)
+void Pi3Cmodel::create(Pi3Cresource *resource, Pi3Cmesh *mesh, uint32_t diffuseColour)
 {	
-	meshRef = resource->addMesh(*mesh, !deleteVerts, reserveBuffer, bufferSize);
+	meshRef = resource->insertMesh(mesh);
+	//meshRef = resource->addMesh(*mesh, !deleteVerts, reserveBuffer, bufferSize);
 	material = *resource->defaultMaterial();
 	material.SetColDiffuse(diffuseColour);
 	bbox = resource->meshes[meshRef].bbox;
@@ -125,7 +126,8 @@ void Pi3Cmodel::render(Pi3Cresource *resource, Pi3Cshader &shader, const Pi3Cmat
 
 void Pi3Cmodel::appendMesh(Pi3Cresource *resource, Pi3Cmesh mesh, bool asCollider)
 {
-	int32_t i = resource->addMesh(mesh);
+	//int32_t i = resource->addMesh(mesh);
+	int32_t i = resource->insertMesh(&mesh);
 	if (group.size() == 0 && meshRef<0) {
 		meshRef = i;
 		bbox = resource->meshes[i].bbox;
@@ -280,7 +282,7 @@ bool Pi3Cmodel::collideSub(const Pi3Cresource *resource, const Pi3Cmatrix &pmat,
 	}
 
 	if (meshRef >= 0) {
-		return Pi3Ccollision::collideVector(resource->meshes[meshRef], tmat, false, pos, dir);
+		return Pi3Ccollision::collideVector(resource, meshRef, tmat, false, pos, dir);
 	}
 		
 	return false;
@@ -343,7 +345,7 @@ float Pi3Cmodel::collideFloorSub(const Pi3Cresource *resource, const Pi3Cmatrix 
 	}
  
 	if (meshRef >= 0) 
-		return Pi3Ccollision::collideFloor(resource->meshes[meshRef], pmat, -pos, prevHeight);
+		return Pi3Ccollision::collideFloor(resource, meshRef, pmat, -pos, prevHeight);
 		
 	return 1e8f;
 }
@@ -401,27 +403,122 @@ Pi3Cmodel* Pi3Cmodel::find(const std::string &name)
 	return nullptr;
 }
 
-void Pi3Cmodel::createRect2D(Pi3Cresource *resource, const vec2f &pos, const vec2f &size)
+void Pi3Cmodel::resizeRect2D(Pi3Cresource *resource, const vec2f &pos, const vec2f &size, const uint32_t colour)
 {
 	if (resource->rectRef >= 0) {
 		meshRef = resource->rectRef;
 		matrix.moveXY(pos);
 		matrix.SetScales(vec3f(size.x, size.y, 1.f));
 		material = *resource->defaultMaterial();  //The default material;
+		material.SetColDiffuse(colour);
 		material.illum = 1;					//non shaded illumination
 	}
 }
 
 void Pi3Cmodel::textModel(Pi3Cresource *resource, Pi3Cfont *font, std::string &text, const float wrapWidth)
 {
-	std::vector<float> *verts = resource->getLetterVerts(resource->letterSheetRef);				//get ptr to vertices from resource letterVerts
+	meshRef = resource->letterSheetRef;
+	Pi3Cmesh& mesh = resource->meshes[meshRef];
+	std::vector<float> *verts = resource->getMeshBuffer(meshRef);				//get ptr to vertices from resource letterVerts
 	if (verts == nullptr) return;
 	Pi3Crect size;
-	uint32_t vertCount = font->textureRects(text, *verts, size, wrapWidth);	//generate verts from text	
-	resource->updateLetterVerts(resource->letterSheetRef, vertCount);								//upload updated verts to GPU
+	uint32_t vertCount = font->textureRects(text, *verts, size, wrapWidth, mesh.stride);	//generate verts from text	
+	resource->updateMesh(meshRef, vertCount);								//upload updated verts to GPU
 	bbox.update(vec3f(size.x, size.y-size.height, 0));
 	bbox.update(vec3f(size.width, 0, 0));
 	matrix.move(vec3f(0, -size.height, 0));
-	meshRef = resource->letterSheetRef;
 	material = font->fontsheet.sheetMaterial;
+}
+
+#define updateCoordsXYZ(x,y,z)											\
+	(*vp.verts)[vp.ptr] = x; (*vp.verts)[vp.ptr+1] = y; (*vp.verts)[vp.ptr+2] = z; vp.ptr+=stride;	\
+
+void Pi3Cmodel::updateSpriteBillboard(Pi3Cresource *resource, const std::vector<vec3f> &pos, const std::vector<vec2f> &size, const vec3f &lookat)
+{
+	//Transform pos into screen space ...
+	Pi3Cmesh &mesh = resource->meshes[meshRef];
+	uint32_t stride = mesh.stride;
+	vertsPtr vp = resource->getMeshVerts(meshRef);
+
+	for (size_t i = 0; i < pos.size(); i++) {
+		float hw = size[i].x * 0.5f;
+		//float hh = size.y * 0.5f;
+
+		//const vec3f &pt = pos[i];
+		float x = pos[i].x, y = pos[i].y, z = pos[i].z, sy = size[i].y;
+		float lx = lookat.x - x;
+		float lz = lookat.z - z;
+		float d = hw / sqrtf(lx*lx + lz * lz);
+		float ax = lz * d, az = -lx * d;
+		
+		updateCoordsXYZ(x - ax, y, z - az); // , uv.x, uv.y);
+		updateCoordsXYZ(x + ax, y + sy, z + az); // , uv.x + us.x, uv.y);
+		updateCoordsXYZ(x + ax, y, z + az); // , uv.x + us.x, uv.y + us.y);
+		updateCoordsXYZ(x - ax, y, z - az); // , uv.x, uv.y);
+		updateCoordsXYZ(x - ax, y + sy, z - az); // , uv.x, uv.y + us.y);
+		updateCoordsXYZ(x + ax, y + sy, z + az); // , uv.x + us.x, uv.y + us.y);
+
+	}
+	resource->updateMesh(meshRef);
+}
+
+void Pi3Cmodel::updateLineQuad(Pi3Cresource *resource, const std::vector<vec3f> &pos, const std::vector<vec3f> &dir, const vec2f &size)
+{
+	//Transform pos into screen space ...
+	Pi3Cmesh &mesh = resource->meshes[meshRef];
+	uint32_t stride = mesh.stride;
+	vertsPtr vp = resource->getMeshVerts(meshRef);
+
+	for (size_t i = 0; i < pos.size(); i++) {
+		//float hw = size[i].x * 0.5f;
+		//float hh = size.y * 0.5f;
+
+		vec3f p1 = pos[i];
+		vec3f p2 = pos[i] + dir[i] * size.y;
+		vec3f wa = vec3f(dir[i].z*size.x, 0, -dir[i].x*size.x);
+		vec3f a = p1 + wa;
+		vec3f b = p1 - wa;
+		vec3f c = p2 - wa;
+		vec3f d = p2 + wa;
+
+		updateCoordsXYZ(a.x, a.y, a.z); // , uv.x, uv.y);
+		updateCoordsXYZ(b.x, b.y, b.z); // , uv.x + us.x, uv.y);
+		updateCoordsXYZ(d.x, d.y, d.z); // , uv.x + us.x, uv.y + us.y);
+		updateCoordsXYZ(b.x, b.y, b.z); // , uv.x, uv.y);
+		updateCoordsXYZ(c.x, c.y, c.z); // , uv.x, uv.y + us.y);
+		updateCoordsXYZ(d.x, d.y, d.z); // , uv.x + us.x, uv.y + us.y);
+
+	}
+	resource->updateMesh(meshRef);
+}
+
+#define updateCoordsXY(x,y)							\
+		(*vp.verts)[vp.ptr] = x; (*vp.verts)[vp.ptr + 1] = y; vp.ptr+=stride; 	\
+
+void Pi3Cmodel::updateSpriteCoordsRotated(Pi3Cresource *resource, const std::vector<vec3f> &pos, const std::vector<vec2f> &size, const std::vector<float> &angle)
+{
+
+	Pi3Cmesh &mesh = resource->meshes[meshRef];
+	uint32_t stride = mesh.stride;
+	vertsPtr vp = resource->getMeshVerts(meshRef);
+
+	for (size_t i = 0; i < pos.size(); i++) {
+
+		float hw = size[i].x;// *0.5f;
+		float hh = size[i].y;// *0.5f;
+		float x = pos[i].x, y = pos[i].y;
+
+		float ca = cos(angle[i]);
+		float sa = sin(angle[i]);
+		float ax = hw * ca - hh * sa;
+		float ay = hw * sa + hh * ca;
+
+		updateCoordsXY(x - ax, y + ay);
+		updateCoordsXY(x + ax, y - ay);
+		updateCoordsXY(x - ay, y - ax);
+		updateCoordsXY(x - ax, y + ay);
+		updateCoordsXY(x + ay, y + ax);
+		updateCoordsXY(x + ax, y - ay);
+	}
+	resource->updateMesh(meshRef);
 }

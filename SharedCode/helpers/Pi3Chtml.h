@@ -1,5 +1,6 @@
 #pragma once
 #include <map>
+#include <string>
 #include "Pi3Ctextformat.h"
 
 namespace Pi3Chtml {

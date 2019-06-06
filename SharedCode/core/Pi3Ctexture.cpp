@@ -52,8 +52,8 @@ void Pi3Ctexture::create(uint32_t width, uint32_t height, uint32_t bytesPerPixel
 	this->width = width;
 	this->height = height;
 	this->bpp = bytesPerPixel;
-	pitch = width* bytesPerPixel;
-	size = height*pitch;
+	pitch = width * bytesPerPixel;
+	size = height * pitch;
 	pixels = new uint8_t[size];
 	switch (bytesPerPixel) {
 	//case 1: format = GL_ALPHA8; break; //RPi doesnt understand this
@@ -63,7 +63,7 @@ void Pi3Ctexture::create(uint32_t width, uint32_t height, uint32_t bytesPerPixel
 	}
 }
 
-void Pi3Ctexture::rawBlit(Pi3Crecti *src_rect, Pi3Ctexture *dest_tex, Pi3Crecti *dst_rect)
+void rawBlit(uint8_t *src_pixels, const Pi3Crecti *src_rect, const uint32_t src_pitch, uint8_t *dest_pixels, const Pi3Crecti *dst_rect, const uint32_t dest_pitch)
 {
 	/*	A VERY RAW blit that does no bounds checking
 		and ASSUMES the source rectangle is inside the
@@ -74,14 +74,68 @@ void Pi3Ctexture::rawBlit(Pi3Crecti *src_rect, Pi3Ctexture *dest_tex, Pi3Crecti 
 
 	uint32_t sint = sizeof(uint32_t);
 	uint32_t dwidth = dst_rect->width * sint;								//Destination width (in bytes)
-	uint32_t dp = dst_rect->y * dest_tex->pitch + dst_rect->x * sint;		//Destination pointer start
-	uint32_t sp = src_rect->y* pitch + src_rect->x * sint;					//Source pointer start
+	uint32_t dp = dst_rect->y * dest_pitch + dst_rect->x * sint;		//Destination pointer start
+	uint32_t sp = src_rect->y * src_pitch + src_rect->x * sint;					//Source pointer start
 
-	for (uint32_t y = 0; y < dst_rect->height; y++)
+	for (int32_t y = 0; y < dst_rect->height; y++)
 	{
-		memcpy(&dest_tex->pixels[dp], &pixels[sp], dwidth);
-		dp += dest_tex->pitch; sp += pitch;
+		memcpy(&dest_pixels[dp], &src_pixels[sp], dwidth);
+		dp += dest_pitch; sp += src_pitch;
 	}
+}
+
+void Pi3Ctexture::blit(Pi3Crecti *src_rect, Pi3Ctexture *dest_tex, Pi3Crecti *dst_rect)
+{
+	rawBlit(pixels, src_rect, pitch, dest_tex->GetTexels(), dst_rect, dest_tex->GetPitch());
+}
+
+bool Pi3Ctexture::resize(const uint32_t new_width, const uint32_t new_height, const bool center)
+{
+	if (new_width > width || new_height > height) return false;
+
+	//save existing content ...
+	uint8_t * newpixels = new uint8_t(size);
+	memcpy(&newpixels, pixels, size);
+	
+	//create new, resized pixel buffer ...
+	if (pixels) delete pixels;
+	uint32_t new_pitch = new_width * 4;
+	uint32_t new_size = new_pitch * new_height;
+	pixels = new uint8_t(new_size);
+	
+	//work out left or centred offsets ...
+	uint32_t dx = (center) ? (new_width - width) / 2 : 0;
+	uint32_t dy = (center) ? (new_height - height) / 2 : 0;
+
+	//create source and destination rectangles ...
+	Pi3Crecti src_rect(0, 0, width, height);
+	Pi3Crecti dest_rect(dx, dy, width, height);
+
+	//Blit saved content into new pixel buffer ...
+	rawBlit(newpixels, &src_rect, pitch, pixels, &dest_rect, new_pitch);
+
+	width = new_width;
+	height = new_height;
+	pitch = new_pitch;
+	size = new_size;
+
+	return true;
+}
+
+bool Pi3Ctexture::merge(Pi3Ctexture * mergetex, bool right_top)
+{
+	uint32_t new_width = width + mergetex->width;
+	uint32_t new_height = (height > mergetex->height) ? height : mergetex->height;
+
+	Pi3Crecti dest_rect(width, 0, mergetex->width, mergetex->height);
+	Pi3Crecti src_rect(0, 0, mergetex->width, mergetex->height);
+
+	if (resize(new_width, new_height, false))
+	{
+		rawBlit(mergetex->GetTexels(), &src_rect, mergetex->pitch, pixels, &dest_rect, pitch);
+		return true;
+	}
+	return false;
 }
 
 void Pi3Ctexture::fromSurface(SDL_Surface* Surface)

@@ -90,7 +90,7 @@ public:
 	//Widgets ...
 	bool Container(const std::string &name, const int minwidth = 0, const int minheight = 0);
 	bool ContainerEnd(const std::string &name);
-	bool Text(std::string &text);
+	bool Text(std::string &text, const uint32_t colour = 0);
 	bool TextArea(std::string &text, const int minwidth, const int minheight);
 	bool ButtonText(const std::string &text, const bool selected = false, const int minwidth = 0, const int minheight = 0);
 	bool ButtonImage(const std::string &img, const bool selected = false, const int minWidth = 0, const int minHeight = 0);
@@ -98,7 +98,7 @@ public:
 	bool SliderDoubleV(const std::string &text, const double from, const double too, double &value, const int minwidth = 0, const int minheight = 0);
 	bool SliderFloat(const std::string &text, const float from, const float too, float &value);
 	bool SliderInt(const std::string &text, const int32_t from, const int32_t too, int32_t &value);
-	bool InputText(const std::string &text, std::string &input);
+	bool InputText(const std::string &text, std::string &input, const int minWidth = 0, const int minHeight = 0);
 	bool InputFloat(const std::string &text, const float from, const float too, float &value);
 	bool InputDouble(const std::string &text, const double from, const double too, double &value);
 	bool InputInt(const std::string &text, const int32_t from, const int32_t too, int32_t &value);
@@ -121,6 +121,7 @@ public:
 	bool renderBackIcon(const std::string &str, const int minwidth = 0, const int minheight = 0);
 
 	bool somethingSelected = false;
+	Pi3Cresource * resource = nullptr;
 
 private:
 
@@ -137,7 +138,6 @@ private:
 	Pi3Cmodel * createImageRect(const std::string &text, const std::shared_ptr<Pi3Ctexture> &ttex);
 	Pi3Cmodel * create2ImageRect(const std::string &text, const std::shared_ptr<Pi3Ctexture> &ttex1, const std::shared_ptr<Pi3Ctexture> &ttex2 = nullptr);
 
-	Pi3Cresource * resource = nullptr;
 	Pi3Cwindow *window = nullptr;
 
 	std::map<std::string, Pi3Cmodel> imageRect{};				//library of font models with images (both text and image)
@@ -159,6 +159,10 @@ private:
 	Pi3Cpointi menuNextItemPos;		//Menubar heading next position
 	std::string menuTouch;		//Currently touch menu heading (for drawing correct menuItem groups)
 	bool selectingMenu = false;	//Ignore other hovers/selections while menu is open with this
+
+	bool textEditing = false;
+	int32_t textID = -1;
+	int32_t thisTextField = -1;
 
 	//std::vector<containerStruct> containers;
 	std::map<std::string, containerStruct> containers;

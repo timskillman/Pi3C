@@ -14,6 +14,8 @@
 #include "Pi3Cfont.h"
 #include "Pi3Csound.h"
 
+#define MAXVBO 1000
+
 // =======================================================================
 // Pi3C Raspberry Pi Graphics Library
 // =======================================================================
@@ -42,14 +44,23 @@
 //
 // =======================================================================
 
+#define DEFAULT_STRIDE 9
+
+struct vertsPtr {
+	vertsPtr(uint32_t ptr, std::vector<float> *verts) : ptr(ptr), verts(verts) {}
+
+	std::vector<float> *verts = nullptr;
+	uint32_t ptr = 0;
+};
+
 class Pi3Cresource {
 public:
 	Pi3Cresource() { }
 	
 	~Pi3Cresource() { }
 	
-	void init(const uint32_t stride = 8);
-	void appendMesh(Pi3Cmesh mesh) { meshes.push_back(mesh); }
+	void init(const uint32_t stride = DEFAULT_STRIDE);
+	//void appendMesh(Pi3Cmesh mesh) { meshes.push_back(mesh); }
 	size_t meshCount() { return meshes.size(); }
 
 	int32_t loadTexture(const std::string &path, const std::string &name, int32_t &texRef);  //loads a texture and returns a texture reference to the textures array (else -1 if failed)
@@ -62,15 +73,31 @@ public:
 		return (ref >= 0 && ref <= (int32_t)textures.size()) ? textures[ref].get() : nullptr;
 	}
 
-	int32_t addMesh(Pi3Cmesh &mesh, const bool deleteVerts = true, const bool dynamicBuffer = false, const uint32_t vertSize = 100000);		//returns mesh reference (or -1 if failed)
-	
-	void uploadMeshesToGPU();
+	//int32_t addMesh(Pi3Cmesh &mesh, const bool deleteVerts = true, const bool dynamicBuffer = false, const uint32_t vertSize = 2000000);		//returns mesh reference (or -1 if failed)
+	int32_t insertMesh(Pi3Cmesh * mesh, uint32_t maxsize = 500000);
+
+	vertsPtr getMeshVerts(uint32_t meshRef) {
+		return vertsPtr(meshes[meshRef].vertOffset * meshes[meshRef].stride, &vertBuffer[meshes[meshRef].bufRef]);
+	}
+
+	//std::vector<float> * getMeshVerts(uint32_t meshRef, uint32_t &p) { 
+	//	p = meshes[meshRef].vertOffset * meshes[meshRef].stride;
+	//	return &vertBuffer[meshes[meshRef].bufRef];
+	//}
+
+	std::vector<float>* getMeshBuffer(const uint32_t meshRef)
+	{
+		if (meshRef < 0) return nullptr;
+		return &vertBuffer[meshes[meshRef].bufRef];
+	}
+
+	//void uploadMeshesToGPU();
 	void updateGPUverts(const int VBO, const int vfrom, const int vsize, const std::vector<float> &verts);
-	void uploadGPUverts(const int bufref, const std::vector<float> &verts);
-	void updateMesh(uint32_t meshRef);
-	void setRenderBuffer(const int bufRef);
+	//void uploadGPUverts(const int bufref, const std::vector<float> &verts);
+	void updateMesh(uint32_t meshRef, uint32_t vertCount = 0, const uint32_t vertOffset = 0);
+	void setRenderBuffer(const int bufRef, const uint32_t stride);
 	void renderMesh(const int meshRef, const GLenum rendermode = GL_TRIANGLES);
-	void renderText(const int meshRef, Pi3Cfont *font, std::string &text, const vec3f &pos, const float wrapWidth);
+	void renderText(const int meshRef, Pi3Cfont *font, std::string &text, const vec3f &pos, const float wrapWidth, const uint32_t colour = 0xffffffff);
 	int32_t touchMesh(const int meshRef, Pi3Ctouch &touch, const Pi3Cmatrix &tmat) const;
 	
 	int32_t addShader(const std::string &vertfile, const std::string &fragfile);
@@ -78,8 +105,7 @@ public:
 	void addMusic(const char * path, const char * musicfile);
 	void addSound(const char * path, const char * soundfile);
 
-	std::vector<float> * getLetterVerts(const uint32_t meshRef);
-	void updateLetterVerts(const uint32_t meshRef, uint32_t vertCount, const uint32_t vertOffset = 0);
+	
 
 	std::shared_ptr<Pi3Cfont> findFont(const std::string &ffont) { return findResource(fonts, ffont); }
 	std::shared_ptr<Pi3Cmusic> findMusic(const std::string &fmusic) { return findResource(music, fmusic); }
@@ -92,7 +118,8 @@ public:
 	inline size_t vertexBufferSize(uint32_t id) { return vertBuffer[id].size(); }
 	
 	std::vector<Pi3Cmesh> meshes;
-	std::vector<std::vector<float>> vertBuffer;
+	std::vector<std::vector<float>> vertBuffer;			//vertex buffers for modify and uploading to GPU
+	std::vector<uint32_t> vertBufferPtr;				//vertex buffer pointer for each vertex buffer (used for calculating free space in each buffer)
 	std::vector<Pi3Cmaterial> materials;
 	std::vector<std::shared_ptr<Pi3Ctexture>> textures;
 	std::vector<Pi3Cshader> shaders;
@@ -103,6 +130,7 @@ public:
 	uint32_t vertCount = 0;
 	int32_t currentBuffer = -1;
 	uint32_t currentBufferSize = 0;
+	//uint32_t bufferPtr = 0;
 
 	int calls;
 	int32_t rectRef = -1;
@@ -119,13 +147,13 @@ private:
 		return T();
 	}
 
-	void addMeshVerts(const Pi3Cmesh &mesh, std::vector<float> &newverts, const uint32_t to, const uint32_t size, const uint32_t vertsize, const bool deleteVerts);
+	//void addMeshVerts(const Pi3Cmesh &mesh, std::vector<float> &newverts, const uint32_t to, const uint32_t size, const uint32_t vertsize, const bool deleteVerts);
 
-	GLuint VBOid[1000];
-	uint32_t stride;
+	GLuint VBOid[MAXVBO];
+	//uint32_t stride;
 	int lastVBO = -1;
-	int startVBO = 0;
-	bool uploaded = false;
+	//int startVBO = 0;
+	int currentVBO = 0;
+	//bool uploaded = false;
 	std::string errorStr;
 };
-

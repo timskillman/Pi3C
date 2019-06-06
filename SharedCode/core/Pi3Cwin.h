@@ -113,6 +113,7 @@ public:
 	bool hasMouseFocus();
 	bool hasKeyboardFocus();
 	void forceMouseUp();
+	void centreMouse() { SDL_WarpMouseInWindow(mWindow, mWidth / 2, mHeight / 2); }
 	bool isMinimized();
 	bool hasquit();
 	void setquit(bool q) { quit = q; }
@@ -122,6 +123,9 @@ public:
 	SDL_Scancode getKeyPress() { return keyPress; }
 	SDL_Scancode getKeyUp() { return keyUp; }
 	const uint8_t * getKeys() { keys = SDL_GetKeyboardState(NULL); return keys; }
+
+	std::string getInput() { return text; }
+	void clearInput() { text = ""; }
 
 	std::string getSystemInfo();
 	void showErrorMessage(const std::string &heading, const std::string &error);
@@ -154,6 +158,9 @@ public:
 	float vdpi = 1.f;
 	//std::vector<Pi3CUIform> forms;
 
+	bool keyDown = false;
+	bool ctrlKey = false;
+	bool shiftKey = false;
 
 private:
 	const Uint8 *keys;
@@ -161,7 +168,8 @@ private:
 	SDL_GLContext GLcontext;
 	SDL_Scancode keyPress;
 	SDL_Scancode keyUp;
-	bool keyDown = false;
+
+	std::string text;
 
 	float ticks;
 	int32_t lastTime;

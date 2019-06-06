@@ -35,7 +35,7 @@ Pi3Cmodel * Pi3Cimgui::createImage(const std::string &text, const std::shared_pt
 {
 	if (texture->isValid()) {
 		Pi3Cmodel texrect;
-		texrect.createRect2D(resource, vec2f(0, -1.f), vec2f(1.f, 1.f)); //Create a 1x1 sized image rectangle that can be scaled to any size
+		texrect.resizeRect2D(resource, vec2f(0, -1.f), vec2f(1.f, 1.f)); //Create a 1x1 sized image rectangle that can be scaled to any size
 		texrect.addPicture(resource, texture);
 		auto obj = imageRect.emplace(text, texrect);
 		return &obj.first->second;
@@ -54,15 +54,15 @@ Pi3Cmodel * Pi3Cimgui::create2ImageRect(const std::string &text, const std::shar
 		//Create an imageRect consisting of Container, Background and 2x Images ...
 		Pi3Cmodel container, texrect1, texrect2, bkgrect;
 
-		bkgrect.createRect2D(resource);
-		texrect1.createRect2D(resource);
+		bkgrect.resizeRect2D(resource);
+		texrect1.resizeRect2D(resource);
 		texrect1.addPicture(resource, ttex1);
 
 		container.group.push_back(bkgrect);
 		container.group.push_back(texrect1);
 		
 		if (ttex2) {
-			texrect2.createRect2D(resource);
+			texrect2.resizeRect2D(resource);
 			texrect2.addPicture(resource, ttex2);
 			container.group.push_back(texrect2);
 		}
@@ -270,7 +270,7 @@ bool Pi3Cimgui::renderRect(const int width, const int height)
 	size = Pi3Cpointi(width, height);
 	bool mouseTouchRect = touched(size);
 	Pi3Cmodel rect;
-	rect.createRect2D(resource, vec2f((float)pos.x, (float)(pos.y - size.y)), vec2f((float)(size.x), (float)(size.y)));
+	rect.resizeRect2D(resource, vec2f((float)pos.x, (float)(pos.y - size.y)), vec2f((float)(size.x), (float)(size.y)));
 	rect.matrix.setz(zpos-1.f);
 	//setButtonBackground(rect, mouseTouchRect);
 	rect.material.SetColDiffuse(currentParams.buttonColour);
@@ -477,8 +477,44 @@ bool Pi3Cimgui::SliderInt(const std::string &text, const int32_t from, const int
 	return false;
 }
 
-bool Pi3Cimgui::InputText(const std::string &text, std::string &input)
+bool Pi3Cimgui::InputText(const std::string &text, std::string &input, const int minWidth, const int minHeight)
 {
+	//Help from http://lazyfoo.net/tutorials/SDL/32_text_input_and_clipboard_handling/index.php
+
+	int mWidth = (minWidth == 0) ? currentParams.minWidth : minWidth; // / dpi;
+	int mHeight = (minHeight == 0) ? currentParams.minHeight : minHeight; // / dpi;
+
+	size = Pi3Cpointi(mWidth, mHeight);
+	bool touch = touched(size);
+	bool clicked = touch && window->mouse.LeftButton;
+
+	if (clicked) {
+		thisTextField = textID;
+		if (!textEditing) {
+			SDL_StartTextInput();
+			textEditing = true;
+			somethingSelected = true;
+		}
+		//calc nearest position to mouse pointer ...
+	}
+
+	if (textID == thisTextField) {
+		//animate caret at text position...
+
+		//add/remove characters from input ...
+		if (textEditing) {
+			std::string text = window->getInput();
+			if (text!="" && !((text[0] == 'c' || text[0] == 'C') && (text[0] == 'v' || text[0] == 'V') && SDL_GetModState() & KMOD_CTRL)) {
+				input += text;
+				window->clearInput();
+			}
+		}
+	}
+
+	//uint32_t col = (colour == 0) ? currentParams.textColour | 0xff000000 : colour;
+	resource->renderText(resource->lettersRef, currentFont, input, vec3f(pos.x, pos.y, zpos), 8000.f, currentParams.textColour);
+
+	textID++;
 	return false;
 }
 
@@ -522,9 +558,11 @@ bool Pi3Cimgui::ListBox(const std::string &text, uint32_t &currentItem, const st
 	return false;
 }
 
-bool Pi3Cimgui::Text(std::string &text)
+bool Pi3Cimgui::Text(std::string &text, const uint32_t colour)
 {
-	resource->renderText(resource->lettersRef, currentFont, text, vec3f(pos.x, pos.y, zpos), 4000);
+	if (text == "") return false;
+	uint32_t col = (colour == 0) ? currentParams.textColour | 0xff000000 : colour;
+	resource->renderText(resource->lettersRef, currentFont, text, vec3f(pos.x, pos.y, zpos), 8000.f, col);
 	return false;
 }
 
@@ -555,6 +593,7 @@ Pi3Cpointi Pi3Cimgui::getPosition()
 
 void Pi3Cimgui::Begin() {
 	setPosition(0, 0);
+	textID = 0;
 	if (!window->mouse.LeftButton) somethingSelected = false;
 }
 

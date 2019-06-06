@@ -77,8 +77,8 @@ public:
 
 	//Pi3Cmodel(const modelParams mp);
 	Pi3Cmodel() {}
-	Pi3Cmodel(Pi3Cresource *resource, Pi3Cmesh mesh, uint32_t diffuseColour = 0xffffffff, bool asCollider = false, bool reserveBuffer = false, uint32_t bufferSize = 65535);
-	Pi3Cmodel(Pi3Cresource *resource, const std::string &name, Pi3Cmesh mesh, uint32_t diffuseColour = 0xffffffff, bool asCollider = false, bool reserveBuffer = false, uint32_t bufferSize = 65535); //add mesh with name
+	Pi3Cmodel(Pi3Cresource *resource, Pi3Cmesh mesh, uint32_t diffuseColour = 0xffffffff);
+	Pi3Cmodel(Pi3Cresource *resource, const std::string &name, Pi3Cmesh mesh, uint32_t diffuseColour = 0xffffffff); //add mesh with name
 	Pi3Cmodel(Pi3Cresource *resource, const std::string &path, const  std::string &modelfile, const bool asCollider, std::function<void(float)> showProgressCB); //load model only
 	Pi3Cmodel(Pi3Cresource *resource, const std::string &modelname, const std::string &path, const std::string &model, const std::string &collider, std::function<void(float)> showProgressCB = nullptr); //load model and collider
 	~Pi3Cmodel() {}
@@ -86,7 +86,7 @@ public:
 // Functions
 
 	void init();
-	void create(Pi3Cresource *resource, Pi3Cmesh *mesh, uint32_t diffuseColour = 0xffffffff, bool asCollider = false, bool reserveBuffer = false, uint32_t bufferSize = 65535);
+	void create(Pi3Cresource *resource, Pi3Cmesh *mesh, uint32_t diffuseColour = 0xffffffff);
 	void render(Pi3Cresource *resource, Pi3Cshader &shader, const Pi3Cmatrix *parent_matrix = nullptr, Pi3Cmaterial *materialOverride = nullptr);
 	void renderBasic(Pi3Cresource *resource, Pi3Cshader &shader, const Pi3Cmatrix *parent_matrix = nullptr, Pi3Cmaterial *materialOverride = nullptr);
 	void appendMesh(Pi3Cresource *resource, Pi3Cmesh mesh, bool asCollider);
@@ -98,7 +98,7 @@ public:
 	int32_t addTexture(Pi3Cresource *resource, const std::string &txfile);
 	int32_t addTexture(Pi3Cresource *resource, const std::shared_ptr<Pi3Ctexture> &texture);
 	int32_t addPicture(Pi3Cresource *resource, const std::shared_ptr<Pi3Ctexture> &texture);
-	void createRect2D(Pi3Cresource *resource, const vec2f &pos = vec2f(0, -1.f), const vec2f &size = vec2f(1.f, 1.f));
+	void resizeRect2D(Pi3Cresource *resource, const vec2f &pos = vec2f(0, -1.f), const vec2f &size = vec2f(1.f, 1.f), const uint32_t colour = 0xffffffff);
 	void textModel(Pi3Cresource *resource, Pi3Cfont *font, std::string &text, const float wrapWidth);
 
 	Pi3Cmodel * append(Pi3Cmodel model, vec3f offset = vec3f(0, 0, 0), vec3f rotation = vec3f(0,0,0));
@@ -106,8 +106,12 @@ public:
 	Pi3Cmodel * appendCollider(Pi3Cmodel &model, vec3f offset = vec3f(0, 0, 0), vec3f rotation = vec3f(0, 0, 0));
 
 	void resize(vec3f size) { Pi3Cmatrix sm; sm.SetScales(size); matrix = matrix * sm; }
-	void move(vec3f v) { matrix.move(v); }
-	void rotate(vec3f r) { matrix.setMoveRotate(vec3f(0,0,0), r); }
+	void move(const vec3f &vec) { matrix.move(vec); }
+	void rotate(const vec3f &rot) { matrix.rotate(rot); }
+
+	void updateSpriteBillboard(Pi3Cresource *resource, const std::vector<vec3f> &pos, const std::vector<vec2f> &size, const vec3f &lookat);
+	void updateSpriteCoordsRotated(Pi3Cresource *resource, const std::vector<vec3f> &pos, const std::vector<vec2f> &size, const std::vector<float> &angles);
+	void updateLineQuad(Pi3Cresource *resource, const std::vector<vec3f> &pos, const std::vector<vec3f> &dir, const vec2f &size);
 
 	Pi3Cmodel* find(const std::string &name); //searches model heirarchy and returns name if found (0 if not)
 

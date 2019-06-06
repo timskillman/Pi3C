@@ -29,6 +29,7 @@ public:
 		float walkSpeed = 1.f;
 		float runSpeed = 2.f;
 		float fallSpeed = 5.f;
+		float flyspeed = 0.f;
 	};
 
 	Pi3Cavatar() : walkSpeed(1.f), runSpeed(2.f), fallSpeed(5.f), size(1.f, 2.f, 1.f), movement(move_walk), faster(false), newmove(true), onground(false) {}
@@ -58,6 +59,7 @@ public:
 	void run(bool faster) { this->faster = faster; }
 
 	bool moved;
+	float flyspeed;
 
 private:
 
@@ -69,6 +71,7 @@ private:
 	float walkSpeed;
 	float runSpeed;
 	float fallSpeed;
+	
 	moveType movement;
 	bool faster;
 	bool onground;

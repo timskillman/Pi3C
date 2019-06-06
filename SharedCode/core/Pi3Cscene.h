@@ -6,8 +6,11 @@
 #include "Pi3Cvector.h"
 #include "Pi3Ctouch.h"
 #include "Pi3Crect.h"
+#include "Pi3Cmaterial.h"
 #include <vector>
 #include <functional>
+
+constexpr float PSPVALUE = 800.f;
 
 // =======================================================================
 // Pi3C Graphics Library
@@ -44,11 +47,15 @@
 class Pi3Cscene {
 public:
 	Pi3Cscene() { }
-	Pi3Cscene(Pi3Cresource *resource) { this->resource = resource; }
+	Pi3Cscene(Pi3Cresource *resource) { 
+		init(resource);
+	}
+
 	~Pi3Cscene() {}
-	
+
 	Pi3Cresource *resource = nullptr; //Ptr to resources (set upon initialisation)
 	
+
 	std::vector<Pi3Cmodel> models;
 	std::vector<Pi3Cmodel> models2D;
 	std::vector<Pi3Cmodel> skyboxes;
@@ -57,7 +64,15 @@ public:
 	
 	//std::vector<Pi3Cavatar> avatar;	//several avatars
 
-	void setResource(Pi3Cresource *resource) { this->resource = resource; }
+	void init(Pi3Cresource *resource) { 
+		this->resource = resource; 
+		selectMaterial = *resource->defaultMaterial();
+		selectMaterial.SetColDiffuse(0xffffff);
+		selectMaterial.SetColEmissive(0xffffff);
+		selectMaterial.SetColAmbient(0xffffff);
+		selectMaterial.rendermode = GL_LINE_STRIP;
+		selectMaterial.illum = 0;
+	}
 	void setMatrix(vec3f const &firstpos, vec3f const &thirdpos, vec3f const &rot);
 	void render3D(const float ticks = 1.f, Pi3Cmaterial *materialOverride = nullptr);
 	void render2D(const float ticks = 1.f);
@@ -68,7 +83,7 @@ public:
 	Pi3Cmodel * getSubModel(const int32_t * groupRefs, const int32_t maxlevel);
 	Pi3Cmatrix * getModelMatrix() { return &modelMatrix3D; }
 
-	Pi3Ctouch touch3D(const vec3f &mousexy); // vec3f xy, Pi3Cmodel *&selgroup, Pi3Cmodel *&selmodel, int32_t &meshRef, int32_t &triref, vec3f &intersection);
+	Pi3Ctouch touch(const vec3f &mousexyz, const bool calcPerspective);
 
 	int32_t loadModelOBJ(const std::string &path, const std::string &file, const std::function<void(float)> showProgressCB);
 	int32_t loadSkybox(const std::string &path, const std::string &file, const std::function<void(float)> showProgressCB, const float scale = 1.f);
@@ -112,10 +127,13 @@ private:
 	float zoom = 1.f;
 	float nearz3D = 1.0f;
 	float farz3D = 5000.f;
-	float perspective = 800.f;
+	float perspective = PSPVALUE;
 
-	std::string getPathFile(const std::string &filepath) const;
+	Pi3Cmaterial selectMaterial;
+
+	std::string getPathFile(std::string &filepath) const;
 	void render(const float ticks, Pi3Cmatrix &projMatrix, Pi3Cmatrix &modelMatrix, std::vector<Pi3Cmodel> &models, Pi3Cmaterial *materialOverride);
 	//void appendLight(Pi3Clight &light) { lights.push_back(light); }
 	//void appendCamera(Pi3Ccamera &camera) { cameras.push_back(camera); }
+
 };

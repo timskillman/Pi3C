@@ -11,17 +11,15 @@ Pi3Cmesh::Pi3Cmesh(const std::string &name, const uint32_t stride) : name(name),
 void Pi3Cmesh::reset()
 {
 	mode = GL_TRIANGLES; 
-	//name = ""; 
 	vertOffset = 0; 
 	vertSize = 0;
 	verts.resize(0);
 	bbox.init();
 	materialRef = -1;
-	//stride = defaultStride;
 	vc = 0;
 }
 	
-void Pi3Cmesh::addPackedVert(const vec3f &position, const vec3f &normal, const vec2f &uv, const GLfloat *cols)
+void Pi3Cmesh::addPackedVert(const vec3f &position, const vec3f &normal, const vec2f &uv, const uint32_t col)
 {
 	if (vc + stride > verts.size()) verts.resize(vc + 1000);
 	verts[vc++] = position.x;
@@ -32,12 +30,14 @@ void Pi3Cmesh::addPackedVert(const vec3f &position, const vec3f &normal, const v
 	verts[vc++] = normal.z;
 	verts[vc++] = uv.x;
 	verts[vc++] = uv.y;
-	if (cols && stride==12) {
-		verts[vc++] = cols[0];
-		verts[vc++] = cols[1];
-		verts[vc++] = cols[2];
-		verts[vc++] = cols[3];
-	}
+	verts[vc++] = (float)(col & 255) / 256.f + (float)((col >> 8) & 255) + (float)((col >> 16) & 255) * 256.f; // Pack 32bit colour in float (65535.996f = 0xffffff)
+	//if (cols && stride==12) {
+	//	//verts[vc++] = (colour & 255) + ((colour >> 8) && 255) * 256 + ((colour >> 16) && 255) * 65536;
+	//	verts[vc++] = cols[0];
+	//	verts[vc++] = cols[1];
+	//	verts[vc++] = cols[2];
+	//	verts[vc++] = cols[3];
+	//}
 }
 
 void Pi3Cmesh::offset(const vec3f pos, std::vector<float> &verts, const uint32_t start, const uint32_t size, const uint32_t stride)
@@ -122,6 +122,7 @@ int32_t Pi3Cmesh::touchPoint(Pi3Ctouch &touch, const Pi3Cmatrix &mtx, const std:
 	uint32_t vsize = vertSize * stride;
 	uint32_t voff = vertOffset * stride;
 	int32_t closestTri = -1;
+	float w1 = 1.f, w2 = 1.f, w3 = 1.f;
 
 	for (size_t i = voff; i < (voff + vsize); i += stride * 3)
 	{
@@ -129,11 +130,13 @@ int32_t Pi3Cmesh::touchPoint(Pi3Ctouch &touch, const Pi3Cmatrix &mtx, const std:
 		uint32_t i3 = i + stride + stride;
 
 		// Calc Z's and discard any triangle that has a point behind the viewer ...
-		float z1 = mtx.transformZ(&mverts[i]); if (z1 > 0) continue;
-		float z2 = mtx.transformZ(&mverts[i2]); if (z2 > 0) continue;
-		float z3 = mtx.transformZ(&mverts[i3]); if (z3 > 0) continue;
+		float z1 = mtx.transformZ(&mverts[i]); if (touch.perspective != 0 && z1 > 0) continue;
+		float z2 = mtx.transformZ(&mverts[i2]); if (touch.perspective != 0 && z2 > 0) continue;
+		float z3 = mtx.transformZ(&mverts[i3]); if (touch.perspective != 0 && z3 > 0) continue;
 
-		float w1 = touch.perspective / z1, w2 = touch.perspective / z2, w3 = touch.perspective / z3;
+		if (touch.perspective != 0) {
+			w1 = touch.perspective / z1, w2 = touch.perspective / z2, w3 = touch.perspective / z3;
+		}
 
 		float x1 = mtx.transformX(&mverts[i]);
 		float x2 = mtx.transformX(&mverts[i2]);
@@ -174,7 +177,6 @@ int32_t Pi3Cmesh::touchPoint(Pi3Ctouch &touch, const Pi3Cmatrix &mtx, const std:
 
 	return closestTri;
 }
-
 
 namespace std
 {
@@ -358,10 +360,11 @@ void Pi3Cmesh::updateNormals(const uint32_t min, const uint32_t max)
 		verts[vc++] = x; verts[vc++] = y; verts[vc++] = pos.z;	\
 		verts[vc++] = 0; verts[vc++] = -1.f; verts[vc++] = 0;	\
 		verts[vc++] = ux; verts[vc++] = 0.9999f-uy;				\
+		verts[vc++] = 65535.996f;								\
 
-void Pi3CspriteArray::addSprite(const vec3f &pos, const vec2f &size, const vec2f &uv, const vec2f &us)
+void Pi3Cmesh::addRect(const vec3f &pos, const vec2f &size, const vec2f &uv, const vec2f &us)
 {
-	if (vc + stride * 6 > verts.size()) verts.resize(vc + 48);
+	if (vc + stride * 6 > verts.size()) verts.resize(vc + 4800);
 	CreateVerts(pos.x, pos.y - size.y, uv.x, uv.y - us.y);
 	CreateVerts(pos.x + size.x, pos.y , uv.x + us.x, uv.y);
 	CreateVerts(pos.x + size.x, pos.y - size.y, uv.x + us.x, uv.y - us.y);
@@ -377,11 +380,8 @@ void Pi3CspriteArray::addSprite(const vec3f &pos, const vec2f &size, const vec2f
 #define updateCoordsXY(x,y)							\
 		verts[p] = x; verts[p + 1] = y; p+=stride; 	\
 
-void Pi3CspriteArray::updateSpriteCoords(std::vector<float> &verts, const uint32_t spriteRef, const float x, const float y)
+void Pi3Cmesh::updateRectCoords2D(std::vector<float> &verts, uint32_t &p, const float x, const float y, const float w, const float h)
 {
-	uint32_t p = (vertOffset + spriteRef * 6) * stride;
-	float w = verts[p + stride] - verts[p];					//derive width and height from rectangle
-	float h = verts[p + stride + 1] - verts[p + 1];
 	updateCoordsXY(x, y - h);
 	updateCoordsXY(x + w, y);
 	updateCoordsXY(x + w, y - h);
@@ -390,72 +390,36 @@ void Pi3CspriteArray::updateSpriteCoords(std::vector<float> &verts, const uint32
 	updateCoordsXY(x + w, y);
 }
 
-#define updateRotateCoordsXY(a,b)								\
-		verts[p] = pos.x + a; verts[p + 1] = pos.y + b; p+=stride; 	\
-
-void Pi3CspriteArray::updateSpriteCoordsRotated(std::vector<float> &verts, const uint32_t spriteRef, const vec2f &pos, const vec2f &size, const float angle)
+void Pi3Cmesh::updateRectCoordsROT(std::vector<float> &verts, uint32_t &p, const float x, const float y,  const float ax, const float ay) 
 {
-	uint32_t p = vertOffset * stride + spriteRef * stride * 6;
-	float hw = size.x * 0.5f;
-	float hh = size.y * 0.5f;
-	//float cx = pos.x + hw;
-	//float cy = pos.y + hh;
-
-	float ca = cos(angle);
-	float sa = sin(angle);
-	float ax = hw* ca - hh* sa;
-	float ay = hw * sa + hh* ca;
-
-
-	updateRotateCoordsXY(-ax, ay);
-	updateRotateCoordsXY(ax, -ay);
-	updateRotateCoordsXY(-ay, -ax);
-	updateRotateCoordsXY(-ax, ay);
-	updateRotateCoordsXY(ay, ax);
-	updateRotateCoordsXY(ax, -ay);
+	updateCoordsXY(x - ax, y + ay);
+	updateCoordsXY(x + ax, y - ay);
+	updateCoordsXY(x - ay, y - ax);
+	updateCoordsXY(x - ax, y + ay);
+	updateCoordsXY(x + ay, y + ax);
+	updateCoordsXY(x + ax, y - ay);
 }
 
+#define updateCoordsXYZ(x,y,z)									\
+	verts[p] = x; verts[p+1] = y; verts[p+2] = z; p+=stride;	\
 
-#define updateCoordsXYZ(x,y,z)							\
-		verts[p] = x; verts[p+1] = y; verts[p+2] = z;	\
-		p+=stride; 										\
 
-/* Transforms a 2D rect into 3D space with the effect of bill-boarding */
-void Pi3CspriteArray::updateSpriteTransformCoords(std::vector<float> &verts, const uint32_t spriteRef, const vec3f &pos, const vec2f &size, const Pi3Cmatrix *scene_matrix, const vec2f &cent) //, const vec2f &uv, const vec2f &us
-{
-	//Transform pos into screen space ...
-	uint32_t p = vertOffset * stride + spriteRef * stride * 6;
-
-	vec3f tpos = scene_matrix->transformVec(pos);
-	float hw = size.x * 0.5f;
-	//float hh = size.y * 0.5f;
-	float cx = cent.x, cy = cent.y;
-	float w = 800.f / tpos.z;
-	updateCoordsXYZ(cx - (tpos.x - hw)*w, cy - tpos.y*w, tpos.z); // , uv.x, uv.y);
-	updateCoordsXYZ(cx - (tpos.x + hw)*w, cy - (tpos.y + size.y)*w, tpos.z); // , uv.x + us.x, uv.y);
-	updateCoordsXYZ(cx - (tpos.x + hw)*w, cy - tpos.y*w, tpos.z); // , uv.x + us.x, uv.y + us.y);
-	updateCoordsXYZ(cx - (tpos.x - hw)*w, cy - tpos.y*w, tpos.z); // , uv.x, uv.y);
-	updateCoordsXYZ(cx - (tpos.x - hw)*w, cy - (tpos.y + size.y)*w, tpos.z); // , uv.x, uv.y + us.y);
-	updateCoordsXYZ(cx - (tpos.x + hw)*w, cy - (tpos.y + size.y)*w, tpos.z); // , uv.x + us.x, uv.y + us.y);
-}
-
-void Pi3CspriteArray::updateSpriteBillboard(std::vector<float> &verts, const uint32_t spriteRef, const vec3f &pos, const vec2f &size, const vec3f &lookat)
-{
-	//Transform pos into screen space ...
-	uint32_t p = vertOffset * stride + spriteRef * stride * 6;
-
-	float hw = size.x * 0.5f;
-	//float hh = size.y * 0.5f;
-
-	float lx = lookat.x - pos.x;
-	float lz = lookat.z - pos.z;
-	float d = hw / sqrtf(lx*lx + lz*lz);
-	float ax = lz*d, az = -lx*d;
-
+void Pi3Cmesh::updateRectCoordsBB(std::vector<float> &verts, uint32_t &p, const vec3f &pos, const float ax, const float az, const float sy) {
 	updateCoordsXYZ(pos.x - ax, pos.y, pos.z - az); // , uv.x, uv.y);
-	updateCoordsXYZ(pos.x + ax, (pos.y + size.y), pos.z + az); // , uv.x + us.x, uv.y);
+	updateCoordsXYZ(pos.x + ax, pos.y + sy, pos.z + az); // , uv.x + us.x, uv.y);
 	updateCoordsXYZ(pos.x + ax, pos.y, pos.z + az); // , uv.x + us.x, uv.y + us.y);
 	updateCoordsXYZ(pos.x - ax, pos.y, pos.z - az); // , uv.x, uv.y);
-	updateCoordsXYZ(pos.x - ax, (pos.y + size.y), pos.z - az); // , uv.x, uv.y + us.y);
-	updateCoordsXYZ(pos.x + ax, (pos.y + size.y), pos.z + az); // , uv.x + us.x, uv.y + us.y);
+	updateCoordsXYZ(pos.x - ax, pos.y + sy, pos.z - az); // , uv.x, uv.y + us.y);
+	updateCoordsXYZ(pos.x + ax, pos.y + sy, pos.z + az); // , uv.x + us.x, uv.y + us.y);
 }
+
+void Pi3Cmesh::updateRectCoordsPSP(std::vector<float> &verts, uint32_t &p, const float x, const float y, const float z, const float cx, const float cy, const float ax, const float sy, const float w)
+{
+	updateCoordsXYZ(cx - (x - ax)*w, cy - y * w, z); // , uv.x, uv.y);
+	updateCoordsXYZ(cx - (x + ax)*w, cy - (y + sy)*w, z); // , uv.x + us.x, uv.y);
+	updateCoordsXYZ(cx - (x + ax)*w, cy - y * w, z); // , uv.x + us.x, uv.y + us.y);
+	updateCoordsXYZ(cx - (x - ax)*w, cy - y * w, z); // , uv.x, uv.y);
+	updateCoordsXYZ(cx - (x - ax)*w, cy - (y + sy)*w, z); // , uv.x, uv.y + us.y);
+	updateCoordsXYZ(cx - (x + ax)*w, cy - (y + sy)*w, z); // , uv.x + us.x, uv.y + us.y);
+}
+

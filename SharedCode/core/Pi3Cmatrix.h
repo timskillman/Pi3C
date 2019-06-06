@@ -54,15 +54,19 @@ public:
 	void SetRotateYbit(const float &angle);
 	void SetRotateZbit(const float &angle);
 	void SetPerspective(const int width, const int height, const float pspmul, const float znear, const float zfar);
-	void SetOrtho(const int left, const int right, const int top, const int bottom, const float znear, const float zfar);
+	void SetOrtho(const float left, const float right, const float top, const float bottom, const float znear, const float zfar, const float invert = 1.0f);
 	void Translate(const vec3f &offset);
 	void Translate(const float x, const float y, const float z);
-	void move(vec3f const &offset);
-	void moveXY(vec2f const &offset);
+	void move(const vec3f &offset);
+	void moveXY(const vec2f &offset);
 	void moveScaleXY(const float x, const float y, const float scalex, const float scaley);
-	void setMoveRotate(vec3f const &offset, vec3f const &rotate, float const &sc = 1.f);
+	void setMoveRotate(const vec3f &offset, const vec3f &rotate, const float sc = 1.f);
+	void setModelMatrix(const vec3f &firstpos, const vec3f &thirdpos, const vec3f &rot);
 	void SetLookAt(vec3f const &dir, vec3f const &up);
 	void rotateMatrixXY(const vec3f &rot);
+	void rotate(const vec3f &rot);
+	void setRotate(const vec3f &rot);
+	void setRotateXY(const vec3f &rot);
 
 	vec3f getScale() const;
 	vec3f getRotation() const;

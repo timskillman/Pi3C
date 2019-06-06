@@ -2,23 +2,28 @@
 
 void Pi3Cresource::init(const uint32_t stride)
 {
-	this->stride = stride;
+	//this->stride = stride;
 	currentBuffer = -1;
 	lastVBO = -1;
-	startVBO = 0;
+	//startVBO = 0;
 	createDefaultMaterial();
-	uploaded = false;
+	//uploaded = false;
 
-	//Create a default 2D rectangle as a helper for creating a letter sheet (verts will dynamically change)
-	Pi3Cmesh lets = Pi3Cshapes::rect(vec2f(0, 0), vec2f(1.f, 1.f));
-	letterSheetRef = addMesh(lets, true, true, 100000); //create a dynamic buffer for the lettersheet (page size)
+	//Create a dummy mesh to reserve GPU memory dynamic creation of letters ...
+	Pi3Cmesh lets;
+	lets.vc = 10000 * 6 * stride;
+	lets.verts.resize(lets.vc); // 10000 letters - reserve MUST be multiple of consistent stride (since glDrawArrays requires a vertex index not a byte index)
+	letterSheetRef = insertMesh(&lets); //create a dynamic buffer for the lettersheet (page size)
 
-	//Create a default 2D rectangle as a helper for creating a letter sheet (verts will dynamically change)
-	lettersRef = addMesh(lets, true, true, 10000); //create a dynamic buffer for small temp lettersheet
+	//Reserve for small text entry fields ...
+	lets.vc = 1000 * 6 * stride;
+	lets.verts.resize(lets.vc);
+	lettersRef = insertMesh(&lets); //create a dynamic buffer for small temp lettersheet
 
 	//Create a default 2D rectangle as a helper for 2D GUI rendering 
 	Pi3Cmesh rect = Pi3Cshapes::rect(vec2f(0, 0), vec2f(1.f, 1.f));
-	rectRef = addMesh(rect);
+	rectRef = insertMesh(&rect); //buffer used for creating models etc..
+
 }
 
 void Pi3Cresource::createDefaultMaterial(const std::string &name)
@@ -31,7 +36,6 @@ void Pi3Cresource::createDefaultMaterial(const std::string &name)
 	defmaterial.texHeight = 1;
 	materials.push_back(defmaterial);
 }
-
 
 int32_t Pi3Cresource::createDefaultTexture(int32_t &texRef)
 {
@@ -50,28 +54,16 @@ int32_t Pi3Cresource::createDefaultTexture(int32_t &texRef)
 	return Texture->textureID; //textures.size();
 }
 
-std::vector<float> * Pi3Cresource::getLetterVerts(const uint32_t meshRef)
-{
-	if (meshRef < 0) return nullptr;
-	Pi3Cmesh &mesh = meshes[meshRef];
-	return &vertBuffer[mesh.bufRef];
-}
-
-void Pi3Cresource::updateLetterVerts(const uint32_t meshRef, uint32_t vertCount, const uint32_t vertOffset)
+void Pi3Cresource::updateMesh(const uint32_t meshRef, uint32_t vertCount, const uint32_t vertOffset)
 {
 	if (meshRef < 0) return; //|| (vertCount / mesh->stride) > vertBuffer[mesh->bufRef].size()
-	Pi3Cmesh *mesh = &meshes[meshRef];
-	mesh->vc = vertCount;
-	mesh->vertSize = vertCount / mesh->stride;
-	mesh->vertOffset = vertOffset;
-	if (uploaded) updateGPUverts(mesh->bufRef, mesh->vertOffset*mesh->stride, vertCount, vertBuffer[mesh->bufRef]);
-}
-
-void Pi3Cresource::updateMesh(uint32_t meshRef)
-{
-	if (meshRef < 0) return;
-	Pi3Cmesh *mesh = &meshes[meshRef];
-	if (uploaded) updateGPUverts(mesh->bufRef, mesh->vertOffset*mesh->stride, mesh->vc, vertBuffer[mesh->bufRef]);
+	Pi3Cmesh &mesh = meshes[meshRef];
+	if (vertCount > 0) {
+		mesh.vc = vertCount;
+		mesh.vertSize = vertCount / mesh.stride;
+		mesh.vertOffset = vertOffset;
+	}
+	updateGPUverts(mesh.bufRef, mesh.vertOffset*mesh.stride, mesh.vc, vertBuffer[mesh.bufRef]);
 }
 
 int32_t Pi3Cresource::addTexture(const std::shared_ptr<Pi3Ctexture> &Texture, int32_t &texRef)
@@ -112,137 +104,116 @@ int32_t Pi3Cresource::loadTexture(const std::string &path, const std::string &te
 	return addTexture(Texture, texRef);
 }
 
-void Pi3Cresource::addMeshVerts(const Pi3Cmesh &mesh, std::vector<float> &newverts, const uint32_t from, const uint32_t size, const uint32_t vertsize, const bool deleteVerts)
+int32_t Pi3Cresource::insertMesh(Pi3Cmesh * mesh, uint32_t maxsize)
 {
-	memcpy(newverts.data(), &mesh.verts[from], size * sizeof(float));
-	Pi3Cmesh newmesh = mesh.clone(from, (deleteVerts) ? 0 : size);
-	newmesh.vertSize = vertsize;
-	vertBuffer.push_back(newverts);
-	currentBuffer++;
-	newmesh.bufRef = currentBuffer;
-	meshes.push_back(newmesh);
-}
+	//Are we requesting too much?  Then attempt it ...
+	uint32_t mvsize = (mesh) ? mesh->verts.size() : 0;
+	if (mvsize > maxsize) maxsize = mvsize; // return -1;
 
-int32_t Pi3Cresource::addMesh(Pi3Cmesh &mesh, const bool deleteVerts, const bool expandingBuffer, const uint32_t vertSize)
-{ 
-	//SDL_Log("Creating verts buffer %d",currentBuffer);
-	if (currentBuffer<0) {
-		//No buffers created yet, create one ...
-		vertBuffer.emplace_back();
-		currentBuffer++;
-		mesh.vertOffset = 0;
-	} 
-
-	std::vector<float> &mverts = vertBuffer[currentBuffer];
-	currentBufferSize = vertSize;
-	uint32_t msz = mverts.size();
-	uint32_t recordsInBuf = (msz + mesh.vc) / mesh.stride;
-	uint32_t records = mesh.vc / mesh.stride;
-
-	if (recordsInBuf > vertSize) {
-		mesh.vertOffset = 0;
-		if (records > vertSize) {
-			uint32_t bufsReq = records / vertSize;
-			std::vector<float> newverts;
-			uint32_t memsize = vertSize * mesh.stride;
-			newverts.resize(memsize);
-			for (size_t b = 0; b < bufsReq; b++) {
-				addMeshVerts(mesh, newverts, b * memsize, memsize, vertSize, deleteVerts);
+	// check if we can squeeze this mesh into a buffer with space ...
+	int32_t cbuf = currentBuffer;
+	if (cbuf > 0 && mvsize > 0) {
+		for (size_t b = 0; b < vertBuffer.size(); b++) {
+			uint32_t spareBuffer = vertBuffer[b].size() - vertBufferPtr[b];
+			if (spareBuffer > mvsize) {
+				cbuf = b; break;
 			}
-			uint32_t remainingRecords = records - bufsReq * vertSize;
-			memsize = remainingRecords * mesh.stride;
-			newverts.resize(memsize);
-			addMeshVerts(mesh, newverts, bufsReq * vertSize * mesh.stride, memsize, remainingRecords, deleteVerts);
-		}
-		else {
-			meshes.emplace_back();
-			Pi3Cmesh &newmesh = meshes.back();
-			newmesh = mesh.clone(0, (deleteVerts) ? 0 : mesh.vc);
-			vertBuffer.push_back(mesh.verts);
-			newmesh.vertOffset = 0;
-			newmesh.vertSize = records;
-			currentBuffer++;
-			newmesh.bufRef = currentBuffer;
 		}
 	}
-	else 
-	{
-		//else copy mesh verts into existing buffer
-		if (expandingBuffer) {
-			mverts.resize(vertSize * mesh.stride); //make max number of verts available
-		}
-		else {
-			mverts.resize(msz + mesh.vc); //only increase to verts being used
-		}
-		meshes.emplace_back();
-		Pi3Cmesh &newmesh = meshes.back();
-		newmesh = mesh.clone(0, (deleteVerts) ? 0 : mesh.vc);
-		if (mesh.verts.size()>0) memcpy(&mverts[msz], &mesh.verts[0], mesh.vc * sizeof(float));
-		newmesh.vertOffset = msz / mesh.stride;
-		newmesh.vertSize = records;
-		newmesh.bufRef = currentBuffer;
+
+	//No buffers created yet? or, request is larger than current buffer?, then create one ...
+	if (cbuf < 0 || (mvsize + vertBufferPtr[cbuf]) > vertBuffer[cbuf].size()) {
+		if (cbuf>=0) SDL_Log("cbuf:%d, mvsize:%d + vertBufferPtr:%d, size=%d, maxsize = %d", cbuf, mvsize , vertBufferPtr[cbuf], vertBuffer[cbuf].size(), maxsize);
+		std::vector<float> newverts(maxsize);
+		vertBuffer.push_back(newverts);
+		vertBufferPtr.push_back(0);
+		currentBuffer++; cbuf = currentBuffer;
+
+		//Create and reserve buffer in GPU ...
+		glGenBuffers(1, &VBOid[currentBuffer]);
+		SDL_Log("VBO:%d, Uploading floats = %d, mvsize=%d", VBOid[currentBuffer], maxsize, mvsize);
+		glBindBuffer(GL_ARRAY_BUFFER, VBOid[currentBuffer]);
+		glBufferData(GL_ARRAY_BUFFER, maxsize * sizeof(float), &vertBuffer[currentBuffer].front(), GL_DYNAMIC_DRAW);
 	}
 
-	//SDL_Log("Sizes: %d,%d", mesh.verts.size(), vertSize * mesh.stride);
-	mesh.verts.resize(0); //free memory since these verts have been transferred
+	if (mesh) {
+		std::vector<float> &mverts = vertBuffer[cbuf];		//Get current buffer
+		uint32_t &bufferPtr = vertBufferPtr[cbuf];
 
-	//If buffer is dynamic, then reserve max number of vertices and create another buffer
-	if (expandingBuffer) {
-		vertBuffer.emplace_back();
-		currentBuffer++;
+		//Upload mesh verts into GPU ...
+		if (mvsize > 0) {
+			uint32_t vcbytes = mesh->vc * sizeof(float);	
+			memcpy(&mverts[bufferPtr], &mesh->verts[0], vcbytes);
+			glBindBuffer(GL_ARRAY_BUFFER, VBOid[cbuf]);
+			glBufferSubData(GL_ARRAY_BUFFER, bufferPtr * sizeof(float), vcbytes, &mverts[bufferPtr]); // &mesh->verts[0]);
+			mesh->verts.resize(0); //delete verts from original mesh as these have been stored and uploaded to GPU
+		}
+		
+		//Push mesh into meshes store ...
+		mesh->vertOffset = bufferPtr / mesh->stride;	//vertice offset index - used for rendering glDrawArrays
+		mesh->vertSize = mesh->vc / mesh->stride;		//vertice size
+		mesh->bufRef = cbuf;
+		meshes.push_back(*mesh);
+
+		bufferPtr += mesh->vc;
+
+		return meshes.size() - 1;
 	}
 
-	return meshes.size() - 1;
+	return 0;
 }
 
-void Pi3Cresource::setRenderBuffer(const int bufRef) 
+void Pi3Cresource::setRenderBuffer(const int bufRef, const uint32_t stride) 
 {
-	/* RPi can't cope with more than 65k vertices per array.
-	 * This function will setup the correct VBO array for the
-	 * mesh if the VBO ref is different from the last VBO used */
-
-	//dont bother changing buffer if its the same as last time
+	// dont bother changing buffer if its the same as last time
 	if (lastVBO == bufRef) return; 
 
-	//Select new Vertex buffer ...
+	// Select new Vertex buffer ...
 	glBindBuffer(GL_ARRAY_BUFFER, VBOid[bufRef]);
 
-	//Reset attributes for newly selected buffer ...
-	GLuint ac = 0; GLuint pos = 0; GLuint stride4 = stride * 4;
-	glVertexAttribPointer(ac, 3, GL_FLOAT, GL_FALSE, stride4, (void*)pos);  //verts
-	glEnableVertexAttribArray(ac++); pos += 12;
+	// Reset attributes for newly selected buffer
+	// (this should really be done by the current shader!)
+	GLuint attribCount = 0; 
+	GLuint pos = 0; 
+	GLuint strideBytes = stride * sizeof(float);
+	glVertexAttribPointer(attribCount, 3, GL_FLOAT, GL_FALSE, strideBytes, (void*)pos);  //verts
+	glEnableVertexAttribArray(attribCount++); pos += 3 * sizeof(float);
 
-	glVertexAttribPointer(ac, 3, GL_FLOAT, GL_FALSE, stride4, (void*)pos);	//normals
-	glEnableVertexAttribArray(ac++); pos += 12;
+	glVertexAttribPointer(attribCount, 3, GL_FLOAT, GL_FALSE, strideBytes, (void*)pos);	//normals
+	glEnableVertexAttribArray(attribCount++); pos += 3 * sizeof(float);
 
-	glVertexAttribPointer(ac, 2, GL_FLOAT, GL_FALSE, stride4, (void*)pos);	//uvs
-	glEnableVertexAttribArray(ac++); pos += 8;
+	glVertexAttribPointer(attribCount, 2, GL_FLOAT, GL_FALSE, strideBytes, (void*)pos);	//uvs
+	glEnableVertexAttribArray(attribCount++); pos += 2 * sizeof(float);
+
+	glVertexAttribPointer(attribCount, 1, GL_FLOAT, GL_FALSE, strideBytes, (void*)pos);	//colour
+	glEnableVertexAttribArray(attribCount++); pos += sizeof(float);
 
 	lastVBO = bufRef;
 }
 
-void Pi3Cresource::renderText(const int meshRef, Pi3Cfont *font, std::string &text, const vec3f &pos, const float wrapWidth)
+void Pi3Cresource::renderText(const int meshRef, Pi3Cfont *font, std::string &text, const vec3f &pos, const float wrapWidth, const uint32_t colour)
 {
 	//Text meshref's can only be used once per frame (otherwise using the same meshRef will simply overwrite the previous text)
-	std::vector<float> *verts = getLetterVerts(meshRef);				//get ptr to vertices from resource letterVerts
-	if (verts == nullptr) return;
 	Pi3Crect size;
-	uint32_t vertCount = font->textureRects(text, *verts, size, wrapWidth);	//generate verts from text	
-	updateLetterVerts(meshRef, vertCount);								//upload updated verts to GPU
+	Pi3Cmesh &mesh = meshes[meshRef];
+	uint32_t vertCount = font->textureRects(text, vertBuffer[mesh.bufRef], size, wrapWidth, mesh.stride);	//generate verts from text	
+	updateMesh(meshRef, vertCount);											//upload updated verts to GPU
 
 	Pi3Cmatrix matrix;
 	matrix.move(pos);
 	//matrix.SetScales(vec3f((float)wh.x, (float)wh.y, 1.f));
 	shaders[0].SetModelMatrix(matrix);
 	shaders[0].setMaterial(font->fontsheet.sheetMaterial);
+	shaders[0].setColDiffuse(colour);
 
 	renderMesh(meshRef, GL_TRIANGLES);
 }
 
 void Pi3Cresource::renderMesh(const int meshRef, const GLenum rendermode)
 {
-	setRenderBuffer(meshes[meshRef].bufRef);
-	meshes[meshRef].render(rendermode);
+	Pi3Cmesh &mesh = meshes[meshRef];
+	setRenderBuffer(mesh.bufRef, mesh.stride);
+	mesh.render(rendermode);
 	calls++; //used for debugging
 }
 
@@ -252,39 +223,40 @@ int32_t Pi3Cresource::touchMesh(const int meshRef, Pi3Ctouch &touch, const Pi3Cm
 	return mesh.touchPoint(touch, tmat, vertBuffer[mesh.bufRef]);
 }
 
-void Pi3Cresource::uploadMeshesToGPU()
-{	
-	/* upload geometry to the GPU */
+//void Pi3Cresource::uploadMeshesToGPU()
+//{	
+//	/* upload geometry to the GPU */
+//
+//	uint32_t vs = vertBuffer.size();
+//	glGenBuffers(vs, &VBOid[startVBO]); //create the GL buffer
+//	
+//	for (uint32_t i= startVBO; i< vs; i++) {
+//		GLuint vno = vertBuffer[i].size();
+//		if (vno > 0) {
+//			SDL_Log("VBO:%d, verts size:%d", VBOid[i], vno);
+//			glBindBuffer(GL_ARRAY_BUFFER, VBOid[i]); //Vertex buffer
+//			glBufferData(GL_ARRAY_BUFFER, vno * sizeof(float), &vertBuffer[i].front(), GL_DYNAMIC_DRAW); //GL_STATIC_DRAW
+//		}
+//	}
+//	startVBO = vs;
+//
+//	//now that geometries are uploaded, we must start with a fresh buffer for new geometry ...
+//	currentBuffer = vs;
+//	vertBuffer.emplace_back(); //create new empty buffer
+//	uploaded = true;
+//}
 
-	uint32_t vs = vertBuffer.size();
-	glGenBuffers(vs, &VBOid[startVBO]); //create the GL buffer
-	
-	for (uint32_t i= startVBO; i< vs; i++) {
-		GLuint vno = vertBuffer[i].size();
-		if (vno > 0) {
-			SDL_Log("VBO:%d, verts size:%d", VBOid[i], vno);
-			glBindBuffer(GL_ARRAY_BUFFER, VBOid[i]); //Vertex buffer
-			glBufferData(GL_ARRAY_BUFFER, vno * sizeof(float), &vertBuffer[i].front(), GL_DYNAMIC_DRAW); //GL_STATIC_DRAW
-		}
-	}
-	startVBO = vs;
-
-	//now that geometries are uploaded, we must start with a fresh buffer for new geometry ...
-	currentBuffer = vs;
-	vertBuffer.emplace_back(); //create new empty buffer
-	uploaded = true;
-}
-
-void Pi3Cresource::uploadGPUverts(const int bufref, const std::vector<float> &verts)
-{
-	setRenderBuffer(bufref);
-	glBufferData(GL_ARRAY_BUFFER, verts.size()*sizeof(float), verts.data(), GL_DYNAMIC_DRAW);
-}
+//void Pi3Cresource::uploadGPUverts(const int bufref, const std::vector<float> &verts)
+//{
+//	setRenderBuffer(bufref);
+//	glBufferData(GL_ARRAY_BUFFER, verts.size()*sizeof(float), verts.data(), GL_DYNAMIC_DRAW);
+//}
 
 void Pi3Cresource::updateGPUverts(const int bufref, const int vfrom, const int vsize, const std::vector<float> &verts)
 {
-	setRenderBuffer(bufref);
-	glBufferSubData(GL_ARRAY_BUFFER, vfrom * sizeof(float), vsize * sizeof(float), &verts[vfrom * sizeof(float)]);
+	//setRenderBuffer(bufref);
+	glBindBuffer(GL_ARRAY_BUFFER, VBOid[bufref]);
+	glBufferSubData(GL_ARRAY_BUFFER, vfrom * sizeof(float), vsize * sizeof(float), &verts[vfrom]);
 }
 
 int32_t Pi3Cresource::addShader(const std::string &vertfile, const std::string &fragfile)
@@ -330,8 +302,9 @@ void Pi3Cresource::clearAll()
 	textures.clear();
 	shaders.clear();
 	vertBuffer.resize(0);
+	vertBufferPtr.resize(0);
 	vertCount = 0;
 	currentBuffer = -1;
 	lastVBO = -1;
-	startVBO = 0;
+	//startVBO = 0;
 }

@@ -127,10 +127,18 @@ int Pi3Cwindow::event()
 		case SDL_KEYDOWN:
 			keyPress = ev.key.keysym.scancode;
 			keyDown = true;
+			{
+				const uint8_t* keystate = getKeys();
+				shiftKey = keystate[SDL_SCANCODE_LSHIFT] || keystate[SDL_SCANCODE_RSHIFT];
+				ctrlKey = keystate[SDL_SCANCODE_LCTRL] || keystate[SDL_SCANCODE_RCTRL];
+			}
 			break;
 		case SDL_KEYUP:
 			keyUp = ev.key.keysym.scancode;
+			keyPress = SDL_SCANCODE_UNKNOWN;
 			keyDown = false;
+			shiftKey = false;
+			ctrlKey = false;
 			break;
 		case SDL_MOUSEWHEEL:
 			mouse.wheel = ev.motion.x;
@@ -168,6 +176,9 @@ int Pi3Cwindow::event()
 			case SDL_BUTTON_RIGHT: mouse.RightButton = false; break;
 			case SDL_BUTTON_MIDDLE: mouse.MiddleButton = false; break;
 			}
+			break;
+		case SDL_TEXTINPUT:
+			text = ev.text.text;
 			break;
 		case SDL_WINDOWEVENT:
 			switch (ev.window.event) {

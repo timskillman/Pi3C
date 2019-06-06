@@ -25,18 +25,19 @@ void Pi3C::init(const std::string &title, const uint32_t width, const uint32_t h
 		return;
 	}
 
-	scene.setResource(&resource);
+	scene.init(&resource);
 	scene.selectShader(basicShaderRef);
 
 	scene.setFog(0xffffff, 10000.f, 25000.f);
 	scene.setViewport2D(Pi3Crecti(0, 0, winw, winh), 0.1f, 4000.f);
-	scene.setPerspective3D(winw, winh, 800.f, 1.f, 5000.f);
+	scene.setPerspective3D(winw, winh, PSPVALUE, 0.1f, 5000.f);
 
 	gui.init(&resource, &window);
 	guifonts.push_back(gui.addFont("../../Resources/fonts/", "NotoSans-Regular.ttf", 18));
 
 	bsMenu.font = guifonts[0];
 	bsMenu.textColour = 0x202020;
+	bsMenu.buttonAlpha = 0.99f;
 	bsMenu.buttonColour = 0xffffff;
 	bsMenu.minWidth = 60;
 	bsMenu.minHeight = 24;
@@ -59,9 +60,10 @@ uint32_t Pi3C::create_background(const std::string &path, const std::string &fil
 {
 	Pi3Cmodel background;
 
-	Pi3CspriteArray rect;
-	rect.addSprite(vec3f(0, winh, -20.f), vec2f(winw, winh));
-	background.meshRef = resource.addMesh(rect);
+	Pi3Cmesh rect;
+	rect.addRect(vec3f(0, winh, -20.f), vec2f(winw, winh));
+	//background.meshRef = resource.addMesh(rect);
+	background.meshRef = resource.insertMesh(&rect);
 
 	background.addTexture(&resource, (file!="" && path!="") ? path+"/"+file : path);
 	background.material.illum = 1;
@@ -69,39 +71,46 @@ uint32_t Pi3C::create_background(const std::string &path, const std::string &fil
 	return add_model_to_scene2D(background);
 }
 
-void Pi3C::update_sprite_position(const uint32_t spritesRef, const uint32_t spriteRef, const float x, const float y)
-{
-	Pi3CspriteArray *rm = (Pi3CspriteArray*)(&resource.meshes[spritesRef]);
-	rm->updateSpriteCoords(resource.vertBuffer[rm->bufRef], spriteRef, x, y);
-}
+//void Pi3C::update_sprite_position(const uint32_t spritesRef, const uint32_t spriteRef, const float x, const float y)
+//{
+//	Pi3CspriteArray *rm = (Pi3CspriteArray*)(&resource.meshes[spritesRef]);
+//	rm->updateSpriteCoords(resource.vertBuffer[rm->bufRef], spriteRef, x, y);
+//}
+//
+//void Pi3C::update_sprite_rotated(const uint32_t spritesRef, const uint32_t spriteRef, const vec2f &pos, const vec2f &size, const float angle)
+//{
+//	Pi3CspriteArray *rm = (Pi3CspriteArray*)(&resource.meshes[spritesRef]);
+//	rm->updateSpriteCoordsRotated(resource.vertBuffer[rm->bufRef], spriteRef, pos, size, angle);
+//}
+//
+//void Pi3C::update_sprite_transform(const uint32_t spritesRef, const uint32_t spriteRef, const vec3f &pos, const vec2f &size, const Pi3Cmatrix *scene_matrix, const vec2f &cent)
+//{
+//	Pi3CspriteArray *rm = (Pi3CspriteArray*)(&resource.meshes[spritesRef]);
+//	rm->updateSpriteTransformCoords(resource.vertBuffer[rm->bufRef], spriteRef, pos, size, scene_matrix, cent);
+//}
+//
+//void Pi3C::update_sprite_billboards(const uint32_t spritesRef, const uint32_t spriteRef, const uint32_t count, const vec3f &lookat)
+//{
+//	Pi3CspriteArray *sa = (Pi3CspriteArray*)(&resource.meshes[spritesRef]);
+//	uint32_t p = sa->calcRectPtr(0);
+//	std::vector<float> &buf = resource.vertBuffer[sa->bufRef];
+//	rm
+//	for (uint32_t s = 0; s < count; s++) {
+//		rm->updateSpriteBillboard(buf, p, rm->sprite_pos[s], rm->sprite_size[s], lookat);
+//	}
+//}
 
-void Pi3C::update_sprite_rotated(const uint32_t spritesRef, const uint32_t spriteRef, const vec2f &pos, const vec2f &size, const float angle)
+int32_t Pi3C::load_model(const std::string &path, const std::string &file, const vec3f &pos)
 {
-	Pi3CspriteArray *rm = (Pi3CspriteArray*)(&resource.meshes[spritesRef]);
-	rm->updateSpriteCoordsRotated(resource.vertBuffer[rm->bufRef], spriteRef, pos, size, angle);
-}
-
-void Pi3C::update_sprite_transform(const uint32_t spritesRef, const uint32_t spriteRef, const vec3f &pos, const vec2f &size, const Pi3Cmatrix *scene_matrix, const vec2f &cent)
-{
-	Pi3CspriteArray *rm = (Pi3CspriteArray*)(&resource.meshes[spritesRef]);
-	rm->updateSpriteTransformCoords(resource.vertBuffer[rm->bufRef], spriteRef, pos, size, scene_matrix, cent);
-}
-
-void Pi3C::update_sprite_billboard(const uint32_t spritesRef, const uint32_t spriteRef, const vec3f &pos, const vec2f &size, const vec3f &lookat)
-{
-	Pi3CspriteArray *rm = (Pi3CspriteArray*)(&resource.meshes[spritesRef]);
-	rm->updateSpriteBillboard(resource.vertBuffer[rm->bufRef], spriteRef, pos, size, lookat);
-}
-
-int32_t Pi3C::load_model(const std::string &path, const std::string &file)
-{
-	return scene.loadModelOBJ(path, file, nullptr);  // loadbarCallback);
+	int32_t modelRef = scene.loadModelOBJ(path, file, nullptr);  // loadbarCallback);
+	if (!pos.isZero()) scene.models[modelRef].move(pos);
+	return modelRef;
 }
 
 bool Pi3C::is_running()
 {
 	if (!has_started) {
-		resource.uploadMeshesToGPU();
+		//resource.uploadMeshesToGPU();
 		start_time = SDL_GetTicks();
 		has_started = true;
 	}
@@ -163,4 +172,17 @@ std::vector<std::string> Pi3C::get_dropfiles()
 	dropfiles.push_back(dropfile);
 	SDL_free(dropfile);
 	return dropfiles;
+}
+
+int32_t Pi3C::add_spriteArray(Pi3CspriteArray &spritearray, const std::string &file)
+{
+	//spritearray.meshRef = resource.addMesh(spritearray.samesh, true, true);
+	spritearray.meshRef = resource.insertMesh(&spritearray.samesh);
+
+	Pi3Cmodel rectangles;
+	rectangles.meshRef = spritearray.meshRef;
+	rectangles.addTexture(&resource, file);
+	rectangles.material.illum = 1;
+	rectangles.material.alpha = 1.f;
+	return add_model_to_scene3D(rectangles);
 }

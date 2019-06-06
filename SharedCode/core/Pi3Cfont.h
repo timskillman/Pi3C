@@ -51,12 +51,12 @@ public:
 	void createFontSheet(const uint32_t sheetWidth, const uint32_t sheetHeight);
 	void getStringSize(const std::string &text, int &w, int &h);
 	Pi3Ctexture * textSurface(const std::string &text);
-	uint32_t textureRects(std::string &text, std::vector<float> &verts, Pi3Crect &size, const float wrapWidth);
+	uint32_t textureRects(std::string &text, std::vector<float> &verts, Pi3Crect &size, const float wrapWidth, const uint32_t stride);
 
 	TTF_Font * font = nullptr;
 
 private:
-	void formatVerts(std::vector<float> &verts, const float wrapWidth, const float linex, const float maxHeight, const uint32_t p, const uint32_t linep);
+	void formatVerts(std::vector<float> &verts, const float wrapWidth, const float linex, const float maxHeight, const uint32_t p, const uint32_t linep, const uint32_t stride);
 	void copyCharToSheet(fontSheetChar &ch, SDL_Surface* Surface, SDL_Surface* destSurface, int &lastX, int &lastY, int &maxHeight);
 
 	SDL_Color colour;

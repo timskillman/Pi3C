@@ -35,16 +35,16 @@
 //
 // =======================================================================
 
+#define DEFAULT_STRIDE 9
+
 class Pi3Cshader {
 public:
-	Pi3Cshader(const char *vertShaderFile, const char *fragShaderFile) : 
-		program(-1), fogMinDist(50.f), fogMaxDist(500.f), fogColour(1.f, 1.f, 1.f)
-	{
+	Pi3Cshader(const char *vertShaderFile, const char *fragShaderFile) {
 		sherror = create(vertShaderFile, fragShaderFile);
 	}
 
-	Pi3Cshader() : program(-1), fogMinDist(50.f), fogMaxDist(500.f), fogColour(1.f,1.f,1.f) {};
-	~Pi3Cshader() {};
+	Pi3Cshader() {}
+	~Pi3Cshader() {}
 
 	std::string create(const char *vertShaderFile, const char *fragShaderFile);
 
@@ -121,23 +121,23 @@ public:
 	void setTicks(float ticks) { this->ticks = ticks; }
 	std::string error() { return sherror; }
 
-	float fogMinDist;
-	float fogMaxDist;
-	vec3f fogColour;
+	float fogMinDist = 400.f;
+	float fogMaxDist = 2000.f;
+	vec3f fogColour { 1.f,1.f,1.f };
 	vec3f lightPos;
-	vec3f lightCol;
+	vec3f lightCol { 1.f,1.f,1.f };
 
 	float ticks = 1.f;
 
 	Pi3Cmatrix ortho;
 	Pi3Cmatrix persp;
-
+	uint32_t stride = DEFAULT_STRIDE;
 
 private:
 
-	GLint program;
-	GLuint vertshader;
-	GLuint fragshader;
+	GLint program = -1;
+	GLuint vertshader = -1;
+	GLuint fragshader = -1;
 	
 	// Default Shader Refs for shader
 	// ==============================
@@ -145,24 +145,24 @@ private:
 	// These shader refs are passive and will 
 	// be unset (-1) if not found in the shader
 
-	GLint illuminationModelRef;
-	GLint diffuseRef;
-	GLint specularRef;
-	GLint specularPower;
-	GLint ambientRef;
-	GLint emissiveRef;
-	GLint texAnimRef;
-	GLint textureRef;
-	GLint reflectRef;
+	GLint illuminationModelRef = -1;
+	GLint diffuseRef = -1;
+	GLint specularRef = -1;
+	GLint specularPower = -1;
+	GLint ambientRef = -1;
+	GLint emissiveRef = -1;
+	GLint texAnimRef = -1;
+	GLint textureRef = -1;
+	GLint reflectRef = -1;
 
-	GLint fogColourRef;
-	GLint fogRangeRef;
-	GLint fogMaxRef;
+	GLint fogColourRef = -1;
+	GLint fogRangeRef = -1;
+	GLint fogMaxRef = -1;
 
-	GLint lightPosRef;
-	GLint lightColRef;
-	GLint perspectiveMatrixRef;
-	GLint modelMatrixRef;
+	GLint lightPosRef = -1;
+	GLint lightColRef = -1;
+	GLint perspectiveMatrixRef = -1;
+	GLint modelMatrixRef = -1;
 	
 	bool init = false;
 	std::string sherror;

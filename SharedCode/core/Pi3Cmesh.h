@@ -37,7 +37,7 @@
 //
 // =======================================================================
 
-#define defaultStride 8
+#define defaultStride 9
 
 class Pi3Cmesh {
 public:
@@ -45,8 +45,8 @@ public:
 	Pi3Cmesh(const std::string &name = "", const uint32_t stride = defaultStride);
 	~Pi3Cmesh() {}
 
-	enum vertRefs { v_x=0 ,v_y=1 ,v_z=2 ,n_x=3, n_y=4, n_z=5, v_u=6, v_v=7 };
-//  STRUCTS
+	enum vertRefs { v_x = 0, v_y = 1, v_z = 2, n_x = 3, n_y = 4, n_z = 5, v_u = 6, v_v = 7 };
+	//  STRUCTS
 
 	struct vertVNU {
 		float vx;
@@ -60,24 +60,24 @@ public:
 	};
 
 	//struct meshHeader {
-		std::string name;
-		Pi3Cbbox3d bbox;
-		uint16_t mode;
-		std::vector<float> verts;
-		GLint vertOffset;
-		uint32_t vertSize;
-		uint32_t stride;
-		int32_t materialRef;
-		size_t vc;
-		GLint bufRef;
-		float animval;											//Each tween must have the same number of vertices as the verts buffer since the verts buffer will hold the results
-		bool collisionMesh;		//if set, then this mesh is collision only
-		bool dynamic;			//if set, mesh can be modified in realtime and verts are not thrown away
-	//};
+	std::string name;
+	Pi3Cbbox3d bbox;
+	uint16_t mode;
+	std::vector<float> verts;
+	GLint vertOffset;
+	uint32_t vertSize;
+	uint32_t stride;
+	int32_t materialRef;
+	uint32_t vc;
+	GLint bufRef;
+	float animval;											//Each tween must have the same number of vertices as the verts buffer since the verts buffer will hold the results
+	bool collisionMesh;		//if set, then this mesh is collision only
+	bool dynamic;			//if set, mesh can be modified in realtime and verts are not thrown away
+//};
 
 /// FUNCTIONS ...
 
-	void addPackedVert(const vec3f &position, const vec3f &normal, const vec2f &uv, const GLfloat *cols);
+	void addPackedVert(const vec3f &position, const vec3f &normal, const vec2f &uv, const uint32_t col);
 
 	void offset(const vec3f pos, std::vector<float> &verts, uint32_t start, const uint32_t size, const uint32_t stride = defaultStride);
 	void resize(const vec3f &pos, const vec3f &size, const std::vector<float> &mverts);
@@ -99,6 +99,13 @@ public:
 
 	void createSharedTriangleList(const std::vector<float> &verts, std::vector<uint32_t> &vertindexes, std::vector<float> &newverts, std::vector<uint32_t> &uvindexes, std::vector<float> &newuvs, const float tolerance = 0.0005f);
 	void createSharedTriangleList(VertsIndsUVs *in, VertsIndsUVs *out, const float tolerance = 0.0005f);
+	void addRect(const vec3f &pos, const vec2f &size, const vec2f &uv = vec2f(0, 0), const vec2f &us = vec2f(1.f, 1.f));
+	void updateRectCoords2D(std::vector<float> &verts, uint32_t &p, const float x, const float y, const float w, const float h);
+	void updateRectCoordsBB(std::vector<float> &verts, uint32_t &p, const vec3f &pos, const float ax, const float az, const float sy);
+	void updateRectCoordsPSP(std::vector<float> &verts, uint32_t &p, const float x, const float y, const float z, const float cx, const float cy, const float ax, const float sy, const float w);
+	void updateRectCoordsROT(std::vector<float> &verts, uint32_t &p, const float x, const float y, const float ax, const float ay);
+
+	uint32_t calcRectPtr(uint32_t ref) { return (vertOffset + ref * 6) * stride; }
 
 	void updateNormals(const uint32_t min, const uint32_t max);
 
@@ -123,14 +130,4 @@ private:
 
 	float triArea(const vec3f &v1, const vec3f &v2, const vec3f &v3, float &maxLength) const;
 
-};
-
-
-class Pi3CspriteArray : public Pi3Cmesh {
-public:
-	void addSprite(const vec3f &pos, const vec2f &size, const vec2f &uv = vec2f(0,0), const vec2f &us = vec2f(1.f, 1.f));
-	void updateSpriteCoords(std::vector<float> &verts, const uint32_t spriteRef, const float x, const float y);
-	void updateSpriteCoordsRotated(std::vector<float> &verts, const uint32_t spriteRef, const vec2f &pos, const vec2f &size, const float angle);
-	void updateSpriteTransformCoords(std::vector<float> &verts, const uint32_t spriteRef, const vec3f &pos, const vec2f &size, const Pi3Cmatrix *scene_matrix, const vec2f &cent); //const vec2f &uv, const vec2f &us,
-	void updateSpriteBillboard(std::vector<float> &verts, const uint32_t spriteRef, const vec3f &pos, const vec2f &size, const vec3f &lookat);
 };

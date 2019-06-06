@@ -89,11 +89,14 @@ float rayIntersectFloor(const vec3f &e1, const vec3f &e2, const vec3f &e3)
 	return f * (e2.x * q.x + e2.y * q.y + e2.z * q.z);  //distance from pos to triangle intersection
 }
 
-bool Pi3Ccollision::collideVector(const Pi3Cmesh &mesh, const Pi3Cmatrix &mtx, const bool bounce, const vec3f &pos, const vec3f &dir)
+bool Pi3Ccollision::collideVector(const Pi3Cresource *resource, const uint32_t meshRef, const Pi3Cmatrix &mtx, const bool bounce, const vec3f &pos, const vec3f &dir)
 {
-	if (mesh.verts.size() == 0) return false;
+	//if (mesh.verts.size() == 0) return false;
+	const Pi3Cmesh &mesh = resource->meshes[meshRef];
+	uint32_t p = mesh.vertOffset * mesh.stride;
+	const std::vector<float> &verts = resource->vertBuffer[mesh.bufRef];
+	uint32_t size = mesh.vertSize * mesh.stride;
 
-	const std::vector<float> &verts = mesh.verts;
 	uint32_t stride = mesh.stride;
 
 	vec3f nextpos = pos + dir;
@@ -102,7 +105,7 @@ bool Pi3Ccollision::collideVector(const Pi3Cmesh &mesh, const Pi3Cmatrix &mtx, c
 	uint32_t x3 = stride * 2;
 	uint32_t st = stride * 3;
 
-	for (size_t sp = 0; sp < verts.size() - st; sp += st) {
+	for (size_t sp = p; sp < p + size - st; sp += st) {
 
 		v1 = mtx.transformVec(&verts[sp]);
 		v2 = mtx.transformVec(&verts[sp + x2]);
@@ -120,22 +123,26 @@ bool Pi3Ccollision::collideVector(const Pi3Cmesh &mesh, const Pi3Cmatrix &mtx, c
 	return false;
 }
 
-float Pi3Ccollision::collideFloor(const Pi3Cmesh &mesh, const Pi3Cmatrix &mtx, const vec3f &pos, float prevHeight)
+float Pi3Ccollision::collideFloor(const Pi3Cresource *resource, const uint32_t meshRef, const Pi3Cmatrix &mtx, const vec3f &pos, float prevHeight)
 {
+	const Pi3Cmesh &mesh = resource->meshes[meshRef];
+	uint32_t p = mesh.vertOffset * mesh.stride;
+	const std::vector<float> &verts = resource->vertBuffer[mesh.bufRef];
+	uint32_t size = mesh.vertSize * mesh.stride;
 
-	if (mesh.verts.size() == 0) return prevHeight;
+	//if (mesh.verts.size() == 0) return prevHeight;
 
 	//check if transformed bounding box 'footprint' collides with pos (sphere collision better?) ...
 	if (!mesh.bbox.pointInsideXZtx(pos, mtx)) return prevHeight;
 
-	const std::vector<float> &verts = mesh.verts;
+	//const std::vector<float> &verts = mesh.verts;
 	uint32_t stride = mesh.stride;
 
 	vec3f v1, v2, v3;
 	uint32_t x2 = stride; uint32_t z2 = stride + 2;
 	uint32_t x3 = stride * 2; uint32_t z3 = stride * 2 + 2;
 
-	for (size_t sp = 0; sp < verts.size() - stride * 3; sp += stride * 3) {
+	for (size_t sp = p; sp < p + size - stride * 3; sp += stride * 3) {
 
 		v1 = mtx.transformVec(&verts[sp]);
 		v2 = mtx.transformVec(&verts[sp + x2]);

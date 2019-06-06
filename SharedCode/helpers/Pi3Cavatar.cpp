@@ -10,6 +10,7 @@ void Pi3Cavatar::init(const avatarParams &p)
 	walkSpeed = p.walkSpeed;
 	runSpeed = p.runSpeed;
 	fallSpeed = p.fallSpeed;
+	flyspeed = p.flyspeed;
 	nextpos = pos;
 	faster = false;
 	newmove = true;
@@ -93,7 +94,7 @@ void Pi3Cavatar::updateAndCollide(const Pi3Cscene *scene, const float ticks)
 	if (scene != nullptr) {
 		if (movement==move_fly || (!scene->collide(footpos, bdir, 3.f) )) pos = nextpos; else this->ticks = 1.f; //&& !scene->collide(headpos, bdir, 8.f)
 
-		if (!(movement == move_fly)) {
+		if (movement != move_fly) {
 			//When walking, simply project a line down and find out where the floor is (collideFloor returns a height value)
 			float floorHt = scene->collideFloor(pos);
 
@@ -112,6 +113,9 @@ void Pi3Cavatar::updateAndCollide(const Pi3Cscene *scene, const float ticks)
 				moved = true;
 			}
 			//SDL_Log("Ground height = %f", floorHt);
+		}
+		else {
+			move(-flyspeed);
 		}
 	}
 	else {
