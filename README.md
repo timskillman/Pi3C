@@ -41,7 +41,6 @@ I hope that you will enjoy your experience with Pi3C!
 
   - The main program
   - Including stuff
-  - Compile
-  - Run
+  - Compile & Run
   
 
