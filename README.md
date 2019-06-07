@@ -4,7 +4,7 @@
 
 Pi3C is a C++ graphics engine and toolkit designed for the Raspberry Pi and works on other platforms such as Windows and Android.
 
-It is designed to encourage youngters and anyone interested in programming by exploring the games and apps provided.
+It is designed to encourage youngsters and anyone interested in programming by exploring the games and apps provided.
 
 These range from a few lines of simple, self explained code to more complex, real-world examples.
 
