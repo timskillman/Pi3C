@@ -1,7 +1,7 @@
 ![alt text](https://github.com/timskillman/Pi3C/blob/master/Resources/images/Pi3Clogo.png "Pi3C Logo")
 
 
-#Pi3C
+# Pi3C
 
 Pi3C is a C++ graphics engine and toolkit designed for the Raspberry Pi and works on other platforms such as Windows and Android.
 
@@ -36,5 +36,12 @@ I hope that you will enjoy your experience with Pi3C!
   - Raspberry Pi setup
   - Setting up SDL 2.0
   - Programming tools
+  
+**3. Hello 3D World!**
+
+  - The main program
+  - Including stuff
+  - Compile
+  - Run
   
 
