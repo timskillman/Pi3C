@@ -1,4 +1,4 @@
-[logo]: https://github.com/timskillman/Pi3C/Resources/images/Pi3Clogo.png "Pi3C Logo"
+![alt text](https://github.com/timskillman/Pi3C/Resources/images/Pi3Clogo.png "Pi3C Logo")
 
 # Pi3C
 
