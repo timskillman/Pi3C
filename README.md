@@ -1,6 +1,8 @@
 ![alt text](https://github.com/timskillman/Pi3C/blob/master/Resources/images/Pi3Clogo.png "Pi3C Logo")
 
 
+#Pi3C
+
 Pi3C is a C++ graphics engine and toolkit designed for the Raspberry Pi and works on other platforms such as Windows and Android.
 
 It is designed to encourage youngsters and anyone interested in programming by exploring the games and apps provided.
@@ -20,7 +22,7 @@ I hope that you will enjoy your experience with Pi3C!
 *Tim Skillman*
 
 
-**Contents**
+# Contents
 
 **1. Introduction**
 
