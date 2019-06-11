@@ -37,46 +37,55 @@ void Pi3Cmaterial::init(const std::string &name)
 void Pi3Cmaterial::SetColAmbient(const uint32_t colour)
 {
 	colAmbient = vec4f((GLfloat)(colour & 255) / 255.f, (GLfloat)((colour >> 8) & 255) / 255.f,(GLfloat)((colour >> 16) & 255) / 255.f, (GLfloat)((colour >> 24) & 255) / 255.f);
+	changed = true;
 }
 
 void Pi3Cmaterial::SetColAmbient(const uint8_t r, const uint8_t g, const uint8_t b, const uint8_t a)
 {
 	colAmbient = vec4f((GLfloat)r / 255.f, (GLfloat)g / 255.f,(GLfloat)b / 255.f, (GLfloat)a / 255.f);
+	changed = true;
 }
 
 void Pi3Cmaterial::SetColEmissive(const uint32_t colour)
 {
 	colEmissive = vec4f((GLfloat)(colour & 255) / 255.f, (GLfloat)((colour >> 8) & 255) / 255.f,(GLfloat)((colour >> 16) & 255) / 255.f, (GLfloat)((colour >> 24) & 255) / 255.f);
+	changed = true;
 }
 
 void Pi3Cmaterial::SetColEmissive(const uint8_t r, const uint8_t g, const uint8_t b, const uint8_t a)
 {
 	colEmissive = vec4f((GLfloat)r / 255.f, (GLfloat)g / 255.f,(GLfloat)b / 255.f, (GLfloat)a / 255.f);
+	changed = true;
 }
 
 void Pi3Cmaterial::SetColDiffuse(const uint32_t colour)
 {
 	colDiffuse = vec4f((GLfloat)(colour & 255) / 255.f, (GLfloat)((colour >> 8) & 255) / 255.f,(GLfloat)((colour >> 16) & 255) / 255.f, (GLfloat)((colour >> 24) & 255) / 255.f);
+	changed = true;
 }
 
 void Pi3Cmaterial::SetColDiffuse(const uint8_t r, const uint8_t g, const uint8_t b, const uint8_t a)
 {
 	colDiffuse = vec4f((GLfloat)r / 255.f, (GLfloat)g / 255.f,(GLfloat)b / 255.f, (GLfloat)a / 255.f);
+	changed = true;
 }
 
 void Pi3Cmaterial::SetColDiffuse(const vec4f &col)
 {
 	colDiffuse = col;
+	changed = true;
 }
 
 void Pi3Cmaterial::SetColSpecular(const uint32_t colour)
 {
 	colSpecular = vec4f((GLfloat)(colour & 255) / 255.f, (GLfloat)((colour >> 8) & 255) / 255.f,(GLfloat)((colour >> 16) & 255) / 255.f, (GLfloat)((colour >> 24) & 255) / 255.f);
+	changed = true;
 }
 
 void Pi3Cmaterial::SetColSpecular(const uint8_t r, const uint8_t g, const uint8_t b, const uint8_t a)
 {
 	colSpecular = vec4f((GLfloat)r / 255.f, (GLfloat)g / 255.f,(GLfloat)b / 255.f, (GLfloat)a / 255.f);
+	changed = true;
 }
 
 void Pi3Cmaterial::SetAnimationTexture(const float stepx, const float stepy)

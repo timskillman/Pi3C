@@ -46,9 +46,9 @@ public:
 	void SetColDiffuse(const vec4f &col);
 	void SetColSpecular(const uint32_t colour);
 	void SetColSpecular(const uint8_t r, const uint8_t g, const uint8_t b, const uint8_t a);
-	void SetSpecularPower(const uint32_t s) { shininess = (float)s / 255.0f; }
+	void SetSpecularPower(const uint32_t s) { shininess = (float)s / 255.0f; changed = true; }
 	void SetAlphaMode(const GLenum mode) { }
-	void SetCullMode(const int32_t cm) { cullface = (cm == 1); }
+	void SetCullMode(const int32_t cm) { cullface = (cm == 1); changed = true; }
 	void SetAnimationTexture(const float stepx, const float stepy);
 	void SetAnimationSheet(const int divx, const int divy, const int frames = 0);
 	void AnimateTexture(const float ticks = 1.f);
@@ -100,6 +100,7 @@ public:
 
 	bool cullface = true;
 	GLenum rendermode;
+	bool changed = true;
 
 };
 

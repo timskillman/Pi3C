@@ -7,22 +7,21 @@ void Pi3Cresource::init(const uint32_t stride)
 	lastVBO = -1;
 	//startVBO = 0;
 	createDefaultMaterial();
-	//uploaded = false;
 
 	//Create a dummy mesh to reserve GPU memory dynamic creation of letters ...
 	Pi3Cmesh lets;
 	lets.vc = 10000 * 6 * stride;
 	lets.verts.resize(lets.vc); // 10000 letters - reserve MUST be multiple of consistent stride (since glDrawArrays requires a vertex index not a byte index)
-	letterSheetRef = insertMesh(&lets); //create a dynamic buffer for the lettersheet (page size)
+	letterSheetRef = addMesh(&lets); //create a dynamic buffer for the lettersheet (page size)
 
 	//Reserve for small text entry fields ...
 	lets.vc = 1000 * 6 * stride;
 	lets.verts.resize(lets.vc);
-	lettersRef = insertMesh(&lets); //create a dynamic buffer for small temp lettersheet
+	lettersRef = addMesh(&lets); //create a dynamic buffer for small temp lettersheet
 
 	//Create a default 2D rectangle as a helper for 2D GUI rendering 
 	Pi3Cmesh rect = Pi3Cshapes::rect(vec2f(0, 0), vec2f(1.f, 1.f));
-	rectRef = insertMesh(&rect); //buffer used for creating models etc..
+	rectRef = addMesh(&rect); //buffer used for creating models etc..
 
 }
 
@@ -104,7 +103,7 @@ int32_t Pi3Cresource::loadTexture(const std::string &path, const std::string &te
 	return addTexture(Texture, texRef);
 }
 
-int32_t Pi3Cresource::insertMesh(Pi3Cmesh * mesh, uint32_t maxsize)
+int32_t Pi3Cresource::addMesh(Pi3Cmesh * mesh, uint32_t maxsize)
 {
 	//Are we requesting too much?  Then attempt it ...
 	uint32_t mvsize = (mesh) ? mesh->verts.size() : 0;
@@ -121,15 +120,13 @@ int32_t Pi3Cresource::insertMesh(Pi3Cmesh * mesh, uint32_t maxsize)
 		}
 	}
 
-	//No buffers created yet? or, request is larger than current buffer?, then create one ...
+	//No buffers created yet or, request is larger than current buffer?, then create new buffer ...
 	bool vertsMoved = false;
 	if (cbuf < 0 || (mvsize + vertBufferPtr[cbuf]) > vertBuffer[cbuf].size()) {
 		if (cbuf>=0) SDL_Log("cbuf:%d, mvsize:%d + vertBufferPtr:%d, size=%d, maxsize = %d", cbuf, mvsize , vertBufferPtr[cbuf], vertBuffer[cbuf].size(), maxsize);
-		//std::vector<float> newverts(maxsize);
 		mesh->verts.resize(maxsize);
 		vertBuffer.push_back(std::move(mesh->verts));
 		vertsMoved = true;
-		//vertBuffer.push_back(newverts);
 		vertBufferPtr.push_back(0);
 		currentBuffer++; cbuf = currentBuffer;
 
@@ -209,7 +206,7 @@ void Pi3Cresource::renderText(const int meshRef, Pi3Cfont *font, std::string &te
 	matrix.move(pos);
 	//matrix.SetScales(vec3f((float)wh.x, (float)wh.y, 1.f));
 	shaders[0].SetModelMatrix(matrix);
-	shaders[0].setMaterial(font->fontsheet.sheetMaterial);
+	shaders[0].setMaterial(&font->fontsheet.sheetMaterial);
 	shaders[0].setColDiffuse(colour);
 
 	renderMesh(meshRef, GL_TRIANGLES);
@@ -228,35 +225,6 @@ int32_t Pi3Cresource::touchMesh(const int meshRef, Pi3Ctouch &touch, const Pi3Cm
 	const Pi3Cmesh &mesh = meshes[meshRef];
 	return mesh.touchPoint(touch, tmat, vertBuffer[mesh.bufRef]);
 }
-
-//void Pi3Cresource::uploadMeshesToGPU()
-//{	
-//	/* upload geometry to the GPU */
-//
-//	uint32_t vs = vertBuffer.size();
-//	glGenBuffers(vs, &VBOid[startVBO]); //create the GL buffer
-//	
-//	for (uint32_t i= startVBO; i< vs; i++) {
-//		GLuint vno = vertBuffer[i].size();
-//		if (vno > 0) {
-//			SDL_Log("VBO:%d, verts size:%d", VBOid[i], vno);
-//			glBindBuffer(GL_ARRAY_BUFFER, VBOid[i]); //Vertex buffer
-//			glBufferData(GL_ARRAY_BUFFER, vno * sizeof(float), &vertBuffer[i].front(), GL_DYNAMIC_DRAW); //GL_STATIC_DRAW
-//		}
-//	}
-//	startVBO = vs;
-//
-//	//now that geometries are uploaded, we must start with a fresh buffer for new geometry ...
-//	currentBuffer = vs;
-//	vertBuffer.emplace_back(); //create new empty buffer
-//	uploaded = true;
-//}
-
-//void Pi3Cresource::uploadGPUverts(const int bufref, const std::vector<float> &verts)
-//{
-//	setRenderBuffer(bufref);
-//	glBufferData(GL_ARRAY_BUFFER, verts.size()*sizeof(float), verts.data(), GL_DYNAMIC_DRAW);
-//}
 
 void Pi3Cresource::updateGPUverts(const int bufref, const int vfrom, const int vsize, const std::vector<float> &verts)
 {

@@ -229,7 +229,9 @@ void Pi3Cmesh::createSharedTriangleList(const std::vector<float> &mverts, std::v
 
 	float itol = 1.f / tolerance;
 	uint32_t index = 0;
-	for (size_t i = vertOffset; i < (vertOffset + vc); i += stride) {
+	uint32_t voff = vertOffset * stride;
+
+	for (size_t i = voff; i < (voff + vc); i += stride) {
 		float x = ((float)((int)(mverts[i] * itol))) * tolerance;
 		float y = ((float)((int)(mverts[i + 1] * itol))) * tolerance;
 		float z = ((float)((int)(mverts[i + 2] * itol))) * tolerance;
@@ -254,7 +256,7 @@ void Pi3Cmesh::createSharedTriangleList(const std::vector<float> &mverts, std::v
 	std::unordered_set<std::mapuv> mapuvs;
 
 	index = 0;
-	for (size_t i = 0; i < vc; i += stride) {
+	for (size_t i = voff; i < (voff + vc); i += stride) {
 		std::mapuv v(mverts[i + 6], mverts[i + 7]);
 		auto it = mapuvs.find(v);
 		if (it == mapuvs.end()) {
@@ -353,6 +355,23 @@ void Pi3Cmesh::updateNormals(const uint32_t min, const uint32_t max)
 		memcpy(&verts[i + 3], &n, sf);
 		memcpy(&verts[i + x2 + 3], &n, sf);
 		memcpy(&verts[i + x3 + 3], &n, sf);
+	}
+}
+
+void Pi3Cmesh::createOutlines()
+{
+	/* Create outline formed from 3x single lines per triangle (not very efficient!) */
+	overts.resize(verts.size() * 2);
+	uint32_t o = 0;
+	for (size_t v = 0; v < verts.size(); v += 3 * stride) {
+		memcpy(&overts[0] + o, &verts[0] + v, stride); o += stride;
+		memcpy(&overts[0] + o, &verts[0] + v + stride, stride); o += stride;
+
+		memcpy(&overts[0] + o, &verts[0] + v + stride, stride); o += stride;
+		memcpy(&overts[0] + o, &verts[0] + v + stride * 2, stride); o += stride;
+
+		memcpy(&overts[0] + o, &verts[0] + v + stride * 2, stride); o += stride;
+		memcpy(&overts[0] + o, &verts[0] + v, stride); o += stride;
 	}
 }
 

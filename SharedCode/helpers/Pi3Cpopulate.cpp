@@ -44,7 +44,7 @@ Pi3Cmodel Pi3Cpopulate::Populate(Pi3Cresource* resource, const uint32_t maxShape
 	}
 
 	Pi3Cmodel popmodel;
-	popmodel.meshRef = resource->insertMesh(shapes.mesh.get());
+	popmodel.meshRef = resource->addMesh(shapes.mesh.get());
 	popmodel.addTexture(resource, texturePath);
 	popmodel.material.illum = 0;
 	popmodel.material.alpha = 1.f;

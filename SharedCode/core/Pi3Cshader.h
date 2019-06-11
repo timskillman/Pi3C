@@ -107,7 +107,7 @@ public:
 	}
 	
 	void setupShader();
-	void setMaterial(Pi3Cmaterial &mat);
+	void setMaterial(Pi3Cmaterial *mat);
 	void setColDiffuse(uint32_t colour);
 	void setProjectionMatrix(const Pi3Cmatrix &matrix) { SetMatrix4f(perspectiveMatrixRef, matrix); }
 	void SetModelMatrix(const Pi3Cmatrix &matrix) { SetMatrix4f(modelMatrixRef, matrix); }
@@ -132,6 +132,7 @@ public:
 	Pi3Cmatrix ortho;
 	Pi3Cmatrix persp;
 	uint32_t stride = DEFAULT_STRIDE;
+	Pi3Cmaterial* lastMaterial = nullptr;
 
 private:
 

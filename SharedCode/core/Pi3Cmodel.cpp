@@ -43,11 +43,11 @@ Pi3Cmodel::Pi3Cmodel(Pi3Cresource *resource, const std::string &path, const std:
 Pi3Cmodel::Pi3Cmodel(Pi3Cresource *resource, const std::string &modelname, const std::string &path, const std::string &model, const std::string &collider, std::function<void(float)> showProgressCB)
 {
 	init();
-	loadCollider(resource, path, model, collider, showProgressCB);
+	loadModelAndCollider(resource, path, model, collider, showProgressCB);
 	name = modelname;
 }
 
-void Pi3Cmodel::loadCollider(Pi3Cresource *resource, std::string path, std::string model, std::string collider, std::function<void(float)> showProgressCB)
+void Pi3Cmodel::loadModelAndCollider(Pi3Cresource *resource, std::string path, std::string model, std::string collider, std::function<void(float)> showProgressCB)
 {
 	if (model != "") loadOBJfile(resource, path, model, showProgressCB, false);
 	if (collider != "") {
@@ -58,7 +58,7 @@ void Pi3Cmodel::loadCollider(Pi3Cresource *resource, std::string path, std::stri
 
 void Pi3Cmodel::create(Pi3Cresource *resource, Pi3Cmesh *mesh, uint32_t diffuseColour)
 {	
-	meshRef = resource->insertMesh(mesh);
+	meshRef = resource->addMesh(mesh);
 	//meshRef = resource->addMesh(*mesh, !deleteVerts, reserveBuffer, bufferSize);
 	material = *resource->defaultMaterial();
 	material.SetColDiffuse(diffuseColour);
@@ -89,8 +89,8 @@ void Pi3Cmodel::renderBasic(Pi3Cresource *resource, Pi3Cshader &shader, const Pi
 	if (meshRef >= 0) {
 		Pi3Cmaterial *selectedMaterial = (materialOverride) ? materialOverride : &material;
 		shader.SetModelMatrix(matrix);
-		shader.setMaterial(*selectedMaterial);
-		resource->renderMesh(meshRef, (*selectedMaterial).rendermode);
+		shader.setMaterial(selectedMaterial);
+		resource->renderMesh(meshRef, selectedMaterial->rendermode);
 	}
 }
 
@@ -119,15 +119,15 @@ void Pi3Cmodel::render(Pi3Cresource *resource, Pi3Cshader &shader, const Pi3Cmat
 		Pi3Cmaterial *selectedMaterial = (materialOverride) ? materialOverride : &material;
 		if (materialOverride) selectedMaterial->SetColDiffuse(material.colDiffuse);
 		shader.SetModelMatrix(newmatrix);
-		shader.setMaterial(*selectedMaterial);
-		resource->renderMesh(meshRef, (*selectedMaterial).rendermode);
+		shader.setMaterial(selectedMaterial);
+		resource->renderMesh(meshRef, selectedMaterial->rendermode);
 	}
 }
 
 void Pi3Cmodel::appendMesh(Pi3Cresource *resource, Pi3Cmesh mesh, bool asCollider)
 {
 	//int32_t i = resource->addMesh(mesh);
-	int32_t i = resource->insertMesh(&mesh);
+	int32_t i = resource->addMesh(&mesh);
 	if (group.size() == 0 && meshRef<0) {
 		meshRef = i;
 		bbox = resource->meshes[i].bbox;
@@ -258,15 +258,23 @@ bool Pi3Cmodel::collide(const Pi3Cresource *resource, const Pi3Cmatrix *parent_m
 		if (group[choice].collide(resource, &newmatrix, pos, dir, radius)) return true;
 	}
 	else {
-		for (auto &sg : group) {
-			if (sg.colliders.size() > 0) {
-				for (auto &collider : sg.colliders) {
-					if (collider.collideSub(resource, newmatrix, pos, dir, radius))
-						return true;
-				}
+		if (colliders.size() > 0) {
+			for (auto& collider : colliders) {
+				if (collider.collideSub(resource, newmatrix, pos, dir, radius))
+					return true;
 			}
-			else
-				if (sg.visible && !sg.deleted && sg.collide(resource, &newmatrix, pos, dir, radius)) return true;
+		}
+		else {
+			for (auto& sg : group) {
+				//if (sg.colliders.size() > 0) {
+				//	for (auto& collider : sg.colliders) {
+				//		if (collider.collideSub(resource, newmatrix, pos, dir, radius))
+				//			return true;
+				//	}
+				//}
+				//else
+					if (sg.visible && !sg.deleted && sg.collide(resource, &newmatrix, pos, dir, radius)) return true;
+			}
 		}
 	}
 
@@ -305,19 +313,28 @@ float Pi3Cmodel::collideFloor(const Pi3Cresource *resource, const Pi3Cmatrix *pa
 		if (group[choice].collideFloor(resource, &newmatrix, pos, ht)) return ht;
 	}
 	else {
-		for (auto &sg : group) {
-			if (sg.colliders.size() > 0) {
-				for (auto &collider : sg.colliders) {
-					ht = collider.collideFloorSub(resource, newmatrix, pos, prevHeight, onehit);
-				}
+		if (colliders.size() > 0) {
+			for (auto& collider : colliders) {
+				ht = collider.collideFloorSub(resource, newmatrix, pos, prevHeight, onehit);
 			}
-			else
-			{
-				if (asCollider) {
-					ht = collideFloorSub(resource, newmatrix, pos, prevHeight, onehit);
-				}
-				else
-					if (sg.visible && !sg.deleted) ht = sg.collideFloor(resource, &newmatrix, pos, ht);
+		}
+		else if (asCollider) {
+			ht = collideFloorSub(resource, newmatrix, pos, prevHeight, onehit);
+		}
+		else {
+			for (auto& sg : group) {
+				//if (sg.colliders.size() > 0) {
+				//	for (auto &collider : sg.colliders) {
+				//		ht = collider.collideFloorSub(resource, newmatrix, pos, prevHeight, onehit);
+				//	}
+				//}
+				//else
+				//{
+				//	if (asCollider) {
+				//		ht = collideFloorSub(resource, newmatrix, pos, prevHeight, onehit);
+				//	}
+				//	else
+				if (sg.visible && !sg.deleted) ht = sg.collideFloor(resource, &newmatrix, pos, ht);
 			}
 		}
 	}

@@ -189,7 +189,7 @@ void Pi3Cshader::setColDiffuse(uint32_t colour)
 	Set4f(diffuseRef, RGB_VEC4(colour));
 }
 
-void Pi3Cshader::setMaterial(Pi3Cmaterial &mat)
+void Pi3Cshader::setMaterial(Pi3Cmaterial *mat)
 {
 	//Animate texture
 	//===============
@@ -197,15 +197,19 @@ void Pi3Cshader::setMaterial(Pi3Cmaterial &mat)
 	//and steps down the Y axis at the end of each X scan
 	//Maximum sheet size is 2048x2048 pixels on the RPi
 
-	Set2f(texAnimRef, mat.animoffset);
-	mat.AnimateTexture(ticks);
+	Set2f(texAnimRef, mat->animoffset);
+	mat->AnimateTexture(ticks);
+
+	if (mat == lastMaterial && !mat->changed) return;
+	lastMaterial = mat;
+	mat->changed = false;
 
 	//if (lastMat == mat.name) {
 	//	return;
 	//}
 
 	//Set Specular colour
-	if (mat.illum == 1) {
+	if (mat->illum == 1) {
 		Setf(fogRangeRef, 1.f); //no fog
 	}
 	else {
@@ -213,21 +217,21 @@ void Pi3Cshader::setMaterial(Pi3Cmaterial &mat)
 	}
 	Setf(fogMaxRef, fogMaxDist);
 
-	Set4f(specularRef, mat.colSpecular);
-	Set4f(ambientRef, mat.colAmbient);
-	Set4f(emissiveRef, mat.colEmissive); //vec4f(1.f, 0.4f, 0.0f, 1.f)); //, 
-	Seti(illuminationModelRef, mat.illum);
-	Seti(reflectRef, mat.reflective);
+	Set4f(specularRef, mat->colSpecular);
+	Set4f(ambientRef, mat->colAmbient);
+	Set4f(emissiveRef, mat->colEmissive); //vec4f(1.f, 0.4f, 0.0f, 1.f)); //, 
+	Seti(illuminationModelRef, mat->illum);
+	Seti(reflectRef, mat->reflective);
 		
 	//Set diffuse colour
-	mat.colDiffuse.w = mat.alpha;
-	if (mat.alpha == 1.0f) glDisable(GL_BLEND); else  glEnable(GL_BLEND);
-	Set4f(diffuseRef, mat.colDiffuse);
+	mat->colDiffuse.w = mat->alpha;
+	if (mat->alpha == 1.0f) glDisable(GL_BLEND); else  glEnable(GL_BLEND);
+	Set4f(diffuseRef, mat->colDiffuse);
 		
-	if (mat.cullface) glEnable(GL_CULL_FACE); else glDisable(GL_CULL_FACE);
-	if (mat.texRef>=0) { 
+	if (mat->cullface) glEnable(GL_CULL_FACE); else glDisable(GL_CULL_FACE);
+	if (mat->texRef>=0) {
 		//if (lastTex!=0) glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, mat.texID);
+		glBindTexture(GL_TEXTURE_2D, mat->texID);
 
 		//lastTex = 0;
 	}

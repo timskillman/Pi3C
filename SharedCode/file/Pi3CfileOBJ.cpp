@@ -21,7 +21,7 @@ namespace Pi3CfileOBJ {
 		mesh.bbox.bboxFromVerts(mesh.verts, 0, mesh.vc, mesh.stride);
 		mesh.hasColliderGrid = mesh.createColliderGrid();
 		//int32_t i = resource->addMesh(mesh, !asCollider, false, 65535);
-		int32_t i = resource->insertMesh(&mesh);
+		int32_t i = resource->addMesh(&mesh);
 		//SDL_Log("Mesh %d: verts = %d,%d, material = %d", mesh.materialRef, mesh.vertOffset, mesh.vertSize, mesh.materialRef);
 	}
 	
@@ -371,17 +371,30 @@ namespace Pi3CfileOBJ {
 
 	///// Save OBJ with Material support //////////////////////////////////////////////////////////////////
 
-	void saveModel(std::stringstream &ss, Pi3Cresource *resource, const Pi3Cmodel &model, const Pi3Cmatrix &mtx, uint32_t &voff, uint32_t &uoff)
+	void saveMaterial(std::stringstream& ss, const Pi3Cmaterial& material, const std::string& subPath, uint32_t counter)
+	{
+		ss << "newmtl " + material.name << "_" << counter << "\n";
+		ss << "Kd " << material.colDiffuse.x << " " << material.colDiffuse.y << " " << material.colDiffuse.z << "\n";
+		ss << "Ks " << material.colSpecular.x << " " << material.colSpecular.y << " " << material.colSpecular.z << "\n";
+		ss << "Ka " << material.colAmbient.x << " " << material.colAmbient.y << " " << material.colAmbient.z << "\n";
+		ss << "Ke " << material.colEmissive.x << " " << material.colEmissive.y << " " << material.colEmissive.z << "\n";
+		ss << "illum " << material.illum << "\n";
+		if (material.alpha < 1.f) ss << "Tr " << material.alpha << "\n";
+		if (material.texName != "" && material.texName != "default") ss << "map_Kd " << subPath << material.texName << "\n";
+	}
+
+	void saveModel(std::stringstream &ss, Pi3Cresource *resource, const Pi3Cmodel &model, const Pi3Cmatrix &mtx, uint32_t &voff, uint32_t &uoff, uint32_t counter)
 	{
 		Pi3Cmatrix tmtx = model.matrix * mtx;
 
 		if (model.group.size() > 0) {
 			for (auto &gmodel : model.group) {
-				saveModel(ss, resource, gmodel, tmtx, voff, uoff);
+				saveModel(ss, resource, gmodel, tmtx, voff, uoff, counter);
 			}
 		}
 		else {
 			if (model.meshRef >= 0) {
+
 				Pi3Cmesh &mesh = resource->meshes[model.meshRef];
 				std::vector<float> &verts = resource->vertBuffer[mesh.bufRef];
 
@@ -424,8 +437,11 @@ namespace Pi3CfileOBJ {
 				for (size_t i = 0; i < newuvs.size(); i += 2)
 					ss << "vt " << newuvs[i] << " " << newuvs[i + 1] << "\n";
 
+				//output material reference ...
+				ss << "usemtl " << model.material.name << "_" << counter << "\n";
+
 				//output triangle indices ...
-				for (size_t i = 0; i < vertindexes.size(); i += 3) {
+				for (size_t i = 0; i < vertindexes.size(); i+=3) {
 					if (vertindexes[i] != vertindexes[i + 1] && vertindexes[i] != vertindexes[i + 2] && vertindexes[i + 1] != vertindexes[i + 2]) {
 						ss << "f " << vertindexes[i] + voff + 1 << "/" << uvindexes[i] + uoff + 1 << " "
 							<< vertindexes[i + 1] + voff + 1 << "/" << uvindexes[i + 1] + uoff + 1 << " "
@@ -444,21 +460,37 @@ namespace Pi3CfileOBJ {
 		const std::string gpath = (path.size() > 0 && *(path.end() - 1) != '/') ? path + "/" : path;
 		const std::string filepath = gpath + filename;
 
+		std::string matfilename = filename + ".mtl";
+		const std::string matpath = gpath + matfilename;
+
 		SDL_RWops *rw = SDL_RWFromFile(filepath.c_str(), "w");
 		if (rw == NULL) return;
 
 		std::stringstream ss;
+		std::stringstream ssmat;
 		Pi3Cmatrix imtx;
+
 		uint32_t voff = 0, uoff = 0;
+
+		ss << "mtllib ./" << matfilename << "\n";
+		uint32_t c = 1; //material counter
 		for (auto &model : scene->models) {
-			if (model.visible && !model.deleted && (!selected || (model.selected && selected))) {
-				saveModel(ss, scene->resource, model, imtx, voff, uoff);
+			if (model.visible && !model.deleted && model.touchable && (!selected || (model.selected && selected))) {
+				saveMaterial(ssmat, model.material, "maps/", c);
+				saveModel(ss, scene->resource, model, imtx, voff, uoff, c);
+				c++;
 			}
 		}
 
 		std::string filestr = ss.str();
 		SDL_RWwrite(rw, &filestr[0], filestr.size(), 1);
 		SDL_RWclose(rw);
+
+		filestr = ssmat.str();
+		SDL_RWops* rwmat = SDL_RWFromFile(matpath.c_str(), "w");
+		SDL_RWwrite(rwmat, &filestr[0], filestr.size(), 1);
+		SDL_RWclose(rwmat);
+
 	}
 
 }

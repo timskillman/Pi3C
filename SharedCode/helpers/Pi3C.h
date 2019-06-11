@@ -51,6 +51,7 @@ public:
 
 	uint32_t create_background(const std::string &path, const std::string &file = "");
 	int32_t load_model(const std::string &path, const std::string &file, const vec3f &pos = vec3f(0,0,0));
+	int32_t load_model_and_collider(const std::string& path, const std::string& model, const std::string& collider, const vec3f& pos = vec3f(0, 0, 0));
 	int32_t add_model_to_scene2D(const Pi3Cmodel &model) { return scene.append2D(model); }
 	int32_t add_model_to_scene3D(const Pi3Cmodel &model) { return scene.append3D(model); }
 	int32_t add_spriteArray(Pi3CspriteArray &spritearray, const std::string &file = "");
@@ -72,6 +73,8 @@ public:
 	void swap_buffers() { frames++; fps++; window.SwapBuffers(); }
 	float getAverageFPS();
 	float getCurrentFPS();
+	void showFPS();
+
 	uint32_t width() { return winw; }
 	uint32_t height() { return winh; }
 

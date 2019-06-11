@@ -63,7 +63,7 @@ uint32_t Pi3C::create_background(const std::string &path, const std::string &fil
 	Pi3Cmesh rect;
 	rect.addRect(vec3f(0, winh, -20.f), vec2f(winw, winh));
 	//background.meshRef = resource.addMesh(rect);
-	background.meshRef = resource.insertMesh(&rect);
+	background.meshRef = resource.addMesh(&rect);
 
 	background.addTexture(&resource, (file!="" && path!="") ? path+"/"+file : path);
 	background.material.illum = 1;
@@ -107,6 +107,14 @@ int32_t Pi3C::load_model(const std::string &path, const std::string &file, const
 	return modelRef;
 }
 
+int32_t Pi3C::load_model_and_collider(const std::string& path, const std::string& modelfile, const std::string& colliderfile, const vec3f& pos)
+{
+	Pi3Cmodel model; model.loadModelAndCollider(&resource, path, modelfile, colliderfile, nullptr);  // loadbarCallback);
+	uint32_t modelRef = scene.append3D(model);
+	if (!pos.isZero()) scene.models[modelRef].move(pos);
+	return modelRef;
+}
+
 bool Pi3C::is_running()
 {
 	if (!has_started) {
@@ -134,6 +142,12 @@ float Pi3C::getCurrentFPS()
 		lastFPS = currentFPS;
 	}
 	return lastFPS;
+}
+
+void Pi3C::showFPS()
+{
+	gui.Begin();
+	gui.Text("FPS:" + std::to_string((int)getCurrentFPS()));
 }
 
 void Pi3C::resize_window()
@@ -177,7 +191,7 @@ std::vector<std::string> Pi3C::get_dropfiles()
 //int32_t Pi3C::add_spriteArray(Pi3CspriteArray &spritearray, const std::string &file)
 //{
 //	//spritearray.meshRef = resource.addMesh(spritearray.samesh, true, true);
-//	spritearray.meshRef = resource.insertMesh(&spritearray.samesh);
+//	spritearray.meshRef = resource.addMesh(&spritearray.samesh);
 //
 //	Pi3Cmodel rectangles;
 //	rectangles.meshRef = spritearray.meshRef;

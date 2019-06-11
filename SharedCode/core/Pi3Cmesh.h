@@ -39,39 +39,48 @@
 
 #define defaultStride 9
 
+
 class Pi3Cmesh {
 public:
 
 	Pi3Cmesh(const std::string &name = "", const uint32_t stride = defaultStride);
 	~Pi3Cmesh() {}
 
-	enum vertRefs { v_x = 0, v_y = 1, v_z = 2, n_x = 3, n_y = 4, n_z = 5, v_u = 6, v_v = 7 };
+	//enum vertRefs { v_x = 0, v_y = 1, v_z = 2, n_x = 3, n_y = 4, n_z = 5, v_u = 6, v_v = 7 };
 	//  STRUCTS
 
-	struct vertVNU {
-		float vx;
-		float vy;
-		float vz;
-		float nx;
-		float ny;
-		float nz;
-		float ux;
-		float uy;
-	};
+	//struct vertVNU {
+	//	float vx;
+	//	float vy;
+	//	float vz;
+	//	float nx;
+	//	float ny;
+	//	float nz;
+	//	float ux;
+	//	float uy;
+	//};
 
 	//struct meshHeader {
 	std::string name;
 	Pi3Cbbox3d bbox;
 	uint16_t mode;
 	std::vector<float> verts;
+	std::vector<float> overts;	//outline vertices
 	GLint vertOffset;
 	uint32_t vertSize;
 	uint32_t stride;
-	int32_t materialRef;
 	uint32_t vc;
 	GLint bufRef;
+	int32_t materialRef;
 	float animval;			//Each tween must have the same number of vertices as the verts buffer since the verts buffer will hold the results
 //};
+
+	struct VertsIndsUVs {
+		std::vector<float>& verts;
+		std::vector<uint32_t>& indexes;
+		std::vector<float>& uvs;
+		std::vector<uint32_t>& uvindexes;
+	};
 
 /// FUNCTIONS ...
 
@@ -87,16 +96,7 @@ public:
 
 	Pi3Cmesh clone(const uint32_t from, const uint32_t size) const;
 
-	//Create index reference list for shared triangle points ...
-	struct VertsIndsUVs {
-		std::vector<float> &verts;
-		std::vector<uint32_t> &indexes;
-		std::vector<float> &uvs;
-		std::vector<uint32_t> &uvindexes;
-	};
 
-	void createSharedTriangleList(const std::vector<float> &verts, std::vector<uint32_t> &vertindexes, std::vector<float> &newverts, std::vector<uint32_t> &uvindexes, std::vector<float> &newuvs, const float tolerance = 0.0005f);
-	void createSharedTriangleList(VertsIndsUVs *in, VertsIndsUVs *out, const float tolerance = 0.0005f);
 	void addRect(const vec3f &pos, const vec2f &size, const vec2f &uv = vec2f(0, 0), const vec2f &us = vec2f(1.f, 1.f));
 	void addXshape(const vec3f& pos, const vec2f& size, const vec2f& uv = vec2f(0, 0), const vec2f& us = vec2f(1.f, 1.f));
 	void updateRectCoords2D(std::vector<float> &verts, uint32_t &p, const float x, const float y, const float w, const float h);
@@ -112,15 +112,20 @@ public:
 	float checkColliderGrid(const vec3f &p, const Pi3Cmatrix &mtx, float prevHeight);
 	bool createColliderGrid();
 
+	void createOutlines();
+
+	void createSharedTriangleList(const std::vector<float>& verts, std::vector<uint32_t>& vertindexes, std::vector<float>& newverts, std::vector<uint32_t>& uvindexes, std::vector<float>& newuvs, const float tolerance = 0.0005f);
+	void createSharedTriangleList(VertsIndsUVs* in, VertsIndsUVs* out, const float tolerance = 0.0005f);
+
 	//bool collideVector(bool bounce, vec3f &pos, vec3f &dir);	//returns hit and modified pos, dir vectors
 	//float collideFloor(vec3f pos, float &prevHeight); 			//returns height above the floor
 
 /// VARIABLES ...
 
 	//meshHeader header;
-	std::vector<std::vector<uint32_t>> sharedIndexes;
-	std::vector<std::vector<float>> tweenverts;				//Holds tweening vertices for animating the mesh
-	std::vector<float> tweenlengths;
+	//std::vector<std::vector<uint32_t>> sharedIndexes;
+	//std::vector<std::vector<float>> tweenverts;				//Holds tweening vertices for animating the mesh
+	//std::vector<float> tweenlengths;
 
 private:
 	void init(std::string _name, uint32_t stride) {
@@ -133,6 +138,5 @@ private:
 	float triArea(const vec3f &v1, const vec3f &v2, const vec3f &v3, float &maxLength) const;
 	
 	std::vector<float> xgrid[10][10]; //collider grid ... stores triangles grouped in a 10x10 area
-
 
 };

@@ -74,7 +74,7 @@ public:
 	}
 
 	//int32_t addMesh(Pi3Cmesh &mesh, const bool deleteVerts = true, const bool dynamicBuffer = false, const uint32_t vertSize = 2000000);		//returns mesh reference (or -1 if failed)
-	int32_t insertMesh(Pi3Cmesh * mesh, uint32_t maxsize = 500000);
+	int32_t addMesh(Pi3Cmesh * mesh, uint32_t maxsize = 500000);
 
 	vertsPtr getMeshVerts(uint32_t meshRef) {
 		return vertsPtr(meshes[meshRef].vertOffset * meshes[meshRef].stride, &vertBuffer[meshes[meshRef].bufRef]);
