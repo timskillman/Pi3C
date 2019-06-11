@@ -1,0 +1,26 @@
+title:Scene Viewer
+fullscreen:false
+screenWidth:800	
+screenHeight:600
+
+fly:false
+lightpos:0.0 1.0 0.0
+startpos:0.0 20.0 0.0
+rotate:0.0 0.0 0.0
+perspective:800.0
+nearz:1.0
+farz:30000.0
+avatarHeight:8.0
+avatarFallSpeed:3
+avatarWalkSpeed:1
+avatarRunSpeed:2
+fogColour:1 1 1
+fogFar:500.0
+fogNear:50.0
+modelPath:../../Resources/models/
+
+skyboxPath:../../Resources/models/skyboxes
+skybox:miramar.obj
+skyboxScale:15.0
+fontsPath:../../Resources/fonts/
+font1:NotoSans-Regular.ttf
