@@ -135,7 +135,7 @@ int main(int argc, char *argv[])
 	
 	int airport = pi3c.load_model("../../Resources/models", "airport.obj", vec3f(-500,0,0));
 
-	int sship = pi3c.load_model("../../Resources/models", "sship3.obj"); //sship //EagleTransporter // NMSship
+	int sship = pi3c.load_model("../../Resources/models", "EagleTransporter.obj"); //sship3 //EagleTransporter // NMSship
 	int cockpit = pi3c.load_model("../../Resources/models", "sshipCockpit2.obj"); //sship //EagleTransporter // NMSship
 
 	int ship = sship;

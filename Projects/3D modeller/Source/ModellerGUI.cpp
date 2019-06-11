@@ -201,7 +201,7 @@ void MGui::doIMGUI(Modeller * md)
 		gui.renderBackIcon("rendl.png", icw, ich);
 		if (gui.ButtonImage("butNew.png") && mb) md->clearScene();
 		if (gui.ButtonImage("butOpen.png") && mb) {}
-		if (gui.ButtonImage("butSave.png") && mb) {}
+		if (gui.ButtonImage("butSave.png") && mb) md->saveFile("D:/", "TestSave.obj");
 		gui.renderBackIcon("butDiv.png", idw, ich);
 
 		if (gui.ButtonImage("butArrow.png", md->editMode == Modeller::ED_SELECT) && mb) md->setEditMode(Modeller::ED_SELECT);

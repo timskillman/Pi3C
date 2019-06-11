@@ -9,6 +9,7 @@
 #include "ModellerGUI.h"
 #include "Pi3Cgizmos.h"
 #include "Pi3Cediting.h"
+#include "Pi3CfileOBJ.h"
 
 class Modeller {
 public:
@@ -81,6 +82,8 @@ public:
 	bool isPerspective() { return views[currentView].projection == PERSPECTIVE;  }
 	bool initialised() { return (resource != nullptr); }
 	void createShape(const Pi3Cmesh& mesh, const vec3f& pos, const uint32_t colour = 0xffffffff);
+	void saveFile(const std::string& path, const std::string& filename) { std::string err; Pi3CfileOBJ::save(path, filename, &scene, false, nullptr, err); }
+
 	//vec3f getRelativeMove(const vec3f& pos);
 
 	void clearSelections();

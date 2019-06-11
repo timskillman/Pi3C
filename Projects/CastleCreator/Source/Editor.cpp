@@ -274,7 +274,7 @@ void Editor::handleEvents()
 		{
 		case SDL_MOUSEMOTION:
 			if (window->mouse.anyButton()) {
-				if (window->mouse.MiddleButton) {
+				if (window->mouse.RightButton) {
 					vec3f rotateVec(window->mouse.deltaXY.y / 300.f, -window->mouse.deltaXY.x / 300.f, 0);
 					if (editMode) 
 						editrot += rotateVec;
@@ -317,7 +317,7 @@ void Editor::touchScene()
 			}
 
 			
-			SDL_Log("Touch tri = %d", touch.triRef/48);
+			//SDL_Log("Touch tri = %d", touch.triRef/48);
 
 			if (touch.maxlevel > 1) {
 
