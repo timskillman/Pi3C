@@ -141,7 +141,7 @@ Pi3C will be cloned onto your Pi and a Pi3C directory, with all the necessary co
 Now you should be setup and ready to play with Pi3C ... **Congratulations!**
 
 
-  
+----------------------------------------------
 
 <a name="tryexamples"></a>
 # Trying the examples
