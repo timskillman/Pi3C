@@ -85,7 +85,7 @@ C++ is one of the most popular, industry standard programming languages.
 **Setting up the SD card**
 
  - Download the latest Raspberry Pi Stretch from [https://www.raspberrypi.org/downloads/](https://www.raspberrypi.org/downloads/)
- - Flash the Raspberry Pi Stretch image to your SD card using [balenaEtcher]
+ - Flash the Raspberry Pi Stretch image to your SD card using [balenaEtcher](https://www.balena.io/etcher/)
  - Insert the SD card into your Raspberry Pi, setup the Pi and start it up
  
 <a name="settingup">**Setting Up SDL 2.0**</a>
