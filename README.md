@@ -34,7 +34,7 @@ I hope that you will enjoy your experience with Pi3C!
 **2. What you need and Setting up**
 
   - Raspberry Pi setup
-  - Setting up SDL 2.0
+  - [Link](#settingup)
   - Programming tools
   
 **3. Hello 3D World!**
@@ -43,4 +43,4 @@ I hope that you will enjoy your experience with Pi3C!
   - Including stuff
   - Compile & Run
   
-
+<a name="settingup">**Setting Up**</a>
