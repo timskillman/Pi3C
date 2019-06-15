@@ -32,7 +32,7 @@ collider:ArkCollider.obj
 #collider:Collider.obj
 
 skyboxPath:../../Resources/models/skyboxes
-skybox:miramar.obj
+skybox:miramar2.obj
 skyboxScale:15.0
 fontsPath:../../Resources/fonts/
 font1:NotoSans-Regular.ttf
