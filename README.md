@@ -96,8 +96,8 @@ C++ is one of the most popular, industry standard programming languages.
  
  Select 'Advanced Options' and configure;
  
-  - Full OpenGL ES driver
-  - 128 megabytes of GPU memory
+  - Full KMS, Open GL driver
+  - 128 megabytes of GPU memory(memory split option)
   - Restart your Pi and setup SDL 2.0 (next section)
   
 <a name="settingup">**Setting Up SDL 2.0 on your Raspberry Pi**</a>
