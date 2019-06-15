@@ -44,6 +44,7 @@ I hope that you will enjoy your experience with Pi3C!
   - Compile & Run
 
 
+----------------------------------------------
 
 <a name="introduction">**1. Introduction**</a>
 
