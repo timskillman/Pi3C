@@ -68,7 +68,7 @@ C++ is one of the most popular, industry standard programming languages.
 
 ----------------------------------------------
 
-# What you need and Setting up**
+# What you need and Setting up
 <a name="whatyouneed"></a>
 
 <a name="pisetup">**Raspberry Pi setup**</a>
