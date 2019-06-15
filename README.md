@@ -31,13 +31,13 @@ I hope that you will enjoy your experience with Pi3C!
   - [Example Apps](#examplegames)
   - [What is C++?](#exampleapps)
 
-**2. What you need and Setting up**
+[**2. What you need and Setting up**](#whatyouneed)
 
-  - Raspberry Pi setup
+  - [Raspberry Pi setup](#pisetup)
   - [Setting up SDL 2.0 on the Raspberry Pi](#settingup)
-  - Programming tools
+  - [Programming tools](#progtools)
   
-**3. Hello 3D World!**
+[**3. Hello 3D World!**](#helloworld)
 
   - The main program
   - Including stuff
@@ -66,7 +66,22 @@ The following apps can be explored in this repo ...
 
 C++ is one of the most popular, industry standard programming languages.
 
+----------------------------------------------
 
+# What you need and Setting up**
+<a name="whatyouneed"></a>
+
+<a name="pisetup">**Raspberry Pi setup**</a>
+
+You will need the following parts
+
+ - Raspberry Pi Model 3 B+
+ - 5 volt, 2.5 amp power supply with Micro-USB connector
+ - Keyboard and Mouse
+ - Monitor or TV with HMDI
+ - HDMI cable
+ - 32GB Micro-SD card
+  
 <a name="settingup">**Setting Up SDL 2.0**</a>
 
 ~~~~
@@ -75,3 +90,5 @@ sudo apt-get install libsdl2-mixer-dev
 sudo apt-get install libsdl2-ttf-dev
 sudo apt-get install libsdl2-image-dev
 ~~~~
+
+<a name="progtools">**Programming tools**</a>
