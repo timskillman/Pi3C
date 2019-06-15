@@ -36,6 +36,7 @@ I hope that you will enjoy your experience with Pi3C!
   - [Raspberry Pi setup](#pisetup)
   - [Setting up SDL 2.0 on the Raspberry Pi](#settingup)
   - [Programming tools](#progtools)
+  - [Downloading Pi3C](#downloadpi3c)
   
 [**3. Hello 3D World!**](#helloworld)
 
@@ -114,3 +115,15 @@ $ sudo apt-get install libsdl2-net-dev
 ~~~~
 
 <a name="progtools">**Programming tools**</a>
+
+
+<a name="downloadingpi3c">**Downloading Pi3C**</a>
+
+One of the easiest ways to download and modify Pi3C for you own use it use Git [(try this link if you want to know more)](https://projects.raspberrypi.org/en/projects/getting-started-with-git)
+
+Start by downloading Git to your Raspberry Pi ... open a task window and type;
+
+~~~~
+$ sudo apt install git
+~~~~
+
