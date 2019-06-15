@@ -88,7 +88,7 @@ C++ is one of the most popular, industry standard programming languages.
  - Download the latest Raspbian Stretch image from [https://www.raspberrypi.org/downloads/](https://www.raspberrypi.org/downloads/)
  - Flash the Raspbian Stretch image to your SD card using [balenaEtcher](https://www.balena.io/etcher/)
  - Insert the SD card into your Raspberry Pi, [setup the Pi](https://projects.raspberrypi.org/en/projects/raspberry-pi-setting-up) and start it up.  You will need WiFi setup as well.
- - Open a task window enter;
+ - Open a terminal window enter;
  
  ~~~~
  $ sudo raspi-config
@@ -119,13 +119,19 @@ $ sudo apt-get install libsdl2-net-dev
 
 One of the easiest ways to download and modify Pi3C for you own use it use Git [(try this link if you want to know more)](https://projects.raspberrypi.org/en/projects/getting-started-with-git)
 
-Start by downloading Git to your Raspberry Pi ... open a task window and type;
+If Git is not already installed on your Pi, start by downloading Git; open a terminal window and type;
 
 ~~~~
 $ sudo apt install git
 ~~~~
 
+Make sure your in home/pi (indicated by the ~ with nothing after it) and enter;
 
+~~~~
+git clone https://github.com/timskillman/Pi3C/
+~~~~
+
+Pi3C will cloned onto your Pi and a Pi3C directory, with all the necessary code and resources, will be downloaded onto your Pi.
 
 <a name="progtools">**Programming tools**</a>
 
