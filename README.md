@@ -115,7 +115,7 @@ $ sudo apt-get install libsdl2-net-dev
 ~~~~
 
 
-<a name="downloadingpi3c">**Downloading Pi3C**</a>
+<a name="downloadpi3c">**Downloading Pi3C**</a>
 
 One of the easiest ways to download and modify Pi3C for you own use it use Git [(try this link if you want to know more)](https://projects.raspberrypi.org/en/projects/getting-started-with-git)
 
