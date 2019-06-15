@@ -84,17 +84,27 @@ C++ is one of the most popular, industry standard programming languages.
 
 **Setting up the SD card**
 
- - Download the latest Raspberry Pi Stretch from [https://www.raspberrypi.org/downloads/](https://www.raspberrypi.org/downloads/)
- - Flash the Raspberry Pi Stretch image to your SD card using [balenaEtcher](https://www.balena.io/etcher/)
- - Insert the SD card into your Raspberry Pi, setup the Pi and start it up
+ - Download the latest Raspbian Stretch image from [https://www.raspberrypi.org/downloads/](https://www.raspberrypi.org/downloads/)
+ - Flash the Raspbian Stretch image to your SD card using [balenaEtcher](https://www.balena.io/etcher/)
+ - Insert the SD card into your Raspberry Pi, setup the Pi and start it up.
+ - Open a task window enter;
  
+ ~~~~
+ $ sudo raspi-config
+ ~~~~
+ 
+ Select 'Advanced Options' and select;
+ 
+  - Full OpenGL ES driver
+  - 128 megabytes of GPU memory
+  
 <a name="settingup">**Setting Up SDL 2.0**</a>
 
 ~~~~
-sudo apt-get install libsdl2-dev
-sudo apt-get install libsdl2-mixer-dev
-sudo apt-get install libsdl2-ttf-dev
-sudo apt-get install libsdl2-image-dev
+$ sudo apt-get install libsdl2-dev
+$ sudo apt-get install libsdl2-mixer-dev
+$ sudo apt-get install libsdl2-ttf-dev
+$ sudo apt-get install libsdl2-image-dev
 ~~~~
 
 <a name="progtools">**Programming tools**</a>
