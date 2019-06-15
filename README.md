@@ -24,12 +24,12 @@ I hope that you will enjoy your experience with Pi3C!
 
 # Contents
 
-**1. Introduction**
+[**1. Introduction**](#introduction)
 
-  - What can I do with Pi3C?
-  - Example Games
-  - Example Apps
-  - What is C++?
+  - [What can I do with Pi3C?](#introduction)
+  - [Example Games](#whatcanido)
+  - [Example Apps](#examplegames)
+  - [What is C++?](#exampleapps)
 
 **2. What you need and Setting up**
 
@@ -42,7 +42,29 @@ I hope that you will enjoy your experience with Pi3C!
   - The main program
   - Including stuff
   - Compile & Run
-  
+
+
+
+<a name="introduction">**1. Introduction**</a>
+
+<a name="whatcanido">**What can I do with Pi3C?**</a>
+
+With Pi3C you can write high speed 2D or 3D games.
+Or, you can write fast applications.
+
+<a name="examplegames">**Example Games**</a>
+
+The following examples can be explored in this repo ...
+
+<a name="exampleapps">**Example Apps**</a>
+
+The following apps can be explored in this repo ...
+
+<a name="whatisc++">**What is C++?**</a>
+
+C++ is one of the most popular, industry standard programming languages.
+
+
 <a name="settingup">**Setting Up SDL 2.0**</a>
 
 ~~~~
