@@ -46,7 +46,8 @@ I hope that you will enjoy your experience with Pi3C!
 
 ----------------------------------------------
 
-<a name="introduction"># Introduction</a>
+# Introduction
+<a name="introduction"></a>
 
 <a name="whatcanido">**What can I do with Pi3C?**</a>
 
