@@ -183,9 +183,11 @@ Now enter
  2. *Under the Permissions tab, All three dropdowns should be set to 'Anyone' and then select OK.*
  3. *Try ./CastleCreator again and it should run*
 
-You will notice the 'options.txt' file and other txt files.  If you feel adventurous, try changing the screen resolution or set fullscreen to 'true'.  The 'options.txt' file is an easy of customising a game or an app without having to recompile your code.
+You will notice the '**options.txt**' file and other txt files in the CastleCreator folder.  If you feel adventurous, open these files and try changing the screen resolution or set fullscreen to 'true'.  The 'options.txt' file is an easy way of customising a game or an app without having to recompile your code.
 
-Try the other examples such as Forest, Snow, 3D modeller and others using the same info for CastleCreator.
+Try the other examples such as **Forest, Snow, 3D modeller** and others using the same info for CastleCreator.
+
+Of course, we're trying out precompiled examples - so let's get coding your own stuff!
 
 
 <a name="progtools">**Programming tools**</a>
