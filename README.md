@@ -133,7 +133,7 @@ git clone https://github.com/timskillman/Pi3C.git
 
 Pi3C will be cloned onto your Pi and a Pi3C directory, with all the necessary code and resources, will be downloaded.
 
-Now you should be setup ... Congratulations!
+Now you should be setup and ready to play with Pi3C ... Congratulations!
 
 
 <a name="progtools">**Programming tools**</a>
