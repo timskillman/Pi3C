@@ -104,7 +104,7 @@ C++ is one of the most popular, industry standard programming languages.
 
 Even though Raspbian Stretch comes with a version of SDL2, you need to download the latest SDL2 development libraries and SDL2's associated libraries for sound, images, network and font support.
 
-Open a terminal window, make sure you're connected to the internet and enter;
+Open a terminal window, make sure you're connected to the internet and enter (You will be prompted to enter 'Y' before installing each library);
 
 ~~~~
  sudo apt-get install libsdl2-dev
@@ -133,7 +133,7 @@ git clone https://github.com/timskillman/Pi3C.git
 
 Pi3C will be cloned onto your Pi and a Pi3C directory, with all the necessary code and resources, will be downloaded.
 
-Now you should be setup and ready to play with Pi3C ... Congratulations!
+Now you should be setup and ready to play with Pi3C ... **Congratulations!**
 
 
 <a name="progtools">**Programming tools**</a>
