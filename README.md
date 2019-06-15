@@ -45,8 +45,9 @@ I hope that you will enjoy your experience with Pi3C!
   
 <a name="settingup">**Setting Up SDL 2.0**</a>
 
-'sudo apt-get install libsdl2-dev'
-'sudo apt-get install libsdl2-mixer-dev'
-'sudo apt-get install libsdl2-ttf-dev'
-'sudo apt-get install libsdl2-image-dev'
-
+~~~~
+sudo apt-get install libsdl2-dev
+sudo apt-get install libsdl2-mixer-dev
+sudo apt-get install libsdl2-ttf-dev
+sudo apt-get install libsdl2-image-dev
+~~~~
