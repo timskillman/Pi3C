@@ -91,7 +91,7 @@ C++ is one of the most popular, industry standard programming languages.
  - Open a terminal window enter;
  
  ~~~~
- $ sudo raspi-config
+  sudo raspi-config
  ~~~~
  
  Select 'Advanced Options' and configure;
@@ -107,11 +107,11 @@ Even though Raspbian Stretch comes with a version of SDL2, you need to download 
 Open a task window, make sure you're connected to the internet and enter;
 
 ~~~~
-$ sudo apt-get install libsdl2-dev
-$ sudo apt-get install libsdl2-mixer-dev
-$ sudo apt-get install libsdl2-ttf-dev
-$ sudo apt-get install libsdl2-image-dev
-$ sudo apt-get install libsdl2-net-dev
+ sudo apt-get install libsdl2-dev
+ sudo apt-get install libsdl2-mixer-dev
+ sudo apt-get install libsdl2-ttf-dev
+ sudo apt-get install libsdl2-image-dev
+ sudo apt-get install libsdl2-net-dev
 ~~~~
 
 
@@ -122,13 +122,13 @@ One of the easiest ways to download and modify Pi3C for you own use it use Git [
 If Git is not already installed on your Pi, start by downloading Git; open a terminal window and type;
 
 ~~~~
-$ sudo apt install git
+ sudo apt install git
 ~~~~
 
-Make sure your in home/pi (indicated by the ~ with nothing after it) and enter;
+Make sure you're in 'home/pi' directory (indicated by the ~ (tilde character) with nothing after it) and enter;
 
 ~~~~
-git clone https://github.com/timskillman/Pi3C/
+git clone https://github.com/timskillman/Pi3C.git
 ~~~~
 
 Pi3C will cloned onto your Pi and a Pi3C directory, with all the necessary code and resources, will be downloaded onto your Pi.
