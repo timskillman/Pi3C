@@ -34,7 +34,7 @@ I hope that you will enjoy your experience with Pi3C!
 **2. What you need and Setting up**
 
   - Raspberry Pi setup
-  - [Setting up](#settingup)
+  - [Setting up SDL 2.0 on the Raspberry Pi](#settingup)
   - Programming tools
   
 **3. Hello 3D World!**
@@ -45,8 +45,8 @@ I hope that you will enjoy your experience with Pi3C!
   
 <a name="settingup">**Setting Up SDL 2.0**</a>
 
-<>sudo apt-get install libsdl2-dev
-sudo apt-get install libsdl2-mixer-dev
-sudo apt-get install libsdl2-ttf-dev
-sudo apt-get install libsdl2-image-dev
+'sudo apt-get install libsdl2-dev'
+'sudo apt-get install libsdl2-mixer-dev'
+'sudo apt-get install libsdl2-ttf-dev'
+'sudo apt-get install libsdl2-image-dev'
 
