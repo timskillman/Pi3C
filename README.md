@@ -154,7 +154,7 @@ Pi3C folders are laid out in the following way;
 Projects     (Examples here)
 SharedCode   (Pi3C core and helper code)
 Resources    (Models, textures and sounds stored here)
-ThirdParty   (Windows only)
+ThirdParty   (Windows only - not needed on the Pi, but keep if developing on a Windows machine as well)
 ~~~~
 
 <a name="projects">**Projects Folder**</a>
