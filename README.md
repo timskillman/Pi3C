@@ -103,7 +103,7 @@ C++ is one of the most popular, industry standard programming languages.
 
 Even though Raspbian Stretch comes with a version of SDL2, you need to download the latest SDL2 development libraries and SDL2's associated libraries for sound, images, network and font support.
 
-Open a task window
+Open a task window, make sure you're connected to the internet and enter;
 
 ~~~~
 $ sudo apt-get install libsdl2-dev
