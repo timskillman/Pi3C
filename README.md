@@ -46,8 +46,8 @@ I hope that you will enjoy your experience with Pi3C!
 
 ----------------------------------------------
 
-# Introduction
 <a name="introduction"></a>
+# Introduction
 
 <a name="whatcanido">**What can I do with Pi3C?**</a>
 
@@ -68,8 +68,8 @@ C++ is one of the most popular, industry standard programming languages.
 
 ----------------------------------------------
 
-# What you need and Setting up
 <a name="whatyouneed"></a>
+# What you need and Setting up
 
 <a name="pisetup">**Raspberry Pi setup**</a>
 
