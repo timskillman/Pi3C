@@ -86,7 +86,7 @@ C++ is one of the most popular, industry standard programming languages.
 
  - Download the latest Raspbian Stretch image from [https://www.raspberrypi.org/downloads/](https://www.raspberrypi.org/downloads/)
  - Flash the Raspbian Stretch image to your SD card using [balenaEtcher](https://www.balena.io/etcher/)
- - Insert the SD card into your Raspberry Pi, setup the Pi and start it up.
+ - Insert the SD card into your Raspberry Pi, [setup the Pi](https://projects.raspberrypi.org/en/projects/raspberry-pi-setting-up) and start it up.  You will need WiFi setup as well.
  - Open a task window enter;
  
  ~~~~
@@ -99,13 +99,18 @@ C++ is one of the most popular, industry standard programming languages.
   - 128 megabytes of GPU memory
   - Restart your Pi and setup SDL 2.0 (next section)
   
-<a name="settingup">**Setting Up SDL 2.0**</a>
+<a name="settingup">**Setting Up SDL 2.0 on your Raspberry Pi**</a>
+
+Even though Raspbian Stretch comes with a version of SDL2, you need to download the latest SDL2 development libraries and SDL2's associated libraries for sound, images, network and font support.
+
+Open a task window
 
 ~~~~
 $ sudo apt-get install libsdl2-dev
 $ sudo apt-get install libsdl2-mixer-dev
 $ sudo apt-get install libsdl2-ttf-dev
 $ sudo apt-get install libsdl2-image-dev
+$ sudo apt-get install libsdl2-net-dev
 ~~~~
 
 <a name="progtools">**Programming tools**</a>
