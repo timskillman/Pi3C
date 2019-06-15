@@ -36,9 +36,14 @@ I hope that you will enjoy your experience with Pi3C!
   - [Raspberry Pi setup](#pisetup)
   - [Setting up SDL 2.0 on the Raspberry Pi](#settingup)
   - [Downloading Pi3C](#downloadpi3c)
+  
+[**3. Trying the Examples**](#tryexamples)
+  - [Pi3C folders](#pi3cfolders)
+  - [Projects Folder](#projects)
+
   - [Programming tools](#progtools)
   
-[**3. Hello 3D World!**](#helloworld)
+[**4. Hello 3D World!**](#helloworld)
 
   - The main program
   - Including stuff
@@ -134,6 +139,53 @@ git clone https://github.com/timskillman/Pi3C.git
 Pi3C will be cloned onto your Pi and a Pi3C directory, with all the necessary code and resources, will be downloaded.
 
 Now you should be setup and ready to play with Pi3C ... **Congratulations!**
+
+
+  
+
+<a name="tryexamples"></a>
+# Trying the examples
+
+<a name="pi3cfolders">**Pi3C folders**</a>
+
+Pi3C folders are laid out in the following way;
+
+~~~~
+Projects
+SharedCode
+Resources
+ThirdParty (Windows only)
+~~~~
+
+<a name="projects">**Projects Folder**</a>
+
+The Projects folder contains all the examples to try out.  You can also add your own folder in this one or one next to it for creating your own projects.
+
+So lets try out some examples!
+
+Opening the Projects folder you will see several examples such as 'Castle Creator' and others.
+Let's try out Castle Creator first and see how it works ...
+
+Open a terminal window (if already closed) and navigate to;
+
+~~~~
+cd Pi3C/Projects/CastleCreator
+~~~~
+
+Now enter
+
+~~~~
+./CastleCreator
+~~~~
+
+*Note: If it doesn't work, you need to change CastleCreator's permissions and do the following ...*
+*1. In the desktop folder, navigate to 'CastleCreator' and click the right button and select 'Permissions'*
+*2. Under the Permissions tab, All three dropdowns should be set to 'Anyone' and then select OK.*
+*3. Try ./CastleCreator again and it should run*
+
+You will notice the 'options.txt' file and other txt files.  If you feel adventurous, try changing the screen resolution or set fullscreen to 'true'.  The 'options.txt' file is an easy of customising a game or an app without having to recompile your code.
+
+Try the other examples such as Forest, Snow, 3D modeller and others using the same info for CastleCreator.
 
 
 <a name="progtools">**Programming tools**</a>
