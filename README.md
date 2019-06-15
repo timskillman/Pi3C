@@ -151,10 +151,10 @@ Now you should be setup and ready to play with Pi3C ... **Congratulations!**
 Pi3C folders are laid out in the following way;
 
 ~~~~
-Projects
-SharedCode
-Resources
-ThirdParty (Windows only)
+Projects     (Examples here)
+SharedCode   (Pi3C core and helper code)
+Resources    (Models, textures and sounds stored here)
+ThirdParty   (Windows only)
 ~~~~
 
 <a name="projects">**Projects Folder**</a>
@@ -179,9 +179,9 @@ Now enter
 ~~~~
 
 *Note: If it doesn't work, you need to change CastleCreator's permissions and do the following ...*
-*1. In the desktop folder, navigate to 'CastleCreator' and click the right button and select 'Permissions'*
-*2. Under the Permissions tab, All three dropdowns should be set to 'Anyone' and then select OK.*
-*3. Try ./CastleCreator again and it should run*
+*  1. In the desktop folder, navigate to 'CastleCreator' and click the right button and select 'Permissions'*
+*  2. Under the Permissions tab, All three dropdowns should be set to 'Anyone' and then select OK.*
+*  3. Try ./CastleCreator again and it should run*
 
 You will notice the 'options.txt' file and other txt files.  If you feel adventurous, try changing the screen resolution or set fullscreen to 'true'.  The 'options.txt' file is an easy of customising a game or an app without having to recompile your code.
 
