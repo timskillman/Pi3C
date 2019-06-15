@@ -73,15 +73,21 @@ C++ is one of the most popular, industry standard programming languages.
 
 <a name="pisetup">**Raspberry Pi setup**</a>
 
-You will need the following parts
+**You will need the following parts**
 
  - Raspberry Pi Model 3 B+
  - 5 volt, 2.5 amp power supply with Micro-USB connector
  - Keyboard and Mouse
  - Monitor or TV with HMDI
  - HDMI cable
- - 32GB Micro-SD card
-  
+ - 16GB or 32GB Micro-SD card
+
+**Setting up the SD card**
+
+ - Download the latest Raspberry Pi Stretch from [https://www.raspberrypi.org/downloads/](https://www.raspberrypi.org/downloads/)
+ - Flash the Raspberry Pi Stretch image to your SD card using [balenaEtcher]
+ - Insert the SD card into your Raspberry Pi, setup the Pi and start it up
+ 
 <a name="settingup">**Setting Up SDL 2.0**</a>
 
 ~~~~
