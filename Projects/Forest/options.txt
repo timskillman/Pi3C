@@ -1,9 +1,9 @@
 title:Forest flight
 fullscreen:true
-screenWidth:1920	
-screenHeight:1080
+screenWidth:1440	
+screenHeight:900
 
-trees:20000
+trees:10000
 fly:true
 lightpos:0.0 1.0 0.0
 startpos:0.0 -30 0.0
@@ -19,9 +19,8 @@ fogColour:0xc0c0c0
 fogFar:15000.0
 fogNear:2000.0
 modelPath:../../Resources/models/
-
-sound:Action Strike.ogg
-soundPath:../../Resources/music/Rafael Krux
+musicPath:../../Resources/music/RafaelKrux
+soundPath:../../Resources/sounds
 
 #Landscape selection: Mountains.obj, landscape.obj
 landscape:landscape.obj

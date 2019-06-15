@@ -147,6 +147,9 @@
     <ClCompile Include="..\..\SharedCode\ui\Pi3Cstring.cpp">
       <Filter>Shared Code\ui</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\SharedCode\helpers\Pi3Cparticles.cpp">
+      <Filter>Shared Code\helpers</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\SharedCode\glutess\dict.h">
@@ -280,6 +283,9 @@
     </ClInclude>
     <ClInclude Include="..\..\SharedCode\ui\Pi3Cstring.h">
       <Filter>Shared Code\ui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\SharedCode\helpers\Pi3Cparticles.h">
+      <Filter>Shared Code\helpers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

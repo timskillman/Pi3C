@@ -20,7 +20,7 @@ public:
 
 	}
 
-	Pi3Cmodel create(Pi3Cresource* resource, const vec3f& pos, const ixyz& area, const uint32_t minsize, const uint32_t maxsize, const uint32_t maxtypes, const uint32_t count);
+	Pi3Cmodel create(Pi3Cresource* resource, const uint32_t count, const vec3f& pos, const ixyz& area, const uint32_t minsize, const uint32_t maxsize, const std::string &tex, const uint32_t maxtypes);
 	void update(const size_t ref, const vec2f size, const uint32_t type);
 	void createParticle(const vec3f& pos, const ixyz& area, const vec2f size, const uint32_t type, const ixyz& wandr);
 	void animate(const float d);

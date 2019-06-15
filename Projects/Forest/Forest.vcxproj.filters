@@ -144,8 +144,8 @@
     <ClCompile Include="..\..\SharedCode\glutess\tessmono.c">
       <Filter>SharedCode\glutess</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\SharedCode\core\Pi3CspriteArray.cpp">
-      <Filter>SharedCode\core</Filter>
+    <ClCompile Include="..\..\SharedCode\helpers\Pi3Cpopulate.cpp">
+      <Filter>SharedCode\helpers</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -281,8 +281,8 @@
     <ClInclude Include="..\..\SharedCode\glutess\tessmono.h">
       <Filter>SharedCode\glutess</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\SharedCode\core\Pi3CspriteArray.h">
-      <Filter>SharedCode\core</Filter>
+    <ClInclude Include="..\..\SharedCode\helpers\Pi3Cpopulate.h">
+      <Filter>SharedCode\helpers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

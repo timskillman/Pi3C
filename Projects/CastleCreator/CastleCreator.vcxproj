@@ -29,7 +29,7 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{86B9CF91-8738-B044-A7BF-A295F9323D12}</ProjectGuid>
     <RootNamespace>CastleCreator</RootNamespace>
-    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.16299.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -246,8 +246,8 @@
     <ClCompile Include="..\..\SharedCode\helpers\Pi3Chumanoid.cpp" />
     <ClCompile Include="..\..\SharedCode\helpers\Pi3CloadOptions.cpp" />
     <ClCompile Include="..\..\SharedCode\ui\Pi3Cimgui.cpp" />
-    <ClCompile Include="Source\Editor.cpp" />
     <ClCompile Include="Source\CastleCreator.cpp" />
+    <ClCompile Include="Source\Editor.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\SharedCode\core\Pi3Cbbox3d.h" />

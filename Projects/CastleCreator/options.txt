@@ -1,5 +1,5 @@
-title:Castle Creator
+title:Castle Editor
 fullscreen:false
-screenWidth:800	
-screenHeight:600
+screenWidth:800
+screenHeight:480
 

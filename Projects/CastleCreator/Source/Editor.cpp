@@ -78,11 +78,13 @@ void Editor::newScene(const uint32_t ref)
 void Editor::setupGUI(loadOptions &opts)
 {
 	// Get GUI fonts
+	SDL_Log("Loading fonts: %s , %s", opts.asString("fontsPath").c_str(),opts.asString("font1").c_str());
+	 
 	//resource->addFont(opts.asString("fontsPath").c_str(), opts.asString("font1").c_str(), 80);
 	guifonts.push_back(gui.addFont(opts.asString("fontsPath").c_str(), opts.asString("font1").c_str(), 22));
 	guifonts.push_back(gui.addFont(opts.asString("fontsPath").c_str(), opts.asString("font1").c_str(), 16));
-
-	gui.loadImages("../../Resources/models/maps", { "larrow.png","rarrow.png","darrow.png","uarrow.png","handle.png","radioon.png","radiooff.png" });
+	
+	//gui.loadImages("../../Resources/models/maps", { "larrow.png","rarrow.png","darrow.png","uarrow.png","handle.png","radioon.png","radiooff.png" });
 	// Setup GUI button styles ...
 	bsMenu.font = guifonts[1];
 	bsMenu.textColour = 0xff303030;
@@ -119,7 +121,7 @@ void Editor::loadModels(const std::string &modelsLibraryFile, const std::string 
 {
 	// Load 3D models and scene ...
 	loadOptions opts(modelsLibraryFile.c_str());
-
+	
 	setupGUI(opts);
 
 	nearzfarz = opts.asVec2f("nearzfarz");
@@ -159,45 +161,6 @@ void Editor::loadModels(const std::string &modelsLibraryFile, const std::string 
 	brush.touchable = false;
 	brushref = scene.append3D(brush);
 
-	//Pi3Cmodel textHello;
-	//livetext = "<h1>John 3</h1> New International Version (NIV)\n\n" \
-	//	"<h2>Jesus Teaches Nicodemus</h2>\n\n" \
-	//	"<h3>3</h3> Now there was a Pharisee, a man named Nicodemus who was a member of the Jewish ruling council. <sup>2</sup> He came to Jesus at night and said, " \
-	//	"\"Rabbi, we know that you are a teacher who has come from God. For no one could perform the signs you are doing if God were not with him.\"\n\n" \
-	//	"<sup>3</sup> Jesus replied, \"Very truly I tell you, no one can see the kingdom of God unless they are born again.[a]\"\n\n" \
-	//	"<sup>4</sup> \"How can someone be born when they are old?\" Nicodemus asked. “Surely they cannot enter a second time into their mother’s womb to be born!\"\n\n" \
-	//	"<sup>5</sup> Jesus answered, \"Very truly I tell you, no one can enter the kingdom of God unless they are born of water and the Spirit. <sup>6</sup> Flesh gives " \
-	//	"birth to flesh, but the Spirit[b] gives birth to spirit. <sup>7</sup> You should not be surprised at my saying, ‘You[c] must be born again.’ <sup>8</sup> The wind " \
-	//	"blows wherever it pleases. You hear its sound, but you cannot tell where it comes from or where it is going. So it is with everyone born of the Spirit.\"[d]\n\n" \
-	//	"<sup>9</sup> \"How can this be?\" Nicodemus asked.\n\n" \
-	//	"<sup>10</sup> \"You are Israel’s teacher,\" said Jesus, \"and do you not understand these things? <sup>11</sup> Very truly I tell you, we speak of what we know, " \
-	//	"and we testify to what we have seen, but still you people do not accept our testimony. <sup>12</sup> I have spoken to you of earthly things and you do not believe; " \
-	//	"how then will you believe if I speak of heavenly things? <sup>13</sup> No one has ever gone into heaven except the one who came from heaven—the Son of Man.[e] " \
-	//	"<sup>14</sup> Just as Moses lifted up the snake in the wilderness, so the Son of Man must be lifted up,[f] <sup>15</sup> that everyone who believes may have eternal" \
-	//	"life in him.\"[g]\n\n" \
-	//	"<sup>16</sup> For God so loved the world that he gave his one and only Son, that whoever believes in him shall not perish but have eternal life. <sup>17</sup> " \
-	//	"For God did not send his Son into the world to condemn the world, but to save the world through him. <sup>18</sup> Whoever believes in him is not condemned, but whoever " \
-	//	"does not believe stands condemned already because they have not believed in the name of God’s one and only Son. <sup>19</sup> This is the verdict: Light has come into " \
-	//	"the world, but people loved darkness instead of light because their deeds were evil. <sup>20</sup> Everyone who does evil hates the light, and will not come into the " \
-	//	"light for fear that their deeds will be exposed. <sup>21</sup> But whoever lives by the truth comes into the light, so that it may be seen plainly that what they have " \
-	//	"done has been done in the sight of God.\n\n" \
-	//	"<h3>John Testifies Again About Jesus</h3>\n\n" \
-	//	"<sup>22</sup> After this, Jesus and his disciples went out into the Judean countryside, where he spent some time with them, and baptized. <sup>23</sup> Now John also " \
-	//	"was baptizing at Aenon near Salim, because there was plenty of water, and people were coming and being baptized. <sup>24</sup> (This was before John was put in prison.) " \
-	//	"<sup>25</sup> An argument developed between some of John’s disciples and a certain Jew over the matter of ceremonial washing. <sup>26</sup> They came to John and said to " \
-	//	"him, \"Rabbi, that man who was with you on the other side of the Jordan—the one you testified about—look, he is baptizing, and everyone is going to him.\"\n\n" \
-	//	"<sup>27</sup> To this John replied, \"A person can receive only what is given them from heaven. <sup>28</sup> You yourselves can testify that I said, ‘I am not the " \
-	//	"Messiah but am sent ahead of him.’ <sup>29</sup> The bride belongs to the bridegroom. The friend who attends the bridegroom waits and listens for him, and is full " \
-	//	"of joy when he hears the bridegroom’s voice. That joy is mine, and it is now complete. <sup>30</sup> He must become greater; I must become less.\"[h]\n\n" \
-	//	"<sup>31</sup> The one who comes from above is above all; the one who is from the earth belongs to the earth, and speaks as one from the earth. The one who " \
-	//	"comes from heaven is above all. <sup>32</sup> He testifies to what he has seen and heard, but no one accepts his testimony. <sup>33</sup> Whoever has accepted " \
-	//	"it has certified that God is truthful. <sup>34</sup> For the one whom God has sent speaks the words of God, for God[i] gives the Spirit without limit. <sup>35</sup> " \
-	//	"The Father loves the Son and has placed everything in his hands. <sup>36</sup> <h3>Whoever believes</h3><i> in the Son has eternal life, but whoever rejects the Son will not see " \
-	//	"life, for God’s wrath remains on them.\"</i>";
-
-	//textHello.textModel(resource, gui.getFont(guifonts[0]).get(), livetext, 1200);
-	//textRef = scene.append3D(textHello);
-
 	// Create a humanoid ...
 	//Pi3Chumanoid::humanoidParams bodyParams;
 	//int32_t bodyRef = scene.append3D(body.create(resource, bodyParams));
@@ -207,21 +170,8 @@ void Editor::loadModels(const std::string &modelsLibraryFile, const std::string 
 	currentModel = modelsLib->group[0].name;
 	//Setup 2D interface ...
 
-	//Pi3Cfont *ffont = resource->findFont("NotoSans-Regular.ttf").get();
-	//if (ffont) {
-	//	std::shared_ptr<Pi3Ctexture> ttex = ffont->asTexture("Castle\nEditor", 0xffff00);
-	//	if (ttex->isValid()) {
-	//		Pi3Cmodel logo(resource, Pi3Cshapes::rect(vec2f(50, 200), vec2f(140, 80)));
-	//		logo.addPicture(resource, ttex);
-	//		scene.append2D(logo);
-	//	}
-	//}
-
 	// Setup humanoid body pointers (can corrupt if done too early)
 	//body.attachModel(scene.models[bodyRef]);
-
-	// Upload meshes to GPU after all geometries have been created ...
-	//resource->uploadMeshesToGPU();
 
 }
 

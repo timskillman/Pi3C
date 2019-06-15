@@ -1,6 +1,12 @@
 #include "Pi3Cparticles.h"
 
-Pi3Cmodel Pi3Cparticles::create(Pi3Cresource* resource, const vec3f& pos, const ixyz& area, const uint32_t minsize, const uint32_t maxsize, const uint32_t maxtypes, const uint32_t count)
+/*  Very rough particle system for snow only 
+
+Particles should eventally emit from a spherical area and move in a given direction and splay radius with a 'wander factor' and lifetime
+
+*/
+
+Pi3Cmodel Pi3Cparticles::create(Pi3Cresource* resource, const uint32_t count, const vec3f& pos, const ixyz& area, const uint32_t minsize, const uint32_t maxsize, const std::string &tex, uint32_t maxtypes)
 {
 	mesh.reset(new Pi3Cmesh);
 	mesh->verts.reserve(count * mesh->stride * 6);
@@ -15,7 +21,7 @@ Pi3Cmodel Pi3Cparticles::create(Pi3Cresource* resource, const vec3f& pos, const 
 
 	Pi3Cmodel model;
 	model.meshRef = resource->addMesh(mesh.get());
-	model.addTexture(resource, "../../Resources/models/maps/snowflakes4b.png");
+	model.addTexture(resource, tex);
 	model.material.illum = 1;
 	model.material.alpha = .99f;
 	mesh.reset();					//destroy the mesh in shapes and free up memory

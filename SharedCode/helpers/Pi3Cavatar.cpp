@@ -18,15 +18,24 @@ void Pi3Cavatar::init(const avatarParams &p)
 	onground = false;
 }
 
-void Pi3Cavatar::moveKeys(const SDL_Scancode k_forward, const SDL_Scancode k_back, const SDL_Scancode k_left, const SDL_Scancode k_right, const SDL_Scancode k_up, const SDL_Scancode k_down)
+SDL_Scancode Pi3Cavatar::mapkey(const std::string &key)
+{
+	auto findkey = keymap.find(key);
+	if (findkey != keymap.end()) return findkey->second;
+	return SDL_SCANCODE_UNKNOWN;
+}
+
+void Pi3Cavatar::doKeys()
 {
 	const Uint8 * keystate = SDL_GetKeyboardState(NULL);
-	if (keystate[k_forward]) forward();
-	if (keystate[k_back]) back();
-	if (keystate[k_left]) left();
-	if (keystate[k_right]) right();
-	if (keystate[k_up]) up();			//only when flying
-	if (keystate[k_down]) down();		//only when flying
+	if (keys.forward != "" && keys.forward[0] == 'K' && keystate[mapkey(keys.forward)]) forward();
+	if (keys.back != "" && keys.back[0] == 'K' && keystate[mapkey(keys.back)]) back();
+	if (keys.left != "" && keys.left[0] == 'K' && keystate[mapkey(keys.left)]) left();
+	if (keys.right != "" && keys.right[0] == 'K' && keystate[mapkey(keys.right)]) right();
+	if (keys.up != "" && keys.up[0] == 'K' && keystate[mapkey(keys.up)]) up();
+	if (keys.down != "" && keys.down[0] == 'K' && keystate[mapkey(keys.down)]) down();
+	if (keys.jump != "" && keys.jump[0] == 'K' && keystate[mapkey(keys.jump)]) jump();
+	faster = (keys.run != "" && keys.run[0] == 'K' && keystate[mapkey(keys.run)]);
 }
 
 void Pi3Cavatar::move(const float speed)
@@ -93,6 +102,11 @@ void Pi3Cavatar::updateAndCollide(const Pi3Cscene *scene, const float ticks)
 
 	if (scene != nullptr) {
 		if (movement==move_fly || (!scene->collide(footpos, bdir, 3.f) )) pos = nextpos; else this->ticks = 1.f; //&& !scene->collide(headpos, bdir, 8.f)
+
+		if (movement == move_fly) {
+			altitude = scene->collideFloor(pos);
+			//SDL_Log("Altitude = %f",floorHt);
+		}
 
 		if (movement != move_fly) {
 			//When walking, simply project a line down and find out where the floor is (collideFloor returns a height value)

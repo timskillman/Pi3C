@@ -78,12 +78,17 @@ int32_t Pi3Cscene::loadModelOBJ(const std::string &path, const std::string &file
 
 int32_t Pi3Cscene::loadSkybox(const std::string &path, const std::string &file, const std::function<void(float)> showProgressCB, const float scale)
 {
-	if (file == "") return -1;
-	Pi3Cmodel model;
-	model.loadOBJfile(resource, path, file, showProgressCB, false);
-	model.matrix.SetScale(scale);
-	skyboxes.push_back(model);
-	return skyboxes.size()-1;
+	int skybox = loadModelOBJ(path, file, showProgressCB); // loadbarCallback);
+	models[skybox].matrix.SetScale(scale);
+	models[skybox].touchable = false;
+
+	//if (file == "") return -1;
+	//Pi3Cmodel model;
+	//model.loadOBJfile(resource, path, file, showProgressCB, false);
+	//model.matrix.SetScale(scale);
+	//skyboxes.push_back(model);
+	//return skyboxes.size()-1;
+	return skybox;
 }
 
 Pi3Cmodel * Pi3Cscene::find(const std::string &name)

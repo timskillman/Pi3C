@@ -5,7 +5,6 @@
 #include "Pi3Cscene.h"
 #include "Pi3Cimgui.h"
 #include "Pi3Cmodel.h"
-#include "Pi3CspriteArray.h"
 #include <vector>
 
 // ==========================================================================
@@ -54,7 +53,7 @@ public:
 	int32_t load_model_and_collider(const std::string& path, const std::string& model, const std::string& collider, const vec3f& pos = vec3f(0, 0, 0));
 	int32_t add_model_to_scene2D(const Pi3Cmodel &model) { return scene.append2D(model); }
 	int32_t add_model_to_scene3D(const Pi3Cmodel &model) { return scene.append3D(model); }
-	int32_t add_spriteArray(Pi3CspriteArray &spritearray, const std::string &file = "");
+	//int32_t add_spriteArray(Pi3CspriteArray &spritearray, const std::string &file = "");
 
 	std::vector<float> * getMeshVerts(const uint32_t meshRef) { return &resource.vertBuffer[resource.meshes[meshRef].bufRef]; }
 	uint32_t getMeshVertPtr(const uint32_t meshRef) { return resource.meshes[meshRef].vertOffset*resource.meshes[meshRef].stride; }
@@ -81,7 +80,7 @@ public:
 	std::vector<std::string> get_dropfiles();
 
 	Pi3Cmodel * model(const uint32_t modelRef) { return &scene.models[modelRef]; }
-	Pi3CspriteArray * getSpriteArray(const uint32_t spriteArrayRef) { return (Pi3CspriteArray*)(&resource.meshes[spriteArrayRef]); }
+	//Pi3CspriteArray * getSpriteArray(const uint32_t spriteArrayRef) { return (Pi3CspriteArray*)(&resource.meshes[spriteArrayRef]); }
 
 	Pi3Cwindow::options winopts;
 	static Pi3Cwindow window;

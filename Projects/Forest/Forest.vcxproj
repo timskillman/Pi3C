@@ -224,7 +224,6 @@
     <ClCompile Include="..\..\SharedCode\core\Pi3Cscene.cpp" />
     <ClCompile Include="..\..\SharedCode\core\Pi3Cshader.cpp" />
     <ClCompile Include="..\..\SharedCode\core\Pi3Cshapes.cpp" />
-    <ClCompile Include="..\..\SharedCode\core\Pi3CspriteArray.cpp" />
     <ClCompile Include="..\..\SharedCode\core\Pi3Ctexture.cpp" />
     <ClCompile Include="..\..\SharedCode\core\Pi3Ctouch.cpp" />
     <ClCompile Include="..\..\SharedCode\core\Pi3Ctriangle.cpp" />
@@ -246,6 +245,7 @@
     <ClCompile Include="..\..\SharedCode\helpers\Pi3Cavatar.cpp" />
     <ClCompile Include="..\..\SharedCode\helpers\Pi3Chtml.cpp" />
     <ClCompile Include="..\..\SharedCode\helpers\Pi3CloadOptions.cpp" />
+    <ClCompile Include="..\..\SharedCode\helpers\Pi3Cpopulate.cpp" />
     <ClCompile Include="..\..\SharedCode\ui\Pi3Cimgui.cpp" />
     <ClCompile Include="..\..\SharedCode\ui\Pi3Cstring.cpp" />
     <ClCompile Include="Source\Forest.cpp" />
@@ -265,7 +265,6 @@
     <ClInclude Include="..\..\SharedCode\core\Pi3Cshader.h" />
     <ClInclude Include="..\..\SharedCode\core\Pi3Cshapes.h" />
     <ClInclude Include="..\..\SharedCode\core\Pi3Csound.h" />
-    <ClInclude Include="..\..\SharedCode\core\Pi3CspriteArray.h" />
     <ClInclude Include="..\..\SharedCode\core\Pi3Ctextformat.h" />
     <ClInclude Include="..\..\SharedCode\core\Pi3Ctexture.h" />
     <ClInclude Include="..\..\SharedCode\core\Pi3Ctouch.h" />
@@ -294,6 +293,7 @@
     <ClInclude Include="..\..\SharedCode\helpers\Pi3Cavatar.h" />
     <ClInclude Include="..\..\SharedCode\helpers\Pi3Chtml.h" />
     <ClInclude Include="..\..\SharedCode\helpers\Pi3CloadOptions.h" />
+    <ClInclude Include="..\..\SharedCode\helpers\Pi3Cpopulate.h" />
     <ClInclude Include="..\..\SharedCode\ui\Pi3Cimgui.h" />
     <ClInclude Include="..\..\SharedCode\ui\Pi3Cstring.h" />
   </ItemGroup>

@@ -68,8 +68,9 @@ public:
 
 	void updateBolt(const uint32_t b)
 	{
-		float dx = pos[b].z * width; float dy = -pos[b].x *width;
-
+		float dx = pos[b].z * width; 
+		float dy = -pos[b].x *width;
+		
 	}
 
 	void animate()
@@ -92,7 +93,10 @@ public:
 	int32_t count = -1;
 };
 
-//float rnd(const uint32_t size) { return (float)(rand() % size); }
+void changeShip(int shipType)
+{
+
+}
 
 int main(int argc, char *argv[])
 {
@@ -114,7 +118,7 @@ int main(int argc, char *argv[])
 	avparams.fallSpeed = opts.asFloat("avatarFallSpeed");
 	player.init(avparams);
 	
-	int landRef = pi3c.load_model("../../Resources/models", opts.asString("landscape"));
+	int landRef = pi3c.load_model(opts.asString("modelPath"), opts.asString("landscape"));
 	pi3c.scene.models[landRef].asCollider = true;  //use this model as a collider
 
 	//Scatter trees in round clusters ...
@@ -122,21 +126,23 @@ int main(int argc, char *argv[])
 	uint32_t maxTreeTypes = 4;
 
 	//Setup our tree array ...
+	SDL_Log("Setting up %d trees ...",maxTrees);
 	Pi3Cpopulate trees;
 	Pi3Cmodel treesModel = trees.Populate(&pi3c.resource, maxTrees, pi3c.scene.models[landRef], "../../Resources/models/maps/redwoods.png", maxTreeTypes, 500.f);
 	int treesModelRef = pi3c.add_model_to_scene3D(treesModel);
 
+	//Pi3Cmodel altimeter;
+	//altimeter.appendMesh(&pi3c.resource, Pi3Cshapes::rect(vec2f(20, 20), vec2f(1, 1), 0x00ff00),false);
+	//int32_t altref = pi3c.scene.append2D(altimeter);
+
 	boltArray bolts;
 
-	int skybox = pi3c.scene.loadModelOBJ(opts.asString("skyboxPath"), opts.asString("skybox"), 0); // loadbarCallback);
-	pi3c.scene.models[skybox].matrix.SetScale(opts.asFloat("skyboxScale"));
-	pi3c.scene.models[skybox].touchable = false;
+	SDL_Log("Loading models ...");
+	int skybox = pi3c.scene.loadSkybox(opts.asString("skyboxPath"), opts.asString("skybox"), 0, opts.asFloat("skyboxScale")); // loadbarCallback);
+	int airport = pi3c.load_model(opts.asString("modelPath"), "airport.obj", vec3f(-500, 0, 0));
 
-	
-	int airport = pi3c.load_model("../../Resources/models", "airport.obj", vec3f(-500,0,0));
-
-	int sship = pi3c.load_model("../../Resources/models", "EagleTransporter.obj"); //sship3 //EagleTransporter // NMSship
-	int cockpit = pi3c.load_model("../../Resources/models", "sshipCockpit2.obj"); //sship //EagleTransporter // NMSship
+	int sship = pi3c.load_model(opts.asString("modelPath"), "sship4.obj"); //sship3 //EagleTransporter // NMSship
+	int cockpit = pi3c.load_model(opts.asString("modelPath"), "sshipCockpit2.obj"); //sship //EagleTransporter // NMSship
 
 	int ship = sship;
 	Pi3Cbbox3d shipbox = pi3c.model(ship)->bbox;
@@ -144,28 +150,37 @@ int main(int argc, char *argv[])
 	pi3c.scene.setFog(opts.asHex("fogColour"), opts.asFloat("fogNear"), opts.asFloat("fogFar"));
 	pi3c.scene.setPerspective3D(screenWidth, screenHeight, opts.asFloat("perspective"), opts.asFloat("nearz"), opts.asFloat("farz"));
 	
-
+	SDL_Log("Loading music and sounds ...");
+	
 	Mix_Music *menuMusic = nullptr;
-	if (opts.asString("sound") != "") {
-		if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0) {
-			SDL_Log("couldn't initialize mix, error: %s\n", Mix_GetError());
-		}
-		SDL_Log("Loading sound");
-		std::string spath = opts.asString("soundPath") + "/" + opts.asString("sound");
-		menuMusic = Mix_LoadMUS(spath.c_str());
-		if (Mix_PlayingMusic() == 0) Mix_PlayMusic(menuMusic, -1);
-	}
+	std::string spath = opts.asString("musicPath") + "/ActionStrike.ogg";
+	menuMusic = Mix_LoadMUS(spath.c_str());
+	if (Mix_PlayingMusic() == 0) Mix_PlayMusic(menuMusic, -1);
+	
+	Mix_Chunk *sound_laser = nullptr;
+	spath = opts.asString("soundPath") + "/alien_laser_1.ogg";
+	sound_laser = Mix_LoadWAV(spath.c_str());
+	
+	Mix_Chunk *sound_engineRunning = nullptr;
+	spath = opts.asString("soundPath") + "/afterburner_1.ogg";
+	sound_engineRunning = Mix_LoadWAV(spath.c_str());
+	
+	Mix_Chunk *sound_cockpit = nullptr;
+	spath = opts.asString("soundPath") + "/cockpit_interior_rumble.ogg";
+	sound_cockpit = Mix_LoadWAV(spath.c_str());
+	
+	Mix_PlayChannel(1, sound_engineRunning, -1);
+	
+	//std::shared_ptr<Pi3Cmusic> music = pi3c.resource.addMusic(opts.asString("musicPath"), "ActionStrike.ogg");
+	//std::shared_ptr<Pi3Csound> sound_laser = pi3c.resource.addSound(opts.asString("soundPath"), "alien_laser_1.ogg");
+	//std::shared_ptr<Pi3Csound> sound_engineRunning = pi3c.resource.addSound(opts.asString("soundPath"), "afterburner_1.ogg");
+	//std::shared_ptr<Pi3Csound> sound_cockpit = pi3c.resource.addSound(opts.asString("soundPath"), "cockpit_interior_rumble.ogg");
 
-	//for (size_t m = 0; m < opts.models.size(); m++) {
-	//	int32_t modelRef = pi3c.scene.loadModelOBJ(opts.modelPath, opts.models[m], nullptr); // loadbarCallback);
-	//	if (opts.colliders[m] != "") {
-	//		Pi3Cmodel collider(&pi3c.resource, opts.modelPath, opts.colliders[m]); // , loadbarCallback, true);
-	//		pi3c.scene.models[modelRef].appendCollider(collider);
-	//	}
-	//	//if (modelRef >= 0) pi3c.scene.models[modelRef].matrix.setMoveRotate(opts.positions[m],opts.rotations[m]);
-	//}
-
-	//pi3c.resource.uploadMeshesToGPU();
+	SDL_Log("Setting up sounds ...");
+	//music->play(-1);
+	//music->volume(120);
+	//sound_engineRunning->play(1,-1);
+	//sound_engineRunning->volume(60);
 
 	vec3f shipRot;
 	float rollDelta = 0;
@@ -182,31 +197,29 @@ int main(int argc, char *argv[])
 		//player.moveKeys(SDL_SCANCODE_W, SDL_SCANCODE_S, SDL_SCANCODE_A, SDL_SCANCODE_D, SDL_SCANCODE_R, SDL_SCANCODE_F);
 		const uint8_t *keystate = pi3c.window.getKeys();
 		player.run(keystate[SDL_SCANCODE_LSHIFT] || keystate[SDL_SCANCODE_RSHIFT]);
-		if (keystate[SDL_SCANCODE_W])  player.flyspeed += 0.1f; // player.forward();
-		if (keystate[SDL_SCANCODE_S]) player.flyspeed -= 0.1f;  //player.back();
-		if (keystate[SDL_SCANCODE_Z] || keystate[SDL_SCANCODE_X]) {
-			//player.left();
-			float ldelta = (keystate[SDL_SCANCODE_Z]) ? 0.03f : -0.03f;
-			player.rotate(vec3f(0, ldelta, 0));
-			shipRot.y -= ldelta;
-			shipRot.z += ldelta*0.5f;
-		}
-		if (keystate[SDL_SCANCODE_SLASH] || keystate[SDL_SCANCODE_APOSTROPHE]) {
-			float ldelta = (keystate[SDL_SCANCODE_SLASH]) ? 0.02f : -0.02f;
-			player.rotate(vec3f(ldelta, 0, 0));
-			shipRot.x -= ldelta *0.5f;
-			//shipRot.y -= ldelta;
-			//shipRot.z += ldelta * 0.5f;
-		}
+		if (keystate[SDL_SCANCODE_W])  player.flyspeed += 0.2f; // player.forward();
+		if (keystate[SDL_SCANCODE_S]) player.flyspeed -= 0.2f;  //player.back();
+		//if (keystate[SDL_SCANCODE_Z] || keystate[SDL_SCANCODE_X]) {
+		//	//player.left();
+		//	float ldelta = (keystate[SDL_SCANCODE_Z]) ? 0.03f : -0.03f;
+		//	player.rotate(vec3f(0, ldelta, 0));
+		//	shipRot.y -= ldelta;
+		//	shipRot.z += ldelta*0.5f;
+		//}
+		//if (keystate[SDL_SCANCODE_SLASH] || keystate[SDL_SCANCODE_APOSTROPHE]) {
+		//	float ldelta = (keystate[SDL_SCANCODE_SLASH]) ? 0.02f : -0.02f;
+		//	player.rotate(vec3f(ldelta, 0, 0));
+		//	shipRot.x -= ldelta *0.5f;
+		//	//shipRot.y -= ldelta;
+		//	//shipRot.z += ldelta * 0.5f;
+		//}
 		//if (keystate[SDL_SCANCODE_D]) player.right();
 		if (keystate[SDL_SCANCODE_R]) player.up();			//only when flying
 		if (keystate[SDL_SCANCODE_F]) player.down();		//only when flying
-		if (keystate[SDL_SCANCODE_SPACE]) player.jump();	//only when walking
-		if (keystate[SDL_SCANCODE_ESCAPE]) pi3c.window.setquit(true);
-		if (keystate[SDL_SCANCODE_C]) ship = cockpit; 
-		if (keystate[SDL_SCANCODE_V]) ship = sship;
-		//if (keystate[SDL_SCANCODE_SPACE]) player.flyspeed += 0.1f; // takeoff = 0.1f;
-		//if (keystate[SDL_SCANCODE_L]) player.flyspeed -= 0.1f; //takeoff = -0.1f;
+		//if (keystate[SDL_SCANCODE_SPACE]) player.jump();	//only when walking
+
+		if (keystate[SDL_SCANCODE_C]) { ship = cockpit; Mix_PlayChannel(1, sound_cockpit, -1); } //sound_cockpit->play(1, -1); }
+		if (keystate[SDL_SCANCODE_V]) { ship = sship; Mix_PlayChannel(1, sound_engineRunning, -1); } //sound_engineRunning->play(1, -1); }
 		if (keystate[SDL_SCANCODE_RETURN]) bolts.fireBolt(-player.getPosition(), player.getRotation());
 
 		if (takeoff != 0) {
@@ -229,19 +242,19 @@ int main(int argc, char *argv[])
 		while (pi3c.do_events()) {
 			switch (pi3c.window.ev.type)
 			{
-			case SDL_TEXTINPUT:
-				//SDL_Log("Key = %d", pi3c.window.ev.text.text);
-				break;
 			case SDL_MOUSEMOTION:
 				//{
 				if (pi3c.window.mouse.RightButton) {
 					vec3f rotDelta(pi3c.window.mouse.deltaXY.y / 300.f, -pi3c.window.mouse.deltaXY.x / 300.f, 0);
 					player.rotate(rotDelta);
-					shipRot.y -= rotDelta.y;
-					shipRot.z += rotDelta.y; // *0.5f;
-					shipRot.x -= rotDelta.x; // *0.5f;
+					shipRot -= vec3f(rotDelta.x, rotDelta.y, -rotDelta.y);
 				}
 				break;
+			case SDL_MOUSEBUTTONDOWN:
+				if (pi3c.window.mouse.LeftButton) {
+					Mix_PlayChannel(0, sound_laser, 0);
+					//sound_laser->play(0, 0);
+				}
 			case SDL_MOUSEWHEEL:
 				break;
 			case SDL_WINDOWEVENT:
@@ -255,7 +268,7 @@ int main(int argc, char *argv[])
 		pi3c.model(ship)->move(-player.getPosition()+offset);
 		pi3c.model(ship)->matrix.setRotate(shipRot);
 		if (shipRot.z != 0) shipRot.z *= 0.95f;			//dampened roll to 0
-		//if (shipRot.x != 0) shipRot.x *= 0.95f;			//dampened pitch to 0
+		if (shipRot.x != 0 && ship == sship) shipRot.x *= 0.7f;			//dampened pitch to 0
 
 		//clear background ...
 		pi3c.clear_window();
@@ -263,15 +276,15 @@ int main(int argc, char *argv[])
 		//Render 3D scene ...
 		pi3c.scene.setMatrix(player.getPosition(), vec3f(0, 0, 0), player.getRotation());
 
-		//treesModel.updateSpriteBillboard(&pi3c.resource, trees.positions, trees.sizes, -player.getPosition());
-
 		pi3c.scene.setSun(0xffffff, vec3f(5000.f, 5000.f, -5000.f)); //transform sun position into scene
 		pi3c.render3D();
 		
 		//Render 2D
+		//pi3c.model(altref)->resizeRect2D(&pi3c.resource, vec2f(20, 20), vec2f(20, player.altitude));
 		pi3c.render2D();
+
 		gui.Begin();
-		std::string fps = "FPS:" + std::to_string((int)pi3c.getCurrentFPS());
+		std::string fps = "Altitude:" + std::to_string((int)player.altitude);
 		gui.Text(fps, 0xff0000ff);
 
 		pi3c.swap_buffers();

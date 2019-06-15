@@ -5,6 +5,11 @@
 class Pi3Cpopulate {
 public:
 
+	struct mapper {
+		std::vector<Pi3Cmodel> mergeModels;
+		const std::string mapImagePath;
+	};
+
 	struct shapeArray {
 
 		void init(const uint32_t maxTypes) {

@@ -1,0 +1,53 @@
+
+newmtl angar
+Kd 1 1 1
+Ks 1 1 1
+Ns 1000
+map_Kd maps/angar.jpg
+
+newmtl ashphalt
+Kd 1 1 1
+Ks 1 1 1
+illum 2
+map_Kd maps/ashphalt.jpg
+
+newmtl glow
+Kd 1 1 1
+Ks 1 1 1
+Ns 1000
+illum 0
+map_Kd maps/blueglow.png
+
+newmtl panels
+Kd 1 1 1
+Ks 1 1 1
+Ns 1000
+map_Kd maps/fx3_panels.png
+
+newmtl wpanels
+Kd 1 1 1
+Ks 1 1 1
+Ns 1000
+map_Kd maps/wpanels.png
+
+newmtl glass
+Kd .5 .5 1
+Ks 1 1 1
+Ns 1000
+illum 2
+Tr 0.5
+
+newmtl blackleather
+Kd 1 1 1
+Ks 1 1 1
+Ns 1000
+map_Kd maps/blackleather.jpg
+
+newmtl target
+Kd 1 1 1
+Ks 1 1 1
+Ns 1000
+Tr 0.99
+illum 0
+map_Kd maps/target.png
+

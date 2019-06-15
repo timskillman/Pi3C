@@ -102,10 +102,9 @@ public:
 	
 	int32_t addShader(const std::string &vertfile, const std::string &fragfile);
 	void addFont(const char * path, const char * fontfile, int ptsize);
-	void addMusic(const char * path, const char * musicfile);
-	void addSound(const char * path, const char * soundfile);
+	std::shared_ptr<Pi3Cmusic> addMusic(const std::string& path, const std::string& musicfile);
+	std::shared_ptr<Pi3Csound> addSound(const std::string& path, const std::string& soundfile);
 
-	
 
 	std::shared_ptr<Pi3Cfont> findFont(const std::string &ffont) { return findResource(fonts, ffont); }
 	std::shared_ptr<Pi3Cmusic> findMusic(const std::string &fmusic) { return findResource(music, fmusic); }

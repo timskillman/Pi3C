@@ -147,7 +147,8 @@ float Pi3C::getCurrentFPS()
 void Pi3C::showFPS()
 {
 	gui.Begin();
-	gui.Text("FPS:" + std::to_string((int)getCurrentFPS()));
+	std::string fps = "FPS:" + std::to_string((int)getCurrentFPS());
+	gui.Text(fps);
 }
 
 void Pi3C::resize_window()

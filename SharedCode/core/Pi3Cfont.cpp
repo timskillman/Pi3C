@@ -107,7 +107,7 @@ void Pi3Cfont::createFontSheet(const uint32_t sheetWidth, const uint32_t sheetHe
 	fontsheet.sheetMaterial.alpha = 0.99f;
 	fontsheet.sheetMaterial.illum = 1; //non shaded illuminat
 
-	fontsheet.sheet->saveAsPNG("textureSheet.png"); //debug
+	//fontsheet.sheet->saveAsPNG("textureSheet.png"); //debug
 	SDL_FreeSurface(destSurface);
 }
 

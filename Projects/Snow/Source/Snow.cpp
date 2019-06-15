@@ -35,12 +35,15 @@
 
 int main(int argc, char *argv[])
 {
-	Pi3C pi3c("Snow", 1920, 1080, false);
+	Pi3C pi3c("Snow", 1920, 1080, true);
 
 	uint32_t bkg = pi3c.create_background("../../Resources/models/maps/snowpath.jpg");  // wintersnow (must be rendered before snowflakes)
 
 	Pi3Cparticles snowParticles;
-	Pi3Cmodel snowmodel = snowParticles.create(&pi3c.resource, vec3f(0, pi3c.height(), -10.f), Pi3Cparticles::ixyz(pi3c.width(), pi3c.height(), 0), 2, 8, 4, 5000);
+	Pi3Cmodel snowmodel = snowParticles.create(&pi3c.resource, 4000,
+		vec3f(0, pi3c.height(), -10.f), Pi3Cparticles::ixyz(pi3c.width(), pi3c.height(), 0), 2, 8,
+		"../../Resources/models/maps/snowflakes4b.png", 4);
+
 	int snowRef = pi3c.add_model_to_scene2D(snowmodel);
 
 	while (pi3c.is_running())

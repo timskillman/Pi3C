@@ -23,6 +23,9 @@ void Pi3Cresource::init(const uint32_t stride)
 	Pi3Cmesh rect = Pi3Cshapes::rect(vec2f(0, 0), vec2f(1.f, 1.f));
 	rectRef = addMesh(&rect); //buffer used for creating models etc..
 
+	if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0) {
+		SDL_Log("couldn't initialize mix, error: %s\n", Mix_GetError());
+	}
 }
 
 void Pi3Cresource::createDefaultMaterial(const std::string &name)
@@ -253,16 +256,21 @@ void Pi3Cresource::addFont(const char * path, const char * fontfile, int ptsize)
 	if (font->font) fonts.insert({ fontfile, font });
 }
 
-void Pi3Cresource::addMusic(const char * path, const char * musicfile) {
+std::shared_ptr<Pi3Cmusic> Pi3Cresource::addMusic(const std::string& path, const std::string& musicfile) {
+	std::string musicpath = (path.size() > 0 && *(path.end() - 1) != '/') ? path + "/" + musicfile : musicfile;
+	SDL_Log("Loading music %s", musicpath.c_str());
 	std::shared_ptr<Pi3Cmusic> smusic;
-	smusic.reset(new Pi3Cmusic(musicfile));
+	smusic.reset(new Pi3Cmusic(musicpath.c_str()));
 	if (smusic->music) music.insert({ musicfile, smusic });
+	return smusic;
 }
 
-void Pi3Cresource::addSound(const char * path, const char * soundfile) {
+std::shared_ptr<Pi3Csound> Pi3Cresource::addSound(const std::string& path, const std::string& soundfile) {
+	std::string soundpath = (path.size() > 0 && *(path.end() - 1) != '/') ? path + "/" + soundfile : soundfile;
 	std::shared_ptr<Pi3Csound> sound;
-	sound.reset(new Pi3Csound(soundfile));
+	sound.reset(new Pi3Csound(soundpath.c_str()));
 	if (sound->sound) sounds.insert({ soundfile, sound });
+	return sound;
 }
 
 void Pi3Cresource::clearAll()
