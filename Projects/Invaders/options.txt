@@ -1,4 +1,4 @@
-title:Forest flight
+title:Invaders!
 fullscreen:true
 screenWidth:800
 screenHeight:480

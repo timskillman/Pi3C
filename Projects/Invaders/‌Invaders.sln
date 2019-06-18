@@ -2,7 +2,7 @@
 # Visual Studio 14
 VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{DA75C201-04BB-4D48-8DCC-C336AE6D4305}") = "Forest", "Forest.vcxproj", "{86B9CF91-8738-B044-A7BF-A295F9323D12}"
+Project("{DA75C201-04BB-4D48-8DCC-C336AE6D4305}") = "Invaders", "Invaders.vcxproj", "{86B9CF91-8738-B044-A7BF-A295F9323D12}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
