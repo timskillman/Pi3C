@@ -1,14 +1,14 @@
 title:Forest flight
 fullscreen:true
-screenWidth:1440	
-screenHeight:900
+screenWidth:800
+screenHeight:480
 
-trees:10000
+trees:30000
 fly:true
 lightpos:0.0 1.0 0.0
 startpos:0.0 -30 0.0
 rotate:0.0 0.0 0.0
-perspective:800.0
+perspective:500.0
 nearz:0.1
 farz:25000.0
 avatarHeight:12.0
@@ -23,7 +23,7 @@ musicPath:../../Resources/music/RafaelKrux
 soundPath:../../Resources/sounds
 
 #Landscape selection: Mountains.obj, landscape.obj
-landscape:landscape.obj
+landscape:Mountains.obj
 skyboxPath:../../Resources/models/skyboxes
 skybox:stormy2.obj
 skyboxScale:25.0
