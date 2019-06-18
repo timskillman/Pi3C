@@ -1,7 +1,7 @@
 title:Invaders!
 fullscreen:true
-screenWidth:800
-screenHeight:480
+screenWidth:1440
+screenHeight:900
 
 trees:30000
 fly:true
