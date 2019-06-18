@@ -1,5 +1,5 @@
 title:Castle Editor
 fullscreen:false
 screenWidth:800
-screenHeight:480
+screenHeight:400
 
