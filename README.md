@@ -41,7 +41,7 @@ I hope that you will enjoy your experience with Pi3C!
   - [Pi3C folders](#pi3cfolders)
   - [Projects Folder](#projects)
   - [Build, Run, Clean, Repeat](#buildrunproj)
-  - [Programming tools](#progtools)
+  - [Keeping up-to-date](#update)
   
 [**4. Hello 3D World!**](#helloworld)
 
@@ -192,9 +192,10 @@ Of course, we're trying out precompiled examples - so let's get coding your own 
 <a name="buildrunproj"></a>
 ## Build, Run, Clean, Repeat
 
-If setup correctly, Pi3C examples and tools should be ready to build and run.  To build a project do the following;
+If setup correctly, Pi3C examples and tools should be ready to build and run.  
+To build a project do the following;
 
-**1. Enter the Project folder you want to build ...**
+**1. Enter the Project folder you want to build**
 ~~~~
 cd Invaders
 ~~~~
@@ -213,7 +214,8 @@ Once built, you will notice a "_build" folder appearing next to the Pi3C folder.
 
 **3. Run**
 
-You will also notice the built, executable file in your project folder.  To run the executable on the Rasspberry Pi (Invaders for example), type;
+You will also notice the built, executable file in your project folder.  
+To run the executable on the Raspberry Pi (Invaders for example), type;
 
 ~~~~
 ./Invaders
@@ -221,15 +223,25 @@ You will also notice the built, executable file in your project folder.  To run 
 
 **4. Clean**
 
-Sometimes your project won't compile as expected - and that's not due to any bad coding! ... For example, if you update Pi3C, the object files in the build folder need cleaning out!  To clean the project entirely, type;
+Sometimes your project won't compile as expected - and that's not due to any bad coding! ... For example, if you update Pi3C, the object files in the build folder need cleaning out.  To clean the project entirely, type;
 
 ~~~~
 make clean
 ~~~~
 
-This basically deleted all the object files in the build folder (note: don't worrry, it wont delete anything important!)
+This basically deletes all the object files in the build folder (note: don't worrry, it won't delete anything important)
 Cleaning will ensure that all your built code is fresh and using the latest changes.
 
+<a name="update"></a>
+## Keep up-to-date
 
-<a name="progtools">**Programming tools**</a>
+Keeping up-to-date with the latest code is simple.  n a terminal window navigate to the Pi3C folder,  and type;
+
+~~~~
+git pull origin master
+~~~~
+
+This command will import (pull) all the latest changes to Pi3C from the GIT repository.
+
+
 
