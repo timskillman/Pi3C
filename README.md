@@ -40,7 +40,7 @@ I hope that you will enjoy your experience with Pi3C!
 [**3. Trying the Examples**](#tryexamples)
   - [Pi3C folders](#pi3cfolders)
   - [Projects Folder](#projects)
-
+  - [Build, Run, Clean, Repeat](#buildrunproj)
   - [Programming tools](#progtools)
   
 [**4. Hello 3D World!**](#helloworld)
@@ -189,6 +189,26 @@ Try the other examples such as **Invaders, Snow, 3D modeller** and others using 
 
 Of course, we're trying out precompiled examples - so let's get coding your own stuff!
 
+<a name="buildrunproj">**Build, Run, Clean, Repeat**</a>
+
+If setup correctly, Pi3C examples and tools should be ready to build and run.  To build a project do the following;
+
+1. Enter the Project folder you want to build ...
+~~~~
+cd Invaders
+~~~~
+(tip: you don't need to type the whole word 'Invaders' ... just the first few characters such as 'Inv' and then press the TAB key ... this will complete the word, avoid spelling mistakes and is a lot quicker. You can do this for shortcut for any part of long pathname for example)
+
+2. Build with 'make'
+~~~~
+make
+~~~~
+
+Make will build the whole project and all of its dependent code.  
+
+Dependent code in this case is 'SharedCode' containing Pi3C.  If not built previously, Pi3C code will also build and it can take some time.  However, this only happens once since the compiler is clever enough to only compile code that has changed after that.
+
+Once built with make, you will notice a "_build" folder appearing next to the Pi3C folder.  This folder contains all the object files created from the source.  These files are then 'linked' together to create the final program.
 
 <a name="progtools">**Programming tools**</a>
 
