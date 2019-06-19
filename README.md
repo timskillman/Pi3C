@@ -235,7 +235,7 @@ Cleaning will ensure that all your built code is fresh and using the latest chan
 <a name="update"></a>
 ## Keep up-to-date
 
-Keeping up-to-date with the latest code is simple.  n a terminal window navigate to the Pi3C folder,  and type;
+Keeping up-to-date with the latest code is simple.  In a terminal window navigate to the Pi3C folder,  and type;
 
 ~~~~
 git pull origin master
