@@ -232,6 +232,8 @@ make clean
 This basically deletes all the object files in the build folder (note: don't worrry, it won't delete anything important)
 Cleaning will ensure that all your built code is fresh and using the latest changes.
 
+You should clean after updating Pi3C (see next section). 
+
 <a name="update"></a>
 ## Keep up-to-date
 
