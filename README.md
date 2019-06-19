@@ -199,7 +199,7 @@ To build a project do the following;
 ~~~~
 cd Invaders
 ~~~~
-(tip: you don't need to type the whole word 'Invaders' ... just the first few characters such as 'Inv' and then press the TAB key ... this will complete the word, avoid spelling mistakes and is a lot quicker. You can do this for shortcut for any part of long pathname for example)
+Note: you don't need to type the whole word 'Invaders' ... type the first few characters such as 'Inv' and then press the TAB key ... this will auto-complete the word. You can do this shortcut for any part of a long pathname for example.
 
 **2. Build with 'make'**
 ~~~~
