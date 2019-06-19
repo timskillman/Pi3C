@@ -189,17 +189,18 @@ Try the other examples such as **Invaders, Snow, 3D modeller** and others using 
 
 Of course, we're trying out precompiled examples - so let's get coding your own stuff!
 
-<a name="buildrunproj">**Build, Run, Clean, Repeat**</a>
+<a name="buildrunproj"></a>
+## Build, Run, Clean, Repeat
 
 If setup correctly, Pi3C examples and tools should be ready to build and run.  To build a project do the following;
 
-1. Enter the Project folder you want to build ...
+**1. Enter the Project folder you want to build ...**
 ~~~~
 cd Invaders
 ~~~~
 (tip: you don't need to type the whole word 'Invaders' ... just the first few characters such as 'Inv' and then press the TAB key ... this will complete the word, avoid spelling mistakes and is a lot quicker. You can do this for shortcut for any part of long pathname for example)
 
-2. Build with 'make'
+**2. Build with 'make'**
 ~~~~
 make
 ~~~~
@@ -208,7 +209,27 @@ Make will build the whole project and all of its dependent code.
 
 Dependent code in this case is 'SharedCode' containing Pi3C.  If not built previously, Pi3C code will also build and it can take some time.  However, this only happens once since the compiler is clever enough to only compile code that has changed after that.
 
-Once built with make, you will notice a "_build" folder appearing next to the Pi3C folder.  This folder contains all the object files created from the source.  These files are then 'linked' together to create the final program.
+Once built, you will notice a "_build" folder appearing next to the Pi3C folder.  This folder contains all the object files created from the source.  These files are then 'linked' together to create the final program.
+
+**3. Run**
+
+You will also notice the built, executable file in your project folder.  To run the executable on the Rasspberry Pi (Invaders for example), type;
+
+~~~~
+./Invaders
+~~~~
+
+**4. Clean**
+
+Sometimes your project won't compile as expected - and that's not due to any bad coding! ... For example, if you update Pi3C, the object files in the build folder need cleaning out!  To clean the project entirely, type;
+
+~~~~
+make clean
+~~~~
+
+This basically deleted all the object files in the build folder (note: don't worrry, it wont delete anything important!)
+Cleaning will ensure that all your built code is fresh and using the latest changes.
+
 
 <a name="progtools">**Programming tools**</a>
 
