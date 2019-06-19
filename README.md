@@ -40,7 +40,7 @@ I hope that you will enjoy your experience with Pi3C!
 [**3. Trying the Examples**](#tryexamples)
   - [Pi3C folders](#pi3cfolders)
   - [Projects Folder](#projects)
-  - [Build, Run, Clean, Repeat](#buildrunproj)
+  - [Build, Run and Clean](#buildrunproj)
   - [Keeping up-to-date](#update)
   
 [**4. Hello 3D World!**](#helloworld)
@@ -190,7 +190,7 @@ Try the other examples such as **Invaders, Snow, 3D modeller** and others using 
 Of course, we're trying out precompiled examples - so let's get coding your own stuff!
 
 <a name="buildrunproj"></a>
-## Build, Run, Clean, Repeat
+## Build, Run and Clean
 
 If setup correctly, Pi3C examples and tools should be ready to build and run.  
 To build a project do the following;
@@ -223,7 +223,7 @@ To run the executable on the Raspberry Pi (Invaders for example), type;
 
 **4. Clean**
 
-Sometimes your project won't compile as expected - and that's not due to any bad coding! ... For example, if you update Pi3C, the object files in the build folder need cleaning out.  To clean the project entirely, type;
+Sometimes your project won't compile as expected - and that's not due to any bad coding! ... For example, when you update Pi3C the object files in the build folder need cleaning out.  To clean the project entirely, type;
 
 ~~~~
 make clean
@@ -232,7 +232,7 @@ make clean
 This basically deletes all the object files in the build folder (note: don't worrry, it won't delete anything important)
 Cleaning will ensure that all your built code is fresh and using the latest changes.
 
-You should clean after updating Pi3C (see next section). 
+You should clean after updating Pi3C or making significant changes.  However, it is not necessary if Pi3C SharedCode has not changed. 
 
 <a name="update"></a>
 ## Keep up-to-date
@@ -243,7 +243,7 @@ Keeping up-to-date with the latest code is simple.  In a terminal window navigat
 git pull origin master
 ~~~~
 
-This command will import (pull) all the latest changes to Pi3C from the GIT repository.
+This command will import (pull) all the latest Pi3C changes from the GIT repository.
 
 
 
