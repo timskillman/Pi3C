@@ -175,6 +175,8 @@ bool Pi3C::do_events()
 			break;
 		}
 		break;
+	case SDL_KEYDOWN:
+		break;
 	}
 	return true;
 

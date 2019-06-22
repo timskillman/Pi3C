@@ -48,6 +48,7 @@ void Pi3Ctexture::createColour(uint32_t col)
 
 void Pi3Ctexture::create(uint32_t width, uint32_t height, uint32_t bytesPerPixel)
 {
+	init();
 	textureID = 0;
 	this->width = width;
 	this->height = height;
@@ -212,6 +213,12 @@ void Pi3Ctexture::upload()
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		uploaded = true;
 	}
+}
+
+void Pi3Ctexture::update()
+{
+	glBindTexture(GL_TEXTURE_2D, textureID);
+	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height, format, GL_UNSIGNED_BYTE, pixels);
 }
 
 void Pi3Ctexture::changeTexels(uint8_t * texels, const GLint x, const GLint y, GLint w, GLint h) {

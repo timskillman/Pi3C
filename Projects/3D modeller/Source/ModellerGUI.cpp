@@ -151,13 +151,13 @@ void MGui::doIMGUI(Modeller * md)
 		float rw = 3.f;
 		uint32_t col = 0xff00ffff;
 		rect.matrix.setz(-1.f);
-		rect.resizeRect2D(gui.resource, vec2f((float)rec.x, (float)rec.y), vec2f((float)rec.width, rw), col);
+		rect.createRect2D(gui.resource, vec2f((float)rec.x, (float)rec.y), vec2f((float)rec.width, rw), col);
 		rect.renderBasic(gui.resource, gui.resource->shaders[0]); 
-		rect.resizeRect2D(gui.resource, vec2f((float)rec.x, (float)(rec.y+rec.height)-rw), vec2f((float)rec.width, rw), col);
+		rect.createRect2D(gui.resource, vec2f((float)rec.x, (float)(rec.y+rec.height)-rw), vec2f((float)rec.width, rw), col);
 		rect.renderBasic(gui.resource, gui.resource->shaders[0]); 
-		rect.resizeRect2D(gui.resource, vec2f((float)rec.x, (float)rec.y), vec2f(rw, (float)rec.height), col);
+		rect.createRect2D(gui.resource, vec2f((float)rec.x, (float)rec.y), vec2f(rw, (float)rec.height), col);
 		rect.renderBasic(gui.resource, gui.resource->shaders[0]); 
-		rect.resizeRect2D(gui.resource, vec2f((float)(rec.x+ rec.width)-rw, (float)rec.y), vec2f(rw, (float)rec.height), col);
+		rect.createRect2D(gui.resource, vec2f((float)(rec.x+ rec.width)-rw, (float)rec.y), vec2f(rw, (float)rec.height), col);
 		rect.renderBasic(gui.resource, gui.resource->shaders[0]);
 	}
 

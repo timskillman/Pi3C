@@ -35,7 +35,7 @@ Pi3Cmodel * Pi3Cimgui::createImage(const std::string &text, const std::shared_pt
 {
 	if (texture->isValid()) {
 		Pi3Cmodel texrect;
-		texrect.resizeRect2D(resource, vec2f(0, -1.f), vec2f(1.f, 1.f)); //Create a 1x1 sized image rectangle that can be scaled to any size
+		texrect.createRect2D(resource, vec2f(0, -1.f), vec2f(1.f, 1.f)); //Create a 1x1 sized image rectangle that can be scaled to any size
 		texrect.addPicture(resource, texture);
 		auto obj = imageRect.emplace(text, texrect);
 		return &obj.first->second;
@@ -54,15 +54,15 @@ Pi3Cmodel * Pi3Cimgui::create2ImageRect(const std::string &text, const std::shar
 		//Create an imageRect consisting of Container, Background and 2x Images ...
 		Pi3Cmodel container, texrect1, texrect2, bkgrect;
 
-		bkgrect.resizeRect2D(resource);
-		texrect1.resizeRect2D(resource);
+		bkgrect.createRect2D(resource);
+		texrect1.createRect2D(resource);
 		texrect1.addPicture(resource, ttex1);
 
 		container.group.push_back(bkgrect);
 		container.group.push_back(texrect1);
 		
 		if (ttex2) {
-			texrect2.resizeRect2D(resource);
+			texrect2.createRect2D(resource);
 			texrect2.addPicture(resource, ttex2);
 			container.group.push_back(texrect2);
 		}
@@ -270,7 +270,7 @@ bool Pi3Cimgui::renderRect(const int width, const int height)
 	size = Pi3Cpointi(width, height);
 	bool mouseTouchRect = touched(size);
 	Pi3Cmodel rect;
-	rect.resizeRect2D(resource, vec2f((float)pos.x, (float)(pos.y - size.y)), vec2f((float)(size.x), (float)(size.y)));
+	rect.createRect2D(resource, vec2f((float)pos.x, (float)(pos.y - size.y)), vec2f((float)(size.x), (float)(size.y)));
 	rect.matrix.setz(zpos-1.f);
 	//setButtonBackground(rect, mouseTouchRect);
 	rect.material.SetColDiffuse(currentParams.buttonColour);

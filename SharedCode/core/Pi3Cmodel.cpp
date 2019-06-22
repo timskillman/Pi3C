@@ -426,7 +426,7 @@ Pi3Cmodel* Pi3Cmodel::find(const std::string &name)
 	return nullptr;
 }
 
-void Pi3Cmodel::resizeRect2D(Pi3Cresource *resource, const vec2f &pos, const vec2f &size, const uint32_t colour)
+void Pi3Cmodel::createRect2D(Pi3Cresource *resource, const vec2f &pos, const vec2f &size, const uint32_t colour)
 {
 	if (resource->rectRef >= 0) {
 		meshRef = resource->rectRef;
@@ -517,6 +517,17 @@ void Pi3Cmodel::updateLineQuad(Pi3Cresource *resource, const std::vector<vec3f> 
 
 #define updateCoordsXY(x,y)							\
 		(*vp.verts)[vp.ptr] = x; (*vp.verts)[vp.ptr + 1] = y; vp.ptr+=stride; 	\
+
+
+void Pi3Cmodel::updateSpriteVerts(vertsPtr &vp, const uint32_t stride, const vec3f& p1, const vec3f& p2, const vec3f& p3, const vec3f& p4)
+{
+	updateCoordsXYZ(p1.x, p1.y, p1.z);
+	updateCoordsXYZ(p3.x, p3.y, p3.z);
+	updateCoordsXYZ(p2.x, p2.y, p2.z);
+	updateCoordsXYZ(p1.x, p1.y, p1.z);
+	updateCoordsXYZ(p4.x, p4.y, p4.z);
+	updateCoordsXYZ(p3.x, p3.y, p3.z);
+}
 
 void Pi3Cmodel::updateSpriteCoordsRotated(Pi3Cresource *resource, const std::vector<vec3f> &pos, const std::vector<vec2f> &size, const std::vector<float> &angle)
 {

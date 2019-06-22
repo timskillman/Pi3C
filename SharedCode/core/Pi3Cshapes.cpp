@@ -673,14 +673,17 @@ namespace Pi3Cshapes {
 		return extrusion;
 	}
 
-	//void elevationMap_verts(std::vector<float>& verts, uint32_t& vc, const uint8_t* map, const uint32_t w, const uint32_t h, const uint32_t bpp, const vec3f &pos, const vec2f &size, float mapHeight, const uint32_t xdivs, const uint32_t ydivs, int direction, const vec2f &uvsize, const uint32_t col)
 	void elevationMap_verts(std::vector<float>& verts, uint32_t& vc, Pi3Ctexture &tex, const vec3f &pos, const vec2f &size, float mapHeight, const uint32_t xdivs, const uint32_t ydivs, int direction, const vec2f &uvsize, const uint32_t col)
 	{
-		uint32_t mw = tex.GetPitch();
-		uint8_t * map = tex.GetTexels();
+
+		uint32_t pitch = tex.GetPitch();
+		uint8_t* map = tex.GetTexels();
 		uint32_t bpp = tex.GetDepth();
 		uint32_t h = tex.GetHeight();
 		uint32_t w = tex.GetWidth();
+
+		float wf = (float)w;
+		float hf = (float)h;
 
 		vec3f vec1, vec2, vec3, vec4, vec5;
 		float v1[3], v2[3], v3[3], v4[3], v5[3];
@@ -704,23 +707,37 @@ namespace Pi3Cshapes {
 		const float ux = xs * uvsize.x;
 		const float uy = ys * uvsize.y;
 
+		float mh = mapHeight / 255.f;
+
+		float xc = (wf-1.f) / (float)xdivs;
+		float yc = (hf-1.f) / (float)ydivs;
+		
+		float yy = 0;
 		for (float yi = -0.5f; yi < 0.499f; yi += ys) {
+			float xx = 0;
 			for (float xi = -0.5f; xi < 0.499f; xi += xs) {
 
-				float x = xi * sz.x; float y = yi * sz.y;
-				float xu = xi * uvsize.x; float yu = yi * uvsize.y;
+				float x = xi * sz.x; 
+				float y = yi * sz.y;
+				float xu = xi * uvsize.x; 
+				float yu = yi * uvsize.y;
 
-				float h00 = ((float)(map[(uint32_t)((float)w * xu) * bpp + ((uint32_t)((float)h * yu)) * mw]) / 255.f) * mapHeight;
-				float h10 = ((float)(map[(uint32_t)((float)w * (xu + ux)) * bpp + ((uint32_t)((float)h * yu)) * mw]) / 255.f) * mapHeight;
-				float h01 = ((float)(map[(uint32_t)((float)w * xu) * bpp + ((uint32_t)((float)h * (yu + uy))) * mw]) / 255.f) * mapHeight;
-				float h11 = ((float)(map[(uint32_t)((float)w * (xu + ux)) * bpp + ((uint32_t)((float)h * (yu + uy))) * mw]) / 255.f) * mapHeight;
+				float h00 = ((float)((map[((uint32_t)xx) * bpp + ((uint32_t)yy) * pitch]) & 255)) * mh;
+				float h10 = ((float)((map[((uint32_t)(xx + xc)) * bpp + ((uint32_t)yy) * pitch]) & 255)) * mh;
+				float h01 = ((float)((map[((uint32_t)xx) * bpp + ((uint32_t)(yy + yc)) * pitch]) & 255)) * mh;
+				float h11 = ((float)((map[((uint32_t)(xx + xc)) * bpp + ((uint32_t)(yy + yc)) * pitch]) & 255)) * mh;
 				float hh = (h00 + h01 + h10 + h11) / 4.0f; //avg height for centre point
 
-				v1[a] = x + xd; v1[b] = y + yd; v1[c] = h11; memcpy(&vec1, &v1, 12);
-				v2[a] = x; v2[b] = y; v2[c] = h00; memcpy(&vec2, &v2, 12);
-				v3[a] = x; v3[b] = y + yd; v3[c] = h01; memcpy(&vec3, &v3, 12);
-				v4[a] = x + xd; v4[b] = y; v4[c] = h10; memcpy(&vec4, &v4, 12);
-				v5[a] = x + xd * 0.5f; v5[b] = y + yd * 0.5f; v5[c] = hh; memcpy(&vec5, &v4, 12);
+				v1[a] = x + xd; v1[b] = h11; v1[c] = y + yd;
+				memcpy(&vec1, &v1, 12);
+				v2[a] = x; v2[b] = h00; v2[c] = y;
+				memcpy(&vec2, &v2, 12);
+				v3[a] = x; v3[b] = h01; v3[c] = y + yd;
+				memcpy(&vec3, &v3, 12);
+				v4[a] = x + xd; v4[b] = h10; v4[c] = y;
+				memcpy(&vec4, &v4, 12);
+				v5[a] = x + xd * 0.5f; v5[b] = hh; v5[c] = y + yd * 0.5f; //centre point
+				memcpy(&vec5, &v5, 12);
 
 				n = vec5.trinormal(vec2, vec3);
 				storeVNTC(verts, vc, pos + vec5, n, vec2f(xu + ux * 0.5f, yu + uy * 0.5f), col);
@@ -741,7 +758,10 @@ namespace Pi3Cshapes {
 				storeVNTC(verts, vc, pos + vec5, n, vec2f(xu + ux * 0.5f, yu + uy * 0.5f), col);
 				storeVNTC(verts, vc, pos + vec4, n, vec2f(xu + ux, yu), col);
 				storeVNTC(verts, vc, pos + vec2, n, vec2f(xu, yu), col);
+
+				xx += xc;
 			}
+			yy += yc;
 		}
 
 	}
@@ -751,6 +771,7 @@ namespace Pi3Cshapes {
 		Pi3Cmesh meshmap("Map");
 		meshmap.stride = 9;
 
+		meshmap.verts.reserve((xdivs + 1)*(ydivs + 1) * 4 * 3 * 9);
 		elevationMap_verts(meshmap.verts, meshmap.vc, tex, pos, size, mapHeight, xdivs, ydivs, direction, uvsize, col);
 
 		meshmap.bbox.bboxFromVerts(meshmap.verts, 0, meshmap.vc, meshmap.stride);

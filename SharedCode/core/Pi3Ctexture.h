@@ -47,6 +47,7 @@ public:
 	//void fromSurfaceXY(SDL_Surface* Surface, const int x, const int y);
 	void fromTextSurface(SDL_Surface* Surface);
 	void upload();
+	void update();
 	void changeTexels(uint8_t * pTexels, const GLint x = 0, const GLint y = 0, GLint w = 0, GLint h = 0);
 	void createColour(uint32_t col);
 	void create(uint32_t width, uint32_t height, uint32_t bytesPerPixel);

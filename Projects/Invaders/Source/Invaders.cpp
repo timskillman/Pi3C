@@ -5,6 +5,10 @@
 #include "Pi3CloadOptions.h"
 #include "Pi3Cavatar.h"
 #include "Pi3Cpopulate.h"
+#include "Pi3CperlinNoise.h"
+
+#include "bullets.h"
+#include "aliens.h"
 
 #include <fstream>
 #include <sstream>
@@ -42,167 +46,6 @@
 // =======================================================================
 
 
-#define maxBolts 50
-#define boltlife 300
-
-
-class boltArray {
-public:
-
-	void init(Pi3Cresource* resource, Pi3Cscene* scene)
-	{
-		Pi3Cmesh boltmesh = Pi3Cshapes::cuboid(vec3f(0, 0, -50), vec3f(2,2,150));
-		Pi3Cmodel boltmodel;
-		boltmodel.create(resource, &boltmesh, 0xff00ffff);
-		boltmodel.name = "bolt";
-		boltmodel.material.illum = 0;
-		boltmodel.visible = false;
-
-		for (size_t i = 0; i < maxBolts; i++) {
-			boltrefs.push_back(scene->append3D(boltmodel));
-			life[i] = boltlife;
-		}
-	}
-
-	void fireBolt(Pi3Cscene* scene, const vec3f &pos, const vec3f &rot, const float flyspeed) {
-		for (size_t i = 0; i < maxBolts; i++) {
-			if (life[i] == boltlife) {
-				Pi3Cmodel &bolt = scene->models[boltrefs[i]];
-				bolt.move(pos);
-				bolt.visible = true;
-				bolt.matrix.setRotateXY(rot); bolt.matrix = bolt.matrix.inverse();
-				this->dir[i] = vec3f(sinf(rot.y)*-cosf(rot.x), -sinf(rot.x), -cosf(rot.y)*cosf(rot.x)) * (20.f+flyspeed);
-				this->pos[i] = pos + this->dir[i];
-				return;
-			}
-		}
-	}
-
-	void animate(Pi3Cscene* scene, const float ticks)
-	{
-		start = -1;
-		for (size_t b = 0; b < maxBolts; b++) {
-			if (scene->models[boltrefs[b]].visible && life[b] >= 0) {
-				if (start < 0) start = b;
-				pos[b] += dir[b]*ticks;
-				scene->models[boltrefs[b]].matrix.move(pos[b]);
-				life[b]--;
-				if (life[b] < 0) {
-					scene->models[boltrefs[b]].visible = false;
-					life[b] = boltlife;
-				}
-				end = b;
-			}
-		}
-	}
-
-	std::vector<int32_t> boltrefs;
-	vec3f pos[maxBolts];
-	vec3f dir[maxBolts];
-	int life[maxBolts]{ boltlife };
-	int start = 0;
-	int end = maxBolts;
-};
-
-#define maxAliens 50
-
-class Aliens {
-public:
-
-	void init(Pi3Cresource* resource, Pi3Cscene* scene, uint32_t landref)
-	{
-		Pi3Cmesh alienmesh = Pi3Cshapes::sphere(vec3f(0, 0, 0), 1.f);
-		Pi3Cmodel alienmodel;
-		alienmodel.create(resource, &alienmesh);
-		alienmodel.material.SetColDiffuse(0xff00ff00);
-		alienmodel.name = "alien";
-		alienmodel.visible = true;
-
-		Pi3Cbbox3d lbox = scene->models[landref].bbox;
-		float toph = lbox.max.y;
-
-		for (size_t i = 0; i < maxAliens; i++) {
-			vec3f pos = vec3f((float)(rand() % 25000 - 12500), toph + (float)(rand() % 2000), (float)(rand() % 25000 - 12500));
-
-			float ht = 1e8f;  //start from way up high!
-			ht = scene->models[landref].collideFloor(resource, nullptr, -pos, ht, true);
-			if (ht < 1e8f) {
-				float sc = 20.f + (float)(rand() % 100);
-				alienmodel.matrix.SetScale(sc);
-				alienmodel.matrix.move(pos);
-				landHeight[i] = pos.y - ht;
-				alienrefs[i] = scene->append3D(alienmodel);
-				dir[i] = vec3f(0, -3.f, 0);
-				landed[i] = false;
-				arrived[i] = false;
-			}
-			else {
-				i--;
-			}
-		}
-	}
-
-	void animate(Pi3Cresource* resource, Pi3Cscene* scene, const uint32_t landref, const float ticks)
-	{
-		int arrivals = 0;
-		for (size_t b = 0; b < maxAliens; b++) {
-			Pi3Cmodel& alien = scene->models[alienrefs[b]];
-			if (alien.visible && alien.matrix.y() > landHeight[b]) {
-				alien.matrix.Translate(dir[b] * ticks);
-			}
-			else {
-				if (!landed[b]) {
-					landed[b] = true;
-					const vec3f& pos = alien.matrix.position();
-					float dist = sqrt(pos.x * pos.x + pos.z * pos.z);
-					dir[b] = -vec3f(pos.x / dist, 0, pos.z / dist);
-				}
-				else {
-					if (!arrived[b]) {
-						alien.matrix.Translate(dir[b] * ticks);
-						const vec3f& pos = alien.matrix.position();
-						float ht = 1e8f;  //start from way up high!
-						ht = scene->models[landref].collideFloor(resource, nullptr, -pos, ht, true);
-						if (ht < 1e8f) alien.matrix.sety(pos.y - ht - 1.f);
-						float dist = sqrt(pos.x * pos.x + pos.z * pos.z);
-						if (dist < 20.f) {
-							arrived[b] = true;
-							alien.material.SetColDiffuse(0xff0000ff);
-						}
-					}
-					else {
-						arrivals++;
-						alien.matrix.SetScale((float)(rand() % (50 * arrivals) + 200 * arrivals) / 10.f);
-					}
-				}
-			}
-		}
-	}
-
-	void hit(Pi3Cresource* resource, Pi3Cscene* scene, boltArray& bolts) {
-		for (size_t a = 0; a < maxAliens; a++) {
-			Pi3Cmodel& alien = scene->models[alienrefs[a]];
-			if (alien.visible) {
-				const vec3f& pos = alien.matrix.position();
-				for (size_t b = bolts.start; b <= bolts.end && bolts.life[b] < boltlife; b++) {
-					if ((bolts.pos[b] - pos).length() < 100.f) {
-						alien.visible = false;
-						bolts.life[b] = boltlife;
-						scene->models[bolts.boltrefs[b]].visible = false;
-					}
-				}
-			}
-		}
-	}
-
-	int32_t alienrefs[maxAliens];
-	float landHeight[maxAliens];
-	vec3f dir[maxAliens];
-	bool landed[maxAliens];
-	bool arrived[maxAliens];
-
-};
-
 
 int main(int argc, char *argv[])
 {
@@ -223,7 +66,7 @@ int main(int argc, char *argv[])
 	avparams.runSpeed = opts.asFloat("avatarRunSpeed");
 	avparams.fallSpeed = opts.asFloat("avatarFallSpeed");
 	player.init(avparams);
-	
+
 	int landRef = pi3c.load_model(opts.asString("modelPath"), opts.asString("landscape"));
 	pi3c.scene.models[landRef].asCollider = true;  //use this model as a collider
 
@@ -240,11 +83,13 @@ int main(int argc, char *argv[])
 	//altimeter.appendMesh(&pi3c.resource, Pi3Cshapes::rect(vec2f(20, 20), vec2f(1, 1), 0x00ff00),false);
 	//int32_t altref = pi3c.scene.append2D(altimeter);
 
-	boltArray bolts;
-	bolts.init(&pi3c.resource, &pi3c.scene);
+	Bullets bullets;
+	bullets.init(&pi3c.resource, &pi3c.scene, 100, 300);
+
+	int aship = pi3c.load_model(opts.asString("modelPath"), "saucer.obj");
 
 	Aliens aliens;
-	aliens.init(&pi3c.resource, &pi3c.scene, landRef);
+	aliens.init(&pi3c.resource, &pi3c.scene, landRef, aship, 40);
 
 	int skybox = pi3c.scene.loadSkybox(opts.asString("skyboxPath"), opts.asString("skybox"), 0, opts.asFloat("skyboxScale")); // loadbarCallback);
 	int airport = pi3c.load_model(opts.asString("modelPath"), "airport.obj", vec3f(-500, 0, 0));
@@ -326,6 +171,8 @@ int main(int argc, char *argv[])
 		if (skybox >= 0) pi3c.model(skybox)->move(-player.getPosition());
 
 		// process window events ...
+		Pi3Cmatrix rmat; rmat.rotate(-player.getRotation());
+		vec3f offset = (ship == cockpit) ? vec3f(0, 0, 0) : -rmat.transformRotateVec(vec3f(0, shipbox.height()*1.5f, shipbox.depth()*1.5f));
 
 		while (pi3c.do_events()) {
 			switch (pi3c.window.ev.type)
@@ -341,7 +188,7 @@ int main(int argc, char *argv[])
 			case SDL_MOUSEBUTTONDOWN:
 				if (pi3c.window.mouse.LeftButton) {
 					Mix_PlayChannel(0, sound_laser, 0);
-					bolts.fireBolt(&pi3c.scene, -player.getPosition()-vec3f(0,20.f,0), player.getRotation(), player.flyspeed);
+					bullets.fire(&pi3c.scene, -player.getPosition()+ offset, player.getRotation(), player.flyspeed);
 					//sound_laser->play(0, 0);
 				}
 			case SDL_MOUSEWHEEL:
@@ -351,9 +198,7 @@ int main(int argc, char *argv[])
 			}
 		}
 
-		Pi3Cmatrix rmat; rmat.rotate(-player.getRotation());
 
-		vec3f offset = (ship == cockpit) ? vec3f(0, 0, 0) : -rmat.transformRotateVec(vec3f(0, shipbox.height()*1.5f, shipbox.depth()*1.5f));
 		pi3c.model(ship)->move(-player.getPosition()+offset);
 		pi3c.model(ship)->matrix.setRotate(shipRot);
 		if (shipRot.z != 0) shipRot.z *= 0.95f;			//dampened roll to 0
@@ -369,9 +214,9 @@ int main(int argc, char *argv[])
 		pi3c.render3D();
 		
 		//Render 2D
-		bolts.animate(&pi3c.scene, pi3c.window.getTicks());
+		bullets.animate(&pi3c.scene, pi3c.window.getTicks());
 		aliens.animate(&pi3c.resource, &pi3c.scene, landRef, pi3c.window.getTicks());
-		aliens.hit(&pi3c.resource, &pi3c.scene, bolts);
+		aliens.hit(&pi3c.resource, &pi3c.scene, bullets);
 
 		//pi3c.model(altref)->resizeRect2D(&pi3c.resource, vec2f(20, 20), vec2f(20, player.altitude));
 		pi3c.render2D();

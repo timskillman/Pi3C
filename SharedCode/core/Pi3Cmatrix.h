@@ -103,7 +103,8 @@ public:
 
 	const vec3f position() const { return vec3f(matrix[m30], matrix[m31], matrix[m32]); }
 
-	const float * get() const { return &matrix[0]; }
+	const float* get() const { return &matrix[0]; }
+	float* set() { return &matrix[0]; }
 
 private:
 	bool identity = true; //used to avoid time wasted multiplying identity matrices!
