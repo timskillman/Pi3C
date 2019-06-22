@@ -40,8 +40,8 @@ I hope that you will enjoy your experience with Pi3C!
 [**3. Trying the Examples**](#tryexamples)
   - [Pi3C folders](#pi3cfolders)
   - [Projects Folder](#projects)
-
-  - [Programming tools](#progtools)
+  - [Build, Run and Clean](#buildrunproj)
+  - [Keeping up-to-date](#update)
   
 [**4. Hello 3D World!**](#helloworld)
 
@@ -185,10 +185,65 @@ Now enter
 
 You will notice the '**options.txt**' file and other txt files in the CastleCreator folder.  If you feel adventurous, open these files and try changing the screen resolution or set fullscreen to 'true'.  The 'options.txt' file is an easy way of customising a game or an app without having to recompile your code.
 
-Try the other examples such as **Forest, Snow, 3D modeller** and others using the same info for CastleCreator.
+Try the other examples such as **Invaders, Snow, 3D modeller** and others using the same info for CastleCreator.
 
 Of course, we're trying out precompiled examples - so let's get coding your own stuff!
 
+<a name="buildrunproj"></a>
+## Build, Run and Clean
 
-<a name="progtools">**Programming tools**</a>
+If setup correctly, Pi3C examples and tools should be ready to build and run.  
+To build a project do the following;
+
+**1. Enter the Project folder you want to build**
+~~~~
+cd Invaders
+~~~~
+Note: you don't need to type the whole word 'Invaders' ... type the first few characters such as 'Inv' and then press the TAB key ... this will auto-complete the word. You can do this shortcut for any part of a long pathname for example.
+
+**2. Build with 'make'**
+~~~~
+make
+~~~~
+
+Make will build the whole project and all of its dependent code.  
+
+Dependent code in this case is 'SharedCode' containing Pi3C.  If not built previously, Pi3C code will also build and it can take some time.  However, this only happens once since the compiler is clever enough to only compile code that has changed after that.
+
+Once built, you will notice a "_build" folder appearing next to the Pi3C folder.  This folder contains all the object files created from the source.  These files are then 'linked' together to create the final program.
+
+**3. Run**
+
+You will also notice the built, executable file in your project folder.  
+To run the executable on the Raspberry Pi (Invaders for example), type;
+
+~~~~
+./Invaders
+~~~~
+
+**4. Clean**
+
+Sometimes your project won't compile as expected - and that's not due to any bad coding! ... For example, when you update Pi3C the object files in the build folder need cleaning out.  To clean the project entirely, type;
+
+~~~~
+make clean
+~~~~
+
+This basically deletes all the object files in the build folder (note: don't worrry, it won't delete anything important)
+Cleaning will ensure that all your built code is fresh and using the latest changes.
+
+You should clean after updating Pi3C or making significant changes.  However, it is not necessary if Pi3C SharedCode has not changed. 
+
+<a name="update"></a>
+## Keep up-to-date
+
+Keeping up-to-date with the latest code is simple.  In a terminal window navigate to the Pi3C folder,  and type;
+
+~~~~
+git pull origin master
+~~~~
+
+This command will import (pull) all the latest Pi3C changes from the GIT repository.
+
+
 
