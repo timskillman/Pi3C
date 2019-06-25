@@ -41,7 +41,7 @@ public:
 	};
 
 	enum textReaderType { RD_NONE, RD_HTML, RD_MARKDOWN };
-	textReaderType textReader = RD_HTML;
+	textReaderType textReader = RD_NONE;
 
 	fontSheet fontsheet;
 
@@ -51,7 +51,7 @@ public:
 	void createFontSheet(const uint32_t sheetWidth, const uint32_t sheetHeight);
 	void getStringSize(const std::string &text, int &w, int &h);
 	Pi3Ctexture * textSurface(const std::string &text);
-	uint32_t textureRects(std::string &text, std::vector<float> &verts, Pi3Crect &size, const float wrapWidth, const uint32_t stride);
+	uint32_t textureRects(const std::string &text, std::vector<float> &verts, Pi3Crect &size, const float wrapWidth, const uint32_t stride);
 
 	TTF_Font * font = nullptr;
 

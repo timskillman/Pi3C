@@ -9,5 +9,5 @@ namespace Pi3Chtml {
 	enum htmlTags { ht_html, ht_body, ht_title, ht_head, ht_p, ht_br, ht_pre };
 	//static std::map<std::string, htmlTags> tags = { { "html", ht_html}, {"body", ht_body}, {"",""}, {"",""}, {"",""}, {"",""}, {"",""}, {"",""}, {"",""}, {"",""}, {"",""}, {"",""}, {"",""}, {"",""}, {"",""}, {"",""}, {"",""}, {"",""}, {"",""}, {"",""}, {"",""}, {"",""}, {"",""}, {"",""}, {"",""}, {"",""}, {"",""}, {"",""}, {"",""}, {"",""}, {"",""}, {"",""} };
 
-	void readHTML(char &c, std::string &text, uint32_t &i, Pi3CtextFormat &format);
+	void readHTML(char &c, const std::string &text, uint32_t &i, Pi3CtextFormat &format);
 }

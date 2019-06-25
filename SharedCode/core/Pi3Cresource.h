@@ -97,7 +97,7 @@ public:
 	void updateMesh(uint32_t meshRef, uint32_t vertCount = 0, const uint32_t vertOffset = 0);
 	void setRenderBuffer(const int bufRef, const uint32_t stride);
 	void renderMesh(const int meshRef, const GLenum rendermode = GL_TRIANGLES);
-	void renderText(const int meshRef, Pi3Cfont *font, std::string &text, const vec3f &pos, const float wrapWidth, const uint32_t colour = 0xffffffff);
+	Pi3Crect renderText(const int meshRef, Pi3Cfont *font, const std::string &text, const vec3f &pos, const float wrapWidth, const uint32_t colour = 0xffffffff);
 	int32_t touchMesh(const int meshRef, Pi3Ctouch &touch, const Pi3Cmatrix &tmat) const;
 	
 	int32_t addShader(const std::string &vertfile, const std::string &fragfile);

@@ -438,7 +438,7 @@ void Pi3Cmodel::createRect2D(Pi3Cresource *resource, const vec2f &pos, const vec
 	}
 }
 
-void Pi3Cmodel::textModel(Pi3Cresource *resource, Pi3Cfont *font, std::string &text, const float wrapWidth)
+void Pi3Cmodel::textModel(Pi3Cresource *resource, Pi3Cfont *font, const std::string &text, const float wrapWidth)
 {
 	meshRef = resource->letterSheetRef;
 	Pi3Cmesh& mesh = resource->meshes[meshRef];

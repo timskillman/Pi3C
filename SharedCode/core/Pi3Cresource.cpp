@@ -197,7 +197,7 @@ void Pi3Cresource::setRenderBuffer(const int bufRef, const uint32_t stride)
 	lastVBO = bufRef;
 }
 
-void Pi3Cresource::renderText(const int meshRef, Pi3Cfont *font, std::string &text, const vec3f &pos, const float wrapWidth, const uint32_t colour)
+Pi3Crect Pi3Cresource::renderText(const int meshRef, Pi3Cfont *font, const std::string &text, const vec3f &pos, const float wrapWidth, const uint32_t colour)
 {
 	//Text meshref's can only be used once per frame (otherwise using the same meshRef will simply overwrite the previous text)
 	Pi3Crect size;
@@ -213,6 +213,7 @@ void Pi3Cresource::renderText(const int meshRef, Pi3Cfont *font, std::string &te
 	shaders[0].setColDiffuse(colour);
 
 	renderMesh(meshRef, GL_TRIANGLES);
+	return size;
 }
 
 void Pi3Cresource::renderMesh(const int meshRef, const GLenum rendermode)

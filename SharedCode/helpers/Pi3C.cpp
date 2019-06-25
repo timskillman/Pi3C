@@ -48,7 +48,7 @@ void Pi3C::init(const std::string &title, const uint32_t width, const uint32_t h
 	bsMenu.highlightColour = 0xc0c0c0;
 }
 
-Pi3Cmodel Pi3C::create_model_from_text(std::string &text, const uint32_t width, const uint32_t colour)
+Pi3Cmodel Pi3C::create_model_from_text(const std::string &text, const uint32_t width, const uint32_t colour)
 {
 	Pi3Cmodel textModel;
 	textModel.textModel(&resource, gui.getFont(guifonts[0]).get(), text, width);
@@ -147,7 +147,7 @@ float Pi3C::getCurrentFPS()
 void Pi3C::showFPS()
 {
 	gui.Begin();
-	std::string fps = "FPS:" + std::to_string((int)getCurrentFPS());
+	const std::string fps = "FPS:" + std::to_string((int)getCurrentFPS());
 	gui.Text(fps);
 }
 

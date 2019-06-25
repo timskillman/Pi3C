@@ -3,7 +3,7 @@
 
 namespace Pi3Chtml {
 
-	void readHTML(char &c, std::string &text, uint32_t &i, Pi3CtextFormat &format)
+	void readHTML(char &c, const std::string &text, uint32_t &i, Pi3CtextFormat &format)
 	{
 		uint32_t tsize = text.size();
 		if (c == '&') {

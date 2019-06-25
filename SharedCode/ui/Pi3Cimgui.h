@@ -90,7 +90,8 @@ public:
 	//Widgets ...
 	bool Container(const std::string &name, const int minwidth = 0, const int minheight = 0);
 	bool ContainerEnd(const std::string &name);
-	bool Text(std::string &text, const uint32_t colour = 0);
+	bool Label(const std::string &text, const int minwidth = 0, const int minheight = 0);										/* Render static label (doesn't change)*/
+	bool Text(const std::string &text, const int minwidth = 0, const int minheight = 0, const uint32_t colour = 0);		/* Render dynamic text */
 	bool TextArea(std::string &text, const int minwidth, const int minheight);
 	bool ButtonText(const std::string &text, const bool selected = false, const int minwidth = 0, const int minheight = 0);
 	bool ButtonImage(const std::string &img, const bool selected = false, const int minWidth = 0, const int minHeight = 0);

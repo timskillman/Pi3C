@@ -172,7 +172,7 @@ void Pi3Cfont::formatVerts(std::vector<float> &verts, const float wrapWidth, con
 		p += stride;												\
 
 
-uint32_t Pi3Cfont::textureRects(std::string &text, std::vector<float> &verts, Pi3Crect &size, const float wrapWidth, const uint32_t stride)
+uint32_t Pi3Cfont::textureRects(const std::string &text, std::vector<float> &verts, Pi3Crect &size, const float wrapWidth, const uint32_t stride)
 {
 	/* Creates a letter sheet made of rectangles with UV mapping to render a font sheet
 	   Fun stuff could be done here such as warping the letter geometry etc.. */
@@ -186,7 +186,8 @@ uint32_t Pi3Cfont::textureRects(std::string &text, std::vector<float> &verts, Pi
 	float linex = 0;
 	uint32_t charsize = 6 * stride; //size of character rectangle
 	format.justify = Pi3CtextFormat::FULL_JUSTIFY;
-	float x = 0; float y = 0; float maxHeight = 0;
+	float x = 0; float y = 0; 
+	float maxHeight = 0; float maxWidth = 0;
 	uint32_t i = 0;
 
 	while (i<tsize) {
@@ -206,14 +207,14 @@ uint32_t Pi3Cfont::textureRects(std::string &text, std::vector<float> &verts, Pi
 
 			if (c > 0) {
 				fontSheetChar &ch = fontsheet.chars[(uint8_t)c];
-				float w = (float)ch.sdlrect.w * format.scale;
+				float xw = x + (float)ch.sdlrect.w * format.scale;
 				float h = (float)ch.sdlrect.h * format.scale;
 				float ux = ch.rect.x; float uy = ch.rect.y;
 				float uw = ch.rect.width; float uh = ch.rect.height;
 
 				if (h > maxHeight) maxHeight = h;
 
-				if (x + w > wrapWidth) { 
+				if (xw > wrapWidth) { 
 					while (text[i++] == ' '); //ignore spaces
 					p = spacep; //wind back and overwrite word that overhangs wrapWidth
 					i = spacei; //point to beginning of word in text string
@@ -223,12 +224,13 @@ uint32_t Pi3Cfont::textureRects(std::string &text, std::vector<float> &verts, Pi
 				else {
 					float yo = (format.scaleYoffset > 0.f) ? y+h * format.scaleYoffset : y;
 					CreateVerts(x, yo-h, ux, uy);
-					CreateVerts(x + w + format.italicSlant, yo, ux + uw, uy + uh);
-					CreateVerts(x + w, yo-h, ux + uw, uy);
+					CreateVerts(xw + format.italicSlant, yo, ux + uw, uy + uh);
+					CreateVerts(xw, yo-h, ux + uw, uy);
 					CreateVerts(x, yo-h, ux, uy);
 					CreateVerts(x + format.italicSlant, yo, ux, uy + uh);
-					CreateVerts(x + w + format.italicSlant, yo, ux + uw, uy + uh);
-					x += w;
+					CreateVerts(xw + format.italicSlant, yo, ux + uw, uy + uh);
+					x = xw;
+					if (x > maxWidth) maxWidth = x;
 
 					if (c == ' ') { //keep note of last space on line in case we word wrap
 						spacep = p;
@@ -243,6 +245,6 @@ uint32_t Pi3Cfont::textureRects(std::string &text, std::vector<float> &verts, Pi
 		i++;
 	}
 	size.x = 0; size.y = 0;
-	size.width = wrapWidth; size.height = y+ maxHeight;
+	size.width = maxWidth; size.height = y+ maxHeight;
 	return p;	//return number of floats created
 }

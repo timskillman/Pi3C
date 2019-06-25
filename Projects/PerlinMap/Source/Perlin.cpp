@@ -41,7 +41,7 @@ int main(int argc, char *argv[])
 	int screenHeight = opts.asInt("screenHeight");
 	Pi3C pi3c(opts.asString("title"), screenWidth, screenHeight, opts.asBool("fullscreen"));
 
-	uint32_t width = 128, height = 128;
+	uint32_t width = 256, height = 256;
 	std::shared_ptr<Pi3Ctexture> ptex(new Pi3Ctexture());
 
 	float pz = 50.f;
@@ -57,11 +57,11 @@ int main(int argc, char *argv[])
 	//ptex->saveAsPNG("pmap.png");
 	
 	Pi3Cmodel rect;
-	rect.createRect2D(&pi3c.resource, vec2f(30, 30), vec2f((float)(width*2), (float)(height*2)));
+	rect.createRect2D(&pi3c.resource, vec2f(30, 30), vec2f(width, height));
 	rect.addPicture(&pi3c.resource, ptex);
 	pi3c.add_model_to_scene2D(rect);
 
-	Pi3Cmesh elevmap = Pi3Cshapes::elevationMap((*ptex), vec3f(0, -80, 0), vec2f(256.f, 256.f), 100.f, 128, 128, 0, 0xffffffff);
+	Pi3Cmesh elevmap = Pi3Cshapes::elevationMap((*ptex), vec3f(0, -80, 0), vec2f(ptex->GetWidth(), ptex->GetHeight()), 100.f, 128, 128, 0, 0xffffffff);
 	Pi3Cmodel map; map.appendMesh(&pi3c.resource, elevmap, false);
 	map.material = (*pi3c.resource.defaultMaterial());  //The default material;
 	map.material.SetColDiffuse(0xffffff);
@@ -83,6 +83,7 @@ int main(int argc, char *argv[])
 	bsHeading.right = 0;
 
 	float roty = 0;
+	bool updateMap = false;
 	while (pi3c.is_running())
 	{
 		pi3c.do_events();
@@ -96,33 +97,44 @@ int main(int argc, char *argv[])
 
 		pi3c.render2D();
 
-		bool change = false;
 		double v = (double)pamp;
 		gui.Begin();
 		gui.setButtonStyle(bsHeading);
 
-		gui.SliderH("", 0, 2, v, 300, 24);
-		if ((float)v != pamp) { pamp = (float)v; change = true; }
+		gui.Label("Perlin Noise Map Generator");
 		gui.nextLine();
 
+		gui.Label("Smoothing:", 120);
+		gui.sameLine();
+		gui.SliderH("", 0, 2, v, 300, 24);
+		if ((float)v != pamp) { pamp = (float)v; updateMap = true; }
+		gui.nextLine();
+
+		gui.Label("Octaves:", 120);
+		gui.sameLine();
 		v = (double)octaves;
 		gui.SliderH("", 1, 10, v, 300, 24);
-		if ((uint8_t)v != octaves) { octaves = (uint8_t)v; change = true; }
+		if ((uint8_t)v != octaves) { octaves = (uint8_t)v; updateMap = true; }
 		gui.nextLine();
 
+		gui.Label("Z position:", 120);
+		gui.sameLine();
 		v = (double)pz;
 		gui.SliderH("", 0, 100, v, 300, 24);
-		if ((uint8_t)v != pz) { pz = (uint8_t)v; change = true; }
+		if ((uint8_t)v != pz) { pz = (uint8_t)v; updateMap = true; }
 		gui.nextLine();
 
+		gui.Label("Scale:", 120);
+		gui.sameLine();
 		v = (double)freq;
 		gui.SliderH("", 0, 100, v, 300, 24);
-		if ((uint8_t)v != freq) { freq = (uint8_t)v; change = true; }
+		if ((uint8_t)v != freq) { freq = (uint8_t)v; updateMap = true; }
 		gui.nextLine();
 
-		if (change) {
+		if (pi3c.window.mouseUp() && updateMap) {
 			pn.createMap(ptex->GetTexels(), width, height, pz, octaves, pamp, freq);
 			ptex->update();
+			updateMap = false;
 		}
 
 		//pi3c.showFPS();

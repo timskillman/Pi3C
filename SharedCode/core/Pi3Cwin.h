@@ -124,6 +124,12 @@ public:
 	SDL_Scancode getKeyUp() { return keyUp; }
 	const uint8_t * getKeys() { keys = SDL_GetKeyboardState(NULL); return keys; }
 
+	bool mouseUp() {
+		bool u = mouse.up;
+		mouse.up = false;
+		return u;
+	}
+
 	std::string getInput() { return text; }
 	void clearInput() { text = ""; }
 

@@ -46,7 +46,7 @@ public:
 	void init(const std::string &title, const uint32_t width = 0, const uint32_t height = 0, const bool fullscreen = false);
 
 	Pi3Cmodel create_model_from_mesh(const Pi3Cmesh &mesh, const uint32_t colour = 0xffffff) { return Pi3Cmodel(&resource, mesh, colour); }
-	Pi3Cmodel create_model_from_text(std::string &text, const uint32_t width, const uint32_t colour = 0x303030);
+	Pi3Cmodel create_model_from_text(const std::string &text, const uint32_t width, const uint32_t colour = 0x303030);
 
 	uint32_t create_background(const std::string &path, const std::string &file = "");
 	int32_t load_model(const std::string &path, const std::string &file, const vec3f &pos = vec3f(0,0,0));
