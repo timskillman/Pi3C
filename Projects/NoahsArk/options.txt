@@ -1,7 +1,7 @@
 title:Noahs Ark
 fullscreen:true
 screenWidth:1920	
-screenHeight:1080
+screenHeight:1200
 
 #1440x900
 

@@ -11,6 +11,7 @@ void Pi3C::init(const std::string &title, const uint32_t width, const uint32_t h
 		winopts.height = height;
 		winopts.fullscreen = fullscreen;
 	}
+	//winopts.antialiasLevel = 2;
 	window.initOptions(winopts);
 
 	winw = window.getWidth();
