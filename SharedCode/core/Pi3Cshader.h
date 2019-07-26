@@ -48,9 +48,8 @@ public:
 
 	std::string create(const char *vertShaderFile, const char *fragShaderFile);
 
-	GLuint loadShaderFile(const GLenum eShaderType, const char *strShaderFile, std::string &error);
 	GLuint loadShaderStr(const GLenum eShaderType, const std::string &shaderSource, std::string &error);
-	bool CreateShaderProgram(const GLuint &vertexShader, const  GLuint &fragmentShader, std::string &error);
+	bool CreateShaderProgram(const GLuint &vertexShader, const GLuint &fragmentShader, const std::string &attribStr, std::string &error);
 
 	inline void Use() { glUseProgram(program); }
 

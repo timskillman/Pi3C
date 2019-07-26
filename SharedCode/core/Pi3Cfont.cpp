@@ -1,6 +1,9 @@
 #include "Pi3Cfont.h"
 #include "Pi3Ctextformat.h"
+
+#ifdef READHTML
 #include "Pi3Chtml.h"
+#endif
 
 Pi3Cfont::Pi3Cfont(const char * path, const char * fontfile, int ptsize) {
 	if (!font) {
@@ -201,7 +204,9 @@ uint32_t Pi3Cfont::textureRects(const std::string &text, std::vector<float> &ver
 		else
 		{
 			switch (textReader) {
+#ifdef READHTML
 			case RD_HTML: Pi3Chtml::readHTML(c, text, i, format); break;
+#endif
 			case RD_MARKDOWN: break;
 			}
 

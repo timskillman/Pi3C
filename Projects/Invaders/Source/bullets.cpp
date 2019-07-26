@@ -1,4 +1,5 @@
 #include "bullets.h"
+#include "Pi3Cshapes.h"
 
 void Bullets::init(Pi3Cresource* resource, Pi3Cscene* scene, const uint32_t _maxBullets, const uint32_t _bulletLife)
 {

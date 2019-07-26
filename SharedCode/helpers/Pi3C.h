@@ -40,10 +40,10 @@
 
 class Pi3C {
 public:
-	Pi3C() {}
-	Pi3C(const std::string &title, const uint32_t width = 0, const uint32_t height = 0, const bool fullscreen = false) { init(title, width, height, fullscreen); }
+	Pi3C(const Pi3Cwindow::options& winopts);
+	Pi3C(const std::string& title = "Pi3C", const uint32_t width = 0, const uint32_t height = 0, const bool fullscreen = false);
 
-	void init(const std::string &title, const uint32_t width = 0, const uint32_t height = 0, const bool fullscreen = false);
+	void init(const Pi3Cwindow::options& winopts);
 
 	Pi3Cmodel create_model_from_mesh(const Pi3Cmesh &mesh, const uint32_t colour = 0xffffff) { return Pi3Cmodel(&resource, mesh, colour); }
 	Pi3Cmodel create_model_from_text(const std::string &text, const uint32_t width, const uint32_t colour = 0x303030);
@@ -82,7 +82,7 @@ public:
 	Pi3Cmodel * model(const uint32_t modelRef) { return &scene.models[modelRef]; }
 	//Pi3CspriteArray * getSpriteArray(const uint32_t spriteArrayRef) { return (Pi3CspriteArray*)(&resource.meshes[spriteArrayRef]); }
 
-	Pi3Cwindow::options winopts;
+	//Pi3Cwindow::options winopts;
 	static Pi3Cwindow window;
 	static Pi3Cresource resource;
 	Pi3Cscene scene;

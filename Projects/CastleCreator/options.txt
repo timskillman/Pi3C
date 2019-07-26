@@ -2,4 +2,5 @@ title:Castle Editor
 fullscreen:false
 screenWidth:800
 screenHeight:400
+perspective:600
 

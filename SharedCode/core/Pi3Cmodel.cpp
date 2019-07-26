@@ -139,6 +139,25 @@ void Pi3Cmodel::appendMesh(Pi3Cresource *resource, Pi3Cmesh mesh, bool asCollide
 	group.push_back(newMesh);
 }
 
+void Pi3Cmodel::updateMesh(Pi3Cresource* resource, const Pi3Cmesh &umesh)
+{
+	Pi3Cmesh& mesh = resource->meshes[meshRef];
+	uint32_t stride = mesh.stride;
+	vertsPtr vp = resource->getMeshVerts(meshRef);
+
+	if (umesh.verts.size() != (*vp.verts).size()) return;
+
+	for (uint32_t i = 0; i < umesh.verts.size(); i++) {
+		(*vp.verts)[vp.ptr++] = umesh.verts[i];
+		//vp.ptr++;
+		//(*vp.verts)[vp.ptr + 1] = umesh.verts[i + 1]; 
+		//(*vp.verts)[vp.ptr + 2] = umesh.verts[i + 2]; 
+		//vp.ptr += stride;
+	}
+	resource->updateMesh(meshRef);
+	//bbox.update(resource->meshes[meshRef].bbox);
+}
+
 int32_t Pi3Cmodel::addTexture(Pi3Cresource *resource, const std::string &txfile)
 {
 	if (txfile == "") return -1;

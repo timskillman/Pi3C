@@ -9,11 +9,13 @@ SHARED_DIR:= ../../SharedCode/core
 FILE_DIR:= ../../SharedCode/file
 UI_DIR:= ../../SharedCode/ui
 HELPS_DIR:= ../../SharedCode/helpers
+EDIT_DIR:= ../../SharedCode/editing
 TESS_DIR:= ../../SharedCode/glutess
 CPATH = $(SHARED_DIR)
 CPATH = $(FILE_DIR)
 CPATH = $(UI_DIR)
 CPATH = $(HELPS_DIR)
+CPATH = $(EDIT_DIR)
 CPATH = $(TESS_DIR)
 
 BUILDPATH = ../../../_build/Projects/$(TARGET)/
@@ -21,7 +23,7 @@ BUILDPATH = ../../../_build/Projects/$(TARGET)/
 GLES_DIR = /opt/vc/include
 CPATH = $(GLES_DIR)
 
-SRC_DIR:= $(SHARED_DIR) $(FILE_DIR) $(UI_DIR) $(HELPS_DIR) $(TESS_DIR) $(GLES_DIR) Source
+SRC_DIR:= $(SHARED_DIR) $(FILE_DIR) $(UI_DIR) $(HELPS_DIR) $(EDIT_DIR) $(TESS_DIR) $(GLES_DIR) Source
 BUILD_DIR:= $(addprefix $(BUILDPATH),$(SRC_DIR))
 
 SRC:= $(foreach sdir,$(SRC_DIR),$(wildcard $(sdir)/*.cpp $(sdir)/*.c))

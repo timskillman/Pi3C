@@ -20,12 +20,32 @@ void Pi3Cresource::init(const uint32_t stride)
 	lettersRef = addMesh(&lets); //create a dynamic buffer for small temp lettersheet
 
 	//Create a default 2D rectangle as a helper for 2D GUI rendering 
-	Pi3Cmesh rect = Pi3Cshapes::rect(vec2f(0, 0), vec2f(1.f, 1.f));
+	Pi3Cmesh rect = createRect(vec3f(0, 0, -10.f), vec2f(1.f, 1.f), 0xffffffff, vec2f(0,0), vec2f(1.f,1.f));
 	rectRef = addMesh(&rect); //buffer used for creating models etc..
 
 	if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0) {
 		SDL_Log("couldn't initialize mix, error: %s\n", Mix_GetError());
 	}
+}
+
+Pi3Cmesh Pi3Cresource::createRect(const vec3f& pos, const vec2f& size, const uint32_t col, const vec2f& uvpos, const vec2f& uvsize)
+{
+	Pi3Cmesh rect("rect");
+	rect.stride = 9;
+
+	vec3f n(0, -1.f, 0);
+
+	rect.addPackedVert(pos + vec3f(size.x, size.y, 0), n, uvpos + uvsize, col);
+	rect.addPackedVert(pos + vec3f(0, 0, 0), n, uvpos, col);
+	rect.addPackedVert(pos + vec3f(0, size.y, 0), n, vec2f(uvpos.x, uvpos.y + uvsize.y), col);
+
+	rect.addPackedVert(pos + vec3f(size.x, 0, 0), n, vec2f(uvpos.x + uvsize.x, uvpos.y), col);
+	rect.addPackedVert(pos + vec3f(0, 0, 0), n, uvpos, col);
+	rect.addPackedVert(pos + vec3f(size.x, size.y, 0), n, uvpos + uvsize, col);
+
+	rect.bbox.bboxFromVerts(rect.verts, 0, rect.vc, rect.stride);
+	rect.materialRef = 0;
+	return rect;
 }
 
 void Pi3Cresource::createDefaultMaterial(const std::string &name)
@@ -243,12 +263,16 @@ int32_t Pi3Cresource::addShader(const std::string &vertfile, const std::string &
 	Pi3Cshader &shader = shaders.back();
 	errorStr = shader.create(vertfile.c_str(), fragfile.c_str());
 	if (errorStr != "") return -1;
+	return shaders.size() - 1;
+}
 
+void Pi3Cresource::useBasicShader(const uint32_t shaderRef)
+{
+	Pi3Cshader &shader = shaders[shaderRef];
 	shader.Use();
 	shader.lightPos = vec3f(0, 0, 1000.f);
 	shader.setFog(100.f, 5000.f, vec3f(1.f, 1.f, 1.f));
 	shader.setupShader();
-	return shaders.size() - 1;
 }
 
 void Pi3Cresource::addFont(const char * path, const char * fontfile, int ptsize) {

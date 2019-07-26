@@ -50,9 +50,17 @@
 int main(int argc, char *argv[])
 {
 	loadOptions opts("options.txt");
-	int screenWidth = opts.asInt("screenWidth");
-	int screenHeight = opts.asInt("screenHeight");
-	Pi3C pi3c(opts.asString("title"), screenWidth , screenHeight, opts.asBool("fullscreen"));
+	Pi3Cwindow::options winopts;
+	winopts.title = opts.asString("title");
+	winopts.width = opts.asInt("screenWidth");
+	winopts.height = opts.asInt("screenHeight");
+	winopts.fullscreen = opts.asBool("fullscreen");
+	//winopts.majorVsn = 3;
+	//winopts.minorVsn = 0;
+	//winopts.antialiasLevel = opts.asInt("antiAlias");
+	Pi3C pi3c(winopts);
+	int screenWidth = winopts.width;
+	int screenHeight = winopts.height;
 
 	Pi3CGL::showGLinfo();
 	
@@ -138,7 +146,12 @@ int main(int argc, char *argv[])
 	float maxspeed = 30.f;
 	player.flyspeed = 0;
 
+	vec3f prot{ 0,0,0 };
+
+	int mx = 100, my = 100;
 	Pi3Cimgui &gui = pi3c.gui;	//expose gui object from pi3c
+
+	if (winopts.fullscreen) SDL_WarpMouseInWindow(pi3c.window.handle(), 100, 100);
 
 	while (pi3c.is_running())
 	{
@@ -170,20 +183,32 @@ int main(int argc, char *argv[])
 		// Centre skybox and other 'infinite' geometry around player...
 		if (skybox >= 0) pi3c.model(skybox)->move(-player.getPosition());
 
+		float ts = 1.f / (float)(pi3c.window.getTicks());
+		//if (pi3c.window.mouse.RightButton) {
+			//vec3f rotDelta(-pi3c.window.mouse.deltaXY.y / 300.f, pi3c.window.mouse.deltaXY.x / 300.f, 0);
+		vec3f rotDelta(-(float)(100 - my) / (50000.f*ts), (float)(100 - mx) / (50000.f*ts), 0);
+		prot += rotDelta;
+		player.rotate(prot);
+		shipRot -= vec3f(prot.x, prot.y, -prot.y);
+		//}
+
 		// process window events ...
 		Pi3Cmatrix rmat; rmat.rotate(-player.getRotation());
 		vec3f offset = (ship == cockpit) ? vec3f(0, 0, 0) : -rmat.transformRotateVec(vec3f(0, shipbox.height()*1.5f, shipbox.depth()*1.5f));
+		bool moving = false;
 
 		while (pi3c.do_events()) {
 			switch (pi3c.window.ev.type)
 			{
 			case SDL_MOUSEMOTION:
-				//{
-				if (pi3c.window.mouse.RightButton) {
-					vec3f rotDelta(pi3c.window.mouse.deltaXY.y / 300.f, -pi3c.window.mouse.deltaXY.x / 300.f, 0);
-					player.rotate(rotDelta);
-					shipRot -= vec3f(rotDelta.x, rotDelta.y, -rotDelta.y);
-				}
+				SDL_GetMouseState(&mx, &my);
+				moving = true;
+
+				//if (pi3c.window.mouse.RightButton) {
+				//	vec3f rotDelta(pi3c.window.mouse.deltaXY.y / 300.f, -pi3c.window.mouse.deltaXY.x / 300.f, 0);
+				//	player.rotate(rotDelta);
+				//	shipRot -= vec3f(rotDelta.x, rotDelta.y, -rotDelta.y);
+				//}
 				break;
 			case SDL_MOUSEBUTTONDOWN:
 				if (pi3c.window.mouse.LeftButton) {
@@ -197,11 +222,13 @@ int main(int argc, char *argv[])
 				break;
 			}
 		}
+		if (winopts.fullscreen) SDL_WarpMouseInWindow(pi3c.window.handle(), 100, 100);
 
-
+		shipRot.z *= 0.9f;			//dampened roll to 0
+		prot = prot * 0.96f;
 		pi3c.model(ship)->move(-player.getPosition()+offset);
 		pi3c.model(ship)->matrix.setRotate(shipRot);
-		if (shipRot.z != 0) shipRot.z *= 0.95f;			//dampened roll to 0
+		//if (shipRot.z != 0) shipRot.z *= 0.95f;			//dampened roll to 0
 		//if (shipRot.x != 0 && ship == sship) shipRot.x *= 0.7f;			//dampened pitch to 0
 
 		//clear background ...
@@ -209,7 +236,6 @@ int main(int argc, char *argv[])
 	
 		//Render 3D scene ...
 		pi3c.scene.setMatrix(player.getPosition(), vec3f(0, 0, 0), player.getRotation());
-
 		pi3c.scene.setSun(0xffffff, vec3f(15000.f, 15000.f, -15000.f)); //transform sun position into scene
 		pi3c.render3D();
 		

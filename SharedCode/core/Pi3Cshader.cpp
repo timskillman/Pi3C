@@ -4,22 +4,51 @@
 
 #define RGB_VEC4(col) vec4f((float)(col & 255) / 255.f, (float)((col >> 8) & 255) / 255.f, (float)((col >> 16) & 255) / 255.f, (float)((col >> 24) & 255) / 255.f)
 
+std::string loadShader(const std::string &file)
+{
+	std::ifstream strfile(file.c_str(), std::ios::binary);
+	std::ostringstream os;
+	if (strfile) os << strfile.rdbuf(); else return "";
+	return os.str();
+}
+
+std::string getAttributes(const std::string &vertShaderSource)
+{
+	std::string attributes;
+	int32_t esv = vertShaderSource.find("#version 3");
+	std::string attkey = (esv >= 0) ? "in " : "attribute";
+	int32_t i = vertShaderSource.find(attkey);
+	while (i > 0) {
+		int j = vertShaderSource.find(";", i + 1);
+		std::string attrib = vertShaderSource.substr(i, j - i);
+		int k = attrib.rfind(" ", j);
+		if (k >= 0) attributes += attrib.substr(k + 1, attrib.size()) + " ";
+		i = vertShaderSource.find(attkey, j);
+	}
+	return attributes;
+}
+
 std::string Pi3Cshader::create(const char *vertShaderFile, const char *fragShaderFile)
 {
 	std::string error = "";
-	vertshader = loadShaderFile(GL_VERTEX_SHADER, vertShaderFile, error);
+	std::string attribStr = "";
+	std::string vertShaderSource = loadShader(vertShaderFile);
+	vertshader = loadShaderStr(GL_VERTEX_SHADER, vertShaderSource, error);
+	if (error == "") {
+		attribStr = getAttributes(vertShaderSource);	//Automatically extract 'attributes' from the vertex shader
+		std::string fragShaderSource = loadShader(fragShaderFile);
+		fragshader = loadShaderStr(GL_FRAGMENT_SHADER, fragShaderSource, error);
+	}
 	if (error == "")
-		fragshader = loadShaderFile(GL_FRAGMENT_SHADER, fragShaderFile, error);
-	if (error == "")
-		CreateShaderProgram(vertshader, fragshader, error);
+		CreateShaderProgram(vertshader, fragshader, attribStr, error);
 
 	glUseProgram(program); //shader must be used before getting attribute refs in setup
-	setupShader();
+	//setupShader();
 
 	return error;
 }
 
-bool Pi3Cshader::CreateShaderProgram(const GLuint &vertexShader, const GLuint &fragmentShader, std::string &error)
+bool Pi3Cshader::CreateShaderProgram(const GLuint &vertexShader, const GLuint &fragmentShader, const std::string &attribStr, std::string &error)
 {
 	program = glCreateProgram();
 	if (program == 0) {
@@ -30,10 +59,9 @@ bool Pi3Cshader::CreateShaderProgram(const GLuint &vertexShader, const GLuint &f
 	glAttachShader(program, vertexShader);
 	glAttachShader(program, fragmentShader);
 
-	glBindAttribLocation(program, 0, "a_Position");
-	glBindAttribLocation(program, 1, "a_Normal");
-	glBindAttribLocation(program, 2, "a_UV");
-	glBindAttribLocation(program, 3, "a_Colour");
+	std::istringstream ss(attribStr);
+	std::string s; uint32_t a = 0;
+	while (ss >> s) glBindAttribLocation(program, a++, s.c_str());
 	stride = DEFAULT_STRIDE;
 
 	glLinkProgram(program); //linking
@@ -68,17 +96,6 @@ bool Pi3Cshader::CreateShaderProgram(const GLuint &vertexShader, const GLuint &f
 	return true;
 }
 
-GLuint Pi3Cshader::loadShaderFile(const GLenum ShaderType, const char *strShaderFile, std::string &error)
-{
-	std::ifstream sfile(strShaderFile, std::ios::in | std::ios::binary);
-	std::string shaderSource;
-	sfile.seekg(0, std::ios::end);
-	shaderSource.resize((size_t)sfile.tellg());
-	sfile.seekg(0, std::ios::beg);
-	sfile.read(&shaderSource[0], shaderSource.size());
-	sfile.close();
-	return loadShaderStr(ShaderType, shaderSource, error);
-}
 
 //GLuint Pi3Cshader::loadShaderFile2(const char *strShaderFile, std::string &error)
 //{

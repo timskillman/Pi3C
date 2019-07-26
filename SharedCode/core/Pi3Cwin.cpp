@@ -131,6 +131,7 @@ int Pi3Cwindow::event()
 				const uint8_t* keystate = getKeys();
 				shiftKey = keystate[SDL_SCANCODE_LSHIFT] || keystate[SDL_SCANCODE_RSHIFT];
 				ctrlKey = keystate[SDL_SCANCODE_LCTRL] || keystate[SDL_SCANCODE_RCTRL];
+				if (keystate[SDL_SCANCODE_ESCAPE]) quit = true;
 			}
 			break;
 		case SDL_KEYUP:

@@ -4,7 +4,6 @@
 #include "Pi3Ctexture.h"
 #include "Pi3Cmaterial.h"
 #include "Pi3Cshader.h"
-#include "Pi3Cshapes.h"
 #include "Pi3CGL.h"
 #include <vector>
 #include <string>
@@ -66,6 +65,7 @@ public:
 	int32_t loadTexture(const std::string &path, const std::string &name, int32_t &texRef);  //loads a texture and returns a texture reference to the textures array (else -1 if failed)
 	int32_t addTexture(const std::shared_ptr<Pi3Ctexture> &Texture, int32_t &texRef);
 	void createDefaultMaterial(const std::string &name = "default");
+	Pi3Cmesh createRect(const vec3f& pos, const vec2f& size, const uint32_t col, const vec2f& uvpos, const vec2f& uvsize);
 	int32_t createDefaultTexture(int32_t &texID);
 	Pi3Cmaterial * defaultMaterial() { return &materials[0]; }
 
@@ -101,6 +101,7 @@ public:
 	int32_t touchMesh(const int meshRef, Pi3Ctouch &touch, const Pi3Cmatrix &tmat) const;
 	
 	int32_t addShader(const std::string &vertfile, const std::string &fragfile);
+	void useBasicShader(const uint32_t shaderRef);
 	void addFont(const char * path, const char * fontfile, int ptsize);
 	std::shared_ptr<Pi3Cmusic> addMusic(const std::string& path, const std::string& musicfile);
 	std::shared_ptr<Pi3Csound> addSound(const std::string& path, const std::string& soundfile);

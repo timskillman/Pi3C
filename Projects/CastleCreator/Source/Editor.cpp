@@ -126,7 +126,7 @@ void Editor::loadModels(const std::string &modelsLibraryFile, const std::string 
 
 	nearzfarz = opts.asVec2f("nearzfarz");
 	scene.setFog(0xffffff, 10000.f, 25000.f);
-	scene.setPerspective3D(window->getWidth(), window->getHeight(), 800.f, nearzfarz.x, nearzfarz.y);
+	scene.setPerspective3D(window->getWidth(), window->getHeight(), opts.asFloat("perspective"), nearzfarz.x, nearzfarz.y);
 
 	// Setup player's avatar ...
 	Pi3Cavatar::avatarParams avparams;
@@ -281,7 +281,8 @@ void Editor::touchScene()
 					}
 					else {
 						//Insert library object as touch position
-						newmod.matrix.move(touch.intersection);
+						vec3f gpos = vec3f(floorf((touch.intersection.x+grid.x*0.5f) / grid.x) * grid.x,touch.intersection.y,floorf((touch.intersection.z+grid.z*0.5f) / grid.z) * grid.z);
+						newmod.matrix.move(gpos);
 						scene.models[0].append(newmod);
 					}
 					window->mouse.up = false;
@@ -356,6 +357,10 @@ void Editor::handleIMGui()
 			if (gui.MenuItem("Delete", "Del")) {}
 			if (gui.MenuItem("Undo", "Ctrl+X")) {}
 			if (gui.MenuItem("Redo", "Ctrl+Y")) {}
+		}
+		if (gui.BeginMenu("View")) {
+			if (gui.MenuItem("Birds eye view", "")) {}
+			if (gui.MenuItem("Fullscreen", "Ctrl+F")) {}
 		}
 		gui.EndMenuBar();
 	}

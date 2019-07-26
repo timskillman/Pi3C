@@ -512,7 +512,7 @@ bool Pi3Cmesh::createColliderGrid()
 	float mz = bbox.min.z;
 	uint32_t stride2 = stride * 2;
 
-	for (size_t v = 0; v < verts.size()- stride * 3; v += stride * 3)
+	for (size_t v = 0; v < vc- stride * 3; v += stride * 3)
 	{
 		int xp = (int)((verts[v] - mx) * w);
 		int zp = (int)((verts[v+2] - mz) * d);

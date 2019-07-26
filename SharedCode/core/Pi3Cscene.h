@@ -88,7 +88,7 @@ public:
 	int32_t loadModelOBJ(const std::string &path, const std::string &file, const std::function<void(float)> showProgressCB);
 	int32_t loadSkybox(const std::string &path, const std::string &file, const std::function<void(float)> showProgressCB, const float scale = 1.f);
 	
-	void selectShader(const uint32_t ref) { currentShader = ref; }
+	void selectShader(const uint32_t ref) { currentShader = ref; resource->shaders[ref].Use(); resource->shaders[ref].setupShader(); }
 	void setSun(const uint32_t col, const vec3f &pos, const int32_t ref = -1);
 	void setFixedLight(const uint32_t col, const vec3f &pos, const int32_t ref = -1);
 	void setFog(const uint32_t col, const float start, const float end, const int32_t ref = -1);

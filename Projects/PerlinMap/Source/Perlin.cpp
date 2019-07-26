@@ -66,7 +66,7 @@ int main(int argc, char *argv[])
 	map.material = (*pi3c.resource.defaultMaterial());  //The default material;
 	map.material.SetColDiffuse(0xffffff);
 	map.material.illum = 2;					//non shaded illumination
-	pi3c.add_model_to_scene3D(map);
+	uint32_t mapref = pi3c.add_model_to_scene3D(map);
 
 	//pi3c.scene.setFog(opts.asHex("fogColour"), opts.asFloat("fogNear"), opts.asFloat("fogFar"));
 	pi3c.scene.setPerspective3D(screenWidth, screenHeight, opts.asFloat("perspective"), opts.asFloat("nearz"), opts.asFloat("farz"));
@@ -90,7 +90,7 @@ int main(int argc, char *argv[])
 		pi3c.clear_window();
 
 		pi3c.scene.setMatrix(vec3f(0, 0, 0), vec3f(0, 0, -300.f), vec3f(0.3f,roty,0));
-		roty += 0.01f;
+		//roty += 0.001f;
 
 		pi3c.scene.setFixedLight(0xffffff, vec3f(1500.f, -1500.f, -1500.f)); //transform sun position into scene
 		pi3c.render3D();
@@ -134,6 +134,7 @@ int main(int argc, char *argv[])
 		if (pi3c.window.mouseUp() && updateMap) {
 			pn.createMap(ptex->GetTexels(), width, height, pz, octaves, pamp, freq);
 			ptex->update();
+			pi3c.scene.models[mapref].updateMesh(&pi3c.resource, Pi3Cshapes::elevationMap((*ptex), vec3f(0, -80, 0), vec2f(ptex->GetWidth(), ptex->GetHeight()), 100.f, 128, 128, 0, 0xffffffff));
 			updateMap = false;
 		}
 

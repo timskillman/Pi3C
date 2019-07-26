@@ -1,5 +1,6 @@
 title:Castle Creator
 screensize:800 400 800
+perspective:1200.0
 fullscreen:false
 fly:false
 lightpos:0.0 1.0 0.0

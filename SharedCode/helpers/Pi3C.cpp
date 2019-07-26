@@ -3,17 +3,28 @@
 Pi3Cwindow Pi3C::window;
 Pi3Cresource Pi3C::resource;
 
-void Pi3C::init(const std::string &title, const uint32_t width, const uint32_t height, const bool fullscreen) {
+Pi3C::Pi3C(const Pi3Cwindow::options& winopts)
+{
+	init(winopts);
+}
 
+Pi3C::Pi3C(const std::string &title, const uint32_t width, const uint32_t height, const bool fullscreen) 
+{
+	Pi3Cwindow::options winopts;
 	winopts.title = title;
 	if (width > 0 && height > 0) {
 		winopts.width = width;
 		winopts.height = height;
 		winopts.fullscreen = fullscreen;
 	}
-	//winopts.antialiasLevel = 2;
-	window.initOptions(winopts);
+	init(winopts);
+}
 
+
+void Pi3C::init(const Pi3Cwindow::options& winopts)
+{
+	window.initOptions(winopts);
+	
 	winw = window.getWidth();
 	winh = window.getHeight();
 
@@ -26,6 +37,7 @@ void Pi3C::init(const std::string &title, const uint32_t width, const uint32_t h
 		return;
 	}
 
+	
 	scene.init(&resource);
 	scene.selectShader(basicShaderRef);
 
@@ -48,6 +60,7 @@ void Pi3C::init(const std::string &title, const uint32_t width, const uint32_t h
 	bsMenu.left = 10;
 	bsMenu.highlightColour = 0xc0c0c0;
 }
+
 
 Pi3Cmodel Pi3C::create_model_from_text(const std::string &text, const uint32_t width, const uint32_t colour)
 {
