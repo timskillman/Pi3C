@@ -36,12 +36,12 @@ Pi3Cmesh Pi3Cresource::createRect(const vec3f& pos, const vec2f& size, const uin
 	vec3f n(0, -1.f, 0);
 
 	rect.addPackedVert(pos + vec3f(size.x, size.y, 0), n, uvpos + uvsize, col);
-	rect.addPackedVert(pos + vec3f(0, 0, 0), n, uvpos, col);
 	rect.addPackedVert(pos + vec3f(0, size.y, 0), n, vec2f(uvpos.x, uvpos.y + uvsize.y), col);
+	rect.addPackedVert(pos + vec3f(0, 0, 0), n, uvpos, col);
 
 	rect.addPackedVert(pos + vec3f(size.x, 0, 0), n, vec2f(uvpos.x + uvsize.x, uvpos.y), col);
-	rect.addPackedVert(pos + vec3f(0, 0, 0), n, uvpos, col);
 	rect.addPackedVert(pos + vec3f(size.x, size.y, 0), n, uvpos + uvsize, col);
+	rect.addPackedVert(pos + vec3f(0, 0, 0), n, uvpos, col);
 
 	rect.bbox.bboxFromVerts(rect.verts, 0, rect.vc, rect.stride);
 	rect.materialRef = 0;

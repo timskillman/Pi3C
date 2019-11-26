@@ -5,7 +5,7 @@
 precision mediump float;       	// Set the default precision to medium
 
 uniform float iTime;
-uniform vec2 iResolution;
+uniform vec3 iResolution;
 
 out vec4 fragColor;
 

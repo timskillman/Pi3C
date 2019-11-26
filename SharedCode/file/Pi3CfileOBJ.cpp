@@ -261,8 +261,8 @@ namespace Pi3CfileOBJ {
 								&v[18], &v[19], &v[20], &v[21], &v[22], &v[23], &v[24], &v[25], &v[26]);
 							for (int32_t i = 0; i < (c-6); i += 3) {
 								mesh.addPackedVert(temp_vertices[v[i + 6] - 1], temp_normals[v[i + 8] - 1], temp_uvs[v[i + 7] - 1], col);
-								mesh.addPackedVert(temp_vertices[v[i + 3] - 1], temp_normals[v[i + 5] - 1], temp_uvs[v[i + 4] - 1], col);
 								mesh.addPackedVert(temp_vertices[v[0] - 1], temp_normals[v[2] - 1], temp_uvs[v[1] - 1], col);
+								mesh.addPackedVert(temp_vertices[v[i + 3] - 1], temp_normals[v[i + 5] - 1], temp_uvs[v[i + 4] - 1], col);
 								tri++;
 							}
 							break;
@@ -273,8 +273,8 @@ namespace Pi3CfileOBJ {
 								&v[12], &v[13], &v[14], &v[15], &v[16], &v[17]);
 							for (int32_t i = 0; i < (c-4); i += 2) {
 								mesh.addPackedVert(temp_vertices[v[i + 4] - 1], temp_normals[v[i + 5] - 1], vec2f(0, 0), col);
-								mesh.addPackedVert(temp_vertices[v[i + 2] - 1], temp_normals[v[i + 3] - 1], vec2f(1.f, 0), col);
 								mesh.addPackedVert(temp_vertices[v[0] - 1], temp_normals[v[1] - 1], vec2f(0, 1.f), col);
+								mesh.addPackedVert(temp_vertices[v[i + 2] - 1], temp_normals[v[i + 3] - 1], vec2f(1.f, 0), col);
 								tri++;
 							}
 							tri++;
@@ -284,8 +284,8 @@ namespace Pi3CfileOBJ {
 							normal = temp_vertices[v[0] - 1].trinormal(temp_vertices[v[1] - 1], temp_vertices[v[2] - 1]); //create a surface normal
 							for (int32_t i = 0; i < (c-2); i++) {
 								mesh.addPackedVert(temp_vertices[v[i + 2] - 1], normal, vec2f(0, 0), col);
-								mesh.addPackedVert(temp_vertices[v[i + 1] - 1], normal, vec2f(1.f, 0), col);
 								mesh.addPackedVert(temp_vertices[v[0] - 1], normal, vec2f(0, 1.f), col);
+								mesh.addPackedVert(temp_vertices[v[i + 1] - 1], normal, vec2f(1.f, 0), col);
 								tri++;
 							}
 							tri++;
@@ -298,8 +298,8 @@ namespace Pi3CfileOBJ {
 							normal = temp_vertices[v[0] - 1].trinormal(temp_vertices[v[2] - 1], temp_vertices[v[4] - 1]); //create a surface normal
 							for (int32_t i = 0; i < (c-4); i += 2) {
 								mesh.addPackedVert(temp_vertices[v[i + 4] - 1], normal, temp_uvs[v[i + 5] - 1], col);
-								mesh.addPackedVert(temp_vertices[v[i + 2] - 1], normal, temp_uvs[v[i + 3] - 1], col);
 								mesh.addPackedVert(temp_vertices[v[0] - 1], normal, temp_uvs[v[1] - 1], col);
+								mesh.addPackedVert(temp_vertices[v[i + 2] - 1], normal, temp_uvs[v[i + 3] - 1], col);
 								tri++;
 							}
 							tri++;

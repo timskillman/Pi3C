@@ -52,7 +52,7 @@ void useShader(uint32_t shaderRef,
 	iframe = shader.GetSetf("iFrame", 0);
 	itime = shader.GetSetf("iTime", (float)SDL_GetTicks() / 1000.f);
 	imouse = shader.GetSet3f("iMouse", vec3f(0, 0, 0));  //x,y,button
-	res = shader.GetSet2f("iResolution", vec2f(width, height));
+	res = shader.GetSet3f("iResolution", vec3f(width, height, width/height));
 }
 
 int main(int argc, char *argv[])
@@ -142,12 +142,13 @@ int main(int argc, char *argv[])
 			case SDL_MOUSEBUTTONDOWN:
 			case SDL_MOUSEMOTION:
 				if (imouse>=0) 
-					shader.Set3f(imouse, vec3f(window.mouse.x, window.mouse.y, (window.mouse.anyButton()) ? 1.f:0));
+					shader.Set3f(imouse, vec3f(window.mouse.x, window.getHeight()- window.mouse.y, (window.mouse.anyButton()) ? 1.f:0));
 				break;
 			case SDL_WINDOWEVENT:
 				switch (window.ev.window.event) {
 				case SDL_WINDOWEVENT_RESIZED:
-					if (res>=0) shader.Set2f(res, vec2f(window.getWidth(), window.getHeight()));
+					width = window.getWidth(); height = window.getHeight();
+					if (res>=0) shader.Set3f(res, vec3f(width, height, width/height));
 					break;
 				}
 				break;
@@ -155,7 +156,7 @@ int main(int argc, char *argv[])
 				if (window.getKeyUp()==SDL_SCANCODE_SPACE) {
 					shaderSelect = (shaderSelect + 1) % shaderRefs.size();
 					useShader(shaderSelect, &resource, shaderRefs, res, iframe, itime, imouse, width, height);
-					if (res >= 0) shader.Set2f(res, vec2f(window.getWidth(), window.getHeight()));
+					if (res >= 0) shader.Set3f(res, vec3f(width, height, width / height));
 					frame = 0;
 					window.setCaption("Shader: " + shaderFiles[shaderSelect]);
 				}

@@ -2,7 +2,7 @@
 precision mediump float;       	// Set the default precision to medium
 
 uniform float iTime;
-uniform vec2 iResolution;
+uniform vec3 iResolution;
 uniform vec3 iMouse;
 
 uniform sampler2D iChannel0;
@@ -383,5 +383,5 @@ void main()
     
     col += sat(rd.y)*vec3(.6, .5, .9);
     
-	fragColor = vec4(col, 0.);
+	fragColor = vec4(col, 1.);
 }

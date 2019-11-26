@@ -46,8 +46,6 @@ int main(int argc, char *argv[])
 
 	Pi3CGL::showGLinfo();
 
-
-	
 	// Setup Editor and Resources ...
 	static Pi3Cresource resource;
 	resource.init();
@@ -55,7 +53,7 @@ int main(int argc, char *argv[])
 	if (!castleEditor.initialised()) return 1;
 	
 	castleEditor.loadModels("CastleModels.txt", "CastleScene.txt");
-	
+		
 	uint32_t frames = 0;
 	uint32_t timer = SDL_GetTicks();
 

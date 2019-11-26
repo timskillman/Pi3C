@@ -37,7 +37,7 @@ void Pi3Cwindow::initOptions(const options &opts)
 		glDepthFunc(GL_LEQUAL);
 		glEnable(GL_DEPTH_TEST);
 		glEnable(GL_CULL_FACE);
-		glCullFace(GL_FRONT);
+		glCullFace(GL_BACK);
 		setAlpha(opts.alphaBlending);
 		setClearColour(opts.clearColour);
 

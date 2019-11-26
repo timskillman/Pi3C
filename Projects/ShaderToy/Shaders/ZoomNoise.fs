@@ -1,9 +1,9 @@
 //https://www.shadertoy.com/view/MlyGWR
 #version 300 es
-precision mediump float;       	// Set the default precision to medium
+precision highp float;       	// Set the default precision to medium
 
 uniform float iTime;
-uniform vec2 iResolution;
+uniform vec3 iResolution;
 uniform vec3 iMouse;
 
 out vec4 fragColor;
@@ -133,7 +133,8 @@ void main(){
  //so far this linear interpolation works fine (a in,it is visible)
  //for a STATIC range of layers, range [2 to 20]
  w=mix(w+.7,w+1.5,float(layers)*.1-.3);
- fragColor=vec4(vec3(w),1.);}
+ fragColor=vec4(vec3(w),1.);
+ }
 
 /*
 //https://www.shadertoy.com/view/ltjXDW#

@@ -7,7 +7,7 @@
 precision highp float;       	// Set the default precision to medium
 
 uniform float iTime;
-uniform vec2 iResolution;
+uniform vec3 iResolution;
 
 uniform sampler2D iChannel0;
 
@@ -28,4 +28,5 @@ void main()
         if(t.x>p.y*.007+1.3)break;
         p += d;
     }
+	c = vec4(c.rgb,1.);
 }

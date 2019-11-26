@@ -102,9 +102,6 @@
     <ClCompile Include="..\..\SharedCode\core\Pi3Cresource.cpp">
       <Filter>Shared Code\core</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\SharedCode\core\Pi3Cscene.cpp">
-      <Filter>Shared Code\core</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\SharedCode\core\Pi3Cshader.cpp">
       <Filter>Shared Code\core</Filter>
     </ClCompile>
@@ -206,9 +203,6 @@
     <ClInclude Include="..\..\SharedCode\core\Pi3Cresource.h">
       <Filter>Shared Code\core</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\SharedCode\core\Pi3Cscene.h">
-      <Filter>Shared Code\core</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\SharedCode\core\Pi3Cshader.h">
       <Filter>Shared Code\core</Filter>
     </ClInclude>
@@ -241,9 +235,6 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Shaders\fs1.glsl">
-      <Filter>assets</Filter>
-    </None>
     <None Include="Shaders\vs1.glsl">
       <Filter>assets</Filter>
     </None>
@@ -253,8 +244,10 @@
     <None Include="..\..\SharedCode\glutess\README.md">
       <Filter>Shared Code\glutess</Filter>
     </None>
-    <None Include="Shaders\ShallowRiver.fs">
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="options.txt">
       <Filter>assets</Filter>
-    </None>
+    </Text>
   </ItemGroup>
 </Project>

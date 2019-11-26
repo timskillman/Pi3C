@@ -8,7 +8,7 @@
 precision highp float;       	// Set the default precision to medium
 
 uniform float iTime;
-uniform vec2 iResolution;
+uniform vec3 iResolution;
 uniform vec3 iMouse;
 
 out vec4 fragColor;
@@ -91,7 +91,7 @@ void main()
 		d += (s = df(ro + rd * d).x) * .3;
 	}
 	
-    fragColor.rgb = GetSky(rd, ld, vec3(1.5));
+    fragColor = vec4(GetSky(rd, ld, vec3(1.5)),1.);
     
 	if (d<dm)
 	{

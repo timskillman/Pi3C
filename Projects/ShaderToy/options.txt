@@ -1,5 +1,5 @@
 title:ShaderToy ES3.0 for Pi4
-fullscreen:false
+fullscreen:true
 screenWidth:640	
 screenHeight:480
 
@@ -10,9 +10,30 @@ tex4:Textures/noise.png
 
 #tests performed on 640x480 RPi4 (no overclocking)
 
+shader:Shaders/GasPlanet.fs
+shader:Shaders/JudgingBegins.fs
+shader:Shaders/GreekFrieze.fs
+shader:Shaders/MatrixRain.fs
+shader:Shaders/SmallStars.fs
+shader:Shaders/Old3Droad.fs
+shader:Shaders/TransSlices.fs
+shader:Shaders/Voronot.fs
+shader:Shaders/FractalComplex.fs
+shader:Shaders/SuperNova.fs
+shader:Shaders/OilOnWater.fs
+shader:Shaders/HyperXOR.fs
+shader:Shaders/ShinySuperNova.fs
+shader:Shaders/ColourTess.fs
+shader:Shaders/Lightning.fs
+shader:Shaders/VogelsDistrib.fs
+shader:Shaders/LightsOn.fs
+shader:Shaders/LightRays.fs
+shader:Shaders/ProcNormalMap.fs
+shader:Shaders/Mandelbrot3.fs
+shader:Shaders/CurveRays.fs
+shader:Shaders/Derivative.fs
 shader:Shaders/Bubbles.fs
-shader:Shaders/Hell.fs 
-shader:Shaders/Mandelbrot.fs
+shader:Shaders/Hell.fs
 shader:Shaders/MengerTunnel.fs
 shader:Shaders/SquareTunnel.fs
 shader:Shaders/CirclePattern.fs

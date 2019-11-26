@@ -14,6 +14,6 @@ fogColour:0xc0c0c0
 fogFar:15000.0
 fogNear:2000.0
 
-contourFile:dragon
+contourFile:raspberry
 fontsPath:../../Resources/fonts/
 font1:NotoSans-Regular.ttf

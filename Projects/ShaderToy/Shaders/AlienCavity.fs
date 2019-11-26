@@ -4,7 +4,7 @@
 precision mediump float;       	// Set the default precision to medium
 
 uniform float iTime;
-uniform vec2 iResolution;
+uniform vec3 iResolution;
 uniform vec3 iMouse;
 
 out vec4 fragColor;
@@ -119,5 +119,5 @@ void main() {
 	vec3 c = mix(vec3(.9, .2, .4), vec3(.3, cos(iTime)*.1, .2), uv.x + ri);
 	c.r *= sin(iTime);
 	c += g * .015;
-	fragColor = vec4(c, 1);
+	fragColor = vec4(c, 1.);
 }

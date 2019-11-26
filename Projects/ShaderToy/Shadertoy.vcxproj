@@ -221,7 +221,6 @@
     <ClCompile Include="..\..\SharedCode\core\Pi3Cmesh.cpp" />
     <ClCompile Include="..\..\SharedCode\core\Pi3Cmodel.cpp" />
     <ClCompile Include="..\..\SharedCode\core\Pi3Cresource.cpp" />
-    <ClCompile Include="..\..\SharedCode\core\Pi3Cscene.cpp" />
     <ClCompile Include="..\..\SharedCode\core\Pi3Cshader.cpp" />
     <ClCompile Include="..\..\SharedCode\core\Pi3Ctexture.cpp" />
     <ClCompile Include="..\..\SharedCode\core\Pi3Ctouch.cpp" />
@@ -253,7 +252,6 @@
     <ClInclude Include="..\..\SharedCode\core\Pi3Cmesh.h" />
     <ClInclude Include="..\..\SharedCode\core\Pi3Cmodel.h" />
     <ClInclude Include="..\..\SharedCode\core\Pi3Cresource.h" />
-    <ClInclude Include="..\..\SharedCode\core\Pi3Cscene.h" />
     <ClInclude Include="..\..\SharedCode\core\Pi3Cshader.h" />
     <ClInclude Include="..\..\SharedCode\core\Pi3Csound.h" />
     <ClInclude Include="..\..\SharedCode\core\Pi3Ctextformat.h" />
@@ -285,9 +283,10 @@
   <ItemGroup>
     <None Include="..\..\SharedCode\glutess\LICENSE" />
     <None Include="..\..\SharedCode\glutess\README.md" />
-    <None Include="Shaders\fs1.glsl" />
-    <None Include="Shaders\ShallowRiver.fs" />
     <None Include="Shaders\vs1.glsl" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="options.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

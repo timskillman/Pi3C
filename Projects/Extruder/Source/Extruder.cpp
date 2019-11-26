@@ -59,14 +59,14 @@ int main(int argc, char *argv[])
 		pi3c.do_events();
 		pi3c.clear_window();
 
-		const uint8_t *keystate = pi3c.window.getKeys();
-		if (keystate[SDL_SCANCODE_S]) {
-			SDL_RWops *fo = SDL_RWFromFile("thumb.png", "wb");
-			pi3c.scene.renderOffscreen(fo, 512, 512);
-			SDL_RWclose(fo);
-			glViewport(0, 0, screenWidth, screenHeight);
-			pi3c.scene.setPerspective3D(screenWidth, screenHeight, opts.asFloat("perspective"), opts.asFloat("nearz"), opts.asFloat("farz"));
-		} 
+		//const uint8_t *keystate = pi3c.window.getKeys();
+		//if (keystate[SDL_SCANCODE_S]) {
+		//	SDL_RWops *fo = SDL_RWFromFile("thumb.png", "wb");
+		//	pi3c.scene.renderOffscreen(fo, 512, 512);
+		//	SDL_RWclose(fo);
+		//	glViewport(0, 0, screenWidth, screenHeight);
+		//	pi3c.scene.setPerspective3D(screenWidth, screenHeight, opts.asFloat("perspective"), opts.asFloat("nearz"), opts.asFloat("farz"));
+		//} 
 		pi3c.scene.setMatrix(vec3f(0, 0, 0), vec3f(0, 0, -300.f), vec3f(roty,roty,0));
 		roty += 0.03f;
 

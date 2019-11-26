@@ -157,7 +157,7 @@ int32_t Pi3Cmesh::touchPoint(Pi3Ctouch &touch, const Pi3Cmatrix &mtx, const std:
 		if (yw1 < touch.touchPoint.y && yw2 < touch.touchPoint.y && yw3 < touch.touchPoint.y) continue;
 
 		// check if triangle is back-facing and if so, discard ...
-		if ((-yw2 * xw3 + yw1 * (-xw2 + xw3) + xw1 * (yw2 - yw3) + xw2 * yw3) > 0) continue;
+		if ((-yw2 * xw3 + yw1 * (-xw2 + xw3) + xw1 * (yw2 - yw3) + xw2 * yw3) < 0) continue;
 
 		//we've found the triangle in 2D, now find the true 3D intersection (if it exists) in world space ...
 		vec3f v1(x2 - x1, y2 - y1, z2 - z1);
