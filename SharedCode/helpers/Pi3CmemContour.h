@@ -1,16 +1,11 @@
 #pragma once
 
 #include "Pi3Ccontour.h"
-
-class Pi3CmlinContour : Pi3ClinContour
-{
-public:
+#include "Pi3Ctexture.h"
+#include <memory>
 
 
-};
-
-
-class Pi3CmlinPath : Pi3ClinPath
+class Pi3CmlinPath : public Pi3ClinPath
 {
 public:
 
@@ -19,6 +14,6 @@ public:
 	void open(const char* filepath);
 	void drawToTexture(std::shared_ptr<Pi3Ctexture> tex, float sc);
 	void fillToTexture(std::shared_ptr<Pi3Ctexture> tex, float sc);
-
+	
 };
 

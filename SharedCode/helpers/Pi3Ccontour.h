@@ -29,9 +29,11 @@ public:
 	Pi3ClinPath() {}
 
 	std::vector<Pi3ClinContour> linContours;
-	Pi3Cbbox2d bbox;
 
 	void append(const Pi3ClinContour& lcont);
 	std::vector<std::vector<vec2f>> asVectors();
 	std::vector<std::vector<float>> asFloats();
+
+	Pi3Cbbox2d bbox;
+
 };

@@ -242,7 +242,7 @@ namespace Pi3CimageTools {
 				else {
 					contour.points.push_back(vec2f((float)startx, (float)starty));
 					contours.append(contour);
-					SDL_Log("Finished path %d", sp);
+					//SDL_Log("Finished path %d", sp);
 				}
 
 			}

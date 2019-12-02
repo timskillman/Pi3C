@@ -1,7 +1,8 @@
 #include "Pi3C.h"
 #include "Pi3CloadOptions.h"
 #include "Pi3Cshapes.h"
-#include "Pi3Ccontour.h"
+#include "Pi3CmemContour.h"
+#include "Pi3Cbbox2d.h"
 
 // ==========================================================================
 // Pi3C Graphics Library Example - Extruder 2D example (by Tim Skillman)
@@ -41,7 +42,7 @@ int main(int argc, char *argv[])
 	int screenHeight = opts.asInt("screenHeight");
 	Pi3C pi3c(opts.asString("title"), screenWidth, screenHeight, opts.asBool("fullscreen"));
 	
-	Pi3ClinPath lpath(opts.asString("contourFile").c_str());
+	Pi3CmlinPath lpath(opts.asString("contourFile").c_str());
 
 	vec2f lpc = lpath.bbox.centre();
 	//uint32_t start_time = SDL_GetTicks();

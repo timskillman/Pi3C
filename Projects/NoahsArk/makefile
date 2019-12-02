@@ -1,7 +1,7 @@
 TARGET = SceneViewer
 
 CC = g++
-CFLAGS = -std=c++17 -Wall
+CFLAGS = -std=c++17 -Wall -Wno-reorder -Wno-unused-variable -Wno-switch
 LDLIBS = -lGL -lSDL2_image -lSDL2_mixer -lSDL2_ttf
 LDFLAGS = $(shell sdl2-config --cflags --libs)
 

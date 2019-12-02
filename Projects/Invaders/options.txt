@@ -3,7 +3,7 @@ fullscreen:true
 screenWidth:1440
 screenHeight:900
 
-trees:30000
+trees:5000
 fly:true
 lightpos:0.0 1.0 0.0
 startpos:0.0 -30 0.0
