@@ -72,16 +72,10 @@
     <ClCompile Include="..\..\SharedCode\core\Pi3Cshader.cpp">
       <Filter>SharedCode\core</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\SharedCode\core\Pi3Cshapes.cpp">
-      <Filter>SharedCode\core</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\SharedCode\core\Pi3Ctexture.cpp">
       <Filter>SharedCode\core</Filter>
     </ClCompile>
     <ClCompile Include="..\..\SharedCode\core\Pi3Ctouch.cpp">
-      <Filter>SharedCode\core</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\SharedCode\core\Pi3Ctriangle.cpp">
       <Filter>SharedCode\core</Filter>
     </ClCompile>
     <ClCompile Include="..\..\SharedCode\core\Pi3Cwin.cpp">
@@ -147,6 +141,18 @@
     <ClCompile Include="..\..\SharedCode\helpers\Pi3Cpopulate.cpp">
       <Filter>SharedCode\helpers</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\SharedCode\helpers\Pi3Cshapes.cpp">
+      <Filter>SharedCode\helpers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\SharedCode\helpers\Pi3Cutils.cpp">
+      <Filter>SharedCode\helpers</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\aliens.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\bullets.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\SharedCode\core\Pi3Cbbox3d.h">
@@ -185,9 +191,6 @@
     <ClInclude Include="..\..\SharedCode\core\Pi3Cshader.h">
       <Filter>SharedCode\core</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\SharedCode\core\Pi3Cshapes.h">
-      <Filter>SharedCode\core</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\SharedCode\core\Pi3Csound.h">
       <Filter>SharedCode\core</Filter>
     </ClInclude>
@@ -198,9 +201,6 @@
       <Filter>SharedCode\core</Filter>
     </ClInclude>
     <ClInclude Include="..\..\SharedCode\core\Pi3Ctouch.h">
-      <Filter>SharedCode\core</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\SharedCode\core\Pi3Ctriangle.h">
       <Filter>SharedCode\core</Filter>
     </ClInclude>
     <ClInclude Include="..\..\SharedCode\core\Pi3Cvector.h">
@@ -283,6 +283,18 @@
     </ClInclude>
     <ClInclude Include="..\..\SharedCode\helpers\Pi3Cpopulate.h">
       <Filter>SharedCode\helpers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\SharedCode\helpers\Pi3Cshapes.h">
+      <Filter>SharedCode\helpers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\SharedCode\helpers\Pi3Cutils.h">
+      <Filter>SharedCode\helpers</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\aliens.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\bullets.h">
+      <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

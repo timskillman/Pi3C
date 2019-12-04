@@ -5,7 +5,7 @@
 // This work is licensed under a Creative Commons Attribution 4.0 International License.
 
 #version 300 es
-precision mediump float;       	// Set the default precision to medium
+precision highp float;       	// Set the default precision to medium
 
 uniform float iTime;
 uniform vec3 iResolution;

@@ -223,10 +223,8 @@
     <ClCompile Include="..\..\SharedCode\core\Pi3Cresource.cpp" />
     <ClCompile Include="..\..\SharedCode\core\Pi3Cscene.cpp" />
     <ClCompile Include="..\..\SharedCode\core\Pi3Cshader.cpp" />
-    <ClCompile Include="..\..\SharedCode\core\Pi3Cshapes.cpp" />
     <ClCompile Include="..\..\SharedCode\core\Pi3Ctexture.cpp" />
     <ClCompile Include="..\..\SharedCode\core\Pi3Ctouch.cpp" />
-    <ClCompile Include="..\..\SharedCode\core\Pi3Ctriangle.cpp" />
     <ClCompile Include="..\..\SharedCode\core\Pi3Cwin.cpp" />
     <ClCompile Include="..\..\SharedCode\file\Pi3Cdirectory.cpp" />
     <ClCompile Include="..\..\SharedCode\file\Pi3CfileOBJ.cpp" />
@@ -247,6 +245,8 @@
     <ClCompile Include="..\..\SharedCode\helpers\Pi3CloadOptions.cpp" />
     <ClCompile Include="..\..\SharedCode\helpers\Pi3Cparticles.cpp" />
     <ClCompile Include="..\..\SharedCode\helpers\Pi3CperlinNoise.cpp" />
+    <ClCompile Include="..\..\SharedCode\helpers\Pi3Cshapes.cpp" />
+    <ClCompile Include="..\..\SharedCode\helpers\Pi3Cutils.cpp" />
     <ClCompile Include="..\..\SharedCode\ui\Pi3Cimgui.cpp" />
     <ClCompile Include="..\..\SharedCode\ui\Pi3Cstring.cpp" />
     <ClCompile Include="Source\Perlin.cpp" />
@@ -263,12 +263,10 @@
     <ClInclude Include="..\..\SharedCode\core\Pi3Cresource.h" />
     <ClInclude Include="..\..\SharedCode\core\Pi3Cscene.h" />
     <ClInclude Include="..\..\SharedCode\core\Pi3Cshader.h" />
-    <ClInclude Include="..\..\SharedCode\core\Pi3Cshapes.h" />
     <ClInclude Include="..\..\SharedCode\core\Pi3Csound.h" />
     <ClInclude Include="..\..\SharedCode\core\Pi3Ctextformat.h" />
     <ClInclude Include="..\..\SharedCode\core\Pi3Ctexture.h" />
     <ClInclude Include="..\..\SharedCode\core\Pi3Ctouch.h" />
-    <ClInclude Include="..\..\SharedCode\core\Pi3Ctriangle.h" />
     <ClInclude Include="..\..\SharedCode\core\Pi3Cvector.h" />
     <ClInclude Include="..\..\SharedCode\core\Pi3Cwin.h" />
     <ClInclude Include="..\..\SharedCode\file\Pi3Cdirectory.h" />
@@ -295,6 +293,8 @@
     <ClInclude Include="..\..\SharedCode\helpers\Pi3CloadOptions.h" />
     <ClInclude Include="..\..\SharedCode\helpers\Pi3Cparticles.h" />
     <ClInclude Include="..\..\SharedCode\helpers\Pi3CperlinNoise.h" />
+    <ClInclude Include="..\..\SharedCode\helpers\Pi3Cshapes.h" />
+    <ClInclude Include="..\..\SharedCode\helpers\Pi3Cutils.h" />
     <ClInclude Include="..\..\SharedCode\ui\Pi3Cimgui.h" />
     <ClInclude Include="..\..\SharedCode\ui\Pi3Cstring.h" />
   </ItemGroup>

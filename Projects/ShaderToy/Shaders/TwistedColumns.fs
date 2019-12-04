@@ -6,7 +6,7 @@
 // filtered and high resolution. Uncomment line 40 to see the columns.
 
 #version 300 es
-precision mediump float;       	// Set the default precision to medium
+precision highp float;       	// Set the default precision to medium
 
 uniform float iTime;
 uniform vec3 iResolution;

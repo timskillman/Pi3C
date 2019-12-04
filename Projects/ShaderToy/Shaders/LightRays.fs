@@ -1,7 +1,7 @@
 //https://www.shadertoy.com/view/lljGDt
 
 #version 300 es
-precision mediump float;       	// Set the default precision to medium
+precision highp float;       	// Set the default precision to medium
 
 uniform float iTime;
 uniform vec3 iResolution;

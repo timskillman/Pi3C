@@ -1,7 +1,7 @@
 //https://www.shadertoy.com/view/XlXGWf
 
 #version 300 es
-precision mediump float;       	// Set the default precision to medium
+precision highp float;       	// Set the default precision to medium
 
 uniform float iTime;
 uniform vec3 iResolution;
@@ -15,7 +15,7 @@ out vec4 fragColor;
 //#define GLSLSANDBOX
 
 #ifdef GL_ES
-precision mediump float;
+precision highp float;
 #endif
 
 float DERRect(in vec3 z, vec4 radii){return length(max(abs(z)-radii.xyz,0.0))-radii.w;}

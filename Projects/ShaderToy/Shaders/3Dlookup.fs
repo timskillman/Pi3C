@@ -20,7 +20,7 @@
 #define METHOD 0
 
 #version 300 es
-precision mediump float;       	// Set the default precision to medium
+precision highp float;       	// Set the default precision to high
 
 uniform float iTime;
 uniform vec3 iResolution;

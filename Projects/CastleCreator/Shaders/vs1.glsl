@@ -1,4 +1,5 @@
-precision mediump float;       // Set the default precision to medium. We don't need as high of a
+precision highp float;       // Set the default precision to medium. We don't need as high of a
+//Note high precision is needed to NVidia RTX2060 card
 
 uniform mat4 u_ProjMatrix;     // view/projection matrix.
 uniform mat4 u_ModelMatrix;    // model matrix.

@@ -28,8 +28,8 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{86B9CF91-8738-B044-A7BF-A295F9323D12}</ProjectGuid>
-    <RootNamespace>ScreenRunner</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
+    <RootNamespace>Extruder</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0.16299.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -41,7 +41,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v141</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
@@ -54,20 +54,20 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v141</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v141</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v141</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
@@ -102,17 +102,17 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>$(ProjectDir)\..\..\ThirdParty\SDL2\include;$(ProjectDir)\..\..\ThirdParty\SDL2_image\include;$(ProjectDir)\..\..\ThirdParty\SDL2_net\include;$(ProjectDir)\..\..\ThirdParty\SDL2_mixer\include;$(ProjectDir)\..\..\ThirdParty\SDL2_ttf\include;$(ProjectDir)\..\..\ThirdParty\glew\include;$(ProjectDir)\..\..\SharedCode\helpers;$(ProjectDir)\..\..\SharedCode\core;$(ProjectDir)\..\..\SharedCode\ui;$(ProjectDir)\..\..\SharedCode\file;$(ProjectDir)\..\..\SharedCode\glutess;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)\..\..\ThirdParty\SDL2\include;$(ProjectDir)\..\..\ThirdParty\SDL2_image\include;$(ProjectDir)\..\..\ThirdParty\SDL2_net\include;$(ProjectDir)\..\..\SharedCode\core;$(ProjectDir)\..\..\ThirdParty\SDL2_mixer\include;$(ProjectDir)\..\..\ThirdParty\glew\include;$(ProjectDir)\..\..\ThirdParty\SDL2_ttf\include;$(ProjectDir)\..\..\SharedCode\ui;$(ProjectDir)\..\..\SharedCode\file;$(ProjectDir)\..\..\SharedCode\helpers;$(ProjectDir)\..\..\SharedCode\glutess;$(IncludePath)</IncludePath>
     <LibraryPath>$(ProjectDir)\..\..\ThirdParty\SDL2_image\lib\x86;$(ProjectDir)\..\..\ThirdParty\SDL2\lib\x86;$(ProjectDir)\..\..\ThirdParty\glew\lib\Release\Win32;$(ProjectDir)\..\..\ThirdParty\SDL2_mixer\lib\x86;$(ProjectDir)\..\..\ThirdParty\SDL2_ttf\lib\x86;$(LibraryPath)</LibraryPath>
     <SourcePath>$(SourcePath)</SourcePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
-    <IncludePath>$(ProjectDir)\..\..\ThirdParty\SDL2\include;$(ProjectDir)\..\..\ThirdParty\SDL2\include;$(ProjectDir)\..\..\ThirdParty\SDL2_image\include;$(ProjectDir)\..\..\ThirdParty\SDL2\include;$(ProjectDir)\..\..\ThirdParty\SDL2\include;$(ProjectDir)\..\..\ThirdParty\SDL2_image\include;$(ProjectDir)\..\..\ThirdParty\SDL2_net\include;$(ProjectDir)\..\..\ThirdParty\SDL2\include;$(ProjectDir)\..\..\ThirdParty\SDL2\include;$(ProjectDir)\..\..\ThirdParty\SDL2_image\include;$(ProjectDir)\..\..\ThirdParty\SDL2\include;$(ProjectDir)\..\..\ThirdParty\SDL2\include;$(ProjectDir)\..\..\ThirdParty\SDL2_image\include;$(ProjectDir)\..\..\ThirdParty\SDL2_net\include;$(ProjectDir)\Shared\SDLwin\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)\..\..\ThirdParty\SDL2\include;$(ProjectDir)\..\..\ThirdParty\SDL2_image\include;$(ProjectDir)\..\..\ThirdParty\SDL2_net\include;$(ProjectDir)\..\..\SharedCode\core;$(ProjectDir)\..\..\SharedCode\ui;$(ProjectDir)\..\..\SharedCode\helpers;$(ProjectDir)\..\..\SharedCode\file;$(ProjectDir)\..\..\SharedCode\glutess;$(IncludePath)</IncludePath>
     <LibraryPath>$(ProjectDir)\..\..\ThirdParty\\SDL2_image\lib\x86;$(ProjectDir)\..\..\ThirdParty\\SDL2\lib\x86;$(ProjectDir)\..\..\ThirdParty\\SDL2_net\lib\x86;$(LibraryPath)</LibraryPath>
     <SourcePath>$(SourcePath)</SourcePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IncludePath>$(ProjectDir)\..\..\ThirdParty\SDL2\include;$(ProjectDir)\..\..\ThirdParty\SDL2_image\include;$(ProjectDir)\..\..\ThirdParty\SDL2_net\include;$(ProjectDir)\..\..\ThirdParty\glew\include;$(ProjectDir)\..\..\ThirdParty\SDL2_mixer\include;$(ProjectDir)\..\..\SharedCode\core;$(ProjectDir)\..\..\SharedCode\helpers;$(ProjectDir)\..\..\SharedCode\glutess;$(ProjectDir)\..\..\SharedCode\ui;$(ProjectDir)\..\..\SharedCode\file;$(ProjectDir)\..\..\ThirdParty\SDL2_ttf\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)\..\..\ThirdParty\SDL2\include;$(ProjectDir)\..\..\ThirdParty\SDL2_image\include;$(ProjectDir)\..\..\ThirdParty\SDL2_net\include;$(ProjectDir)\..\..\ThirdParty\SDL2_ttf\include;$(ProjectDir)\..\..\ThirdParty\glew\include;$(ProjectDir)\..\..\SharedCode\ui;$(ProjectDir)\..\..\ThirdParty\SDL2_mixer\include;$(ProjectDir)\..\..\SharedCode\file;$(ProjectDir)\..\..\SharedCode\core;$(ProjectDir)\..\..\SharedCode\helpers;$(ProjectDir)\..\..\SharedCode\glutess;$(IncludePath)</IncludePath>
     <LibraryPath>$(ProjectDir)\..\..\ThirdParty\SDL2_image\lib\x86;$(ProjectDir)\..\..\ThirdParty\SDL2\lib\x86;$(ProjectDir)\..\..\ThirdParty\SDL2_net\lib\x86;$(ProjectDir)\..\..\ThirdParty\glew\lib\Release\Win32;$(ProjectDir)\..\..\ThirdParty\SDL2_mixer\lib\x86;$(ProjectDir)\..\..\ThirdParty\SDL2_ttf\lib\x86;$(LibraryPath)</LibraryPath>
     <SourcePath>$(SourcePath)</SourcePath>
   </PropertyGroup>
@@ -177,7 +177,7 @@
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>SDL2.lib;SDL2main.lib;SDL2_mixer.lib;OpenGL32.lib;SDL2_image.lib;glew32s.lib;SDL2_ttf.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>SDL2.lib;SDL2main.lib;SDL2_mixer.lib;OpenGL32.lib;SDL2_image.lib;SDL2_ttf.lib;glew32s.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Windows</SubSystem>
     </Link>
   </ItemDefinitionGroup>
@@ -212,6 +212,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\SharedCode\core\Pi3Cbbox2d.cpp" />
     <ClCompile Include="..\..\SharedCode\core\Pi3Cbbox3d.cpp" />
     <ClCompile Include="..\..\SharedCode\core\Pi3Ccollision.cpp" />
     <ClCompile Include="..\..\SharedCode\core\Pi3Cfont.cpp" />
@@ -223,9 +224,12 @@
     <ClCompile Include="..\..\SharedCode\core\Pi3Cresource.cpp" />
     <ClCompile Include="..\..\SharedCode\core\Pi3Cscene.cpp" />
     <ClCompile Include="..\..\SharedCode\core\Pi3Cshader.cpp" />
+    <ClCompile Include="..\..\SharedCode\helpers\Pi3CmemContour.cpp" />
+    <ClCompile Include="..\..\SharedCode\helpers\Pi3Cshapes.cpp" />
     <ClCompile Include="..\..\SharedCode\core\Pi3Ctexture.cpp" />
     <ClCompile Include="..\..\SharedCode\core\Pi3Ctouch.cpp" />
     <ClCompile Include="..\..\SharedCode\core\Pi3Cwin.cpp" />
+    <ClCompile Include="..\..\SharedCode\file\Pi3CbinStream.cpp" />
     <ClCompile Include="..\..\SharedCode\file\Pi3Cdirectory.cpp" />
     <ClCompile Include="..\..\SharedCode\file\Pi3CfileOBJ.cpp" />
     <ClCompile Include="..\..\SharedCode\glutess\dict.c" />
@@ -240,19 +244,16 @@
     <ClCompile Include="..\..\SharedCode\glutess\tessellate.cpp" />
     <ClCompile Include="..\..\SharedCode\glutess\tessmono.c" />
     <ClCompile Include="..\..\SharedCode\helpers\Pi3C.cpp" />
-    <ClCompile Include="..\..\SharedCode\helpers\Pi3Cavatar.cpp" />
-    <ClCompile Include="..\..\SharedCode\helpers\Pi3Chtml.cpp" />
+    <ClCompile Include="..\..\SharedCode\helpers\Pi3Ccontour.cpp" />
+    <ClCompile Include="..\..\SharedCode\helpers\Pi3CimageTools.cpp" />
     <ClCompile Include="..\..\SharedCode\helpers\Pi3CloadOptions.cpp" />
-    <ClCompile Include="..\..\SharedCode\helpers\Pi3Cpopulate.cpp" />
-    <ClCompile Include="..\..\SharedCode\helpers\Pi3Cshapes.cpp" />
     <ClCompile Include="..\..\SharedCode\helpers\Pi3Cutils.cpp" />
     <ClCompile Include="..\..\SharedCode\ui\Pi3Cimgui.cpp" />
     <ClCompile Include="..\..\SharedCode\ui\Pi3Cstring.cpp" />
-    <ClCompile Include="Source\aliens.cpp" />
-    <ClCompile Include="Source\bullets.cpp" />
-    <ClCompile Include="Source\Invaders.cpp" />
+    <ClCompile Include="Source\Extruder.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\SharedCode\core\Pi3Cbbox2d.h" />
     <ClInclude Include="..\..\SharedCode\core\Pi3Cbbox3d.h" />
     <ClInclude Include="..\..\SharedCode\core\Pi3Ccollision.h" />
     <ClInclude Include="..\..\SharedCode\core\Pi3Cfont.h" />
@@ -261,16 +262,18 @@
     <ClInclude Include="..\..\SharedCode\core\Pi3Cmatrix.h" />
     <ClInclude Include="..\..\SharedCode\core\Pi3Cmesh.h" />
     <ClInclude Include="..\..\SharedCode\core\Pi3Cmodel.h" />
-    <ClInclude Include="..\..\SharedCode\core\Pi3Crect.h" />
     <ClInclude Include="..\..\SharedCode\core\Pi3Cresource.h" />
     <ClInclude Include="..\..\SharedCode\core\Pi3Cscene.h" />
     <ClInclude Include="..\..\SharedCode\core\Pi3Cshader.h" />
+    <ClInclude Include="..\..\SharedCode\helpers\Pi3CmemContour.h" />
+    <ClInclude Include="..\..\SharedCode\helpers\Pi3Cshapes.h" />
     <ClInclude Include="..\..\SharedCode\core\Pi3Csound.h" />
     <ClInclude Include="..\..\SharedCode\core\Pi3Ctextformat.h" />
     <ClInclude Include="..\..\SharedCode\core\Pi3Ctexture.h" />
     <ClInclude Include="..\..\SharedCode\core\Pi3Ctouch.h" />
     <ClInclude Include="..\..\SharedCode\core\Pi3Cvector.h" />
     <ClInclude Include="..\..\SharedCode\core\Pi3Cwin.h" />
+    <ClInclude Include="..\..\SharedCode\file\Pi3CbinStream.h" />
     <ClInclude Include="..\..\SharedCode\file\Pi3Cdirectory.h" />
     <ClInclude Include="..\..\SharedCode\file\Pi3CfileOBJ.h" />
     <ClInclude Include="..\..\SharedCode\glutess\dict-list.h" />
@@ -290,16 +293,12 @@
     <ClInclude Include="..\..\SharedCode\glutess\tessellate.h" />
     <ClInclude Include="..\..\SharedCode\glutess\tessmono.h" />
     <ClInclude Include="..\..\SharedCode\helpers\Pi3C.h" />
-    <ClInclude Include="..\..\SharedCode\helpers\Pi3Cavatar.h" />
-    <ClInclude Include="..\..\SharedCode\helpers\Pi3Chtml.h" />
+    <ClInclude Include="..\..\SharedCode\helpers\Pi3Ccontour.h" />
+    <ClInclude Include="..\..\SharedCode\helpers\Pi3CimageTools.h" />
     <ClInclude Include="..\..\SharedCode\helpers\Pi3CloadOptions.h" />
-    <ClInclude Include="..\..\SharedCode\helpers\Pi3Cpopulate.h" />
-    <ClInclude Include="..\..\SharedCode\helpers\Pi3Cshapes.h" />
     <ClInclude Include="..\..\SharedCode\helpers\Pi3Cutils.h" />
     <ClInclude Include="..\..\SharedCode\ui\Pi3Cimgui.h" />
     <ClInclude Include="..\..\SharedCode\ui\Pi3Cstring.h" />
-    <ClInclude Include="Source\aliens.h" />
-    <ClInclude Include="Source\bullets.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\SharedCode\glutess\LICENSE" />

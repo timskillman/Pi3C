@@ -1,5 +1,5 @@
 #version 300 es
-precision mediump float;       	// Set the default precision to medium
+precision highp float;       	// Set the default precision to medium
 
 //Flowing Water
 //https://www.shadertoy.com/view/lls3zf
