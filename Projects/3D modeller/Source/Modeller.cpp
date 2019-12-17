@@ -60,7 +60,7 @@ void Modeller::init()
 	setupGUI(opts);
 
 	nearzfarz = opts.asVec2f("nearzfarz");
-	scene.setFog(0xffffff, 10000.f, 25000.f);
+	scene.setFog(0xffffff, 25000.f, 35000.f);
 	scene.setPerspective3D(window->getWidth(), window->getHeight(), PSPVALUE, nearzfarz.x, nearzfarz.y);
 
 	// Setup player's avatar ...
@@ -133,6 +133,14 @@ void Modeller::handleKeys()
 {
 	const uint8_t *keystate = window->getKeys();
 
+	if (keystate[SDL_SCANCODE_P]) {
+		uint32_t w = 800;
+		uint32_t h = 600;
+		Pi3Crecti rect(0, 0, w, h);
+		std::vector<uint8_t> snap;
+		snap.resize(w * h * 4);
+		scene.snapShot(rect, snap);
+	}
 }
 
 void Modeller::createShape(const Pi3Cmesh& mesh, const vec3f& pos, const uint32_t colour)

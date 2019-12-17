@@ -242,6 +242,13 @@ bool Pi3Cscene::snapShot(const Pi3Crecti &rect, std::vector<uint8_t> &snapShot)
 		glViewport(rect.x, rect.y, rect.width, rect.height);
 		//glReadBuffer(GL_COLOR_ATTACHMENT0);
 		glReadPixels(rect.x, rect.y, rect.width, rect.height, GL_RGBA, GL_UNSIGNED_BYTE, &snapShot[0]);
+
+		SDL_Surface *ss = SDL_CreateRGBSurfaceFrom(&snapShot[0], rect.width, rect.height, 32, rect.width * 4, 0x000000ff, 0x0000ff00, 0x00ff0000, 0xff000000);
+		SDL_RWops *fo = SDL_RWFromFile("snapshot.png", "wb");
+		IMG_SavePNG_RW(ss, fo, 0);
+		SDL_RWclose(fo);
+		SDL_FreeSurface(ss);
+
 		return true;
 	}
 	catch (const std::bad_alloc&) {
