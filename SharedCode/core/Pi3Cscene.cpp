@@ -1,5 +1,6 @@
 #include "Pi3Cscene.h"
 #include <algorithm>
+#include <cstring>
 
 void Pi3Cscene::render(const float ticks, Pi3Cmatrix &projMatrix, Pi3Cmatrix &modelMatrix, std::vector<Pi3Cmodel> &mods, Pi3Cmaterial *materialOverride)
 {
@@ -241,6 +242,19 @@ void Pi3Cscene::flipImage(std::vector<uint8_t> &src, std::vector<uint8_t> &dest,
 	}
 }
 
+void Pi3Cscene::saveBufferToPNG(const char * filename, std::vector<uint8_t> &snapShot, const int width, const int height)
+{
+		std::vector<uint8_t> destimage;
+		destimage.resize(snapShot.size());
+		flipImage(snapShot, destimage, width, height);
+
+		SDL_Surface *ss = SDL_CreateRGBSurfaceFrom(&destimage[0], width, height, 32, width * 4, 0x000000ff, 0x0000ff00, 0x00ff0000, 0xff000000);
+		SDL_RWops *fo = SDL_RWFromFile(filename, "wb");
+		IMG_SavePNG_RW(ss, fo, 0);
+		SDL_RWclose(fo);
+		SDL_FreeSurface(ss);
+}
+
 bool Pi3Cscene::snapShot(const Pi3Crecti &rect, std::vector<uint8_t> &snapShot)
 {
 	//SDL_Surface *sshot = SDL_CreateRGBSurface(0, rect.width, rect.height, 32, 0x00ff0000, 0x0000ff00, 0x000000ff, 0xff000000);
@@ -254,7 +268,8 @@ bool Pi3Cscene::snapShot(const Pi3Crecti &rect, std::vector<uint8_t> &snapShot)
 		glViewport(rect.x, rect.y, rect.width, rect.height);
 		//glReadBuffer(GL_COLOR_ATTACHMENT0);
 		glReadPixels(rect.x, rect.y, rect.width, rect.height, GL_RGBA, GL_UNSIGNED_BYTE, &snapShot[0]);
-
+		saveBufferToPNG("snapshot.png",snapShot,rect.width, rect.height);
+		/*
 		std::vector<uint8_t> destimage;
 		destimage.resize(snapShot.size());
 		flipImage(snapShot, destimage, rect.width, rect.height);
@@ -264,6 +279,7 @@ bool Pi3Cscene::snapShot(const Pi3Crecti &rect, std::vector<uint8_t> &snapShot)
 		IMG_SavePNG_RW(ss, fo, 0);
 		SDL_RWclose(fo);
 		SDL_FreeSurface(ss);
+		* */
 
 		return true;
 	}
@@ -272,17 +288,15 @@ bool Pi3Cscene::snapShot(const Pi3Crecti &rect, std::vector<uint8_t> &snapShot)
 	}
 }
 
-void Pi3Cscene::renderOffscreen(SDL_RWops *f, const int width, const int height, const Pi3Cshader &shader)
+void Pi3Cscene::renderOffscreen(const int width, const int height, const Pi3Cshader &shader)
 {
-#ifdef __LINUX__
+//#ifdef __LINUX__
 	
-	/*
 	GLuint fbo = 0, frame_buf = 0, colour_buf = 0, depth_buf = 0;
-
 
 	glGenRenderbuffers(1, &colour_buf);
 	glBindRenderbuffer(GL_RENDERBUFFER, colour_buf);
-	glRenderbufferStorage(GL_RENDERBUFFER, GL_RGBA, width, height);
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_RGBA8_OES, width, height);
 
 	glGenRenderbuffers(1, &depth_buf);
 	glBindRenderbuffer(GL_RENDERBUFFER, depth_buf);
@@ -293,7 +307,6 @@ void Pi3Cscene::renderOffscreen(SDL_RWops *f, const int width, const int height,
 	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, colour_buf);
 	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depth_buf);
 
-
 	GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
 
 	if (status != GL_FRAMEBUFFER_COMPLETE)
@@ -301,21 +314,47 @@ void Pi3Cscene::renderOffscreen(SDL_RWops *f, const int width, const int height,
 		switch (status)
 		{
 		case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT:
-			XDEBUG_PRINTCOLOR(0, __L("GRPBUFFEROPENGLRENDER::Ini Unable to create Framebuffer : GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT"));
+			SDL_Log("GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT");
 			break;
 		case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT:
-			XDEBUG_PRINTCOLOR(0, __L("GRPBUFFEROPENGLRENDER::Ini Unable to create Framebuffer : GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT"));
+			SDL_Log("GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT");
 			break;
 		case GL_FRAMEBUFFER_UNSUPPORTED:
-			XDEBUG_PRINTCOLOR(0, __L("GRPBUFFEROPENGLRENDER::Ini Unable to create Framebuffer : GL_FRAMEBUFFER_UNSUPPORTED"));
+			SDL_Log("GL_FRAMEBUFFER_UNSUPPORTED");
 			break;
 		default:
-			XDEBUG_PRINTCOLOR(0, __L("GRPBUFFEROPENGLRENDER::Ini Unable to create Framebuffer : Unknown Reason"));
+			SDL_Log("Unable to create FrameBuffer");
 			break;
 		}
+	} 
+	else {
+		SDL_Log("FrameBuffer created");
 	}
-	*/
-#endif
+
+	//RENDER
+	glViewport(0, 0, width, height);
+	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_MULTISAMPLE);
+
+	//glClearColor(0, 0, 0, 0);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //Clear colour and Z buffer
+
+	render3D();
+	
+	std::vector<uint8_t> data(width*height * 4);
+	glReadPixels(0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, &data[0]);
+
+	saveBufferToPNG("offscreen.png", data, width, height);
+	
+	//deinit frame buffer:
+	glDeleteFramebuffers(1, &frame_buf);
+	glDeleteRenderbuffers(1, &depth_buf);
+	glDeleteRenderbuffers(1, &colour_buf);
+
+	// Return to onscreen rendering:
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	
+//#endif
 
 #ifdef __WINDOWS__
 	//initialize frame buffer

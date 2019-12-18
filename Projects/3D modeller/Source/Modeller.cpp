@@ -23,6 +23,9 @@ Modeller::Modeller(Pi3Cresource *resource, Pi3Cwindow *window)
 	scene.selectShader(basicShaderRef);
 	scene.setViewport2D(Pi3Crecti(0, 0, window->getWidth(), window->getHeight()),-200.f, 2000.f);
 	window->setClearColour(0xff804040);
+	
+	scene.renderOffscreen(1200,800,resource->shaders[0]);
+	
 }
 
 Modeller::~Modeller()
