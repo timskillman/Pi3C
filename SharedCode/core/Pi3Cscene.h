@@ -78,6 +78,8 @@ public:
 	void render2D(const float ticks = 1.f);
 	void renderSkybox(const vec3f &pos, const int32_t skyboxref = 0, float ticks = 1.f);
 	void renderOffscreen(SDL_RWops *f, const int width, const int height, const Pi3Cshader &shader);
+
+	void flipImage(std::vector<uint8_t> &src, std::vector<uint8_t> &dest, uint32_t w, uint32_t h);
 	bool snapShot(const Pi3Crecti &rect, std::vector<uint8_t> &snapShot);
 
 	Pi3Cmodel * getSubModel(const int32_t * groupRefs, const int32_t maxlevel);

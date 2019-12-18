@@ -229,6 +229,18 @@ void Pi3Cscene::resize(const Pi3Crecti &rect)
 //	for (auto &model : models) if (model.selected) model.deleted = true;
 //}
 
+void Pi3Cscene::flipImage(std::vector<uint8_t> &src, std::vector<uint8_t> &dest, uint32_t w, uint32_t h)
+{
+	uint32_t span = w * 4;
+	uint8_t *pt = &src[0] + 0;
+	uint8_t *pb = &dest[0] + (h-1) * span;
+	for (uint32_t y = 0; y < h; y++) {
+		std::memcpy(pb, pt, span);
+		pb -= span;
+		pt += span;
+	}
+}
+
 bool Pi3Cscene::snapShot(const Pi3Crecti &rect, std::vector<uint8_t> &snapShot)
 {
 	//SDL_Surface *sshot = SDL_CreateRGBSurface(0, rect.width, rect.height, 32, 0x00ff0000, 0x0000ff00, 0x000000ff, 0xff000000);
@@ -243,7 +255,11 @@ bool Pi3Cscene::snapShot(const Pi3Crecti &rect, std::vector<uint8_t> &snapShot)
 		//glReadBuffer(GL_COLOR_ATTACHMENT0);
 		glReadPixels(rect.x, rect.y, rect.width, rect.height, GL_RGBA, GL_UNSIGNED_BYTE, &snapShot[0]);
 
-		SDL_Surface *ss = SDL_CreateRGBSurfaceFrom(&snapShot[0], rect.width, rect.height, 32, rect.width * 4, 0x000000ff, 0x0000ff00, 0x00ff0000, 0xff000000);
+		std::vector<uint8_t> destimage;
+		destimage.resize(snapShot.size());
+		flipImage(snapShot, destimage, rect.width, rect.height);
+
+		SDL_Surface *ss = SDL_CreateRGBSurfaceFrom(&destimage[0], rect.width, rect.height, 32, rect.width * 4, 0x000000ff, 0x0000ff00, 0x00ff0000, 0xff000000);
 		SDL_RWops *fo = SDL_RWFromFile("snapshot.png", "wb");
 		IMG_SavePNG_RW(ss, fo, 0);
 		SDL_RWclose(fo);
