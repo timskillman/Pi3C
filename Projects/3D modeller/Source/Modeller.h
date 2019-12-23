@@ -19,7 +19,7 @@ public:
 
 	enum Projection { PERSPECTIVE, ORTHOGRAPHIC };
 	enum SceneLayout { TOPLEFT = 0, TOPRIGHT = 1, BOTTOMLEFT = 2, BOTTOMRIGHT = 3 };
-	enum EditMode { ED_SELECT, ED_ROTATE, ED_MOVE, ED_SCALE, ED_CREATE, ED_CONTOUR, ED_ROTATESCENE, ED_DRAGBAR };
+	enum EditMode { ED_SELECT, ED_ROTATE, ED_MOVE, ED_SCALE, ED_CREATE, ED_CONTOUR, ED_ROTATESCENE };
 	enum ViewProject { VIEW_LEFT, VIEW_RIGHT, VIEW_TOP, VIEW_BOTTOM, VIEW_FRONT, VIEW_BACK, VIEW_FREE, VIEW_PERSPECTIVE };
 	enum CreateTool { CT_CUBOID, CT_SPHERE, CT_CYLINDER, CT_CONE, CT_TCONE, CT_TUBE, CT_TORUS, CT_WEDGE, CT_EXTRUDE, CT_LATHE, CT_TEXT, CT_LIBSHAPE, CT_LANDSCAPE, CT_NONE };
 
@@ -75,6 +75,9 @@ public:
 	void animate();
 	//void open();
 	void init();
+	void setCursor(SDL_Cursor *newCursor);
+	void setDragBarH(bool on) { setDragBar(on, WECursor); };
+	void setDragBarV(bool on) { setDragBar(on, NSCursor); };
 
 	//void saveScene(const std::string &file, Pi3Cmodel *models);
 	void clearScene();
@@ -126,6 +129,8 @@ public:
 	Pi3Cmaterial outlines;
 
 	bool keypress = false;
+	bool dragbar = false;
+
 	Pi3Ctouch touch;
 
 	int32_t currentView = -1;
@@ -161,8 +166,15 @@ public:
 	SDL_Cursor * crossCursor = nullptr;
 	SDL_Cursor * textCursor = nullptr;
 	SDL_Cursor * currentCursor = nullptr;
+	SDL_Cursor * WECursor = nullptr;
+	SDL_Cursor * NSCursor = nullptr;
 
 private:
 	MGui mgui;
 	
+	void touchPerspectiveView(viewInfo &vi);
+	void touchOrthoView(viewInfo &vi);
+	void touchObject(Pi3Cmodel& sbox, Pi3Cmodel& mgiz);
+	void setDragBar(bool on, SDL_Cursor * newCursor);
+
 };

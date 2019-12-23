@@ -24,7 +24,7 @@ Modeller::Modeller(Pi3Cresource *resource, Pi3Cwindow *window)
 	scene.setViewport2D(Pi3Crecti(0, 0, window->getWidth(), window->getHeight()),-200.f, 2000.f);
 	window->setClearColour(0xff804040);
 	
-	scene.renderOffscreen(1200,800,resource->shaders[0]);
+	//scene.renderOffscreen(1200,800,resource->shaders[0]);
 	
 }
 
@@ -35,6 +35,8 @@ Modeller::~Modeller()
 	if (moveCursor) SDL_FreeCursor(moveCursor);
 	if (crossCursor) SDL_FreeCursor(crossCursor);
 	if (textCursor) SDL_FreeCursor(textCursor);
+	if (WECursor) SDL_FreeCursor(WECursor);
+	if (NSCursor) SDL_FreeCursor(NSCursor);
 }
 
 void Modeller::clearScene()
@@ -117,6 +119,8 @@ void Modeller::init()
 	crossCursor = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_CROSSHAIR);
 	moveCursor = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_SIZEALL);
 	textCursor = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_IBEAM);
+	NSCursor = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_SIZENS);
+	WECursor = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_SIZEWE);
 	currentCursor = arrowCursor;
 }
 
@@ -137,12 +141,13 @@ void Modeller::handleKeys()
 	const uint8_t *keystate = window->getKeys();
 
 	if (keystate[SDL_SCANCODE_P]) {
-		uint32_t w = 800;
-		uint32_t h = 600;
-		Pi3Crecti rect(0, 0, w, h);
-		std::vector<uint8_t> snap;
-		snap.resize(w * h * 4);
-		scene.snapShot(rect, snap);
+		scene.renderOffscreen(800, 600);
+		//uint32_t w = 800;
+		//uint32_t h = 600;
+		//Pi3Crecti rect(0, 0, w, h);
+		//std::vector<uint8_t> snap;
+		//snap.resize(w * h * 4);
+		//scene.snapShot(rect, snap);
 	}
 }
 
@@ -170,7 +175,7 @@ void Modeller::handleEvents()
 		switch (window->ev.type)
 		{
 		case SDL_MOUSEBUTTONDOWN:
-			if (currentView != -1 && window->mouse.LeftButton) {
+			if (currentView != -1 && window->mouse.LeftButton && !dragbar) {
 				
 				currentSelView = currentView;
 
@@ -208,7 +213,7 @@ void Modeller::handleEvents()
 			}
 			break;
 		case SDL_MOUSEMOTION:
-			if (window->mouse.anyButton() && currentView>=0) {
+			if (window->mouse.anyButton() && currentView>=0 && !dragbar) {
 				vec3f mouseXYZ = vec3f(window->mouse.deltaXY.x, -window->mouse.deltaXY.y, 0);
 				if (window->mouse.MiddleButton) {
 					currentSelView = currentView;
@@ -250,7 +255,8 @@ void Modeller::handleEvents()
 		case SDL_KEYDOWN:
 			switch (window->getKeyPress()) {
 			case SDL_SCANCODE_DELETE: editUndo.deleteSelection(scene.models); break;
-			case SDL_SCANCODE_X: if (window->ctrlKey) editUndo.deleteSelection(scene.models);
+			case SDL_SCANCODE_X: 
+				if (window->ctrlKey) editUndo.deleteSelection(scene.models);
 				break;
 			case SDL_SCANCODE_Z: 
 				if (window->ctrlKey) {
@@ -279,34 +285,79 @@ void Modeller::handleEvents()
 
 }
 
+void Modeller::setCursor(SDL_Cursor *newCursor)
+{
+	if (newCursor != currentCursor) {
+		currentCursor = newCursor;
+		SDL_SetCursor(currentCursor);
+	}
+}
+
+void Modeller::setDragBar(bool on, SDL_Cursor *newCursor)
+{
+	if (on && !dragbar) {
+		dragbar = true;
+		SDL_SetCursor(newCursor);
+	}
+	else if (!on && dragbar) {
+		dragbar = false;
+		SDL_SetCursor(currentCursor);
+	}
+}
+
+void Modeller::touchPerspectiveView(viewInfo &vi)
+{
+	scene.setMatrix(vi.pan, vec3f(0, 0, -vi.zoom), vi.rot);
+	scene.setPerspective3D(vi.viewport.width, vi.viewport.height, PSPVALUE, nearzfarz.x, nearzfarz.y);
+	float iy = window->getHeight() - window->mouse.y;
+	vec3f mousexyz(vi.viewport.width*0.5f - (window->mouse.x - vi.viewport.x), vi.viewport.height*0.5f - (iy - vi.viewport.y), 0);
+	touch = scene.touch(mousexyz, true);
+}
+
+void Modeller::touchOrthoView(viewInfo &vi)
+{
+	scene.setMatrix(vi.pos, vec3f(0, 0, 0), vi.rot);
+	scene.setOrthographic3D(vi.viewport, vi.zoom, -2000.f, 2000.f);
+	vec3f mousexyz = -currentPos;
+	touch = scene.touch(mousexyz, false);
+}
+
+void Modeller::touchObject(Pi3Cmodel& sbox, Pi3Cmodel& mgiz)
+{
+	setCursor(handCursor);
+
+	sbox.visible = true;
+	vertsPtr vp = resource->getMeshVerts(sbox.meshRef);
+	Pi3Cgizmos::select_box_verts(*vp.verts, vp.ptr, touch.selmodel->bbox.min + touch.selmodel->matrix.position(), touch.selmodel->bbox.size(), 0xffffff);
+	resource->updateMesh(sbox.meshRef);
+	selectedName = touch.selmodel->name;
+
+	mgiz.visible = true;
+	mgiz.matrix.move(touch.selmodel->bbox.center());
+}
+
 void Modeller::touchScene()
 {
 	//selGroup = nullptr;
 	//scene.models[brushref].visible = false;
-	SDL_Cursor * newCursor = arrowCursor;
+	//SDL_Cursor * newCursor = arrowCursor;
+	if (dragbar) return;
 
 	if (currentView >= 0 && !mgui.somethingSelected()) {
 
 		viewInfo &vi = views[currentView];
 		if (vi.projection == PERSPECTIVE) {
-			scene.setMatrix(vi.pan, vec3f(0, 0, -vi.zoom), vi.rot);
-			scene.setPerspective3D(vi.viewport.width, vi.viewport.height, PSPVALUE, nearzfarz.x, nearzfarz.y);
-			float iy = window->getHeight() - window->mouse.y;
-			vec3f mousexyz(vi.viewport.width*0.5f - (window->mouse.x - vi.viewport.x), vi.viewport.height*0.5f - (iy - vi.viewport.y), 0);
-			touch = scene.touch(mousexyz, true);
+			touchPerspectiveView(vi);
 		}
 		else
 		{
-			scene.setMatrix(vi.pos, vec3f(0, 0, 0), vi.rot);
-			scene.setOrthographic3D(vi.viewport, vi.zoom, -2000.f, 2000.f);
-			vec3f mousexyz = -currentPos;
-			touch = scene.touch(mousexyz, false);
+			touchOrthoView(vi);
 		}
+
+		if (editMode== ED_CREATE) setCursor(crossCursor);
 
 		Pi3Cmodel& sbox = scene.models[selboxRef];
 		Pi3Cmodel& mgiz = scene.models[moveGizmoRef];
-
-		if (editMode== ED_CREATE) newCursor = crossCursor;
 
 		if (touch.touched()) {
 
@@ -316,29 +367,10 @@ void Modeller::touchScene()
 			currentPos = -touch.intersection;
 
 			switch (editMode) {
-			case ED_SELECT: 
-				{
-					newCursor = handCursor;
-
-					sbox.visible = true;
-					vertsPtr vp = resource->getMeshVerts(sbox.meshRef);
-					Pi3Cgizmos::select_box_verts(*vp.verts, vp.ptr, touch.selmodel->bbox.min + touch.selmodel->matrix.position(), touch.selmodel->bbox.size(), 0xffffff);
-					resource->updateMesh(sbox.meshRef);
-					selectedName = touch.selmodel->name;
-
-					mgiz.visible = true;
-					mgiz.matrix.move(touch.selmodel->bbox.center());
-				}
-				break;
-			case ED_MOVE: 
-				newCursor = moveCursor; 
-				break;
-			case ED_ROTATE: 
-				newCursor = handCursor; 
-				break;
-			case ED_SCALE: 
-				newCursor = handCursor; 
-				break;
+			case ED_SELECT: touchObject(sbox, mgiz); break;
+			case ED_MOVE: setCursor(moveCursor); break;
+			case ED_ROTATE: setCursor(handCursor); break;
+			case ED_SCALE: setCursor(handCursor); break;
 			}
 			
 		}
@@ -348,10 +380,8 @@ void Modeller::touchScene()
 			selectedName = "";
 		}
 	}
-
-	if (newCursor != currentCursor) {
-		currentCursor = newCursor;
-		SDL_SetCursor(currentCursor);
+	else {
+		setCursor(arrowCursor);
 	}
 }
 

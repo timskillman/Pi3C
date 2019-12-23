@@ -1,6 +1,7 @@
 #include "ModellerGUI.h"
 #include "Modeller.h"
 
+
 void MGui::init(loadOptions &opts, Pi3Cresource * resource, Pi3Cwindow *window)
 {
 	gui.init(resource, window);
@@ -163,9 +164,12 @@ void MGui::doIMGUI(Modeller * md)
 
 	//Drag bar horizontal ...
 	gui.setPosition(leftbarWidth + (int)(dragBarX * (float)workWidth - dragBarThickness * 0.5f), wpos.y);
-	if (gui.renderRect((int)dragBarThickness, midht) && mb && !draggingBarX && !draggingBarY) {
+
+	bool touchDragBarH = gui.renderRect((int)dragBarThickness, midht);
+	if (touchDragBarH || draggingBarX) md->setDragBarH(true);
+
+	if (touchDragBarH && mb && !draggingBarX && !draggingBarY) {
 		draggingBarX = true;
-		md->editMode = Modeller::ED_DRAGBAR;
 	}
 	else if (draggingBarX && mb) {
 		dragBarX = (float)(mx - leftbarWidth) / (float)workWidth;
@@ -173,13 +177,18 @@ void MGui::doIMGUI(Modeller * md)
 		if (dragBarX > 0.98f) dragBarX = 0.98f;
 		ibx = 1.f - dragBarX;
 	}
-	else draggingBarX = false;
+	else {
+		draggingBarX = false;
+	}
 
 	//Drag bar vertical ...
 	gui.setPosition(leftbarWidth, topbarHeight + menuHeight + (int)((float)workHeight*dragBarY - dragBarThickness * 0.5f));
-	if (gui.renderRect(workWidth, (int)dragBarThickness) && mb && !draggingBarX && !draggingBarY) {
+
+	bool touchDragBarV = gui.renderRect(workWidth, (int)dragBarThickness);
+	if (touchDragBarV || draggingBarY) md->setDragBarV(true);
+
+	if (touchDragBarV && mb && !draggingBarX && !draggingBarY) {
 		draggingBarY = true;
-		md->editMode = Modeller::ED_DRAGBAR;
 	}
 	else if (draggingBarY && mb) {
 		dragBarY = (float)(my - topbarHeight - menuHeight) / (float)workHeight;
@@ -187,7 +196,13 @@ void MGui::doIMGUI(Modeller * md)
 		if (dragBarY > 0.98f) dragBarY = 0.98f;
 		iby = 1.f - dragBarY;
 	}
-	else draggingBarY = false;
+	else {
+		draggingBarY = false;
+	}
+
+	if (!(touchDragBarH || touchDragBarV || draggingBarX || draggingBarY)) {
+		md->setDragBarH(false);
+	}
 
 	//Top menu bar icons ...
 	int icw = (int)((float)bsIcons.minWidth*0.5f);

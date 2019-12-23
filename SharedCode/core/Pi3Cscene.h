@@ -77,8 +77,9 @@ public:
 	void render3D(const float ticks = 1.f, Pi3Cmaterial *materialOverride = nullptr);
 	void render2D(const float ticks = 1.f);
 	void renderSkybox(const vec3f &pos, const int32_t skyboxref = 0, float ticks = 1.f);
-	void renderOffscreen(const int width, const int height, const Pi3Cshader &shader);
+	void renderOffscreen(const int width, const int height); //, const Pi3Cshader &shader
 
+	void checkFBerrors();
 	void flipImage(std::vector<uint8_t> &src, std::vector<uint8_t> &dest, uint32_t w, uint32_t h);
 	void saveBufferToPNG(const char * filename, std::vector<uint8_t> &snapShot, const int width, const int height);
 	bool snapShot(const Pi3Crecti &rect, std::vector<uint8_t> &snapShot);

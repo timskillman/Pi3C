@@ -288,25 +288,8 @@ bool Pi3Cscene::snapShot(const Pi3Crecti &rect, std::vector<uint8_t> &snapShot)
 	}
 }
 
-void Pi3Cscene::renderOffscreen(const int width, const int height, const Pi3Cshader &shader)
+void Pi3Cscene::checkFBerrors()
 {
-//#ifdef __LINUX__
-	
-	GLuint fbo = 0, frame_buf = 0, colour_buf = 0, depth_buf = 0;
-
-	glGenRenderbuffers(1, &colour_buf);
-	glBindRenderbuffer(GL_RENDERBUFFER, colour_buf);
-	glRenderbufferStorage(GL_RENDERBUFFER, GL_RGBA8_OES, width, height);
-
-	glGenRenderbuffers(1, &depth_buf);
-	glBindRenderbuffer(GL_RENDERBUFFER, depth_buf);
-	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, width, height);
-
-	glGenFramebuffers(1, &frame_buf);
-	glBindFramebuffer(GL_FRAMEBUFFER, frame_buf);
-	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, colour_buf);
-	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depth_buf);
-
 	GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
 
 	if (status != GL_FRAMEBUFFER_COMPLETE)
@@ -326,10 +309,32 @@ void Pi3Cscene::renderOffscreen(const int width, const int height, const Pi3Csha
 			SDL_Log("Unable to create FrameBuffer");
 			break;
 		}
-	} 
+	}
 	else {
 		SDL_Log("FrameBuffer created");
 	}
+}
+
+void Pi3Cscene::renderOffscreen(const int width, const int height) //, const Pi3Cshader &shader
+{
+//#ifdef __arm__
+	
+	GLuint fbo = 0, frame_buf = 0, colour_buf = 0, depth_buf = 0;
+
+	glGenRenderbuffers(1, &colour_buf);
+	glBindRenderbuffer(GL_RENDERBUFFER, colour_buf);
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_RGBA8_OES, width, height);
+
+	glGenRenderbuffers(1, &depth_buf);
+	glBindRenderbuffer(GL_RENDERBUFFER, depth_buf);
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, width, height);
+
+	glGenFramebuffers(1, &frame_buf);
+	glBindFramebuffer(GL_FRAMEBUFFER, frame_buf);
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, colour_buf);
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depth_buf);
+
+	//checkFBerrors();
 
 	//RENDER
 	glViewport(0, 0, width, height);
@@ -356,61 +361,61 @@ void Pi3Cscene::renderOffscreen(const int width, const int height, const Pi3Csha
 	
 //#endif
 
-#ifdef __WINDOWS__
-	//initialize frame buffer
-	GLuint fbo = 0, render_buf = 0, depth_buf = 0;
-	glGenFramebuffers(1, &fbo);
-	//glBindFramebuffer(GL_FRAMEBUFFER, fbo);
-	//glFramebufferRenderbuffer(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, render_buf);
-
-	glGenRenderbuffers(1, &render_buf);
-	glBindRenderbuffer(GL_RENDERBUFFER, render_buf);
-	glRenderbufferStorage(GL_RENDERBUFFER, GL_RGBA, width, height);
-
-	glGenRenderbuffers(1, &depth_buf);
-	glBindRenderbuffer(GL_RENDERBUFFER, depth_buf);
-	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, width, height);
-
-	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
-	glFramebufferRenderbuffer(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, render_buf);
-	glFramebufferRenderbuffer(GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depth_buf);
-
-	//render
-	glViewport(0, 0, width, height);
-	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_MULTISAMPLE);
-
-	glClearColor(0, 0, 0, 0);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //Clear colour and Z buffer
-
-	//RENDER
-	render3D();
-
-	std::vector<std::uint8_t> data(width*height * 4);
-	//glFramebufferReadBufferEXT(GL_COLOR_ATTACHMENT0);
-	glReadBuffer(GL_COLOR_ATTACHMENT0);
-	glReadPixels(0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, &data[0]);
-
-	//write png
-	SDL_Surface *ss = SDL_CreateRGBSurfaceFrom(&data[0], width, height, 32, width * 4, 0x000000ff, 0x0000ff00, 0x00ff0000, 0xff000000);
-
-	//SDL_RWops *fo = SDL_RWFromFile("thumb.png", "wb");
-	//IMG_SavePNG_RW(ss, fo, 0);
-	//SDL_RWclose(fo);
-
-	IMG_SavePNG_RW(ss, f, 0);
-	SDL_FreeSurface(ss);
-	//SDL_RWclose(f);
-
-	//deinit frame buffer:
-	glDeleteFramebuffers(1, &fbo);
-	glDeleteRenderbuffers(1, &render_buf);
-	glDeleteRenderbuffers(1, &depth_buf);
-
-	// Return to onscreen rendering:
-	glBindFramebufferEXT(GL_FRAMEBUFFER, 0);
-
-	//glViewport(vx, vy, vw, vh); //restore viewport to what it was
-	glEnable(GL_DEPTH_TEST);
-#endif
+//#ifdef __WINDOWS__
+//	//initialize frame buffer
+//	GLuint fbo = 0, render_buf = 0, depth_buf = 0;
+//	glGenFramebuffers(1, &fbo);
+//	//glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+//	//glFramebufferRenderbuffer(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, render_buf);
+//
+//	glGenRenderbuffers(1, &render_buf);
+//	glBindRenderbuffer(GL_RENDERBUFFER, render_buf);
+//	glRenderbufferStorage(GL_RENDERBUFFER, GL_RGBA, width, height);
+//
+//	glGenRenderbuffers(1, &depth_buf);
+//	glBindRenderbuffer(GL_RENDERBUFFER, depth_buf);
+//	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, width, height);
+//
+//	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+//	glFramebufferRenderbuffer(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, render_buf);
+//	glFramebufferRenderbuffer(GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depth_buf);
+//
+//	//render
+//	glViewport(0, 0, width, height);
+//	glEnable(GL_DEPTH_TEST);
+//	glEnable(GL_MULTISAMPLE);
+//
+//	glClearColor(0, 0, 0, 0);
+//	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //Clear colour and Z buffer
+//
+//	//RENDER
+//	render3D();
+//
+//	std::vector<std::uint8_t> data(width*height * 4);
+//	//glFramebufferReadBufferEXT(GL_COLOR_ATTACHMENT0);
+//	glReadBuffer(GL_COLOR_ATTACHMENT0);
+//	glReadPixels(0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, &data[0]);
+//
+//	//write png
+//	SDL_Surface *ss = SDL_CreateRGBSurfaceFrom(&data[0], width, height, 32, width * 4, 0x000000ff, 0x0000ff00, 0x00ff0000, 0xff000000);
+//
+//	//SDL_RWops *fo = SDL_RWFromFile("thumb.png", "wb");
+//	//IMG_SavePNG_RW(ss, fo, 0);
+//	//SDL_RWclose(fo);
+//
+//	IMG_SavePNG_RW(ss, f, 0);
+//	SDL_FreeSurface(ss);
+//	//SDL_RWclose(f);
+//
+//	//deinit frame buffer:
+//	glDeleteFramebuffers(1, &fbo);
+//	glDeleteRenderbuffers(1, &render_buf);
+//	glDeleteRenderbuffers(1, &depth_buf);
+//
+//	// Return to onscreen rendering:
+//	glBindFramebufferEXT(GL_FRAMEBUFFER, 0);
+//
+//	//glViewport(vx, vy, vw, vh); //restore viewport to what it was
+//	glEnable(GL_DEPTH_TEST);
+//#endif
 }
