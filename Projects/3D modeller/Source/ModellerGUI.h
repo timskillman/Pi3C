@@ -17,6 +17,7 @@ public:
 	Pi3Crecti getRectBottomLeft();
 	Pi3Crecti getRectTopRight();
 	Pi3Crecti getRectTopLeft();
+	Pi3Crecti getRectFull();
 
 private:
 
@@ -49,5 +50,7 @@ private:
 	int workHeight = 0;
 	float ibx = 1.f - dragBarX;
 	float iby = 1.f - dragBarY;
+
+	void renderYellowBorder(uint32_t currentSelView);
 
 };

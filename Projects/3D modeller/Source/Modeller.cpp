@@ -55,6 +55,7 @@ void Modeller::setupGUI(loadOptions &opts)
 	views[TOPRIGHT] = setupView(VIEW_LEFT);
 	views[BOTTOMLEFT] = setupView(VIEW_TOP);
 	views[BOTTOMRIGHT] = setupView(VIEW_PERSPECTIVE);
+	views[FULL] = setupView(VIEW_PERSPECTIVE);
 }
 
 void Modeller::init()
@@ -242,7 +243,7 @@ void Modeller::handleEvents()
 		case SDL_MOUSEWHEEL:
 			if (currentView >= 0) {
 				view.zoom += window->mouse.wheel * view.zoomFactor();
-				currentSelView = currentView;
+				currentSelView = currentSelView;
 			}
 			break;
 		case SDL_WINDOWEVENT:
@@ -283,6 +284,21 @@ void Modeller::handleEvents()
 		}
 	}
 
+}
+
+void Modeller::setFullScene()
+{
+	//currentSelView = currentView;
+	if (fullview < 0) {
+		fullview = currentSelView;
+		views[FULL] = views[currentSelView];
+		currentSelView = FULL;
+	}
+	else {
+		currentSelView = fullview;
+		fullview = -1;
+	}
+	window->mouse.up = false;
 }
 
 void Modeller::setCursor(SDL_Cursor *newCursor)
@@ -449,25 +465,32 @@ void Modeller::render()
 
 	currentView = -1;
 
-	//render perspective view (right lower)...
-	views[BOTTOMRIGHT].viewport = mgui.getRectBottomRight();
-	if (views[BOTTOMRIGHT].viewport.touch(mx, my)) currentView = BOTTOMRIGHT;
-	renderScene(views[BOTTOMRIGHT]);
+	if (fullview >= 0) {
+		views[FULL].viewport = mgui.getRectFull();
+		currentView = FULL;
+		renderScene(views[FULL]);
+	}
+	else {
+		//render perspective view (right lower)...
+		views[BOTTOMRIGHT].viewport = mgui.getRectBottomRight();
+		if (views[BOTTOMRIGHT].viewport.touch(mx, my)) currentView = BOTTOMRIGHT;
+		renderScene(views[BOTTOMRIGHT]);
 
-	//render left lower ...
-	views[BOTTOMLEFT].viewport = mgui.getRectBottomLeft();
-	if (views[BOTTOMLEFT].viewport.touch(mx, my)) currentView = BOTTOMLEFT;
-	renderScene(views[BOTTOMLEFT]);
+		//render left lower ...
+		views[BOTTOMLEFT].viewport = mgui.getRectBottomLeft();
+		if (views[BOTTOMLEFT].viewport.touch(mx, my)) currentView = BOTTOMLEFT;
+		renderScene(views[BOTTOMLEFT]);
 
-	//render left top ...
-	views[TOPLEFT].viewport = mgui.getRectTopLeft();
-	if (views[TOPLEFT].viewport.touch(mx, my)) currentView = TOPLEFT;
-	renderScene(views[TOPLEFT]);
+		//render left top ...
+		views[TOPLEFT].viewport = mgui.getRectTopLeft();
+		if (views[TOPLEFT].viewport.touch(mx, my)) currentView = TOPLEFT;
+		renderScene(views[TOPLEFT]);
 
-	//render right top ...
-	views[TOPRIGHT].viewport = mgui.getRectTopRight();
-	if (views[TOPRIGHT].viewport.touch(mx, my)) currentView = TOPRIGHT;
-	renderScene(views[TOPRIGHT]);
+		//render right top ...
+		views[TOPRIGHT].viewport = mgui.getRectTopRight();
+		if (views[TOPRIGHT].viewport.touch(mx, my)) currentView = TOPRIGHT;
+		renderScene(views[TOPRIGHT]);
+	}
 
 	//Render 2D
 	scene.setViewport(screenRect);

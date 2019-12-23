@@ -18,7 +18,7 @@ public:
 	~Modeller();
 
 	enum Projection { PERSPECTIVE, ORTHOGRAPHIC };
-	enum SceneLayout { TOPLEFT = 0, TOPRIGHT = 1, BOTTOMLEFT = 2, BOTTOMRIGHT = 3 };
+	enum SceneLayout { TOPLEFT = 0, TOPRIGHT = 1, BOTTOMLEFT = 2, BOTTOMRIGHT = 3, FULL = 4 };
 	enum EditMode { ED_SELECT, ED_ROTATE, ED_MOVE, ED_SCALE, ED_CREATE, ED_CONTOUR, ED_ROTATESCENE };
 	enum ViewProject { VIEW_LEFT, VIEW_RIGHT, VIEW_TOP, VIEW_BOTTOM, VIEW_FRONT, VIEW_BACK, VIEW_FREE, VIEW_PERSPECTIVE };
 	enum CreateTool { CT_CUBOID, CT_SPHERE, CT_CYLINDER, CT_CONE, CT_TCONE, CT_TUBE, CT_TORUS, CT_WEDGE, CT_EXTRUDE, CT_LATHE, CT_TEXT, CT_LIBSHAPE, CT_LANDSCAPE, CT_NONE };
@@ -78,6 +78,7 @@ public:
 	void setCursor(SDL_Cursor *newCursor);
 	void setDragBarH(bool on) { setDragBar(on, WECursor); };
 	void setDragBarV(bool on) { setDragBar(on, NSCursor); };
+	void setFullScene();
 
 	//void saveScene(const std::string &file, Pi3Cmodel *models);
 	void clearScene();
@@ -135,7 +136,8 @@ public:
 
 	int32_t currentView = -1;
 	int32_t currentSelView = -1;
-	viewInfo views[4];
+	viewInfo views[5];
+	int32_t fullview = -1;
 
 	//float zoom = 1.f;
 	//vec2f pan{ 0,0 };

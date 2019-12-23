@@ -69,7 +69,7 @@ public:
 		bool anyButton() { return LeftButton || MiddleButton || RightButton; }
 
 		void resetButtons() {
-			RightButton = false; LeftButton = false; MiddleButton = false; drag = false;
+			RightButton = LeftButton = MiddleButton = drag = false;
 		}
 
 		void reset() { 

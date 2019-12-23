@@ -169,9 +169,9 @@ int Pi3Cwindow::event()
 				mouse.wasDragging = mouse.drag;
 				mouse.x = ev.button.x;
 				mouse.y = ev.button.y;
-				mouse.drag = false;
-				mouse.up = true;
 			}
+			mouse.drag = false;
+			mouse.up = true;
 			switch (ev.button.button) {
 			case SDL_BUTTON_LEFT: mouse.LeftButton = false; break;
 			case SDL_BUTTON_RIGHT: mouse.RightButton = false; break;

@@ -79,6 +79,32 @@ void MGui::init(loadOptions &opts, Pi3Cresource * resource, Pi3Cwindow *window)
 	bsItems.selectColour = selectColour;
 }
 
+void MGui::renderYellowBorder(uint32_t currentSelView)
+{
+	Pi3Crecti rec;
+	switch (currentSelView) {
+	case Modeller::TOPLEFT: rec = getRectTopLeft(); break;
+	case Modeller::TOPRIGHT:rec = getRectTopRight(); break;
+	case Modeller::BOTTOMLEFT:rec = getRectBottomLeft(); break;
+	case Modeller::BOTTOMRIGHT:rec = getRectBottomRight(); break;
+	case Modeller::FULL:rec = getRectFull(); break;
+	}
+
+	if (rec.width > 0) {
+		Pi3Cmodel rect;
+		float rw = 3.f;
+		uint32_t col = 0xff00ffff;
+		rect.matrix.setz(-1.f);
+		rect.createRect2D(gui.resource, vec2f((float)rec.x, (float)rec.y), vec2f((float)rec.width, rw), col);
+		rect.renderBasic(gui.resource, gui.resource->shaders[0]);
+		rect.createRect2D(gui.resource, vec2f((float)rec.x, (float)(rec.y + rec.height) - rw), vec2f((float)rec.width, rw), col);
+		rect.renderBasic(gui.resource, gui.resource->shaders[0]);
+		rect.createRect2D(gui.resource, vec2f((float)rec.x, (float)rec.y), vec2f(rw, (float)rec.height), col);
+		rect.renderBasic(gui.resource, gui.resource->shaders[0]);
+		rect.createRect2D(gui.resource, vec2f((float)(rec.x + rec.width) - rw, (float)rec.y), vec2f(rw, (float)rec.height), col);
+		rect.renderBasic(gui.resource, gui.resource->shaders[0]);
+	}
+}
 
 void MGui::doIMGUI(Modeller * md)
 {
@@ -122,6 +148,7 @@ void MGui::doIMGUI(Modeller * md)
 	int mx = md->window->mouse.x;
 	int my = md->window->mouse.y;
 	bool mb = md->window->mouse.LeftButton;
+	bool mu = md->window->mouse.up;
 
 	workWidth = hw - leftbarWidth - rightbarWidth;
 	workHeight = hh - menuHeight - topbarHeight - botbarHeight;
@@ -139,69 +166,48 @@ void MGui::doIMGUI(Modeller * md)
 	gui.setPosition(0, wpos.y + midht);
 	gui.renderRect(hw, botbarHeight);
 
+	if (md->fullview < 0) {
+		//Drag bar horizontal ...
+		gui.setPosition(leftbarWidth + (int)(dragBarX * (float)workWidth - dragBarThickness * 0.5f), wpos.y);
 
-	Pi3Crecti rec;
-	switch (md->currentSelView) {
-	case Modeller::TOPLEFT: rec = getRectTopLeft(); break;
-	case Modeller::TOPRIGHT:rec = getRectTopRight(); break;
-	case Modeller::BOTTOMLEFT:rec = getRectBottomLeft(); break;
-	case Modeller::BOTTOMRIGHT:rec = getRectBottomRight(); break;
-	}
-	if (rec.width > 0) {
-		Pi3Cmodel rect;
-		float rw = 3.f;
-		uint32_t col = 0xff00ffff;
-		rect.matrix.setz(-1.f);
-		rect.createRect2D(gui.resource, vec2f((float)rec.x, (float)rec.y), vec2f((float)rec.width, rw), col);
-		rect.renderBasic(gui.resource, gui.resource->shaders[0]); 
-		rect.createRect2D(gui.resource, vec2f((float)rec.x, (float)(rec.y+rec.height)-rw), vec2f((float)rec.width, rw), col);
-		rect.renderBasic(gui.resource, gui.resource->shaders[0]); 
-		rect.createRect2D(gui.resource, vec2f((float)rec.x, (float)rec.y), vec2f(rw, (float)rec.height), col);
-		rect.renderBasic(gui.resource, gui.resource->shaders[0]); 
-		rect.createRect2D(gui.resource, vec2f((float)(rec.x+ rec.width)-rw, (float)rec.y), vec2f(rw, (float)rec.height), col);
-		rect.renderBasic(gui.resource, gui.resource->shaders[0]);
-	}
+		bool touchDragBarH = gui.renderRect((int)dragBarThickness, midht);
+		if (touchDragBarH || draggingBarX) md->setDragBarH(true);
 
-	//Drag bar horizontal ...
-	gui.setPosition(leftbarWidth + (int)(dragBarX * (float)workWidth - dragBarThickness * 0.5f), wpos.y);
+		if (touchDragBarH && mb && !draggingBarX && !draggingBarY) {
+			draggingBarX = true;
+		}
+		else if (draggingBarX && mb) {
+			dragBarX = (float)(mx - leftbarWidth) / (float)workWidth;
+			if (dragBarX < 0.02f) dragBarX = 0.02f;
+			if (dragBarX > 0.98f) dragBarX = 0.98f;
+			ibx = 1.f - dragBarX;
+		}
+		else {
+			draggingBarX = false;
+		}
 
-	bool touchDragBarH = gui.renderRect((int)dragBarThickness, midht);
-	if (touchDragBarH || draggingBarX) md->setDragBarH(true);
+		//Drag bar vertical ...
+		gui.setPosition(leftbarWidth, topbarHeight + menuHeight + (int)((float)workHeight*dragBarY - dragBarThickness * 0.5f));
 
-	if (touchDragBarH && mb && !draggingBarX && !draggingBarY) {
-		draggingBarX = true;
-	}
-	else if (draggingBarX && mb) {
-		dragBarX = (float)(mx - leftbarWidth) / (float)workWidth;
-		if (dragBarX < 0.02f) dragBarX = 0.02f;
-		if (dragBarX > 0.98f) dragBarX = 0.98f;
-		ibx = 1.f - dragBarX;
-	}
-	else {
-		draggingBarX = false;
-	}
+		bool touchDragBarV = gui.renderRect(workWidth, (int)dragBarThickness);
+		if (touchDragBarV || draggingBarY) md->setDragBarV(true);
 
-	//Drag bar vertical ...
-	gui.setPosition(leftbarWidth, topbarHeight + menuHeight + (int)((float)workHeight*dragBarY - dragBarThickness * 0.5f));
+		if (touchDragBarV && mb && !draggingBarX && !draggingBarY) {
+			draggingBarY = true;
+		}
+		else if (draggingBarY && mb) {
+			dragBarY = (float)(my - topbarHeight - menuHeight) / (float)workHeight;
+			if (dragBarY < 0.02f) dragBarY = 0.02f;
+			if (dragBarY > 0.98f) dragBarY = 0.98f;
+			iby = 1.f - dragBarY;
+		}
+		else {
+			draggingBarY = false;
+		}
 
-	bool touchDragBarV = gui.renderRect(workWidth, (int)dragBarThickness);
-	if (touchDragBarV || draggingBarY) md->setDragBarV(true);
-
-	if (touchDragBarV && mb && !draggingBarX && !draggingBarY) {
-		draggingBarY = true;
-	}
-	else if (draggingBarY && mb) {
-		dragBarY = (float)(my - topbarHeight - menuHeight) / (float)workHeight;
-		if (dragBarY < 0.02f) dragBarY = 0.02f;
-		if (dragBarY > 0.98f) dragBarY = 0.98f;
-		iby = 1.f - dragBarY;
-	}
-	else {
-		draggingBarY = false;
-	}
-
-	if (!(touchDragBarH || touchDragBarV || draggingBarX || draggingBarY)) {
-		md->setDragBarH(false);
+		if (!(touchDragBarH || touchDragBarV || draggingBarX || draggingBarY)) {
+			md->setDragBarH(false);
+		}
 	}
 
 	//Top menu bar icons ...
@@ -249,7 +255,7 @@ void MGui::doIMGUI(Modeller * md)
 
 	gui.setPosition(hw - rightbarWidth - 100, workHeight + topbarHeight + menuHeight + 3);
 	gui.renderBackIcon("rendl.png", icw, ich);
-	if (gui.ButtonImage("butBigwin.png") && mb) {}
+	if (gui.ButtonImage("butBigwin.png") && mu) md->setFullScene();
 	if (gui.ButtonImage("butSceneRot.png", md->editMode == Modeller::ED_ROTATESCENE) && mb) md->setEditMode(Modeller::ED_ROTATESCENE);
 	gui.renderBackIcon("rendr.png", icw, ich);
 
@@ -282,6 +288,8 @@ void MGui::doIMGUI(Modeller * md)
 	static double v = 5;
 	gui.SliderH("Scroll", 0, 10, v, 300, 24);
 
+	renderYellowBorder(md->currentSelView);
+
 	if (md->currentView != -1) {
 		Pi3Crecti &rect = md->views[md->currentView].viewport;
 		gui.setButtonStyle(bsMenu);
@@ -294,6 +302,8 @@ void MGui::doIMGUI(Modeller * md)
 			//gui.Text(md->selectedName, 0xffffffff);
 		}
 	}
+
+	
 }
 
 Pi3Crecti MGui::getRectBottomRight()
@@ -314,4 +324,9 @@ Pi3Crecti MGui::getRectTopRight()
 Pi3Crecti MGui::getRectTopLeft()
 {
 	return Pi3Crecti(leftbarWidth, botbarHeight + (int)((float)workHeight * iby) + dbh, (int)((float)workWidth * dragBarX) - dbh, (int)((float)workHeight * dragBarY) -dbh*3);
+}
+
+Pi3Crecti MGui::getRectFull()
+{
+	return Pi3Crecti(leftbarWidth, botbarHeight, workWidth, workHeight - dbh * 3);
 }
