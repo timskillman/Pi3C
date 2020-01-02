@@ -140,16 +140,6 @@ Modeller::viewInfo Modeller::setupView(const ViewProject proj)
 void Modeller::handleKeys()
 {
 	const uint8_t *keystate = window->getKeys();
-
-	if (keystate[SDL_SCANCODE_P]) {
-		scene.renderOffscreen(800, 600);
-		//uint32_t w = 800;
-		//uint32_t h = 600;
-		//Pi3Crecti rect(0, 0, w, h);
-		//std::vector<uint8_t> snap;
-		//snap.resize(w * h * 4);
-		//scene.snapShot(rect, snap);
-	}
 }
 
 void Modeller::createShape(const Pi3Cmesh& mesh, const vec3f& pos, const uint32_t colour)
@@ -207,7 +197,8 @@ void Modeller::handleEvents()
 					break;
 				case ED_ROTATE: 
 					break;
-				case ED_SCALE: 
+				case ED_SCALE:
+					editUndo.setSelectionCentre(scene.models);
 					break;
 				}
 
@@ -230,7 +221,7 @@ void Modeller::handleEvents()
 					case ED_SCALE:
 						{
 							vec3f sc = view.viewCoords(mouseXYZ) * 0.5f;
-							editUndo.scaleSelections(scene.models, vec3f(sc.x,sc.y,-sc.z));
+							editUndo.scaleSelections(scene.models, vec3f(sc.x,sc.y,sc.z));
 						}
 						break;
 					case ED_ROTATESCENE:
@@ -266,6 +257,9 @@ void Modeller::handleEvents()
 				break;
 			case SDL_SCANCODE_Y:
 				if (window->ctrlKey) editUndo.redo(scene.models);
+				break;
+			case SDL_SCANCODE_P:
+				scene.renderOffscreen(800, 600);
 				break;
 			}
 			//keyPress = ev.key.keysym.scancode;

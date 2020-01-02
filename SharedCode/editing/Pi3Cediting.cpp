@@ -46,13 +46,33 @@ void Pi3Cedit::moveSelections(std::vector<Pi3Cmodel>& models, const vec3f& vec)
 	}
 }
 
-void Pi3Cedit::scaleSelections(std::vector<Pi3Cmodel>& models, const vec3f& vec)
+void Pi3Cedit::setSelectionCentre(std::vector<Pi3Cmodel>& models)
 {
-	undos.logScale(models, vec);
-	Pi3Cmatrix scmatrix;
-	scmatrix.SetScales((vec/2.f)+vec3f(1.f,1.f,1.f));
+	centre = getSelectionBounds(models).center();
+}
+
+Pi3Cbbox3d Pi3Cedit::getSelectionBounds(std::vector<Pi3Cmodel>& models)
+{
+	Pi3Cbbox3d bounds;
 	for (auto& model : models) {
-		if (model.selected && !model.deleted) model.matrix = model.matrix*scmatrix;
+		if (model.selected && !model.deleted) {
+			bounds.update(model.bbox, &model.matrix);
+		}
+	}
+	return bounds;
+}
+
+void Pi3Cedit::scaleSelections(std::vector<Pi3Cmodel>& models, const vec3f& scale)
+{
+	undos.logScale(models, scale);
+	Pi3Cmatrix scmatrix;
+	scmatrix.SetScales((scale /2.f)+vec3f(1.f,1.f,1.f));
+	for (auto& model : models) {
+		if (model.selected && !model.deleted) {
+			model.matrix.Translate(-centre);
+			model.matrix = model.matrix*scmatrix;
+			model.matrix.Translate(centre);
+		}
 	}
 }
 

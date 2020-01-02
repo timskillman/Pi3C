@@ -17,6 +17,10 @@ public:
 	void moveSelections(std::vector<Pi3Cmodel>& models, const vec3f& vec);
 	void scaleSelections(std::vector<Pi3Cmodel>& models, const vec3f& vec);
 	void rotateSelections(std::vector<Pi3Cmodel>& models, const vec3f& vec);
+	void setSelectionCentre(std::vector<Pi3Cmodel>& models);
+
+	Pi3Cbbox3d getSelectionBounds(std::vector<Pi3Cmodel>& models);
 
 	Pi3Cundos undos;
+	vec3f centre;
 };
