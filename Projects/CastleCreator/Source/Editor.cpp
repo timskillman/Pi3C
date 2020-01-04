@@ -273,18 +273,19 @@ void Editor::touchScene()
 
 				if (window->mouse.LeftButton && window->mouse.up && currentSel<modelsLib->group.size()) {
 					Pi3Cmodel newmod = modelsLib->group[currentSel];
-					if (gridlock) {
-						//Replace selected object with library object
-						Pi3Cmodel &touchMod = scene.models[touch.groupRefs[0]].group[touch.groupRefs[1]];
-						newmod.matrix = touchMod.matrix;		//use old matrix of object to replace
-						touchMod = newmod;
-					}
-					else {
+					//if (gridlock) {
+					//	//Replace selected object with library object
+					//	Pi3Cmodel &touchMod = scene.models[touch.groupRefs[0]].group[touch.groupRefs[1]];
+					//	newmod.matrix = touchMod.matrix;		//use old matrix of object to replace
+					//	touchMod = newmod;
+					//}
+					//else {
 						//Insert library object as touch position
-						vec3f gpos = vec3f(floorf((touch.intersection.x+grid.x*0.5f) / grid.x) * grid.x,touch.intersection.y,floorf((touch.intersection.z+grid.z*0.5f) / grid.z) * grid.z);
+						vec3f gpos = touch.intersection;
+						if (gridlock) gpos = vec3f(floorf((gpos.x + grid.x*0.5f) / grid.x) * grid.x, gpos.y, floorf((gpos.z + grid.z*0.5f) / grid.z) * grid.z);
 						newmod.matrix.move(gpos);
 						scene.models[0].append(newmod);
-					}
+					//}
 					window->mouse.up = false;
 				}
 				else if (window->mouse.wheel) {
