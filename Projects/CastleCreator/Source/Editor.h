@@ -74,6 +74,8 @@ private:
 
 	//scene model refs ..
 	int32_t brushref = -1;
+	int32_t ballbrushref = -1;
+	int32_t gridbrushref = -1;
 	int32_t sceneModelRef = -1;
 	int32_t skybox = -1;
 	int32_t textRef = -1;

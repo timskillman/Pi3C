@@ -159,9 +159,19 @@ void Editor::loadModels(const std::string &modelsLibraryFile, const std::string 
 	scene.models[skybox].touchable = false;
 
 	// Create a brush for touching objects ...
-	Pi3Cmodel brush = Pi3Cmodel(resource, Pi3Cshapes::sphere(vec3f(0, 0, 0), 2.0f, 0xffffff, 0.f, 10, 20), 0xff00ffff);
+	Pi3Cmodel brush = Pi3Cmodel(resource, Pi3Cshapes::sphere(vec3f(0, 0, 0), 2.0f, 0xffffff, 0.f, 10, 20), 0xffff00);
 	brush.touchable = false;
-	brushref = scene.append3D(brush);
+	brush.visible = false;
+	brush.material.alpha = 0.5f;
+	ballbrushref = scene.append3D(brush);
+
+	Pi3Cmodel gridbrush = Pi3Cmodel(resource, Pi3Cshapes::cuboid(vec3f(0, 0, 0), vec3f(grid.x,1.f, grid.z), 0xffffff, 1,1,1), 0xffff00);
+	gridbrush.touchable = false;
+	gridbrush.visible = true;
+	gridbrush.material.alpha = 0.5f;
+	gridbrushref = scene.append3D(gridbrush);
+
+	brushref = gridbrushref;
 
 	// Create a humanoid ...
 	//Pi3Chumanoid::humanoidParams bodyParams;
@@ -201,8 +211,14 @@ void Editor::handleKeys()
 		}
 		if (keystate[SDL_SCANCODE_G]) { 
 			gridlock = !gridlock; 
-			uint32_t col = (gridlock) ? 0xff00ffff : 0xffff000;
-			if (brushref>=0) scene.models[brushref].material.SetColDiffuse(col);
+			//uint32_t col = (gridlock) ? 0xff00ffff : 0xffff00;
+			//scene.models[brushref].visible = false;
+			//brushref = (gridlock) ? gridbrushref : ballbrushref;
+			
+			//if (brushref >= 0) {
+				//scene.models[brushref].visible = true;
+				//scene.models[brushref].material.SetColDiffuse(col);
+			//}
 			keypress = true; 
 		}
 		if (keystate[SDL_SCANCODE_DELETE]) {
@@ -264,7 +280,14 @@ void Editor::touchScene()
 
 			//move 3D pointer (sphere) to touch intersetion point ...
 			if (brushref >= 0) {
-				scene.models[brushref].matrix.move(touch.intersection);
+				scene.models[brushref].visible = false;
+				vec3f gpos = touch.intersection;
+				brushref = ballbrushref;
+				if (gridlock && gpos.y < 1.f) {
+					gpos = vec3f(floorf((gpos.x + grid.x*0.5f) / grid.x) * grid.x, 0, floorf((gpos.z + grid.z*0.5f) / grid.z) * grid.z);
+					brushref = gridbrushref;
+				}
+				scene.models[brushref].matrix.move(gpos);
 				scene.models[brushref].visible = true;
 			}
 

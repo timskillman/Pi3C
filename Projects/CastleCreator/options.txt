@@ -1,6 +1,6 @@
 title:Castle Editor
 fullscreen:false
 screenWidth:800
-screenHeight:400
+screenHeight:600
 perspective:600
 
