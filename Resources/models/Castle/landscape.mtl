@@ -5,7 +5,7 @@ Ks 0.000000 0.000000 0.000000
 Tr 1.000000
 illum 0
 Ns 0.000000
-map_Kd maps/thickgrasspale.png
+map_Kd maps/thickgrass.png
 
 newmtl landscape
 Ka 0.300000 0.300000 0.300000
