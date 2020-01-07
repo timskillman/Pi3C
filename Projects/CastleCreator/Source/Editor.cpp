@@ -17,6 +17,8 @@ Editor::Editor(Pi3Cresource *resource, Pi3Cwindow *window)
 	this->resource = resource;
 	this->window = window;
 
+	gridlock = true;
+	
 	gui.init(resource, window);
 
 	std::vector<std::string> dir = Pi3Cdirectory::readDirectory("../");
