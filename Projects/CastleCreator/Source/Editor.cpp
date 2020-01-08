@@ -211,14 +211,6 @@ void Editor::handleKeys()
 		}
 		if (keystate[SDL_SCANCODE_G]) { 
 			gridlock = !gridlock; 
-			//uint32_t col = (gridlock) ? 0xff00ffff : 0xffff00;
-			//scene.models[brushref].visible = false;
-			//brushref = (gridlock) ? gridbrushref : ballbrushref;
-			
-			//if (brushref >= 0) {
-				//scene.models[brushref].visible = true;
-				//scene.models[brushref].material.SetColDiffuse(col);
-			//}
 			keypress = true; 
 		}
 		if (keystate[SDL_SCANCODE_DELETE]) {
