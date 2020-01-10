@@ -159,3 +159,20 @@ illum 2
 animsheet 16 13 201
 Ns 0.000000
 map_Kd maps/germanFlagAni.png
+
+newmtl churchWall
+Ka 0.300000 0.300000 0.300000
+Kd 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+illum 2
+Ns 0.000000
+map_Kd maps/blockwall2.jpg
+
+newmtl stainglass
+Ka 0.300000 0.300000 0.300000
+Kd 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Tr 0.800000
+illum 1
+Ns 0.000000
+map_Kd maps/stglass.png

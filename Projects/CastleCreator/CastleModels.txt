@@ -15,19 +15,22 @@ fogColour:1 1 1
 fogFar:15000.0
 fogNear:100.0
 modelPath:../../Resources/models/Castle
-model:Buildings g RoundTower RoundTower.obj RoundTowerColl.obj 150 RoundTowerLoPoly.obj 10000
-model:Buildings g RoundTowerTall RoundTower2.obj RoundTower2Coll.obj 200 RoundTower2LoPoly2.obj 10000
-model:Buildings g SquareTower SquareTower1.obj SquareTower1Coll.obj 150 SquareTower1LoPoly.obj 10000
-model:Buildings g SquareTowerTall SquareTower2.obj SquareTower2Coll.obj 150 SquareTower2LoPoly.obj 10000
-model:Buildings g Dias Dias.obj DiasColl.obj 10000
-model:Buildings g Keep Keep.obj KeepColl.obj 150 KeepLoPoly.obj 10000
+model:Castle g RoundTower RoundTower.obj RoundTowerColl.obj 150 RoundTowerLoPoly.obj 10000
+model:Castle g RoundTowerTall RoundTower2.obj RoundTower2Coll.obj 200 RoundTower2LoPoly2.obj 10000
+model:Castle g SquareTower SquareTower1.obj SquareTower1Coll.obj 150 SquareTower1LoPoly.obj 10000
+model:Castle g SquareTowerTall SquareTower2.obj SquareTower2Coll.obj 150 SquareTower2LoPoly.obj 10000
+model:Castle g Dias Dias.obj DiasColl.obj 10000
+model:Castle g Keep Keep.obj KeepColl.obj 150 KeepLoPoly.obj 10000
+model:Castle g Wall Wall1.obj Wall1Coll.obj 10000
+model:Castle g WallLeanTo WallLeanTo1.obj WallLeanTo1Coll.obj 10000
+model:Castle g WallDiagonal WallDiag1.obj WallDiag1Coll.obj 10000
+model:Castle g Gate Gate1.obj Gate1Coll.obj 10000
 model:Buildings g ShamblesTall Shambles.obj ShamblesColl.obj 500 ShamblesLoPoly.obj 1000 ShamblesLoPoly2.obj 10000
 model:Buildings g Shambles Shambles2.obj Shambles2Coll.obj 200 Shambles2LoPoly.obj 10000
-model:Buildings g Wall Wall1.obj Wall1Coll.obj 10000
-model:Buildings g WallLeanTo WallLeanTo1.obj WallLeanTo1Coll.obj 10000
-model:Buildings g WallDiagonal WallDiag1.obj WallDiag1Coll.obj 10000
-model:Buildings g Gate Gate1.obj Gate1Coll.obj 10000
 model:Buildings g Forge forge.obj forgeColl.obj 10000
+model:Buildings g ChurchTower ChurchTower.obj ChurchTowerColl.obj 10000
+model:Buildings g ChurchSection ChurchSection.obj ChurchSection.obj 10000
+model:Buildings g ChurchCentre ChurchCentre.obj ChurchCentre.obj 10000
 model:Courtyard f Well WellStocks.obj WellStocksColl.obj 10000
 model:Courtyard f CattleStall CattleStall.obj CattleStallColl.obj 150 CattleStallLoPoly.obj 10000
 model:Ground g Grass grass.obj grass.obj 200 grass.obj 10000
