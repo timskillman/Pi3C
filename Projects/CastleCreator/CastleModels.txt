@@ -29,7 +29,7 @@ model:Buildings g ShamblesTall Shambles.obj ShamblesColl.obj 500 ShamblesLoPoly.
 model:Buildings g Shambles Shambles2.obj Shambles2Coll.obj 200 Shambles2LoPoly.obj 10000
 model:Buildings g Forge forge.obj forgeColl.obj 10000
 model:Buildings g ChurchTower ChurchTower.obj ChurchTowerColl.obj 10000
-model:Buildings g ChurchSection ChurchSection.obj ChurchSection.obj 10000
+model:Buildings g ChurchSection ChurchSection.obj ChurchSectionColl.obj 10000
 model:Buildings g ChurchCentre ChurchCentre.obj ChurchCentre.obj 10000
 model:Courtyard f Well WellStocks.obj WellStocksColl.obj 10000
 model:Courtyard f CattleStall CattleStall.obj CattleStallColl.obj 150 CattleStallLoPoly.obj 10000
