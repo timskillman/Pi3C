@@ -31,6 +31,7 @@ model:Buildings g Forge forge.obj forgeColl.obj 10000
 model:Buildings g ChurchTower ChurchTower.obj ChurchTowerColl.obj 10000
 model:Buildings g ChurchSection ChurchSection.obj ChurchSectionColl.obj 10000
 model:Buildings g ChurchCentre ChurchCentre.obj ChurchCentreColl.obj 10000
+model:Buildings g ChurchEntrance ChurchEntrance.obj ChurchEntranceColl.obj 10000
 model:Courtyard f Well WellStocks.obj WellStocksColl.obj 10000
 model:Courtyard f CattleStall CattleStall.obj CattleStallColl.obj 150 CattleStallLoPoly.obj 10000
 model:Ground g Grass grass.obj grass.obj 200 grass.obj 10000
