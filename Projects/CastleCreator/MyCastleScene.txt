@@ -1,0 +1,8 @@
+title:CastleScene
+gridsize:76 0 76
+object:Landscape -38 0 -38 0
+object:ChurchCentre 0 -0.395788 -152 0
+object:ChurchWing 0 -0.395787 -76 0
+object:ChurchWing 76 -0.395789 -152 270
+object:ChurchSection 0 -0.395789 -228 270
+object:ChurchWing 0 -0.395787 -304 270

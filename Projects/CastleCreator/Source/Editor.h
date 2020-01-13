@@ -29,11 +29,13 @@ public:
 	void render();
 	void animate();
 	void open();
+	void save();
 	void loadModels(const std::string &modelLibrary, const std::string &scenefile);
 	void saveScene(const std::string &file, Pi3Cmodel *models);
 	void newScene(const uint32_t ref);
 
 	bool initialised() { return (resource != nullptr); }
+	bool fileExists(const std::string &file);
 
 private:
 

@@ -4,6 +4,7 @@
 #include "Pi3Cdirectory.h"
 #include <fstream>
 #include <sstream>
+#include <sys/stat.h>
 
 Editor::Editor(Pi3Cresource *resource, Pi3Cwindow *window)
 {
@@ -191,9 +192,12 @@ void Editor::handleKeys()
 {
 	player.moved = false;
 	const uint8_t *keystate = window->getKeys();
-	player.run(keystate[SDL_SCANCODE_LSHIFT] || keystate[SDL_SCANCODE_RSHIFT]);
+	bool shiftKey = keystate[SDL_SCANCODE_LSHIFT] || keystate[SDL_SCANCODE_RSHIFT];
+	bool ctrlKey = keystate[SDL_SCANCODE_LCTRL] || keystate[SDL_SCANCODE_RCTRL];
+	
+	player.run(shiftKey);
 	if (keystate[SDL_SCANCODE_W]) if (editMode) editpos.y += 5.f; else player.forward();
-	if (keystate[SDL_SCANCODE_S]) if (editMode) editpos.y -= 5.f; else player.back();
+	if (keystate[SDL_SCANCODE_S] && !ctrlKey) if (editMode) editpos.y -= 5.f; else player.back();
 	if (keystate[SDL_SCANCODE_A]) if (editMode) editpos.x += 5.f; else player.left();
 	if (keystate[SDL_SCANCODE_D]) if (editMode) editpos.x -= 5.f; else player.right();
 	if (keystate[SDL_SCANCODE_R]) if (editMode) editpos.z += 5.f; else player.up();			//only when flying
@@ -218,6 +222,10 @@ void Editor::handleKeys()
 				Pi3Cmodel &touchMod = scene.models[touch.groupRefs[0]].group[touch.groupRefs[1]];
 				touchMod.deleted = true;
 			}
+			keypress = true;
+		}
+		if (keystate[SDL_SCANCODE_S] && ctrlKey) {
+			save();
 			keypress = true;
 		}
 	}
@@ -366,7 +374,7 @@ void Editor::handleIMGui()
 		if (gui.BeginMenu("File")) {
 			if (gui.MenuItem("New", "Ctrl+N")) newScene(sceneModelRef);
 			if (gui.MenuItem("Open", "Ctrl+O")) open();
-			if (gui.MenuItem("Save", "Ctrl+S")) {}
+			if (gui.MenuItem("Save", "Ctrl+S")) save();
 			if (gui.MenuItem("Quit", "")) window->setquit(true);
 		}
 		if (gui.BeginMenu("Edit")) {
@@ -479,7 +487,7 @@ void Editor::loadModelLibrary(const std::string &path, const std::vector<std::st
 		if (findLib == modelLibrary.end()) {
 			modelLibrary.insert({ minfo.group, Pi3Cmodel()});
 			auto findLib2 = modelLibrary.find(minfo.group);
-			if (findLib2 != modelLibrary.end()) models = &findLib2->second; else models = nullptr; //somethings seriously wrong!
+			if (findLib2 != modelLibrary.end()) models = &findLib2->second; else models = nullptr; //something's seriously wrong!
 		}
 		else {
 			models = &findLib->second;
@@ -505,9 +513,14 @@ void Editor::loadModelLibrary(const std::string &path, const std::vector<std::st
 void Editor::open()
 {
 	if (scene.models.size()>0) scene.models[0].group.clear();
-	Pi3Cmodel sceneModel = loadScene("CastleScene.txt", grid);
+	Pi3Cmodel sceneModel = loadScene("MyCastleScene.txt", grid);
 	scene.models[0] = sceneModel;
 	// sceneModelRef = scene.append3D(sceneModel);
+}
+
+void Editor::save()
+{
+	saveScene("MyCastleScene.txt", &scene.models[0]);
 }
 
 Pi3Cmodel Editor::loadScene(const std::string &file, vec3f &grid)
@@ -520,14 +533,15 @@ Pi3Cmodel Editor::loadScene(const std::string &file, vec3f &grid)
 	std::vector<std::string> objects = opts.asStringArray("object");
 
 	std::string objname;
-	float gx, gy, gz, rot;
+	float gx, gy, gz;
+	float rotx = 0, roty = 0, rotz = 0;
 	for (auto &o : objects) {
 		std::stringstream ss(o);
-		ss >> objname >> gx >> gy >> gz >> rot;
+		ss >> objname >> gx >> gy >> gz >> roty; //rotx >> roty >> rotz;
 		Pi3Cmodel *fmodel = findModel(objname);
 		if (fmodel) {
-			vec3f position = { gx*grid.x, gy*grid.y, gz*grid.z };
-			vec3f rotation = { 0, rot *DEG2RAD, 0 };
+			vec3f position =  { gx, gy, gz }; //{ gx*grid.x, gy*grid.y, gz*grid.z };
+			vec3f rotation = { rotx *DEG2RAD, roty *DEG2RAD, rotz *DEG2RAD };
 			model.append(*fmodel, position, rotation);
 		}
 	}
@@ -536,12 +550,21 @@ Pi3Cmodel Editor::loadScene(const std::string &file, vec3f &grid)
 
 void Editor::saveScene(const std::string &file, Pi3Cmodel *models)
 {
-	loadOptions opts(file.c_str());
-
+	//loadOptions opts(file.c_str());
+    std::ofstream ofs(file, std::ofstream::out);
+    
+	ofs << "title:CastleScene\n";
+	ofs << "gridsize:" << grid.x << " " << grid.y << " " << grid.z << "\n";
 	for (auto &model : models->group) {
-		std::stringstream ss;
 		vec3f position = model.matrix.position();
 		vec3f rot = model.matrix.getRotation() * RAD2DEG;
-		ss << model.name << position.x << position.y << position.z << rot.x << rot.y << rot.z;
+		ofs << "object:" << model.name << " " << position.x << " " << position.y << " " << position.z << " " << rot.y << "\n"; //rot.x << " " << rot.y << " " << rot.z << "\n";
 	}
+	ofs.close();
+}
+
+bool Editor::fileExists(const std::string &file)
+{
+	struct stat buffer;
+	return (stat (file.c_str(), &buffer) == 0);
 }

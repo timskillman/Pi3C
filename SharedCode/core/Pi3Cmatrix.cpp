@@ -221,8 +221,8 @@ vec3f Pi3Cmatrix::getRotation() const
 {
 	//based on code from https://www.learnopencv.com/rotation-matrix-to-euler-angles/
 
-	//float sy = sqrtf(matrix[21] * matrix[21] + matrix[22] * matrix[22]);
-	float sy = sqrtf(matrix[00] * matrix[00]);
+	float sy = sqrtf(matrix[21] * matrix[21] + matrix[22] * matrix[22]);
+	//float sy = sqrtf(matrix[00] * matrix[00]);
 
 	float x, z;
 	float y = atan2f(-matrix[20], sy);
