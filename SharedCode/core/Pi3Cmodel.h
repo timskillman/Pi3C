@@ -123,6 +123,7 @@ public:
 
 	Pi3Cmatrix matrix;				//matrix used to transform mesh/group
 	Pi3Cmaterial material;			//used for rendering mesh - can be modified
+	vec3f rotation;
 
 	uint32_t flags = 0;
 	int32_t meshRef = -1;			//mesh reference to mesh in resources (-1 is no ref - nothing to render)

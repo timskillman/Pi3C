@@ -321,6 +321,7 @@ void Editor::touchScene()
 					float rotateBy = (!gridlock) ? (PI / 8.f)*sgn : (PI / 2.f)*sgn;
 					rotmtx.SetRotateYbit(rotateBy);
 					rotGroup->matrix = rotmtx * rotGroup->matrix;
+					rotGroup->rotation.y += rotateBy;
 					window->mouse.wheel = 0;
 				}
 				else if (!window->mouse.anyButton()) {
@@ -537,7 +538,7 @@ Pi3Cmodel Editor::loadScene(const std::string &file, vec3f &grid)
 	float rotx = 0, roty = 0, rotz = 0;
 	for (auto &o : objects) {
 		std::stringstream ss(o);
-		ss >> objname >> gx >> gy >> gz >> roty; //rotx >> roty >> rotz;
+		ss >> objname >> gx >> gy >> gz >> rotx >> roty >> rotz;
 		Pi3Cmodel *fmodel = findModel(objname);
 		if (fmodel) {
 			vec3f position =  { gx, gy, gz }; //{ gx*grid.x, gy*grid.y, gz*grid.z };
@@ -556,9 +557,11 @@ void Editor::saveScene(const std::string &file, Pi3Cmodel *models)
 	ofs << "title:CastleScene\n";
 	ofs << "gridsize:" << grid.x << " " << grid.y << " " << grid.z << "\n";
 	for (auto &model : models->group) {
-		vec3f position = model.matrix.position();
-		vec3f rot = model.matrix.getRotation() * RAD2DEG;
-		ofs << "object:" << model.name << " " << position.x << " " << position.y << " " << position.z << " " << rot.y << "\n"; //rot.x << " " << rot.y << " " << rot.z << "\n";
+		if (!model.deleted) {
+			vec3f position = model.matrix.position();
+			vec3f rot = model.rotation * RAD2DEG; // matrix.getRotation() * RAD2DEG;
+			ofs << "object:" << model.name << " " << position.x << " " << position.y << " " << position.z << " " << rot.x << " " << rot.y << " " << rot.z << "\n";
+		}
 	}
 	ofs.close();
 }

@@ -195,6 +195,7 @@ Pi3Cmodel * Pi3Cmodel::append(Pi3Cmodel model, vec3f offset, vec3f rotation)
 		Pi3Cmatrix mm;
 		mm.setMoveRotate(offset, rotation);
 		model.matrix = model.matrix * mm;
+		model.rotation = rotation;
 	}
 	group.push_back(model);
 	bbox.update(model.bbox, &model.matrix);
