@@ -37,19 +37,21 @@ model:Courtyard f Well WellStocks.obj WellStocksColl.obj 10000
 model:Courtyard f CattleStall CattleStall.obj CattleStallColl.obj 150 CattleStallLoPoly.obj 10000
 model:Ground g Grass grass.obj grass.obj 200 grass.obj 10000
 model:Ground g Mud muddyGrass.obj muddyGrass.obj 200 muddyGrass.obj 10000
-model:Ground g CrossRoad cobbleCross.obj cobbleCross.obj 200 cobbleCross.obj 10000
-model:Ground g RoadTee cobbleTee.obj cobbleTee.obj 200 cobbleTee.obj 10000
+model:Ground g Cross cobbleCross.obj cobbleCross.obj 200 cobbleCross.obj 10000
+model:Ground g Tee cobbleTee.obj cobbleTee.obj 200 cobbleTee.obj 10000
 model:Ground g Road cobbleRoad.obj cobbleRoad.obj 10000
 model:Ground g Corner cobbleCorner.obj cobbleCorner.obj 10000
-model:Ground g Landscape landscape.obj landscape.obj 10000
+model:Ground g Landscape Landscape.obj Landscape.obj 10000
 model:Trees f AshTree AshTree.obj grass.obj 10000
 model:Courtyard f Cart cart.obj cartColl.obj 150 cartLoPoly.obj 10000
 model:Courtyard f Wagon wagon.obj wagonColl.obj 150 wagonLoPoly.obj 10000
-model:Furniture f TableBenches tableBenches.obj tableBenchesColl.obj 150 tableBenches.obj 10000
-model:Furniture f Table table.obj tableColl.obj 150 table.obj 10000
-model:Furniture f Chair chair.obj chairColl.obj 150 chair.obj 10000
-model:Furniture f GermanFlag flagGerman.obj flagGerman.obj 10000
-model:Furniture f Torch torch.obj torch.obj 10000
+model:Items f TableBenches tableBenches.obj tableBenchesColl.obj 150 tableBenches.obj 10000
+model:Items f Table table.obj tableColl.obj 150 table.obj 10000
+model:Items f Chair chair.obj chairColl.obj 150 chair.obj 10000
+model:Items f GermanFlag flagGerman.obj flagGerman.obj 10000
+model:Items f Torch torch.obj torch.obj 10000
+model:Items f Barrel Barrel.obj BarrelColl.obj 10000
+model:Items f WaterTrough WaterTrough.obj WaterTroughColl.obj 10000
 logo:maps/logo.png
 skyboxPath:../../Resources/models/skyboxes
 skybox:miramar2.obj

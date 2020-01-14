@@ -51,9 +51,9 @@ public:
 
 	void init(const avatarParams &p);
 	void setTicks(float tick) { ticks = tick; }
-	void setPosition(vec3f position) { this->matrix.move(position); }
+	void setPosition(vec3f position) { pos = position; this->matrix.move(position); }
 	void setSize(vec3f size) { this->size = size; }
-	void setOrientation(vec3f rot) { this->rot = rot; }
+	void setRotation(vec3f rot) { this->rot = rot; }
 	vec3f getPosition() { return pos; }
 	vec3f getRotation() { return rot; }
 	vec3f getSize() { return size; }

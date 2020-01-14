@@ -128,7 +128,7 @@ void Editor::loadModels(const std::string &modelsLibraryFile, const std::string 
 	setupGUI(opts);
 
 	nearzfarz = opts.asVec2f("nearzfarz");
-	scene.setFog(0xffffff, 10000.f, 25000.f);
+	scene.setFog(0xffffff, 40000.f, 50000.f);
 	scene.setPerspective3D(window->getWidth(), window->getHeight(), opts.asFloat("perspective"), nearzfarz.x, nearzfarz.y);
 
 	// Setup player's avatar ...
@@ -533,9 +533,15 @@ Pi3Cmodel Editor::loadScene(const std::string &file, vec3f &grid)
 	grid = opts.asVec3f("gridsize");
 	std::vector<std::string> objects = opts.asStringArray("object");
 
+	vec3f ppos = opts.asVec3f("playerPos");
+	player.setPosition(ppos);
+	vec3f prot = opts.asVec3f("playerRot");
+	player.setRotation(prot);
+
 	std::string objname;
 	float gx, gy, gz;
 	float rotx = 0, roty = 0, rotz = 0;
+
 	for (auto &o : objects) {
 		std::stringstream ss(o);
 		ss >> objname >> gx >> gy >> gz >> rotx >> roty >> rotz;
@@ -556,6 +562,10 @@ void Editor::saveScene(const std::string &file, Pi3Cmodel *models)
     
 	ofs << "title:CastleScene\n";
 	ofs << "gridsize:" << grid.x << " " << grid.y << " " << grid.z << "\n";
+	vec3f ppos = player.getPosition();
+	vec3f prot = player.getRotation();
+	ofs << "playerPos:" << ppos.x << " " << ppos.y << " " << ppos.z << "\n";
+	ofs << "playerRot:" << prot.x << " " << prot.y << " " << prot.z << "\n";
 	for (auto &model : models->group) {
 		if (!model.deleted) {
 			vec3f position = model.matrix.position();

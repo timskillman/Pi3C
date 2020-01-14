@@ -1,31 +1,30 @@
 title:CastleScene
 gridsize:76 0 76
+playerPos:12.971 -90.0596 402.898
+playerRot:-0.123333 10.15 0
 object:Landscape -38 0 -38 0 0 0
 object:ChurchCentre 0 -0.395789 -152 0 0 0
 object:ChurchTower -76 -0.395789 -152 0 0 0
 object:ChurchTower 0 -0.39579 -76 0 270 0
-object:ChurchTower 76 -0.395789 -152 0 -180 0
-object:ChurchTower 0 -0.395787 -228 0 90.0001 0
 object:ChurchSection 76 -0.395792 -152 0 -180 0
 object:ChurchSection 152 -0.395796 -152 0 -180 0
 object:ChurchCentre 228 -0.395786 -152 0 0 0
-object:ChurchSection 304 -0.395787 -76 0 0 0
-object:ChurchSection 228 -0.395786 -76 0 -90 0
-object:ChurchWing 228 -0.395786 0 0 -90 0
+object:ChurchSection 228 -0.395786 -76 0 -90.0002 0
+object:ChurchWing 228 -0.395786 0 0 -90.0002 0
 object:ChurchSection 304 -0.395794 -152 0 -180 0
 object:ChurchWing 380 -0.395792 -152 0 -180 0
-object:ChurchSection 228 -0.395793 -228 0 90 0
-object:ChurchSection 228 -0.395789 -304 0 90 0
+object:ChurchSection 228 -0.395793 -228 0 90.0002 0
+object:ChurchSection 228 -0.395789 -304 0 90.0002 0
 object:ChurchSection 76 -0.395786 -304 0 0 0
-object:ChurchSection 0 -0.395779 -228 0 90 0
-object:ChurchSection 0 -0.39579 -304 0 90 0
+object:ChurchSection 0 -0.395779 -228 0 90.0002 0
+object:ChurchSection 0 -0.39579 -304 0 90.0002 0
 object:ChurchCentre 0 -0.39583 -380 0 0 0
 object:ChurchCentre 228 -0.395815 -380 0 0 0
 object:ChurchSection 152 -0.395825 -380 0 0 0
 object:ChurchSection 76 -0.395795 -380 0 0 0
 object:ChurchWing 304 -0.39576 -380 0 -180 0
-object:ChurchSection 228 -0.395775 -456 0 90 0
-object:ChurchWing 228 -0.39576 -532 0 90 0
+object:ChurchSection 228 -0.395775 -456 0 90.0002 0
+object:ChurchWing 228 -0.39576 -532 0 90.0002 0
 object:ChurchTower -76 -0.395794 -380 0 0 0
-object:ChurchSection 0 -0.395798 -456 0 90 0
-object:ChurchEntrance 0 -0.3958 -532 0 90 0
+object:ChurchSection 0 -0.395798 -456 0 90.0002 0
+object:ChurchEntrance 0 -0.3958 -532 0 90.0002 0
