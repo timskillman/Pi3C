@@ -664,8 +664,8 @@ void writeJSmatrix(PrettyWriter<StringBuffer> &json_writer, const char * key, Pi
 void Editor::saveScene(const std::string &file, Pi3Cmodel *models)
 {
 	//loadOptions opts(file.c_str());
-	//vec3f ppos = player.getPosition();
-	//vec3f prot = player.getRotation();
+	vec3f ppos = player.getPosition();
+	vec3f prot = player.getRotation();
 
 	//std::ofstream ofs(file + ".txt", std::ofstream::out);
 	//ofs << "title:CastleScene\n";
@@ -692,8 +692,8 @@ void Editor::saveScene(const std::string &file, Pi3Cmodel *models)
 
 		json_writer.Key("player");
 		json_writer.StartObject();
-			writeJSvec3f(json_writer, "position", player.getPosition());
-			writeJSvec3f(json_writer, "rotation", player.getRotation());
+			writeJSvec3f(json_writer, "position", ppos);
+			writeJSvec3f(json_writer, "rotation", prot);
 		json_writer.EndObject();
 
 		json_writer.Key("objects");
