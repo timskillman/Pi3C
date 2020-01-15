@@ -1,10 +1,5 @@
 #include "Editor.h"
-#include "Pi3Cshapes.h"
-#include "Pi3Crect.h"
-#include "Pi3Cdirectory.h"
-#include <fstream>
-#include <sstream>
-#include <sys/stat.h>
+
 //JSON
 #include "rapidjson.h"
 #include "prettywriter.h"
@@ -12,6 +7,14 @@
 #include "document.h"
 #include <istreamwrapper.h>
 #include <iostream>
+
+#include "Pi3Cshapes.h"
+#include "Pi3Crect.h"
+#include "Pi3Cdirectory.h"
+#include <fstream>
+#include <sstream>
+#include <sys/stat.h>
+
 
 using namespace rapidjson;
 
