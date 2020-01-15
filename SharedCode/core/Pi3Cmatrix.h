@@ -106,6 +106,18 @@ public:
 	const float* get() const { return &matrix[0]; }
 	float* set() { return &matrix[0]; }
 
+	void set(float m0_0, float m0_1, float m0_2, float m0_3,
+		float m1_0, float m1_1, float m1_2, float m1_3,
+		float m2_0, float m2_1, float m2_2, float m2_3,
+		float m3_0, float m3_1, float m3_2, float m3_3)
+	{
+		matrix[m00] = m0_0; matrix[m01] = m0_1; matrix[m02] = m0_2; matrix[m03] = m0_3;
+		matrix[m10] = m1_0; matrix[m11] = m1_1; matrix[m12] = m1_2; matrix[m13] = m1_3;
+		matrix[m20] = m2_0; matrix[m21] = m2_1; matrix[m22] = m2_2; matrix[m23] = m2_3;
+		matrix[m30] = m3_0; matrix[m31] = m3_1; matrix[m32] = m3_2; matrix[m33] = m3_3;
+		identity = false;
+	}
+
 private:
 	bool identity = true; //used to avoid time wasted multiplying identity matrices!
 	float matrix[16] = {};

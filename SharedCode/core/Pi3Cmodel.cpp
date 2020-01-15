@@ -202,6 +202,14 @@ Pi3Cmodel * Pi3Cmodel::append(Pi3Cmodel model, vec3f offset, vec3f rotation)
 	return &group.back();
 }
 
+Pi3Cmodel * Pi3Cmodel::append(Pi3Cmodel model, Pi3Cmatrix matrix)
+{
+	model.matrix = matrix;
+	group.push_back(model);
+	bbox.update(model.bbox, &model.matrix);
+	return &group.back();
+}
+
 Pi3Cmodel * Pi3Cmodel::appendCollider(Pi3Cmodel &model, vec3f offset, vec3f rotation)
 {
 	model.matrix.setMoveRotate(offset, rotation);
