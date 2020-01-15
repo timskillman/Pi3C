@@ -41,6 +41,7 @@ private:
 
 	void loadModelLibrary(const std::string &path, const std::vector<std::string> &vals);
 	Pi3Cmodel loadScene(const std::string &file, vec3f &grid);
+	Pi3Cmodel loadSceneJSON(const std::string &file, vec3f &grid);
 	Pi3Cmodel createScene(const uint32_t width, const uint32_t depth, Pi3Cmodel *usemodel, const vec3f &grid);
 	Pi3Cmodel * findModel(const std::string &modelName);		//searches all sub-libs to find model
 	Pi3Cmodel * selectLib(const std::string &libName);

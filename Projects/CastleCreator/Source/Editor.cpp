@@ -5,6 +5,14 @@
 #include <fstream>
 #include <sstream>
 #include <sys/stat.h>
+//JSON
+#include "prettywriter.h"
+#include "stringbuffer.h"
+#include "document.h"
+#include <istreamwrapper.h>
+#include <iostream>
+
+using namespace rapidjson;
 
 Editor::Editor(Pi3Cresource *resource, Pi3Cwindow *window)
 {
@@ -514,7 +522,8 @@ void Editor::loadModelLibrary(const std::string &path, const std::vector<std::st
 void Editor::open()
 {
 	if (scene.models.size()>0) scene.models[0].group.clear();
-	Pi3Cmodel sceneModel = loadScene("MyCastleScene.txt", grid);
+	//Pi3Cmodel sceneModel = loadScene("MyCastleScene.txt", grid);
+	Pi3Cmodel sceneModel = loadSceneJSON("MyCastleScene.txt.json", grid);
 	scene.models[0] = sceneModel;
 	// sceneModelRef = scene.append3D(sceneModel);
 }
@@ -555,10 +564,61 @@ Pi3Cmodel Editor::loadScene(const std::string &file, vec3f &grid)
 	return model;
 }
 
+vec3f JSvec3f(const Value &d, const char * key)
+{
+	if (!d.HasMember(key)) return vec3f(0, 0, 0);
+	const Value& a = d[key];
+	if (a.Size() != 3) return vec3f(0, 0, 0);
+	return vec3f((float)a[0].GetDouble(), (float)a[1].GetDouble(), (float)a[2].GetDouble());
+}
+
+Pi3Cmodel Editor::loadSceneJSON(const std::string &file, vec3f &grid)
+{
+	std::ifstream ifs(file.c_str());
+	IStreamWrapper isw(ifs);
+
+	Document d;
+	d.ParseStream(isw);
+	
+	Pi3Cmodel model;
+	vec3f position, rotation;
+	std::string objname;
+
+	if (!d.IsObject()) return model;
+
+	if (d.HasMember("title")) model.name = d["title"].GetString();
+	
+	grid = JSvec3f(d, "grid");
+	const Value& p = d["player"];
+	if (p.HasMember("position")) player.setPosition(JSvec3f(p, "position"));
+	if (p.HasMember("rotation")) player.setRotation(JSvec3f(p, "rotation"));
+
+	const Value& obj = d["objects"];
+
+	for (SizeType i = 0; i < obj.Size(); i++)
+	{
+		const Value& ob = obj[i];
+		if (ob.IsObject()) {
+			if (ob.HasMember("name")) objname = ob["name"].GetString();
+			if (ob.HasMember("position")) position = JSvec3f(ob, "position");
+			if (ob.HasMember("rotation")) rotation = JSvec3f(ob, "rotation");
+			Pi3Cmodel *fmodel = findModel(objname);
+			model.append(*fmodel, position, rotation * DEG2RAD);
+		}
+	}
+
+	return model;
+}
+
+double formatDbl(float v)
+{
+	return std::floor((double)v * 10000) / 10000;
+}
+
 void Editor::saveScene(const std::string &file, Pi3Cmodel *models)
 {
 	//loadOptions opts(file.c_str());
-    std::ofstream ofs(file, std::ofstream::out);
+    std::ofstream ofs(file+".txt", std::ofstream::out);
     
 	ofs << "title:CastleScene\n";
 	ofs << "gridsize:" << grid.x << " " << grid.y << " " << grid.z << "\n";
@@ -574,6 +634,79 @@ void Editor::saveScene(const std::string &file, Pi3Cmodel *models)
 		}
 	}
 	ofs.close();
+
+	StringBuffer json_string_buffer;
+	PrettyWriter<StringBuffer> json_writer(json_string_buffer);
+	json_writer.SetFormatOptions(kFormatSingleLineArray);
+
+	json_writer.StartObject();		//<<<There must be a root object surrounding everything
+
+	json_writer.Key("title");
+	json_writer.String("CastleScene");
+
+	json_writer.Key("grid");
+	json_writer.StartArray();
+	json_writer.Double(grid.x);
+	json_writer.Double(grid.y);
+	json_writer.Double(grid.z);
+	json_writer.EndArray();
+
+	json_writer.Key("player");
+	json_writer.StartObject();
+
+		json_writer.Key("position");
+		json_writer.StartArray();
+			json_writer.Double(formatDbl(ppos.x));
+			json_writer.Double(formatDbl(ppos.y));
+			json_writer.Double(formatDbl(ppos.z));
+		json_writer.EndArray();
+
+		json_writer.Key("rotation");
+		json_writer.StartArray();
+			json_writer.Double(formatDbl(prot.x));
+			json_writer.Double(formatDbl(prot.y));
+			json_writer.Double(formatDbl(prot.z));
+		json_writer.EndArray();
+
+	json_writer.EndObject();
+
+	json_writer.Key("objects");
+	json_writer.StartArray();
+	for (auto &model : models->group) {
+		if (!model.deleted) {
+			vec3f position = model.matrix.position();
+			vec3f rot = model.rotation * RAD2DEG; // matrix.getRotation() * RAD2DEG;
+
+			json_writer.StartObject();
+
+				json_writer.Key("name");
+				json_writer.String(model.name.c_str());
+
+				json_writer.Key("position");
+				json_writer.StartArray();
+					json_writer.Double(formatDbl(position.x));
+					json_writer.Double(formatDbl(position.y));
+					json_writer.Double(formatDbl(position.z));
+				json_writer.EndArray();
+
+				json_writer.Key("rotation");
+				json_writer.StartArray();
+					json_writer.Double(formatDbl(rot.x));
+					json_writer.Double(formatDbl(rot.y));
+					json_writer.Double(formatDbl(rot.z));
+				json_writer.EndArray();
+
+			json_writer.EndObject();
+		}
+	}
+	json_writer.EndArray();
+
+	json_writer.EndObject();
+
+	std::ofstream jsonfs(file + ".json", std::ofstream::out);
+	jsonfs << json_string_buffer.GetString() << std::endl;
+	jsonfs.close();
+
 }
 
 bool Editor::fileExists(const std::string &file)
