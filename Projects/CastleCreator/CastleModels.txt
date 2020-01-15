@@ -19,7 +19,7 @@ model:Castle g RoundTower RoundTower.obj RoundTowerColl.obj 150 RoundTowerLoPoly
 model:Castle g RoundTowerTall RoundTower2.obj RoundTower2Coll.obj 200 RoundTower2LoPoly2.obj 10000
 model:Castle g SquareTower SquareTower1.obj SquareTower1Coll.obj 150 SquareTower1LoPoly.obj 10000
 model:Castle g SquareTowerTall SquareTower2.obj SquareTower2Coll.obj 150 SquareTower2LoPoly.obj 10000
-model:Castle g Dias Dias.obj DiasColl.obj 10000
+model:Castle g Dias Dias.obj DiasColl.obj 250 DiasLoPoly.obj 10000
 model:Castle g Keep Keep.obj KeepColl.obj 150 KeepLoPoly.obj 10000
 model:Castle g Wall Wall1.obj Wall1Coll.obj 10000
 model:Castle g WallLeanTo WallLeanTo1.obj WallLeanTo1Coll.obj 10000
