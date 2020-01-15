@@ -41,7 +41,7 @@ model:Ground g Cross cobbleCross.obj cobbleCross.obj 200 cobbleCross.obj 10000
 model:Ground g Tee cobbleTee.obj cobbleTee.obj 200 cobbleTee.obj 10000
 model:Ground g Road cobbleRoad.obj cobbleRoad.obj 10000
 model:Ground g Corner cobbleCorner.obj cobbleCorner.obj 10000
-model:Ground g Landscape Landscape.obj Landscape.obj 10000
+model:Ground g Landscape landscape.obj landscape.obj 10000
 model:Trees f AshTree AshTree.obj grass.obj 10000
 model:Courtyard f Cart cart.obj cartColl.obj 150 cartLoPoly.obj 10000
 model:Courtyard f Wagon wagon.obj wagonColl.obj 150 wagonLoPoly.obj 10000
