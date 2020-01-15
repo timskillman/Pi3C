@@ -57,7 +57,7 @@ namespace Pi3CfileOBJ {
 	{
 		std::string line;
 		Pi3Cmaterial objmat;
-		SDL_Log("Loading material '%s'", (path + name).c_str());
+		//SDL_Log("Loading material '%s'", (path + name).c_str());
 		std::ifstream matfile(path + name, std::ifstream::in);
 		if (!matfile.is_open()) {
 			SDL_Log("*** Material '%s' not found! ***", name.c_str());
@@ -245,7 +245,7 @@ namespace Pi3CfileOBJ {
 					}
 
 					if (materialfound<0) {
-						SDL_Log("No material found - using default one");
+						//SDL_Log("No material found - using default one");
 						materialfound = 0;
 						meshModel.resize(1);
 						meshModel[0].materialRef = 0;
@@ -331,12 +331,12 @@ namespace Pi3CfileOBJ {
 							materialfound = 0; //use default
 						}
 						else {
-							SDL_Log("Material found %d, %s", materialfound, materialName.c_str());
+							//SDL_Log("Material found %d, %s", materialfound, materialName.c_str());
 						}
 						if (meshModel.size() > (size_t)materialfound) {
 							meshModel[materialfound].materialRef = materialfound; //passed back to model
 							if (meshModel[materialfound].name == "") {
-								SDL_Log("Add new mesh: mesh_%s",vals.c_str());
+								//SDL_Log("Add new mesh: mesh_%s",vals.c_str());
 								meshModel[materialfound].name = "mesh_" + vals; //Set new mesh name
 							}
 						}
@@ -347,7 +347,7 @@ namespace Pi3CfileOBJ {
 			}
 		}
 
-		SDL_Log("Creating resource ...");
+		//SDL_Log("Creating resource ...");
 		
 		//Add all models with no alpha materials
 		for (size_t i=0; i<meshModel.size(); i++) {

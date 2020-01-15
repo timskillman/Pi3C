@@ -106,7 +106,7 @@ int32_t Pi3Cresource::loadTexture(const std::string &path, const std::string &te
 	for (size_t i = 0; i < materials.size(); i++) {
 		if (texname == materials[i].texName) {
 			texRef = materials[i].texRef;
-			SDL_Log("Using existing texture '%s'", texname.c_str());
+			//SDL_Log("Using existing texture '%s'", texname.c_str());
 			return materials[i].texID;
 		}
 	}
@@ -115,7 +115,7 @@ int32_t Pi3Cresource::loadTexture(const std::string &path, const std::string &te
 	Texture.reset(new Pi3Ctexture());
 
 	std::string filename = path + texname;
-	SDL_Log("Loading texture '%s'", filename.c_str());
+	//SDL_Log("Loading texture '%s'", filename.c_str());
 
 	Texture->loadFromFile(filename.c_str());
 	if (Texture.get()==nullptr){

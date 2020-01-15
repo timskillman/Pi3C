@@ -1,13 +1,4 @@
 #include "Editor.h"
-
-//JSON
-#include "rapidjson.h"
-#include "prettywriter.h"
-#include "stringbuffer.h"
-#include "document.h"
-#include <istreamwrapper.h>
-#include <iostream>
-
 #include "Pi3Cshapes.h"
 #include "Pi3Crect.h"
 #include "Pi3Cdirectory.h"

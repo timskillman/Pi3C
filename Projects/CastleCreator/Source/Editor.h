@@ -12,7 +12,6 @@
 #include "Pi3Cresource.h"
 #include "Pi3Cscene.h"
 #include "Pi3Cavatar.h"
-#include "Pi3Chumanoid.h"
 #include "Pi3CloadOptions.h"
 #include "Pi3Cimgui.h"
 
@@ -66,7 +65,7 @@ private:
 	std::vector<std::string> guifonts;
 
 	Pi3Cmodel *modelsLib;
-	Pi3Chumanoid body;
+	//Pi3Chumanoid body;
 
 	vec4f lastCol { 0, 0, 0, 0 };
 	bool editMode = 0;
