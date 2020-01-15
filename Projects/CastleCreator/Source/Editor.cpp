@@ -6,6 +6,7 @@
 #include <sstream>
 #include <sys/stat.h>
 //JSON
+#include "rapidjson.h"
 #include "prettywriter.h"
 #include "stringbuffer.h"
 #include "document.h"
