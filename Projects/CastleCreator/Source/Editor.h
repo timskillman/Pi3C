@@ -1,13 +1,6 @@
 #pragma once
 
-//JSON
-#include "rapidjson.h"
-#include "prettywriter.h"
-#include "stringbuffer.h"
-#include "document.h"
-#include <istreamwrapper.h>
-#include <iostream>
-
+#include "Pi3Cjson.h"
 #include "Pi3Cwin.h"
 #include "Pi3Cresource.h"
 #include "Pi3Cscene.h"
@@ -39,7 +32,7 @@ public:
 	void open();
 	void save();
 	void loadModels(const std::string &modelLibrary, const std::string &scenefile);
-	void saveScene(const std::string &file, Pi3Cmodel *models);
+	void saveSceneJSON(const std::string &file, Pi3Cmodel *models);
 	void newScene(const uint32_t ref);
 
 	bool initialised() { return (resource != nullptr); }
@@ -48,7 +41,7 @@ public:
 private:
 
 	void loadModelLibrary(const std::string &path, const std::vector<std::string> &vals);
-	Pi3Cmodel loadScene(const std::string &file, vec3f &grid);
+	//Pi3Cmodel loadScene(const std::string &file, vec3f &grid);
 	Pi3Cmodel loadSceneJSON(const std::string &file, vec3f &grid);
 	Pi3Cmodel createScene(const uint32_t width, const uint32_t depth, Pi3Cmodel *usemodel, const vec3f &grid);
 	Pi3Cmodel * findModel(const std::string &modelName);		//searches all sub-libs to find model
@@ -60,12 +53,12 @@ private:
 	Pi3Cimgui gui;
 	Pi3Cscene scene;
 	Pi3Cavatar player;
+
 	std::map<std::string, Pi3Cmodel> modelLibrary;
 	std::vector<std::string> libnames;
 	std::vector<std::string> guifonts;
 
 	Pi3Cmodel *modelsLib;
-	//Pi3Chumanoid body;
 
 	vec4f lastCol { 0, 0, 0, 0 };
 	bool editMode = 0;

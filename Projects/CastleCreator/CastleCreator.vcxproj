@@ -242,6 +242,7 @@
     <ClCompile Include="..\..\SharedCode\helpers\Pi3Cavatar.cpp" />
     <ClCompile Include="..\..\SharedCode\helpers\Pi3Chtml.cpp" />
     <ClCompile Include="..\..\SharedCode\helpers\Pi3Chumanoid.cpp" />
+    <ClCompile Include="..\..\SharedCode\helpers\Pi3Cjson.cpp" />
     <ClCompile Include="..\..\SharedCode\helpers\Pi3CloadOptions.cpp" />
     <ClCompile Include="..\..\SharedCode\helpers\Pi3Cshapes.cpp" />
     <ClCompile Include="..\..\SharedCode\helpers\Pi3Cutils.cpp" />
@@ -288,6 +289,7 @@
     <ClInclude Include="..\..\SharedCode\helpers\Pi3Cavatar.h" />
     <ClInclude Include="..\..\SharedCode\helpers\Pi3Chtml.h" />
     <ClInclude Include="..\..\SharedCode\helpers\Pi3Chumanoid.h" />
+    <ClInclude Include="..\..\SharedCode\helpers\Pi3Cjson.h" />
     <ClInclude Include="..\..\SharedCode\helpers\Pi3CloadOptions.h" />
     <ClInclude Include="..\..\SharedCode\helpers\Pi3Cshapes.h" />
     <ClInclude Include="..\..\SharedCode\helpers\Pi3Cutils.h" />

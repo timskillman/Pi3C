@@ -7,7 +7,7 @@
 #include <sys/stat.h>
 
 
-using namespace rapidjson;
+//using namespace rapidjson;
 
 Editor::Editor(Pi3Cresource *resource, Pi3Cwindow *window)
 {
@@ -524,89 +524,33 @@ void Editor::open()
 
 void Editor::save()
 {
-	saveScene("MyCastleScene", &scene.models[0]);
-}
-
-Pi3Cmodel Editor::loadScene(const std::string &file, vec3f &grid)
-{
-	loadOptions opts(file.c_str());
-
-	Pi3Cmodel model;
-	model.name = opts.asString("title");
-	grid = opts.asVec3f("gridsize");
-	std::vector<std::string> objects = opts.asStringArray("object");
-
-	vec3f ppos = opts.asVec3f("playerPos");
-	player.setPosition(ppos);
-	vec3f prot = opts.asVec3f("playerRot");
-	player.setRotation(prot);
-
-	std::string objname;
-	float gx, gy, gz;
-	float rotx = 0, roty = 0, rotz = 0;
-
-	for (auto &o : objects) {
-		std::stringstream ss(o);
-		ss >> objname >> gx >> gy >> gz >> rotx >> roty >> rotz;
-		Pi3Cmodel *fmodel = findModel(objname);
-		if (fmodel) {
-			vec3f position =  { gx, gy, gz }; //{ gx*grid.x, gy*grid.y, gz*grid.z };
-			vec3f rotation = { rotx *DEG2RAD, roty *DEG2RAD, rotz *DEG2RAD };
-			model.append(*fmodel, position, rotation);
-		}
-	}
-	return model;
-}
-
-vec3f readJSvec3f(const Value &d, const char * key)
-{
-	if (!d.HasMember(key)) return vec3f(0, 0, 0);
-	const Value& a = d[key];
-	if (a.Size() != 3) return vec3f(0, 0, 0);
-	return vec3f((float)a[0].GetDouble(), (float)a[1].GetDouble(), (float)a[2].GetDouble());
-}
-
-Pi3Cmatrix readJSmatrix(const Value &d, const char * key)
-{
-	Pi3Cmatrix matrix;
-	if (!d.HasMember(key)) return matrix;
-	const Value& a = d[key];
-	if (a.Size() != 12) return matrix;
-	matrix.set(a[0].GetDouble(), a[1].GetDouble(), a[2].GetDouble(), 0,
-		a[3].GetDouble(), a[4].GetDouble(), a[5].GetDouble(), 0, 
-		a[6].GetDouble(), a[7].GetDouble(), a[8].GetDouble(), 0, 
-		a[9].GetDouble(), a[10].GetDouble(), a[11].GetDouble(), 1.f);
-	return matrix;
+	saveSceneJSON("MyCastleScene", &scene.models[0]);
 }
 
 Pi3Cmodel Editor::loadSceneJSON(const std::string &file, vec3f &grid)
 {
-	std::ifstream ifs(file.c_str());
-	IStreamWrapper isw(ifs);
-
-	Document d;
-	d.ParseStream(isw);
+	Pi3Cjson json(file.c_str());
 	
 	Pi3Cmodel model;
 	Pi3Cmatrix matrix;
 	std::string objname;
 
-	if (!d.IsObject()) return model;
+	if (!json.doc.IsObject()) return model;
 
-	if (d.HasMember("title")) model.name = d["title"].GetString();
+	if (json.doc.HasMember("title")) model.name = json.doc["title"].GetString();
 	
-	grid = readJSvec3f(d, "grid");
-	const Value& p = d["player"];
-	if (p.HasMember("position")) player.setPosition(readJSvec3f(p, "position"));
-	if (p.HasMember("rotation")) player.setRotation(readJSvec3f(p, "rotation"));
+	grid = json.readVec3f(json.doc, "grid");
+	const Value& p = json.doc["player"];
+	if (p.HasMember("position")) player.setPosition(json.readVec3f(p, "position"));
+	if (p.HasMember("rotation")) player.setRotation(json.readVec3f(p, "rotation"));
 
-	const Value& obj = d["objects"];
+	const Value& obj = json.doc["objects"];
 	if (obj.IsArray()) {
 		for (SizeType i = 0; i < obj.Size(); i++) {
 			if (obj[i].IsObject()) {
 				const Value& ob = obj[i];
 				if (ob.HasMember("name")) objname = ob["name"].GetString();
-				if (ob.HasMember("matrix")) matrix = readJSmatrix(ob, "matrix");
+				if (ob.HasMember("matrix")) matrix = json.readMatrix(ob, "matrix");
 				model.append(*findModel(objname), matrix);
 			}
 		}
@@ -615,99 +559,39 @@ Pi3Cmodel Editor::loadSceneJSON(const std::string &file, vec3f &grid)
 	return model;
 }
 
-double formatDbl(float v)
+void Editor::saveSceneJSON(const std::string &file, Pi3Cmodel *models)
 {
-	return std::floor((double)v * 10000) / 10000;
-}
-
-void writeJSstring(PrettyWriter<StringBuffer> &json_writer, const char * key, const char * str)
-{
-	json_writer.Key(key);
-	json_writer.String(str);
-}
-
-void writeJSvec3f(PrettyWriter<StringBuffer> &json_writer, const char * key, vec3f& v)
-{
-	json_writer.Key(key);
-	json_writer.StartArray();
-	json_writer.Double(formatDbl(v.x));
-	json_writer.Double(formatDbl(v.y));
-	json_writer.Double(formatDbl(v.z));
-	json_writer.EndArray();
-}
-
-void writeJSmatrix(PrettyWriter<StringBuffer> &json_writer, const char * key, Pi3Cmatrix& matrix)
-{
-	json_writer.Key(key);
-	json_writer.StartArray();
-	const float* mv = matrix.get();
-	json_writer.Double(formatDbl(mv[matrix.m00]));
-	json_writer.Double(formatDbl(mv[matrix.m01]));
-	json_writer.Double(formatDbl(mv[matrix.m02]));
-	json_writer.Double(formatDbl(mv[matrix.m10]));
-	json_writer.Double(formatDbl(mv[matrix.m11]));
-	json_writer.Double(formatDbl(mv[matrix.m12]));
-	json_writer.Double(formatDbl(mv[matrix.m20]));
-	json_writer.Double(formatDbl(mv[matrix.m21]));
-	json_writer.Double(formatDbl(mv[matrix.m22]));
-	json_writer.Double(formatDbl(mv[matrix.m30]));
-	json_writer.Double(formatDbl(mv[matrix.m31]));
-	json_writer.Double(formatDbl(mv[matrix.m32]));
-	json_writer.EndArray();
-}
-
-void Editor::saveScene(const std::string &file, Pi3Cmodel *models)
-{
-	//loadOptions opts(file.c_str());
 	vec3f ppos = player.getPosition();
-	vec3f prot = player.getRotation();
+	vec3f prot = player.getRotation();;
 
-	//std::ofstream ofs(file + ".txt", std::ofstream::out);
-	//ofs << "title:CastleScene\n";
-	//ofs << "gridsize:" << grid.x << " " << grid.y << " " << grid.z << "\n";
-	//ofs << "playerPos:" << ppos.x << " " << ppos.y << " " << ppos.z << "\n";
-	//ofs << "playerRot:" << prot.x << " " << prot.y << " " << prot.z << "\n";
-	//for (auto &model : models->group) {
-	//	if (!model.deleted) {
-	//		vec3f position = model.matrix.position();
-	//		vec3f rot = model.rotation * RAD2DEG; // matrix.getRotation() * RAD2DEG;
-	//		ofs << "object:" << model.name << " " << position.x << " " << position.y << " " << position.z << " " << rot.x << " " << rot.y << " " << rot.z << "\n";
-	//	}
-	//}
-	//ofs.close();
+	Pi3Cjson json;
 
-	StringBuffer json_string_buffer;
-	PrettyWriter<StringBuffer> json_writer(json_string_buffer);
-	json_writer.SetFormatOptions(kFormatSingleLineArray);
+	json.StartObject();		//<<<There must be a root object surrounding everything
 
-	json_writer.StartObject();		//<<<There must be a root object surrounding everything
+		json.writeString("title", file.c_str());
+		json.writeVec3f("grid", grid);
 
-		writeJSstring(json_writer, "title", file.c_str());
-		writeJSvec3f(json_writer, "grid", grid);
+		json.Key("player");
+		json.StartObject();
+			json.writeVec3f("position", ppos);
+			json.writeVec3f("rotation", prot);
+		json.EndObject();
 
-		json_writer.Key("player");
-		json_writer.StartObject();
-			writeJSvec3f(json_writer, "position", ppos);
-			writeJSvec3f(json_writer, "rotation", prot);
-		json_writer.EndObject();
-
-		json_writer.Key("objects");
-		json_writer.StartArray();
+		json.Key("objects");
+		json.StartArray();
 		for (auto &model : models->group) {
 			if (!model.deleted) {
-				json_writer.StartObject();
-				writeJSstring(json_writer, "name", model.name.c_str());
-				writeJSmatrix(json_writer, "matrix", model.matrix);
-				json_writer.EndObject();
+				json.StartObject();
+				json.writeString("name", model.name.c_str());
+				json.writeMatrix("matrix", model.matrix);
+				json.EndObject();
 			}
 		}
-		json_writer.EndArray();
+		json.EndArray();
 
-	json_writer.EndObject();
+	json.EndObject();
 
-	std::ofstream jsonfs(file + ".json", std::ofstream::out);
-	jsonfs << json_string_buffer.GetString() << std::endl;
-	jsonfs.close();
+	json.saveFile((file + ".json").c_str());
 
 }
 
