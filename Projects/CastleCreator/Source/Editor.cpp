@@ -81,14 +81,15 @@ void Editor::newScene(const uint32_t ref)
 		scene.models.push_back(sceneModel);
 }
 
-void Editor::setupGUI(loadOptions &opts)
+void Editor::setupGUI(std::string fontsPath, std::string fontName) // &opts)
 {
 	// Get GUI fonts
-	SDL_Log("Loading fonts: %s , %s", opts.asString("fontsPath").c_str(),opts.asString("font1").c_str());
+	//SDL_Log("Loading fonts: %s , %s", opts.asString("fontsPath").c_str(),opts.asString("font1").c_str());
 	 
 	//resource->addFont(opts.asString("fontsPath").c_str(), opts.asString("font1").c_str(), 80);
-	guifonts.push_back(gui.addFont(opts.asString("fontsPath").c_str(), opts.asString("font1").c_str(), 22));
-	guifonts.push_back(gui.addFont(opts.asString("fontsPath").c_str(), opts.asString("font1").c_str(), 16));
+	guifonts.push_back(gui.addFont(fontsPath.c_str(), fontName.c_str(), 22)); // opts.asString("fontsPath").c_str(), opts.asString("font1").c_str(), 22));
+	guifonts.push_back(gui.addFont(fontsPath.c_str(), fontName.c_str(), 16));
+	//guifonts.push_back(gui.addFont(opts.asString("fontsPath").c_str(), opts.asString("font1").c_str(), 16));
 	
 	//gui.loadImages("../../Resources/models/maps", { "larrow.png","rarrow.png","darrow.png","uarrow.png","handle.png","radioon.png","radiooff.png" });
 	// Setup GUI button styles ...
@@ -128,7 +129,8 @@ void Editor::loadModels(const std::string &modelsLibraryFile, const std::string 
 	// Load 3D models and scene ...
 	loadOptions opts(modelsLibraryFile.c_str());
 	
-	setupGUI(opts);
+	setupGUI(opts.asString("fontsPath"), opts.asString("font1"));
+	//setupGUI(opts);
 
 	nearzfarz = opts.asVec2f("nearzfarz");
 	scene.setFog(0xffffff, 40000.f, 50000.f);
@@ -514,6 +516,97 @@ void Editor::loadModelLibrary(const std::string &path, const std::vector<std::st
 	}
 }
 
+void Editor::loadModelLibraryJSON(const std::string &file)
+{
+	Pi3Cmodel *models = nullptr;
+
+	Pi3Cjson json(file.c_str());
+
+	if (!json.doc.IsObject()) return;
+
+	std::string libraryName = json.readString(json.doc, "title");
+	std::string modelPath = json.readString(json.doc, "modelPath");
+
+	const Value& vw = json.doc["view"];
+	int32_t scwidth, scheight;
+	json.readInt2(vw, "screensize", scwidth, scheight);
+	float znear = 1.f, zfar = 30000.f;
+	json.readFloat2(vw, "nearzfarz", znear, zfar);
+	scene.setPerspective3D(scwidth, scheight, json.readFloat(vw, "perspective"), znear, zfar);
+	scene.setFog(json.readHex(vw, "fogColour"), json.readFloat(vw, "fogNear"), json.readFloat(vw, "fogFar"));
+
+	skybox = scene.loadModelOBJ(json.readString(vw, "skyboxPath"), json.readString(vw, "skybox"), 0);
+	scene.models[skybox].matrix.SetScale(json.readFloat(vw, "skyboxScale"));
+	scene.models[skybox].touchable = false;
+
+	std::string fontsPath = json.readString(vw, "fontsPath");
+	std::string fontName = json.readString(vw, "font");
+	setupGUI(fontsPath, fontName);
+
+	const Value& av = json.doc["avatar"];
+	Pi3Cavatar::avatarParams avparams;
+	avparams.movement = json.readBool(av, "fly") ? Pi3Cavatar::move_fly : Pi3Cavatar::move_walk;
+	avparams.position = json.readVec3f(av, "position");
+	avparams.rotation = json.readVec3f(av, "rotation");
+	avparams.size = { 1.f, json.readFloat(av,"height"), 1.f };
+	avparams.fallSpeed = json.readFloat(av, "fallSpeed");
+	avparams.walkSpeed = json.readFloat(av, "walkSpeed");
+	avparams.runSpeed = json.readFloat(av, "runSpeed");
+	player.init(avparams);
+
+	const Value& obj = json.doc["models"];
+	if (obj.IsArray()) {
+		for (SizeType i = 0; i < obj.Size(); i++) {
+			if (obj[i].IsObject()) {
+				modelInfo lodmodels;
+
+				const Value& ob = obj[i];
+				lodmodels.group = json.readString(ob, "category");
+				lodmodels.name = json.readString(ob, "name");
+				lodmodels.gridLocked = (json.readString(ob, "flags") == "g");
+				lodmodels.collider = json.readString(ob, "colliderFile");
+
+				const Value& lod0 = json.doc["LOD0"];
+				if (!lod0.IsNull()) {
+					lodmodels.LODmodels.push_back(json.readString(lod0, "file"));
+					lodmodels.LODdists.push_back(json.readFloat(lod0, "dist"));
+				}
+
+				const Value& lod1 = json.doc["LOD1"];
+				if (!lod1.IsNull()) {
+					lodmodels.LODmodels.push_back(json.readString(lod1, "file"));
+					lodmodels.LODdists.push_back(json.readFloat(lod1, "dist"));
+				}
+
+
+
+				//auto findLib = modelLibrary.find(lodmodels.group);
+				//if (findLib == modelLibrary.end()) {
+				//	modelLibrary.insert({ lodmodels.group, Pi3Cmodel() });
+				//	auto findLib2 = modelLibrary.find(lodmodels.group);
+				//	if (findLib2 != modelLibrary.end()) models = &findLib2->second; else models = nullptr; //something's seriously wrong!
+				//}
+				//else {
+				//	models = &findLib->second;
+				//}
+
+				//Pi3Cmodel model; // (mp);
+				//model.name = lodmodels.name;
+				//float lodfrom = 0.f;
+				//for (size_t j = 0; j < lodmodels.LODmodels.size(); j++) {
+				//	std::string colliderFile = (j == 0) ? lodmodels.collider : "";
+				//	std::string modelFile = lodmodels.LODmodels[j];
+				//	Pi3Cmodel modelLOD(resource, modelFile, path, modelFile, colliderFile);
+				//	float lodToo = lodmodels.LODdists[j];
+				//	model.appendLOD(modelLOD, lodfrom, lodToo);
+				//	lodfrom = lodToo;
+				//}
+				//models->append(model);
+			}
+		}
+	}
+}
+
 void Editor::open()
 {
 	if (scene.models.size()>0) scene.models[0].group.clear();
@@ -536,8 +629,7 @@ Pi3Cmodel Editor::loadSceneJSON(const std::string &file, vec3f &grid)
 	std::string objname;
 
 	if (!json.doc.IsObject()) return model;
-
-	if (json.doc.HasMember("title")) model.name = json.doc["title"].GetString();
+	model.name = json.readString(json.doc, "title");
 	
 	grid = json.readVec3f(json.doc, "grid");
 	const Value& p = json.doc["player"];

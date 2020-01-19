@@ -18,8 +18,16 @@ public:
 	Pi3Cjson();
 	Pi3Cjson(const char * file);
 
+	int readInt(const Value& doc, const char * key);
+	void readInt2(const Value& doc, const char * key, int32_t &v1, int32_t &v2);
+	void readInt3(const Value& doc, const char * key, int32_t &v1, int32_t &v2, int32_t &v3);
+	bool readBool(const Value& doc, const char * key);
+	float readFloat(const Value& doc, const char * key);
+	void readFloat2(const Value& doc, const char * key, float& v1, float& v2);
 	vec3f readVec3f(const Value& doc, const char * key);
 	Pi3Cmatrix readMatrix(const Value& doc, const char * key);
+	uint32_t readHex(const Value& doc, const char * key);
+	std::string readString(const Value& doc, const char * key);
 
 	void writeString(const char * key, const char * str);
 	void writeVec3f(const char * key, vec3f& v);

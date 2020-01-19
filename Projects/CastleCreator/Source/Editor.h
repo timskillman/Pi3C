@@ -21,7 +21,7 @@ public:
 
 	Editor(Pi3Cresource *resource, Pi3Cwindow *window);
 
-	void setupGUI(loadOptions &opts);
+	void setupGUI(std::string fontsPath, std::string fontName); // loadOptions &opts);
 	void handleKeys();
 	void handleEvents();
 	void handleIMGui();
@@ -41,6 +41,7 @@ public:
 private:
 
 	void loadModelLibrary(const std::string &path, const std::vector<std::string> &vals);
+	void loadModelLibraryJSON(const std::string &path);
 	//Pi3Cmodel loadScene(const std::string &file, vec3f &grid);
 	Pi3Cmodel loadSceneJSON(const std::string &file, vec3f &grid);
 	Pi3Cmodel createScene(const uint32_t width, const uint32_t depth, Pi3Cmodel *usemodel, const vec3f &grid);

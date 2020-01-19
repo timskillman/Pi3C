@@ -2,7 +2,6 @@
 
 Pi3Cjson::Pi3Cjson() 
 {
-	//PrettyWriter<StringBuffer> json_writer(json_string_buffer);
 	json_string_buffer.Clear();
 	json_writer.Reset(json_string_buffer);
 	json_writer.SetFormatOptions(kFormatSingleLineArray);
@@ -13,6 +12,58 @@ Pi3Cjson::Pi3Cjson(const char * file)
 	std::ifstream ifs(file);
 	IStreamWrapper isw(ifs);
 	doc.ParseStream(isw);
+}
+
+int Pi3Cjson::readInt(const Value& doc, const char * key)
+{
+	if (!doc.HasMember(key)) return 0;
+	return doc[key].GetInt();
+}
+
+void Pi3Cjson::readInt2(const Value& doc, const char * key, int32_t &v1, int32_t &v2)
+{
+	if (!doc.HasMember(key)) return;
+	const Value& a = doc[key];
+	if (a.Size() != 2) return;
+	v1 = a[0].GetInt();
+	v2 = a[1].GetInt();
+}
+void Pi3Cjson::readInt3(const Value& doc, const char * key, int32_t &v1, int32_t &v2, int32_t &v3)
+{
+	if (!doc.HasMember(key)) return;
+	const Value& a = doc[key];
+	if (a.Size() != 3) return;
+	v1 = a[0].GetInt();
+	v2 = a[1].GetInt();
+	v3 = a[2].GetInt();
+}
+
+bool Pi3Cjson::readBool(const Value& doc, const char * key)
+{
+	if (!doc.HasMember(key)) return false;
+	return doc[key].GetBool();
+}
+
+uint32_t Pi3Cjson::readHex(const Value& doc, const char * key)
+{
+	if (!doc.HasMember(key)) return 0;
+	std::string v = doc[key].GetString();
+	return std::stoi(v, 0, 16);
+}
+
+float Pi3Cjson::readFloat(const Value& doc, const char * key)
+{
+	if (!doc.HasMember(key)) return 0;
+	return doc[key].GetFloat();
+}
+
+void Pi3Cjson::readFloat2(const Value& doc, const char * key, float& v1, float& v2)
+{
+	if (!doc.HasMember(key)) return;
+	const Value& a = doc[key];
+	if (a.Size() != 2) return;
+	v1 = a[0].GetFloat();
+	v2 = a[1].GetFloat();
 }
 
 vec3f Pi3Cjson::readVec3f(const Value& doc, const char * key)
@@ -34,6 +85,10 @@ Pi3Cmatrix Pi3Cjson::readMatrix(const Value& doc, const char * key)
 		a[6].GetDouble(), a[7].GetDouble(), a[8].GetDouble(), 0,
 		a[9].GetDouble(), a[10].GetDouble(), a[11].GetDouble(), 1.f);
 	return matrix;
+}
+
+std::string Pi3Cjson::readString(const Value& doc, const char * key) {
+	return (doc.HasMember(key)) ? doc[key].GetString() : "";
 }
 
 double Pi3Cjson::formatDbl(float v)
