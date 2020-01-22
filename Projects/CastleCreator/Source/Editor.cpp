@@ -34,25 +34,25 @@ Editor::Editor(Pi3Cresource *resource, Pi3Cwindow *window)
 
 }
 
-Pi3Cmodel Editor::createScene(const uint32_t width, const uint32_t depth, Pi3Cmodel *usemodel, const vec3f &grid)
-{
-	float hw = width * grid.x * 0.5f;
-	float hd = depth * grid.z * 0.5f;
-	Pi3Cmodel model;
-	//Pi3Cmodel *findModel = modelsLib.find(modelname);
-	if (!usemodel) return model;
-
-	for (uint32_t z = 0; z < depth; z++)
-	{
-		for (uint32_t x = 0; x < width; x++)
-		{
-			vec3f position = { x*grid.x-hw, 0, z*grid.z-hd };
-			vec3f rotation = { 0, 0, 0 };
-			model.append(*usemodel, position, rotation);
-		}
-	}
-	return model;
-}
+//Pi3Cmodel Editor::createScene(const uint32_t width, const uint32_t depth, Pi3Cmodel *usemodel, const vec3f &grid)
+//{
+//	float hw = width * grid.x * 0.5f;
+//	float hd = depth * grid.z * 0.5f;
+//	Pi3Cmodel model;
+//	//Pi3Cmodel *findModel = modelsLib.find(modelname);
+//	if (!usemodel) return model;
+//
+//	for (uint32_t z = 0; z < depth; z++)
+//	{
+//		for (uint32_t x = 0; x < width; x++)
+//		{
+//			vec3f position = { x*grid.x-hw, 0, z*grid.z-hd };
+//			vec3f rotation = { 0, 0, 0 };
+//			model.append(*usemodel, position, rotation);
+//		}
+//	}
+//	return model;
+//}
 
 Pi3Cmodel * Editor::selectLib(const std::string &libName)
 {
@@ -73,8 +73,9 @@ Pi3Cmodel * Editor::findModel(const std::string &modelName)
 
 void Editor::newScene(const uint32_t ref)
 {
-	Pi3Cmodel sceneModel = createScene(1, 1, findModel("Landscape"), grid);
-	grid = vec3f(76.f, 0, 76.f);
+	Pi3Cmodel sceneModel = *findModel("Landscape"); // createScene(1, 1, findModel("Landscape"), grid);
+	Pi3Cmodel &submod = sceneModel.group[0];
+	submod.edit = false;
 	if (scene.models.size() > 0)
 		scene.models[0] = sceneModel;
 	else
@@ -117,52 +118,24 @@ void Editor::setupGUI(std::string fontsPath, std::string fontName) // &opts)
 	bsItems.buttonAlpha = 0.8f;
 	bsItems.buttonColour = 0xffffffff;
 	bsItems.textColour = 0xff404040;
-	bsItems.minWidth = 140.f;
+	bsItems.minWidth = 200.f;
 	bsItems.minHeight= 40.f;
 	bsItems.justify = Pi3Cimgui::CENTRE;
 	bsItems.align = Pi3Cimgui::BOTTOM;
 	bsItems.selectColour = 0x808000;
 }
 
-void Editor::loadModels(const std::string &modelsLibraryFile, const std::string &scenefile)
+void Editor::loadModels(const std::string &modelsLibraryFile)
 {
 	// Load 3D models and scene ...
-	loadOptions opts(modelsLibraryFile.c_str());
-	
-	setupGUI(opts.asString("fontsPath"), opts.asString("font1"));
-	//setupGUI(opts);
 
-	nearzfarz = opts.asVec2f("nearzfarz");
-	scene.setFog(0xffffff, 40000.f, 50000.f);
-	scene.setPerspective3D(window->getWidth(), window->getHeight(), opts.asFloat("perspective"), nearzfarz.x, nearzfarz.y);
-
-	// Setup player's avatar ...
-	Pi3Cavatar::avatarParams avparams;
-	avparams.movement = Pi3Cavatar::move_walk;
-	avparams.position = opts.asVec3f("startpos");
-	avparams.rotation = opts.asVec3f("rotation");
-	avparams.size = { 1.f, opts.asFloat("avatarHeight"), 1.f };
-	avparams.walkSpeed = opts.asFloat("avatarWalkSpeed");
-	avparams.runSpeed = opts.asFloat("avatarRunSpeed");
-	avparams.fallSpeed = opts.asFloat("avatarFallSpeed");
-	player.init(avparams);
+	//Setup 2D interface ...
+	setupGUI("../../Resources/fonts/", "NotoSans-Regular.ttf");
 
 	// Load model library ...
-	loadModelLibrary(opts.asString("modelPath"), opts.asStringArray("model"));
+	loadModelLibraryJSON("CastleModels.json");
+
 	for (auto &ln : modelLibrary) libnames.push_back(ln.first);
-
-	grid = { 76.f ,0 ,76.f };
-	newScene(0);
-	Pi3Cmodel sceneModel = createScene(20, 20, findModel("Grass"), grid);
-
-	// Load scene model ...
-	//Pi3Cmodel sceneModel = loadScene(scenefile, &modelsLib, grid);
-	//sceneModelRef = scene.append3D(sceneModel);
-
-	// Load Skybox ...
-	skybox = scene.loadModelOBJ(opts.asString("skyboxPath"), opts.asString("skybox"), 0); // loadbarCallback);
-	scene.models[skybox].matrix.SetScale(opts.asFloat("skyboxScale"));
-	scene.models[skybox].touchable = false;
 
 	// Create a brush for touching objects ...
 	Pi3Cmodel brush = Pi3Cmodel(resource, Pi3Cshapes::sphere(vec3f(0, 0, 0), 2.0f, 0xffffff, 0.f, 10, 20), 0xffff00);
@@ -186,7 +159,7 @@ void Editor::loadModels(const std::string &modelsLibraryFile, const std::string 
 	currentLib = libnames[0];
 	modelsLib = selectLib(currentLib);
 	currentModel = modelsLib->group[0].name;
-	//Setup 2D interface ...
+	
 
 	// Setup humanoid body pointers (can corrupt if done too early)
 	//body.attachModel(scene.models[bodyRef]);
@@ -225,12 +198,12 @@ void Editor::handleKeys()
 		if (keystate[SDL_SCANCODE_DELETE]) {
 			if (selGroup) {
 				Pi3Cmodel &touchMod = scene.models[touch.groupRefs[0]].group[touch.groupRefs[1]];
-				touchMod.deleted = true;
+				if (touchMod.edit) touchMod.deleted = true;
 			}
 			keypress = true;
 		}
 		if (keystate[SDL_SCANCODE_S] && ctrlKey) {
-			save();
+			save("MyCastleScene");
 			keypress = true;
 		}
 	}
@@ -321,12 +294,14 @@ void Editor::touchScene()
 				else if (window->mouse.wheel) {
 					//Rotate selected object ...
 					Pi3Cmodel *rotGroup = scene.getSubModel(&touch.groupRefs[0], 1);
-					Pi3Cmatrix rotmtx;
-					float sgn = (float)window->mouse.wheel;
-					float rotateBy = (!gridlock) ? (PI / 8.f)*sgn : (PI / 2.f)*sgn;
-					rotmtx.SetRotateYbit(rotateBy);
-					rotGroup->matrix = rotmtx * rotGroup->matrix;
-					rotGroup->rotation.y += rotateBy;
+					if (rotGroup->edit) {
+						Pi3Cmatrix rotmtx;
+						float sgn = (float)window->mouse.wheel;
+						float rotateBy = (!gridlock) ? (PI / 8.f)*sgn : (PI / 2.f)*sgn;
+						rotmtx.SetRotateYbit(rotateBy);
+						rotGroup->matrix = rotmtx * rotGroup->matrix;
+						rotGroup->rotation.y += rotateBy;
+					}
 					window->mouse.wheel = 0;
 				}
 				else if (!window->mouse.anyButton()) {
@@ -380,7 +355,7 @@ void Editor::handleIMGui()
 		if (gui.BeginMenu("File")) {
 			if (gui.MenuItem("New", "Ctrl+N")) newScene(sceneModelRef);
 			if (gui.MenuItem("Open", "Ctrl+O")) open();
-			if (gui.MenuItem("Save", "Ctrl+S")) save();
+			if (gui.MenuItem("Save", "Ctrl+S")) save("MyCastleScene");
 			if (gui.MenuItem("Quit", "")) window->setquit(true);
 		}
 		if (gui.BeginMenu("Edit")) {
@@ -447,75 +422,6 @@ void Editor::render()
 	}
 }
 
-struct modelInfo {
-	std::string group;
-	std::string name;
-	std::string collider;
-	bool gridLocked;
-	std::vector<std::string> LODmodels;
-	std::vector<float> LODdists;
-};
-
-modelInfo getModelInfo(const std::string &str)
-{
-	modelInfo lodmodels;
-
-	std::stringstream ss(str);
-	std::string model, gl;
-	float lodVal = 0;
-	ss >> lodmodels.group >> gl >> lodmodels.name >> model >> lodmodels.collider >> lodVal;
-
-	lodmodels.gridLocked = (gl == "g");
-	lodmodels.LODmodels.push_back(model);
-	lodmodels.LODdists.push_back(lodVal);
-
-	while (ss >> model) {
-		ss >> lodVal;
-		lodmodels.LODmodels.push_back(model);
-		lodmodels.LODdists.push_back(lodVal);
-	}
-	return lodmodels;
-}
-
-void Editor::loadModelLibrary(const std::string &path, const std::vector<std::string> &vals)
-{
-	//loadOptions opts(file.c_str());
-
-	//Pi3Cmodel::modelParams mp;
-	//mp.resource = resource;
-	//mp.path = path;
-	Pi3Cmodel *models = nullptr;
-
-	for (auto &val : vals) {
-		modelInfo minfo = getModelInfo(val);
-
-		auto findLib = modelLibrary.find(minfo.group);
-		if (findLib == modelLibrary.end()) {
-			modelLibrary.insert({ minfo.group, Pi3Cmodel()});
-			auto findLib2 = modelLibrary.find(minfo.group);
-			if (findLib2 != modelLibrary.end()) models = &findLib2->second; else models = nullptr; //something's seriously wrong!
-		}
-		else {
-			models = &findLib->second;
-		}
-
-		//mp.name = minfo.name;
-		Pi3Cmodel model; // (mp);
-		model.name = minfo.name;
-
-		float lodfrom = 0.f;
-		for (size_t j = 0; j < minfo.LODmodels.size(); j++) {
-			std::string colliderFile = (j == 0) ? minfo.collider : "";
-			std::string modelFile = minfo.LODmodels[j];
-			Pi3Cmodel modelLOD(resource, modelFile, path, modelFile, colliderFile);
-			float lodToo = minfo.LODdists[j];
-			model.appendLOD(modelLOD, lodfrom, lodToo);
-			lodfrom = lodToo;
-		}
-		models->append(model);
-	}
-}
-
 void Editor::loadModelLibraryJSON(const std::string &file)
 {
 	Pi3Cmodel *models = nullptr;
@@ -530,18 +436,18 @@ void Editor::loadModelLibraryJSON(const std::string &file)
 	const Value& vw = json.doc["view"];
 	int32_t scwidth, scheight;
 	json.readInt2(vw, "screensize", scwidth, scheight);
-	float znear = 1.f, zfar = 30000.f;
-	json.readFloat2(vw, "nearzfarz", znear, zfar);
-	scene.setPerspective3D(scwidth, scheight, json.readFloat(vw, "perspective"), znear, zfar);
+
+	nearzfarz = json.readVec2f(vw, "nearzfarz");
+	scene.setPerspective3D(scwidth, scheight, json.readFloat(vw, "perspective"), nearzfarz.x, nearzfarz.y);
 	scene.setFog(json.readHex(vw, "fogColour"), json.readFloat(vw, "fogNear"), json.readFloat(vw, "fogFar"));
+	grid = json.readVec3f(vw, "grid");
 
-	skybox = scene.loadModelOBJ(json.readString(vw, "skyboxPath"), json.readString(vw, "skybox"), 0);
-	scene.models[skybox].matrix.SetScale(json.readFloat(vw, "skyboxScale"));
-	scene.models[skybox].touchable = false;
+	std::string skyboxpath = json.readString(vw, "skyboxPath");
+	std::string skyboxfile = json.readString(vw, "skybox");
 
-	std::string fontsPath = json.readString(vw, "fontsPath");
-	std::string fontName = json.readString(vw, "font");
-	setupGUI(fontsPath, fontName);
+	//std::string fontsPath = json.readString(vw, "fontsPath");
+	//std::string fontName = json.readString(vw, "font");
+	//setupGUI(fontsPath, fontName);
 
 	const Value& av = json.doc["avatar"];
 	Pi3Cavatar::avatarParams avparams;
@@ -558,66 +464,76 @@ void Editor::loadModelLibraryJSON(const std::string &file)
 	if (obj.IsArray()) {
 		for (SizeType i = 0; i < obj.Size(); i++) {
 			if (obj[i].IsObject()) {
-				modelInfo lodmodels;
+				//modelInfo lodmodels;
 
 				const Value& ob = obj[i];
-				lodmodels.group = json.readString(ob, "category");
-				lodmodels.name = json.readString(ob, "name");
-				lodmodels.gridLocked = (json.readString(ob, "flags") == "g");
-				lodmodels.collider = json.readString(ob, "colliderFile");
+				std::string category = json.readString(ob, "category");
+				std::string modelname = json.readString(ob, "name");
+				bool gridLocked = (json.readString(ob, "flags") == "g");
+				std::string collider = json.readString(ob, "colliderFile");
 
-				const Value& lod0 = json.doc["LOD0"];
-				if (!lod0.IsNull()) {
-					lodmodels.LODmodels.push_back(json.readString(lod0, "file"));
-					lodmodels.LODdists.push_back(json.readFloat(lod0, "dist"));
+				std::vector<std::string> LODmodels;
+				std::vector<float> LODdists;
+				if (ob.HasMember("LOD0")) {
+					const Value& lod0 = ob["LOD0"];
+					if (!lod0.IsNull()) {
+						LODmodels.push_back(json.readString(lod0, "file"));
+						LODdists.push_back(json.readFloat(lod0, "dist"));
+					}
 				}
 
-				const Value& lod1 = json.doc["LOD1"];
-				if (!lod1.IsNull()) {
-					lodmodels.LODmodels.push_back(json.readString(lod1, "file"));
-					lodmodels.LODdists.push_back(json.readFloat(lod1, "dist"));
+				if (ob.HasMember("LOD1")) {
+					const Value& lod1 = ob["LOD1"];
+					if (!lod1.IsNull()) {
+						LODmodels.push_back(json.readString(lod1, "file"));
+						LODdists.push_back(json.readFloat(lod1, "dist"));
+					}
 				}
 
+				auto findLib = modelLibrary.find(category);
+				if (findLib == modelLibrary.end()) {
+					modelLibrary.insert({ category, Pi3Cmodel() });
+					auto findLib2 = modelLibrary.find(category);
+					if (findLib2 != modelLibrary.end()) models = &findLib2->second; else models = nullptr; //something's seriously wrong!
+				}
+				else {
+					models = &findLib->second;
+				}
 
-
-				//auto findLib = modelLibrary.find(lodmodels.group);
-				//if (findLib == modelLibrary.end()) {
-				//	modelLibrary.insert({ lodmodels.group, Pi3Cmodel() });
-				//	auto findLib2 = modelLibrary.find(lodmodels.group);
-				//	if (findLib2 != modelLibrary.end()) models = &findLib2->second; else models = nullptr; //something's seriously wrong!
-				//}
-				//else {
-				//	models = &findLib->second;
-				//}
-
-				//Pi3Cmodel model; // (mp);
-				//model.name = lodmodels.name;
-				//float lodfrom = 0.f;
-				//for (size_t j = 0; j < lodmodels.LODmodels.size(); j++) {
-				//	std::string colliderFile = (j == 0) ? lodmodels.collider : "";
-				//	std::string modelFile = lodmodels.LODmodels[j];
-				//	Pi3Cmodel modelLOD(resource, modelFile, path, modelFile, colliderFile);
-				//	float lodToo = lodmodels.LODdists[j];
-				//	model.appendLOD(modelLOD, lodfrom, lodToo);
-				//	lodfrom = lodToo;
-				//}
-				//models->append(model);
+				Pi3Cmodel model; // (mp);
+				model.name = modelname;
+				float lodfrom = 0.f;
+				for (size_t j = 0; j < LODmodels.size(); j++) {
+					std::string colliderFile = (j == 0) ? collider : "";
+					std::string modelFile = LODmodels[j];
+					Pi3Cmodel modelLOD(resource, modelFile, modelPath, modelFile, colliderFile);
+					float lodToo = LODdists[j];
+					model.appendLOD(modelLOD, lodfrom, lodToo);
+					lodfrom = lodToo;
+				}
+				models->append(model);
 			}
 		}
 	}
+
+	newScene(0);
+
+	skybox = scene.loadModelOBJ(skyboxpath, skyboxfile, 0);
+	scene.models[skybox].matrix.SetScale(json.readFloat(vw, "skyboxScale"));
+	scene.models[skybox].touchable = false;
+
 }
 
 void Editor::open()
 {
 	if (scene.models.size()>0) scene.models[0].group.clear();
-	//Pi3Cmodel sceneModel = loadScene("MyCastleScene.txt", grid);
 	Pi3Cmodel sceneModel = loadSceneJSON("MyCastleScene.json", grid);
 	scene.models[0] = sceneModel;
 }
 
-void Editor::save()
+void Editor::save(const std::string &file)
 {
-	saveSceneJSON("MyCastleScene", &scene.models[0]);
+	saveSceneJSON(file, &scene.models[0]);
 }
 
 Pi3Cmodel Editor::loadSceneJSON(const std::string &file, vec3f &grid)

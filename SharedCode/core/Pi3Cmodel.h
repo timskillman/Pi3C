@@ -133,6 +133,7 @@ public:
 	bool visible = true;			//visible in scene
 	bool deleted = false;			//deleted from scene (useful for undo/redo)
 	bool touchable = true;			//model is displayed but not touchable
+	bool edit = true;				//model can/not be edited
 	bool selected = false;			//model selected (useful for editing)
 	bool asCollider = false;		//if true, then use this model as a collider as well as rendered
 

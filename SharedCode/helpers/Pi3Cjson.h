@@ -24,6 +24,7 @@ public:
 	bool readBool(const Value& doc, const char * key);
 	float readFloat(const Value& doc, const char * key);
 	void readFloat2(const Value& doc, const char * key, float& v1, float& v2);
+	vec2f readVec2f(const Value& doc, const char * key);
 	vec3f readVec3f(const Value& doc, const char * key);
 	Pi3Cmatrix readMatrix(const Value& doc, const char * key);
 	uint32_t readHex(const Value& doc, const char * key);

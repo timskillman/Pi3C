@@ -48,7 +48,8 @@ uint32_t Pi3Cjson::readHex(const Value& doc, const char * key)
 {
 	if (!doc.HasMember(key)) return 0;
 	std::string v = doc[key].GetString();
-	return std::stoi(v, 0, 16);
+	long n = std::stol(v, nullptr, 16);
+	return (uint32_t)n;
 }
 
 float Pi3Cjson::readFloat(const Value& doc, const char * key)
@@ -66,6 +67,14 @@ void Pi3Cjson::readFloat2(const Value& doc, const char * key, float& v1, float& 
 	v2 = a[1].GetFloat();
 }
 
+vec2f Pi3Cjson::readVec2f(const Value& doc, const char * key)
+{
+	if (!doc.HasMember(key)) return vec2f(0, 0);
+	const Value& a = doc[key];
+	if (a.Size() != 2) return vec2f(0, 0);
+	return vec2f((float)a[0].GetDouble(), (float)a[1].GetDouble());
+
+}
 vec3f Pi3Cjson::readVec3f(const Value& doc, const char * key)
 {
 	if (!doc.HasMember(key)) return vec3f(0, 0, 0);

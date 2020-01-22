@@ -30,8 +30,8 @@ public:
 	void render();
 	void animate();
 	void open();
-	void save();
-	void loadModels(const std::string &modelLibrary, const std::string &scenefile);
+	void save(const std::string& file);
+	void loadModels(const std::string &modelLibrary);
 	void saveSceneJSON(const std::string &file, Pi3Cmodel *models);
 	void newScene(const uint32_t ref);
 
@@ -40,11 +40,11 @@ public:
 
 private:
 
-	void loadModelLibrary(const std::string &path, const std::vector<std::string> &vals);
+	//void loadModelLibrary(const std::string &path, const std::vector<std::string> &vals);
 	void loadModelLibraryJSON(const std::string &path);
 	//Pi3Cmodel loadScene(const std::string &file, vec3f &grid);
 	Pi3Cmodel loadSceneJSON(const std::string &file, vec3f &grid);
-	Pi3Cmodel createScene(const uint32_t width, const uint32_t depth, Pi3Cmodel *usemodel, const vec3f &grid);
+	//Pi3Cmodel createScene(const uint32_t width, const uint32_t depth, Pi3Cmodel *usemodel, const vec3f &grid);
 	Pi3Cmodel * findModel(const std::string &modelName);		//searches all sub-libs to find model
 	Pi3Cmodel * selectLib(const std::string &libName);
 

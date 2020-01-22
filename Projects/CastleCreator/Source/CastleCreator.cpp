@@ -52,7 +52,7 @@ int main(int argc, char *argv[])
 	Editor castleEditor(&resource, &window);
 	if (!castleEditor.initialised()) return 1;
 	
-	castleEditor.loadModels("CastleModels.txt", "CastleScene.txt");
+	castleEditor.loadModels("CastleModels.json");
 		
 	uint32_t frames = 0;
 	uint32_t timer = SDL_GetTicks();
