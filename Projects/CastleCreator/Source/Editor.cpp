@@ -469,6 +469,7 @@ void Editor::loadModelLibraryJSON(const std::string &file)
 				const Value& ob = obj[i];
 				std::string category = json.readString(ob, "category");
 				std::string modelname = json.readString(ob, "name");
+				std::string modelID = json.readString(ob, "id");
 				bool gridLocked = (json.readString(ob, "flags") == "g");
 				std::string collider = json.readString(ob, "colliderFile");
 
@@ -501,7 +502,8 @@ void Editor::loadModelLibraryJSON(const std::string &file)
 				}
 
 				Pi3Cmodel model; // (mp);
-				model.name = modelname;
+				model.name = modelID;
+				model.desc = modelname;
 				float lodfrom = 0.f;
 				for (size_t j = 0; j < LODmodels.size(); j++) {
 					std::string colliderFile = (j == 0) ? collider : "";
@@ -526,9 +528,10 @@ void Editor::loadModelLibraryJSON(const std::string &file)
 
 void Editor::open()
 {
-	if (scene.models.size()>0) scene.models[0].group.clear();
+	if (scene.models.size()>0) newScene(0); //scene.models[0].group.clear();
 	Pi3Cmodel sceneModel = loadSceneJSON("MyCastleScene.json", grid);
-	scene.models[0] = sceneModel;
+	scene.models.push_back(sceneModel);
+	//scene.models[0] = sceneModel;
 }
 
 void Editor::save(const std::string &file)
@@ -559,7 +562,8 @@ Pi3Cmodel Editor::loadSceneJSON(const std::string &file, vec3f &grid)
 				const Value& ob = obj[i];
 				if (ob.HasMember("name")) objname = ob["name"].GetString();
 				if (ob.HasMember("matrix")) matrix = json.readMatrix(ob, "matrix");
-				model.append(*findModel(objname), matrix);
+				Pi3Cmodel* m = findModel(objname);
+				if (m) model.append(*findModel(objname), matrix);
 			}
 		}
 	}

@@ -2,7 +2,7 @@
 	"title": "Castle Creator",
 	"modelPath": "../../Resources/models/Castle",
 	"view": {
-		"screensize": [1024, 768],
+		"screensize": [800, 600],
 		"perspective": 1200.0,
 		"fullscreen": false,
 		"lightpos": [ 0.0, 1.0, 0.0],
@@ -31,6 +31,7 @@
 			"category": "Castle",
 			"flags": "g",
 			"name": "Round Tower",
+			"id": "RoundTower",
 			"LOD0": { 
 				"file": "RoundTower.obj",
 				"dist": 150.0
@@ -45,6 +46,7 @@
 			"category": "Castle",
 			"flags": "g",
 			"name": "Round Tower Tall",
+			"id": "RoundTowerTall",
 			"LOD0": { 
 				"file": "RoundTower2.obj",
 				"dist": 200.0
@@ -59,6 +61,7 @@
 			"category": "Castle",
 			"flags": "g",
 			"name": "Square Tower",
+			"id": "SquareTower",
 			"LOD0": { 
 				"file": "SquareTower1.obj",
 				"dist": 150.0
@@ -73,6 +76,7 @@
 			"category": "Castle",
 			"flags": "g",
 			"name": "Square Tower Tall",
+			"id": "SquareTowerTall",
 			"LOD0": { 
 				"file": "SquareTower2.obj",
 				"dist": 150.0
@@ -87,6 +91,7 @@
 			"category": "Castle",
 			"flags": "g",
 			"name": "Dias",
+			"id": "Dias",
 			"LOD0": { 
 				"file": "Dias.obj",
 				"dist": 150.0
@@ -101,6 +106,7 @@
 			"category": "Castle",
 			"flags": "g",
 			"name": "Keep",
+			"id": "Keep",
 			"LOD0": { 
 				"file": "Keep.obj",
 				"dist": 150.0
@@ -115,6 +121,7 @@
 			"category": "Castle",
 			"flags": "g",
 			"name": "Wall",
+			"id": "Wall",
 			"LOD0": { 
 				"file": "Wall1.obj",
 				"dist": 10000.0
@@ -125,6 +132,7 @@
 			"category": "Castle",
 			"flags": "g",
 			"name": "Wall lean-to",
+			"id": "WallLeanTo",
 			"LOD0": { 
 				"file": "WallLeanTo1.obj",
 				"dist": 10000.0
@@ -135,6 +143,7 @@
 			"category": "Castle",
 			"flags": "g",
 			"name": "Wall diagonal",
+			"id": "WallDiagonal",
 			"LOD0": { 
 				"file": "WallDiag1.obj",
 				"dist": 10000.0
@@ -145,6 +154,7 @@
 			"category": "Castle",
 			"flags": "g",
 			"name": "Gate",
+			"id": "Gate",
 			"LOD0": { 
 				"file": "Gate1.obj",
 				"dist": 10000.0
@@ -155,6 +165,7 @@
 			"category": "Buildings",
 			"flags": "g",
 			"name": "House 3 story",
+			"id": "ShamblesTall",
 			"LOD0": { 
 				"file": "Shambles.obj",
 				"dist": 500.0
@@ -169,6 +180,7 @@
 			"category": "Buildings",
 			"flags": "g",
 			"name": "House 2 story",
+			"id": "Shambles",
 			"LOD0": { 
 				"file": "Shambles2.obj",
 				"dist": 500.0
@@ -183,6 +195,7 @@
 			"category": "Buildings",
 			"flags": "g",
 			"name": "Forge",
+			"id": "Forge",
 			"LOD0": { 
 				"file": "forge.obj",
 				"dist": 10000.0
@@ -193,6 +206,7 @@
 			"category": "Cathedral",
 			"flags": "g",
 			"name": "Cathedral tower stairs",
+			"id": "ChurchTower",
 			"LOD0": { 
 				"file": "ChurchTower.obj",
 				"dist": 10000.0
@@ -203,6 +217,7 @@
 			"category": "Cathedral",
 			"flags": "g",
 			"name": "Cathedral section",
+			"id": "ChurchSection",
 			"LOD0": { 
 				"file": "ChurchSection.obj",
 				"dist": 10000.0
@@ -213,6 +228,7 @@
 			"category": "Cathedral",
 			"flags": "g",
 			"name": "Cathedral centre",
+			"id": "ChurchCentre",
 			"LOD0": { 
 				"file": "ChurchCentre.obj",
 				"dist": 10000.0
@@ -223,6 +239,7 @@
 			"category": "Cathedral",
 			"flags": "g",
 			"name": "Cathedral entrance",
+			"id": "ChurchEntrance",
 			"LOD0": { 
 				"file": "ChurchEntrance.obj",
 				"dist": 10000.0
@@ -233,6 +250,7 @@
 			"category": "Cathedral",
 			"flags": "g",
 			"name": "Cathedral wing entrance",
+			"id": "ChurchWing",
 			"LOD0": { 
 				"file": "ChurchWing.obj",
 				"dist": 10000.0
@@ -243,6 +261,7 @@
 			"category": "Courtyard",
 			"flags": "g",
 			"name": "Well",
+			"id": "Well",
 			"LOD0": { 
 				"file": "WellStocks.obj",
 				"dist": 10000.0
@@ -253,6 +272,7 @@
 			"category": "Courtyard",
 			"flags": "g",
 			"name": "Stables",
+			"id": "Stables",
 			"LOD0": { 
 				"file": "CattleStall.obj",
 				"dist": 230.0
@@ -267,6 +287,7 @@
 			"category": "Ground",
 			"flags": "g",
 			"name": "Grass",
+			"id": "Grass",
 			"LOD0": { 
 				"file": "grass.obj",
 				"dist": 10000.0
@@ -277,6 +298,7 @@
 			"category": "Ground",
 			"flags": "g",
 			"name": "Mud",
+			"id": "Mud",
 			"LOD0": { 
 				"file": "muddyGrass.obj",
 				"dist": 10000.0
@@ -287,6 +309,7 @@
 			"category": "Ground",
 			"flags": "g",
 			"name": "Cross road",
+			"id": "CrossRoad",
 			"LOD0": { 
 				"file": "cobbleCross.obj",
 				"dist": 10000.0
@@ -297,6 +320,7 @@
 			"category": "Ground",
 			"flags": "g",
 			"name": "Tee road",
+			"id": "Tee",
 			"LOD0": { 
 				"file": "cobbleTee.obj",
 				"dist": 10000.0
@@ -307,6 +331,7 @@
 			"category": "Ground",
 			"flags": "g",
 			"name": "Road",
+			"id": "Road",
 			"LOD0": { 
 				"file": "cobbleRoad.obj",
 				"dist": 10000.0
@@ -317,6 +342,7 @@
 			"category": "Ground",
 			"flags": "g",
 			"name": "Corner",
+			"id": "Corner",
 			"LOD0": { 
 				"file": "cobbleCorner.obj",
 				"dist": 10000.0
@@ -327,6 +353,7 @@
 			"category": "Ground",
 			"flags": "g",
 			"name": "Landscape",
+			"id": "Landscape",
 			"LOD0": { 
 				"file": "landscape.obj",
 				"dist": 10000.0
@@ -337,6 +364,7 @@
 			"category": "Trees",
 			"flags": "g",
 			"name": "Ash tree",
+			"id": "AshTree",
 			"LOD0": { 
 				"file": "AshTree.obj",
 				"dist": 10000.0
@@ -347,6 +375,7 @@
 			"category": "Courtyard",
 			"flags": "g",
 			"name": "Cart",
+			"id": "Cart",
 			"LOD0": { 
 				"file": "Cart.obj",
 				"dist": 150.0
@@ -361,6 +390,7 @@
 			"category": "Courtyard",
 			"flags": "g",
 			"name": "Wagon",
+			"id": "Wagon",
 			"LOD0": { 
 				"file": "wagon.obj",
 				"dist": 150.0
@@ -375,6 +405,7 @@
 			"category": "Items",
 			"flags": "g",
 			"name": "Table & Benches",
+			"id": "TableBenches",
 			"LOD0": { 
 				"file": "tableBenches.obj",
 				"dist": 10000.0
@@ -385,6 +416,7 @@
 			"category": "Items",
 			"flags": "g",
 			"name": "Table",
+			"id": "Table",
 			"LOD0": { 
 				"file": "table.obj",
 				"dist": 10000.0
@@ -395,6 +427,7 @@
 			"category": "Items",
 			"flags": "g",
 			"name": "Chair",
+			"id": "Chair",
 			"LOD0": { 
 				"file": "chair.obj",
 				"dist": 10000.0
@@ -405,6 +438,7 @@
 			"category": "Items",
 			"flags": "g",
 			"name": "German flag",
+			"id": "GermanFlag",
 			"LOD0": { 
 				"file": "flagGerman.obj",
 				"dist": 10000.0
@@ -414,6 +448,7 @@
 			"category": "Items",
 			"flags": "g",
 			"name": "Torch",
+			"id": "Torch",
 			"LOD0": { 
 				"file": "torch.obj",
 				"dist": 10000.0
@@ -423,6 +458,7 @@
 			"category": "Items",
 			"flags": "g",
 			"name": "Barrel",
+			"id": "Barrel",
 			"LOD0": { 
 				"file": "Barrel.obj",
 				"dist": 10000.0
@@ -433,6 +469,7 @@
 			"category": "Items",
 			"flags": "g",
 			"name": "Water trough",
+			"id": "WaterTrough",
 			"LOD0": { 
 				"file": "WaterTrough.obj",
 				"dist": 10000.0

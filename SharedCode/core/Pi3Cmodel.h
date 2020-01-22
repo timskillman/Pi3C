@@ -121,6 +121,7 @@ public:
 // Variables
 
 	std::string name;				//model name (used for search)
+	std::string desc;				//model description (long name)
 
 	Pi3Cmatrix matrix;				//matrix used to transform mesh/group
 	Pi3Cmaterial material;			//used for rendering mesh - can be modified
