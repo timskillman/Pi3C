@@ -369,7 +369,44 @@
 				"file": "AshTree.obj",
 				"dist": 10000.0
 				},
-			"colliderFile": "AshTree.obj"
+			"RandomScale": [0.5, 2.0],
+			"RandomRotation": [0.0, 360.0]
+		},
+		{
+			"category": "Trees",
+			"flags": "g",
+			"name": "Oak tree",
+			"id": "OakTree",
+			"LOD0": { 
+				"file": "OakTree.obj",
+				"dist": 10000.0
+				},
+			"RandomScale": [0.5, 2.2],
+			"RandomRotation": [0.0, 360.0]
+		},
+		{
+			"category": "Plants",
+			"flags": "g",
+			"name": "Fern",
+			"id": "Fern",
+			"LOD0": { 
+				"file": "fern.obj",
+				"dist": 10000.0
+				},
+			"RandomScale": [0.5, 3.0],
+			"RandomRotation": [0.0, 360.0]
+		},
+		{
+			"category": "Plants",
+			"flags": "g",
+			"name": "Palm",
+			"id": "Palm",
+			"LOD0": { 
+				"file": "Palm.obj",
+				"dist": 10000.0
+				},
+			"RandomScale": [0.5, 3.0],
+			"RandomRotation": [0.0, 360.0]
 		},
 		{
 			"category": "Courtyard",
@@ -475,6 +512,18 @@
 				"dist": 10000.0
 				},
 			"colliderFile": "WaterTroughColl.obj"
+		},
+		{
+			"category": "Animals",
+			"flags": "g",
+			"name": "Cow",
+			"id": "Cow",
+			"LOD0": { 
+				"file": "cow.obj",
+				"dist": 10000.0
+				},
+			"RandomScale": [0.7, 1.2],
+			"RandomRotation": [0.0, 360.0]
 		}
 	]
 

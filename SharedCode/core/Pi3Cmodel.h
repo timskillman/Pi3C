@@ -127,6 +127,9 @@ public:
 	Pi3Cmaterial material;			//used for rendering mesh - can be modified
 	vec3f rotation;
 
+	vec2f randomScale = { 1.f, 1.f };
+	vec2f randomRotation = { 0,0 };
+
 	uint32_t flags = 0;
 	int32_t meshRef = -1;			//mesh reference to mesh in resources (-1 is no ref - nothing to render)
 	int32_t materialRef = -1;		//material reference to original material in resource

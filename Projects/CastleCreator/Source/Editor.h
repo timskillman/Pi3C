@@ -40,6 +40,8 @@ public:
 
 private:
 
+	vec3f getGridPos(vec3f touchPoint);
+
 	//void loadModelLibrary(const std::string &path, const std::vector<std::string> &vals);
 	void loadModelLibraryJSON(const std::string &path);
 	//Pi3Cmodel loadScene(const std::string &file, vec3f &grid);

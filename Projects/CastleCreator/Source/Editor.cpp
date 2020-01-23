@@ -244,6 +244,18 @@ void Editor::handleEvents()
 	}
 }
 
+vec3f Editor::getGridPos(vec3f gpos)
+{
+	if (gridlock && gpos.y < 1.f) 
+		gpos = vec3f(floorf((gpos.x + grid.x*0.5f) / grid.x) * grid.x, 0, floorf((gpos.z + grid.z*0.5f) / grid.z) * grid.z);
+	return gpos;
+}
+
+float randomRange(float a, float b)
+{
+	return a + ((float)(std::rand() % 10000) / 10000.f)* (b - a);
+}
+
 void Editor::touchScene()
 {
 	selGroup = nullptr;
@@ -259,12 +271,8 @@ void Editor::touchScene()
 			//move 3D pointer (sphere) to touch intersetion point ...
 			if (brushref >= 0) {
 				scene.models[brushref].visible = false;
-				vec3f gpos = touch.intersection;
-				brushref = ballbrushref;
-				if (gridlock && gpos.y < 1.f) {
-					gpos = vec3f(floorf((gpos.x + grid.x*0.5f) / grid.x) * grid.x, 0, floorf((gpos.z + grid.z*0.5f) / grid.z) * grid.z);
-					brushref = gridbrushref;
-				}
+				vec3f gpos = getGridPos(touch.intersection);
+				brushref = (gridlock && gpos.y<1.f) ? gridbrushref : ballbrushref;
 				scene.models[brushref].matrix.move(gpos);
 				scene.models[brushref].visible = true;
 			}
@@ -284,9 +292,16 @@ void Editor::touchScene()
 					//}
 					//else {
 						//Insert library object as touch position
-						vec3f gpos = touch.intersection;
-						if (gridlock) gpos = vec3f(floorf((gpos.x + grid.x*0.5f) / grid.x) * grid.x, gpos.y, floorf((gpos.z + grid.z*0.5f) / grid.z) * grid.z);
+						vec3f gpos = getGridPos(touch.intersection);
 						newmod.matrix.move(gpos);
+						newmod.matrix.SetScale(randomRange(newmod.randomScale.x, newmod.randomScale.y)); // +((float)(std::rand() % 1000) / 1000.f)* (newmod.randomScale.y - newmod.randomScale.x));
+						if (newmod.randomRotation.x != 0 || newmod.randomRotation.y != 0) {
+							Pi3Cmatrix rotmtx;
+							float rotateBy = randomRange(newmod.randomRotation.x * DEG2RAD, newmod.randomRotation.y * DEG2RAD);
+							rotmtx.SetRotateYbit(rotateBy);
+							newmod.matrix = rotmtx * newmod.matrix;
+							newmod.rotation.y += rotateBy;
+						}
 						scene.models[0].append(newmod);
 					//}
 					window->mouse.up = false;
@@ -466,12 +481,16 @@ void Editor::loadModelLibraryJSON(const std::string &file)
 			if (obj[i].IsObject()) {
 				//modelInfo lodmodels;
 
+				Pi3Cmodel model;
+
 				const Value& ob = obj[i];
 				std::string category = json.readString(ob, "category");
 				std::string modelname = json.readString(ob, "name");
 				std::string modelID = json.readString(ob, "id");
 				bool gridLocked = (json.readString(ob, "flags") == "g");
 				std::string collider = json.readString(ob, "colliderFile");
+				vec2f randomScale = { 1.f,1.f };
+				vec2f randomRotation = { 0,0 };
 
 				std::vector<std::string> LODmodels;
 				std::vector<float> LODdists;
@@ -491,6 +510,9 @@ void Editor::loadModelLibraryJSON(const std::string &file)
 					}
 				}
 
+				if (ob.HasMember("RandomScale")) model.randomScale = json.readVec2f(ob, "RandomScale");
+				if (ob.HasMember("RandomRotation")) model.randomRotation = json.readVec2f(ob, "RandomRotation");
+
 				auto findLib = modelLibrary.find(category);
 				if (findLib == modelLibrary.end()) {
 					modelLibrary.insert({ category, Pi3Cmodel() });
@@ -501,7 +523,6 @@ void Editor::loadModelLibraryJSON(const std::string &file)
 					models = &findLib->second;
 				}
 
-				Pi3Cmodel model; // (mp);
 				model.name = modelID;
 				model.desc = modelname;
 				float lodfrom = 0.f;

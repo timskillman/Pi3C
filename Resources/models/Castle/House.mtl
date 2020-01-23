@@ -5,7 +5,7 @@ Ks 0.000000 0.000000 0.000000
 Tr 1.000000
 illum 2
 Ns 0.000000
-map_Kd maps/thickgrass.jpg
+map_Kd maps/thickgrass.png
 
 newmtl clump
 Ka 0.500000 0.500000 0.500000
@@ -15,6 +15,42 @@ Tr 1.000000
 illum 2
 Ns 0.000000
 map_Kd maps/grassClump.png
+
+newmtl Fern
+Ka 0.500000 0.500000 0.500000
+Kd 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Tr 1.000000
+illum 2
+Ns 0.000000
+map_Kd maps/fern.png
+
+newmtl Palm
+Ka 0.500000 0.500000 0.500000
+Kd 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Tr 1.000000
+illum 2
+Ns 0.000000
+map_Kd maps/PalmFrond.png
+
+newmtl fernshadow
+Ka 0.500000 0.500000 0.500000
+Kd 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Tr 0.900000
+illum 2
+Ns 0.000000
+map_Kd maps/fernshadow.png
+
+newmtl treeshadow
+Ka 0.500000 0.500000 0.500000
+Kd 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Tr 0.900000
+illum 2
+Ns 0.000000
+map_Kd maps/treeshadow.png
 
 newmtl fence
 Ka 0.300000 0.300000 0.300000
@@ -115,6 +151,15 @@ illum 1
 Ns 0.000000
 map_Kd maps/cobbleTexs.jpg
 
+newmtl COWSKIN
+Ka 0.300000 0.300000 0.300000
+Kd 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Tr 1.000000
+illum 2
+Ns 0.000000
+map_Kd maps/COWSKIN.jpg
+
 newmtl ashcanopy
 Ka 0.300000 0.300000 0.300000
 Kd 1.000000 1.000000 1.000000
@@ -123,6 +168,15 @@ Tr 1.000000
 illum 2
 Ns 0.000000
 map_Kd maps/ashcanopy.png
+
+newmtl oakcanopy
+Ka 0.300000 0.300000 0.300000
+Kd 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Tr 1.000000
+illum 2
+Ns 0.000000
+map_Kd maps/oakcanopy.png
 
 newmtl bark
 Ka 0.300000 0.300000 0.300000
