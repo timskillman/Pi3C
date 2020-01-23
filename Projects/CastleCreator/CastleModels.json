@@ -521,9 +521,7 @@
 			"LOD0": { 
 				"file": "cow.obj",
 				"dist": 10000.0
-				},
-			"RandomScale": [0.7, 1.2],
-			"RandomRotation": [0.0, 360.0]
+				}
 		}
 	]
 
