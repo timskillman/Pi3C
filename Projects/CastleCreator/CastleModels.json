@@ -519,9 +519,11 @@
 			"name": "Cow",
 			"id": "Cow",
 			"LOD0": { 
-				"file": "cow.obj",
+				"file": "cow2.obj",
 				"dist": 10000.0
-				}
+				},
+			"RandomScale": [0.9, 1.1],
+			"RandomRotation": [0.0, 360.0]
 		}
 	]
 

@@ -160,6 +160,15 @@ illum 2
 Ns 0.000000
 map_Kd maps/COWSKIN.jpg
 
+newmtl cowmap
+Ka 0.300000 0.300000 0.300000
+Kd 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Tr 1.000000
+illum 2
+Ns 0.000000
+map_Kd maps/cowmap.png
+
 newmtl ashcanopy
 Ka 0.300000 0.300000 0.300000
 Kd 1.000000 1.000000 1.000000
