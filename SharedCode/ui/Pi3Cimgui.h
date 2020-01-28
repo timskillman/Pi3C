@@ -53,9 +53,11 @@ public:
 	};
 
 	void init(Pi3Cresource * resource, Pi3Cwindow *window) { this->resource = resource; this->window = window; }
+
 	void setPosition(const int x, const int y);
-	Pi3Cpointi getPosition();
 	void movePosition(const int x, const int y);
+	Pi3Cpointi getPosition();
+
 	void setFont(const std::string &fontName);
 
 	std::shared_ptr<Pi3Cfont> getFont(const std::string &fontName) {

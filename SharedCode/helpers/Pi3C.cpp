@@ -65,7 +65,7 @@ void Pi3C::init(const Pi3Cwindow::options& winopts)
 Pi3Cmodel Pi3C::create_model_from_text(const std::string &text, const uint32_t width, const uint32_t colour)
 {
 	Pi3Cmodel textModel;
-	textModel.textModel(&resource, gui.getFont(guifonts[0]).get(), text, width);
+	textModel.textModel(&resource, gui.getFont(guifonts[0]).get(), text, width, Pi3Cfont::RD_HTML);
 	textModel.material.SetColDiffuse(colour);
 	return textModel;
 }

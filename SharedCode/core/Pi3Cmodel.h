@@ -100,7 +100,7 @@ public:
 	int32_t addTexture(Pi3Cresource *resource, const std::shared_ptr<Pi3Ctexture> &texture);
 	int32_t addPicture(Pi3Cresource *resource, const std::shared_ptr<Pi3Ctexture> &texture);
 	void createRect2D(Pi3Cresource *resource, const vec2f &pos = vec2f(0, -1.f), const vec2f &size = vec2f(1.f, 1.f), const uint32_t colour = 0xffffffff);
-	void textModel(Pi3Cresource *resource, Pi3Cfont *font, const std::string &text, const float wrapWidth);
+	void textModel(Pi3Cresource *resource, Pi3Cfont *font, const std::string &text, const float wrapWidth, const Pi3Cfont::textReaderType textType = Pi3Cfont::RD_NONE);
 
 	Pi3Cmodel * append(Pi3Cmodel model, vec3f offset = vec3f(0, 0, 0), vec3f rotation = vec3f(0,0,0));
 	Pi3Cmodel * append(Pi3Cmodel model, Pi3Cmatrix matrix);

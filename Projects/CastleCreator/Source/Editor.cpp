@@ -282,8 +282,8 @@ void Editor::touchScene()
 
 			if (touch.maxlevel > 1) {
 
-				if (window->mouse.LeftButton && window->mouse.up && currentSel<modelsLib->group.size()) {
-					Pi3Cmodel newmod = modelsLib->group[currentSel];
+				if (window->mouse.LeftButton && window->mouse.up && currentItemSel<modelsLib->group.size()) {
+					Pi3Cmodel newmod = modelsLib->group[currentItemSel];
 					//if (gridlock) {
 					//	//Replace selected object with library object
 					//	Pi3Cmodel &touchMod = scene.models[touch.groupRefs[0]].group[touch.groupRefs[1]];
@@ -396,6 +396,7 @@ void Editor::handleIMGui()
 			currentLib = libname;
 			modelsLib = selectLib(libname);
 			currentModel = modelsLib->group[0].name;
+			currentItemSel = 0;
 			player.moved = true;
 		}
 	}
@@ -407,7 +408,7 @@ void Editor::handleIMGui()
 		std::string &name = modelsLib->group[i].name;
 		if (gui.ButtonText(name, currentModel == name)) {
 			currentModel = name;
-			currentSel = i;
+			currentItemSel = i;
 			player.moved = true;
 		}
 	}

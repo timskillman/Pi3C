@@ -1,6 +1,7 @@
 #include "Pi3Cfont.h"
 #include "Pi3Ctextformat.h"
 
+#define READHTML
 #ifdef READHTML
 #include "Pi3Chtml.h"
 #endif
@@ -175,7 +176,7 @@ void Pi3Cfont::formatVerts(std::vector<float> &verts, const float wrapWidth, con
 		p += stride;												\
 
 
-uint32_t Pi3Cfont::textureRects(const std::string &text, std::vector<float> &verts, Pi3Crect &size, const float wrapWidth, const uint32_t stride)
+uint32_t Pi3Cfont::textureRects(const std::string &text, std::vector<float> &verts, Pi3Crect &size, const float wrapWidth, const uint32_t stride, const textReaderType textReader)
 {
 	/* Creates a letter sheet made of rectangles with UV mapping to render a font sheet
 	   Fun stuff could be done here such as warping the letter geometry etc.. */
@@ -229,11 +230,11 @@ uint32_t Pi3Cfont::textureRects(const std::string &text, std::vector<float> &ver
 				else {
 					float yo = (format.scaleYoffset > 0.f) ? y+h * format.scaleYoffset : y;
 					CreateVerts(x, yo-h, ux, uy);
+					CreateVerts(xw, yo - h, ux + uw, uy);
 					CreateVerts(xw + format.italicSlant, yo, ux + uw, uy + uh);
-					CreateVerts(xw, yo-h, ux + uw, uy);
 					CreateVerts(x, yo-h, ux, uy);
-					CreateVerts(x + format.italicSlant, yo, ux, uy + uh);
 					CreateVerts(xw + format.italicSlant, yo, ux + uw, uy + uh);
+					CreateVerts(x + format.italicSlant, yo, ux, uy + uh);
 					x = xw;
 					if (x > maxWidth) maxWidth = x;
 

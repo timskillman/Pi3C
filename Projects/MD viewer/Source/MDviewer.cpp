@@ -83,7 +83,7 @@ int main(int argc, char *argv[])
 		bool paperTouch = gui.renderRect(mediaWidth, mediaHeight);
 
 		pi3c.scene.models2D[textRef].matrix.move(vec3f((pi3c.window.getWidth() - mediaWidth + 40) / 2, pi3c.window.getHeight()-40, -1.5));
-		//scene.models2D[textRef].textModel(&resource, gui.getFont(guifonts[0]).get(), livetext, 700); // +sin(rq)*800.f);
+		//pi3c.scene.models2D[textRef].textModel(&pi3c.resource, gui.getFont(pi3c.guifonts[0]).get(), livetext, 700); // +sin(rq)*800.f);
 
 		pi3c.render2D();
 

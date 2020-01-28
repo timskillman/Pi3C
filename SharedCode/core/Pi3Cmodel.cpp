@@ -466,14 +466,14 @@ void Pi3Cmodel::createRect2D(Pi3Cresource *resource, const vec2f &pos, const vec
 	}
 }
 
-void Pi3Cmodel::textModel(Pi3Cresource *resource, Pi3Cfont *font, const std::string &text, const float wrapWidth)
+void Pi3Cmodel::textModel(Pi3Cresource *resource, Pi3Cfont *font, const std::string &text, const float wrapWidth, const Pi3Cfont::textReaderType textType)
 {
 	meshRef = resource->letterSheetRef;
 	Pi3Cmesh& mesh = resource->meshes[meshRef];
 	std::vector<float> *verts = resource->getMeshBuffer(meshRef);				//get ptr to vertices from resource letterVerts
 	if (verts == nullptr) return;
 	Pi3Crect size;
-	uint32_t vertCount = font->textureRects(text, *verts, size, wrapWidth, mesh.stride);	//generate verts from text	
+	uint32_t vertCount = font->textureRects(text, *verts, size, wrapWidth, mesh.stride, textType);	//generate verts from text	
 	resource->updateMesh(meshRef, vertCount);								//upload updated verts to GPU
 	bbox.update(vec3f(size.x, size.y-size.height, 0));
 	bbox.update(vec3f(size.width, 0, 0));

@@ -73,7 +73,7 @@ private:
 	vec2f nearzfarz{ 1.f, 5000.f };
 	bool gridlock = false;
 	Pi3Cmodel *selGroup = nullptr;
-	uint32_t currentSel = 1;
+	uint32_t currentItemSel = 0;
 	std::string currentLib;
 	std::string currentModel;
 	bool keypress = false;

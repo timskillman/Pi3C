@@ -227,7 +227,9 @@
     <ClCompile Include="..\..\SharedCode\core\Pi3Ctouch.cpp" />
     <ClCompile Include="..\..\SharedCode\core\Pi3Cwin.cpp" />
     <ClCompile Include="..\..\SharedCode\file\Pi3Cdirectory.cpp" />
+    <ClCompile Include="..\..\SharedCode\file\Pi3CfileDialogs.cpp" />
     <ClCompile Include="..\..\SharedCode\file\Pi3CfileOBJ.cpp" />
+    <ClCompile Include="..\..\SharedCode\file\Pi3Cjson.cpp" />
     <ClCompile Include="..\..\SharedCode\glutess\dict.c" />
     <ClCompile Include="..\..\SharedCode\glutess\geom.c" />
     <ClCompile Include="..\..\SharedCode\glutess\memalloc.c" />
@@ -242,7 +244,6 @@
     <ClCompile Include="..\..\SharedCode\helpers\Pi3Cavatar.cpp" />
     <ClCompile Include="..\..\SharedCode\helpers\Pi3Chtml.cpp" />
     <ClCompile Include="..\..\SharedCode\helpers\Pi3Chumanoid.cpp" />
-    <ClCompile Include="..\..\SharedCode\helpers\Pi3Cjson.cpp" />
     <ClCompile Include="..\..\SharedCode\helpers\Pi3CloadOptions.cpp" />
     <ClCompile Include="..\..\SharedCode\helpers\Pi3Cshapes.cpp" />
     <ClCompile Include="..\..\SharedCode\helpers\Pi3Cutils.cpp" />
@@ -269,7 +270,9 @@
     <ClInclude Include="..\..\SharedCode\core\Pi3Cvector.h" />
     <ClInclude Include="..\..\SharedCode\core\Pi3Cwin.h" />
     <ClInclude Include="..\..\SharedCode\file\Pi3Cdirectory.h" />
+    <ClInclude Include="..\..\SharedCode\file\Pi3CfileDialogs.h" />
     <ClInclude Include="..\..\SharedCode\file\Pi3CfileOBJ.h" />
+    <ClInclude Include="..\..\SharedCode\file\Pi3Cjson.h" />
     <ClInclude Include="..\..\SharedCode\glutess\dict-list.h" />
     <ClInclude Include="..\..\SharedCode\glutess\dict.h" />
     <ClInclude Include="..\..\SharedCode\glutess\geom.h" />
@@ -289,7 +292,6 @@
     <ClInclude Include="..\..\SharedCode\helpers\Pi3Cavatar.h" />
     <ClInclude Include="..\..\SharedCode\helpers\Pi3Chtml.h" />
     <ClInclude Include="..\..\SharedCode\helpers\Pi3Chumanoid.h" />
-    <ClInclude Include="..\..\SharedCode\helpers\Pi3Cjson.h" />
     <ClInclude Include="..\..\SharedCode\helpers\Pi3CloadOptions.h" />
     <ClInclude Include="..\..\SharedCode\helpers\Pi3Cshapes.h" />
     <ClInclude Include="..\..\SharedCode\helpers\Pi3Cutils.h" />

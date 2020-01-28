@@ -144,8 +144,11 @@
     <ClCompile Include="..\..\SharedCode\helpers\Pi3Cutils.cpp">
       <Filter>Shared Code\helpers</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\SharedCode\helpers\Pi3Cjson.cpp">
-      <Filter>Shared Code\helpers</Filter>
+    <ClCompile Include="..\..\SharedCode\file\Pi3Cjson.cpp">
+      <Filter>Shared Code\file</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\SharedCode\file\Pi3CfileDialogs.cpp">
+      <Filter>Shared Code\file</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -278,8 +281,11 @@
     <ClInclude Include="..\..\SharedCode\helpers\Pi3Cutils.h">
       <Filter>Shared Code\helpers</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\SharedCode\helpers\Pi3Cjson.h">
-      <Filter>Shared Code\helpers</Filter>
+    <ClInclude Include="..\..\SharedCode\file\Pi3Cjson.h">
+      <Filter>Shared Code\file</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\SharedCode\file\Pi3CfileDialogs.h">
+      <Filter>Shared Code\file</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -222,7 +222,7 @@ Pi3Crect Pi3Cresource::renderText(const int meshRef, Pi3Cfont *font, const std::
 	//Text meshref's can only be used once per frame (otherwise using the same meshRef will simply overwrite the previous text)
 	Pi3Crect size;
 	Pi3Cmesh &mesh = meshes[meshRef];
-	uint32_t vertCount = font->textureRects(text, vertBuffer[mesh.bufRef], size, wrapWidth, mesh.stride);	//generate verts from text	
+	uint32_t vertCount = font->textureRects(text, vertBuffer[mesh.bufRef], size, wrapWidth, mesh.stride, Pi3Cfont::RD_NONE);	//generate verts from text	
 	updateMesh(meshRef, vertCount);											//upload updated verts to GPU
 
 	Pi3Cmatrix matrix;
