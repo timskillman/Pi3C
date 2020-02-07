@@ -1,4 +1,4 @@
-precision highp float;       	// Set the default precision to medium
+//precision highp float;       	// Set the default precision to medium
 //Note high precision is needed to NVidia RTX2060 card
 
 uniform sampler2D u_Texture;   	// texture

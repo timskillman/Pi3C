@@ -22,8 +22,8 @@ void Pi3Cwindow::initOptions(const options &opts)
 	mHeight = opts.height;
 	if (init(opts.title.c_str(), opts.width, opts.height, opts.sdlflags | ((opts.fullscreen) ? SDL_WINDOW_FULLSCREEN : 0), opts.antialiasLevel))
 	{
-
-		SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
+		SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_COMPATIBILITY);
+		//SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
 		SDL_GL_SetAttribute(SDL_GL_BUFFER_SIZE, opts.bufferSize);
 		SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, opts.depthSize);
 		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, opts.majorVsn);
