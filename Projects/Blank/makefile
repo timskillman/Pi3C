@@ -1,4 +1,4 @@
-TARGET = Modeller3D
+TARGET = MyPi3C
 
 CC = g++
 CFLAGS = -std=c++17 -Wall
