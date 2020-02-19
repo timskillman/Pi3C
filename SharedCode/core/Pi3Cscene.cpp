@@ -67,7 +67,7 @@ std::string Pi3Cscene::getPathFile(std::string &file) const
 	return path;
 }
 
-int32_t Pi3Cscene::loadModelOBJ(const std::string &path, const std::string &modelfile, bool grouped, const std::function<void(float)> showProgressCB)
+int32_t Pi3Cscene::loadModelOBJ(const std::string &path, const std::string &modelfile, const vec3f pos, const bool grouped, const std::function<void(float)> showProgressCB)
 {
 	if (modelfile == "") return -1;
 	std::string newfile = modelfile;
@@ -77,6 +77,7 @@ int32_t Pi3Cscene::loadModelOBJ(const std::string &path, const std::string &mode
 		models.emplace_back();
 		Pi3Cmodel &model = models.back();
 		model.loadOBJfile(resource, newpath, newfile, showProgressCB, false);
+		model.matrix.Translate(pos);
 	}
 	else
 	{
@@ -91,6 +92,7 @@ int32_t Pi3Cscene::loadModelOBJ(const std::string &path, const std::string &mode
 				newModel.meshRef = i;
 				newModel.material = resource->materials[resource->meshes[i].materialRef]; 	//copy material into group model so it can change;
 				newModel.bbox = resource->meshes[i].bbox;
+				newModel.matrix.Translate(pos);
 				models.push_back(newModel);
 			}
 		}
@@ -100,7 +102,7 @@ int32_t Pi3Cscene::loadModelOBJ(const std::string &path, const std::string &mode
 
 int32_t Pi3Cscene::loadSkybox(const std::string &path, const std::string &file, const std::function<void(float)> showProgressCB, const float scale)
 {
-	int skybox = loadModelOBJ(path, file, true, showProgressCB); // loadbarCallback);
+	int skybox = loadModelOBJ(path, file, vec3f(0,0,0), true, showProgressCB); // loadbarCallback);
 	models[skybox].matrix.SetScale(scale);
 	models[skybox].touchable = false;
 

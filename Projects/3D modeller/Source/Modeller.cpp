@@ -81,7 +81,7 @@ void Modeller::init()
 	//player.init(avparams);
 
 	// Load Skybox ...
-	skybox = scene.loadModelOBJ(opts.asString("skyboxPath"), opts.asString("skybox"), true, nullptr); // loadbarCallback);
+	skybox = scene.loadModelOBJ(opts.asString("skyboxPath"), opts.asString("skybox"), vec3f(0,0,0), true, nullptr); // loadbarCallback);
 	scene.models[skybox].matrix.SetScale(opts.asFloat("skyboxScale"));
 	scene.models[skybox].touchable = false;
 
@@ -203,7 +203,6 @@ void Modeller::handleEvents()
 					break;
 				case ED_MOVE: 
 					touchScene();
-					SDL_Log("Touched %d ...", touch.selmodel);
 					if (touch.selmodel) {
 						editUndo.selectModel(scene.models, touch.selmodel, window->ctrlKey);
 						scene.models[touch.groupRefs[0]].selected = true;
@@ -236,7 +235,6 @@ void Modeller::handleEvents()
 					switch (editMode) {
 					case ED_MOVE:
 						editUndo.moveSelections(scene.models, view.viewCoords(mouseXYZ));
-						SDL_Log("Dragging ...");
 						panning = true;
 						break;
 					case ED_ROTATE:
@@ -298,7 +296,8 @@ void Modeller::handleEvents()
 			std::string file = dropfile;
 			SDL_free(dropfile);
 			if (file.substr(file.size() - 4, 4) == ".obj") {
-				int32_t modelRef = scene.loadModelOBJ("", file, false, nullptr);  // loadbarCallback);
+				
+				int32_t modelRef = scene.loadModelOBJ("", file, touch.touched() ? touch.intersection : vec3f(0,0,0), false, nullptr);  // loadbarCallback);
 				if (modelRef >= 0) {
 					//scene.models[modelRef].move(-currentPos);
 				}

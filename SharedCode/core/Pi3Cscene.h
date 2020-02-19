@@ -89,7 +89,7 @@ public:
 
 	Pi3Ctouch touch(const vec3f &mousexyz, const bool calcPerspective);
 
-	int32_t loadModelOBJ(const std::string &path, const std::string &file, bool grouped, const std::function<void(float)> showProgressCB);
+	int32_t loadModelOBJ(const std::string &path, const std::string &file, const vec3f pos, const bool grouped, const std::function<void(float)> showProgressCB);
 	int32_t loadSkybox(const std::string &path, const std::string &file, const std::function<void(float)> showProgressCB, const float scale = 1.f);
 	
 	void selectShader(const uint32_t ref) { currentShader = ref; resource->shaders[ref].Use(); resource->shaders[ref].setupShader(); }
