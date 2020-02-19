@@ -129,6 +129,8 @@ Pi3Ctouch Pi3Cscene::touch(const vec3f &mousexyz, const bool calcPerspective) //
 {
 	//calc ray position and direction from x,y screen coords and transform into model world space
 	Pi3Ctouch touch;
+	return touch;
+
 	if (calcPerspective) {
 		touch.calcRay(mousexyz, perspective);
 	}

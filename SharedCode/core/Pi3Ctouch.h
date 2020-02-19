@@ -13,22 +13,22 @@ public:
 	bool touched() { return triRef >= 0; }
 
 	//input
-	vec3f touchPoint;
-	vec3f raypos;
-	vec3f raydir;
+	vec3f touchPoint = { 0, 0, 0 };
+	vec3f raypos = { 0, 1.f, 0 };
+	vec3f raydir = { 0, 1.f, 0 };
 
 	//output
 	int32_t groupRefs[100];
-	int32_t maxlevel;
+	int32_t maxlevel = 0;
 	//Pi3Cmodel *selgroup;
-	Pi3Cmodel *selmodel;
-	int32_t meshRef;
-	int32_t triRef;
-	vec3f intersection;
-	vec3f normal;
+	Pi3Cmodel *selmodel = nullptr;
+	int32_t meshRef = -1;
+	int32_t triRef = -1;
+	vec3f intersection = { 0, 0, 0 };
+	vec3f normal = { 0, 0, 0 };
 
 	//temps
-	bool touching;
-	float perspective;
-	float prevDist;			//temp var used by mesh touch
+	bool touching = false;
+	float perspective =  400.f;
+	float prevDist = 0;			//temp var used by mesh touch
 };

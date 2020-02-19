@@ -18,6 +18,7 @@ public:
 
 	enum Alignment { LEFT, CENTRE, RIGHT, TOP, BOTTOM };
 	enum ButtonType { TEXT, IMAGE };
+	enum ListBoxFlags { SCROLL_VERTICAL, SCROLL_HORIZONTAL };
 
 	struct containerStruct {
 		bool initialised = false;
@@ -109,7 +110,7 @@ public:
 	bool Radio(const std::string &text, bool &value);
 	bool Combo(const std::string &text, uint32_t &currentSelection, const std::vector<std::string> &values);
 	bool ComboIcons(const std::string &text, const std::string &images, uint32_t &currentSelection, const std::vector<std::string> &values);
-	bool ListBox(const std::string &text, uint32_t &currentSelection, const std::vector<std::string> &values, const int minwidth = 0.f, const int minheight = 0.f);
+	bool ListBox(const std::string &text, uint32_t &currentSelection, const std::vector<std::string> &values, const int minwidth = 0.f, const int minheight = 0.f, const ListBoxFlags flags = ListBoxFlags::SCROLL_VERTICAL);
 
 	//Menu bar widget ...
 	bool BeginMenuBar();

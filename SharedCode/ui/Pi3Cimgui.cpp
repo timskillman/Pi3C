@@ -556,8 +556,14 @@ bool Pi3Cimgui::ComboIcons(const std::string &text, const std::string &images, u
 	return false;
 }
 
-bool Pi3Cimgui::ListBox(const std::string &text, uint32_t &currentItem, const std::vector<std::string> &values, const int minwidth, const int minheight)
+bool Pi3Cimgui::ListBox(const std::string &text, uint32_t &currentItem, const std::vector<std::string> &values, const int minwidth, const int minheight, const ListBoxFlags flags)
 {
+	bool mb = window->mouse.LeftButton;
+
+	if (renderRect(minwidth, minheight) && mb) {
+
+	}
+
 	return false;
 }
 
