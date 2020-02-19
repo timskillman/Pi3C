@@ -275,6 +275,10 @@ void Modeller::handleEvents()
 			case SDL_SCANCODE_A:
 				if (window->ctrlKey) selectAll();
 				break;
+			case SDL_SCANCODE_G:
+				scene.models[gridRef].visible = !scene.models[gridRef].visible;
+				window->mouse.up = false;
+				break;
 			case SDL_SCANCODE_P:
 				scene.renderOffscreen(800, 600);
 				break;
