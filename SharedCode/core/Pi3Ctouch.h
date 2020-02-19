@@ -11,6 +11,11 @@ public:
 	//functions
 	void calcRay(vec3f touchPoint, float perspective);
 	bool touched() { return triRef >= 0; }
+	void reset() {
+		intersection = vec3f(0, 0, 0);
+		selmodel = nullptr;
+		touching = false;
+	}
 
 	//input
 	vec3f touchPoint = { 0, 0, 0 };

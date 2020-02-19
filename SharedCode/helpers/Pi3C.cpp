@@ -114,11 +114,9 @@ uint32_t Pi3C::create_background(const std::string &path, const std::string &fil
 //	}
 //}
 
-int32_t Pi3C::load_model(const std::string &path, const std::string &file, const vec3f &pos)
+int32_t Pi3C::load_model(const std::string &path, const std::string &modelfile, const vec3f &pos)
 {
-	int32_t modelRef = scene.loadModelOBJ(path, file, vec3f(0, 0, 0), true, nullptr);  // loadbarCallback);
-	if (!pos.isZero()) scene.models[modelRef].move(pos);
-	return modelRef;
+	return scene.loadModelOBJ(path, modelfile, pos, true, nullptr);  // loadbarCallback);
 }
 
 int32_t Pi3C::load_model_and_collider(const std::string& path, const std::string& modelfile, const std::string& colliderfile, const vec3f& pos)

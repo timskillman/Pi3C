@@ -36,7 +36,7 @@
 //
 // =======================================================================
 
-#define SPEEED 10.f
+#define SPEEED 1000.f //milliseconds
 
 class Pi3Cwindow {
 public:

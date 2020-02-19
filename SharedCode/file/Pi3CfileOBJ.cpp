@@ -90,7 +90,7 @@ namespace Pi3CfileOBJ {
 						sscanf(vals.c_str(), "%f %f %f", &objmat.colSpecular.x, &objmat.colSpecular.y, &objmat.colSpecular.z);
 					else if (com == "Ke")
 						sscanf(vals.c_str(), "%f %f %f", &objmat.colEmissive.x, &objmat.colEmissive.y, &objmat.colEmissive.z);
-					else if (com == "Tr") // || com == "d"
+					else if (com == "Tr" || com == "d") //
 						sscanf(vals.c_str(), "%f", &objmat.alpha);
 					else if (com == "illum") {
 						sscanf(vals.c_str(), "%d", &objmat.illum);

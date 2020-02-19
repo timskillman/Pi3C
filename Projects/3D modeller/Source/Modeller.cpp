@@ -44,6 +44,11 @@ void Modeller::clearScene()
 	for (auto &model : scene.models) {
 		if (model.touchable) model.deleted = true;
 	}
+	touch.reset();
+	scene.models[brushref].visible = false;
+	scene.models[selboxRef].visible = false;
+	scene.models[moveGizmoRef].visible = false;
+	selectedName = "";
 }
 
 void Modeller::setupGUI(loadOptions &opts)
@@ -296,11 +301,7 @@ void Modeller::handleEvents()
 			std::string file = dropfile;
 			SDL_free(dropfile);
 			if (file.substr(file.size() - 4, 4) == ".obj") {
-				
 				int32_t modelRef = scene.loadModelOBJ("", file, touch.touched() ? touch.intersection : vec3f(0,0,0), false, nullptr);  // loadbarCallback);
-				if (modelRef >= 0) {
-					//scene.models[modelRef].move(-currentPos);
-				}
 			}
 			break;
 		}

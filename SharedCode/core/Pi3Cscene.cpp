@@ -97,7 +97,7 @@ int32_t Pi3Cscene::loadModelOBJ(const std::string &path, const std::string &mode
 			}
 		}
 	}
-	return models.size()-1;
+	return models.size()-1; //reference returned is only meaningful with grouped flag set
 }
 
 int32_t Pi3Cscene::loadSkybox(const std::string &path, const std::string &file, const std::function<void(float)> showProgressCB, const float scale)

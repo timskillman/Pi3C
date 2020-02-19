@@ -59,7 +59,7 @@ void main()
 
 	// apply shade and fog ...
 	if (u_illuminationModel == 2) {
-		float rDotV = max(dot(Normal, lightVector), 0.1);
+		float rDotV = max(dot(Normal, lightVector), 0.3); //0.1
 		fogFactor = fogFactor * rDotV;
 		//rDotV = max(0.0, dot(lightVector, Normal));
 		ambcol = u_ambientColour * diffuseCol; 

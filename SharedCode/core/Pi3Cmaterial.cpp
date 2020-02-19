@@ -9,7 +9,7 @@ Pi3Cmaterial::Pi3Cmaterial()
 
 void Pi3Cmaterial::init(const std::string &name)
 {
-	colAmbient = { 0.05f,0.05f,0.05f,1.0f };
+	colAmbient = { 0.2f,0.2f,0.2f,1.0f };
 	colDiffuse = { 1.0f,1.0f,1.0f,1.0f };
 	colSpecular = { 0.1f,0.1f,0.1f,1.0f };
 	colEmissive = { 0.0f,0.0f,0.0f,0.0f };
@@ -31,7 +31,7 @@ void Pi3Cmaterial::init(const std::string &name)
 	this->name = name;
 	rendermode = GL_TRIANGLES;
 	frameticks = 0;
-	framespeed = 1.f;
+	framespeed = 1.f/30.f; //30FPS
 }
 
 void Pi3Cmaterial::SetColAmbient(const uint32_t colour)
