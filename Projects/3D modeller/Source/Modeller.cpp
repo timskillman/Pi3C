@@ -142,6 +142,12 @@ void Modeller::handleKeys()
 	const uint8_t *keystate = window->getKeys();
 }
 
+void Modeller::createLandscape(const vec3f pos, const uint32_t colour)
+{
+	Pi3Ctexture maptex = Pi3Ctexture("maps/mountainsHgt2.png", false);
+	createShape(Pi3Cshapes::elevationMap(maptex, vec3f(0, 0, 0), vec3f(128.f, 20.f, 128.f), 128, 128, 1), pos, colour);
+}
+
 void Modeller::createShape(const Pi3Cmesh& mesh, const vec3f& pos, const uint32_t colour)
 {
 	Pi3Cmodel shape = Pi3Cmodel(resource, mesh, colour);
@@ -186,9 +192,11 @@ void Modeller::handleEvents()
 						case CT_WEDGE: break;
 						case CT_EXTRUDE: break;
 						case CT_LATHE: break;
-						case CT_LANDSCAPE: break;
+						case CT_LANDSCAPE: createLandscape(pos, currentColour); break;
 						}
 					}
+					window->mouse.up = false;
+					break;
 				case ED_SELECT:
 					touchScene();
 					if (touch.selmodel) editUndo.selectModel(scene.models, touch.selmodel, window->ctrlKey); else clearSelections();

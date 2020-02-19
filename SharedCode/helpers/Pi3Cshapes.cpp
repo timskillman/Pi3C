@@ -704,7 +704,7 @@ namespace Pi3Cshapes {
 
 #define twotris true
 
-	void elevationMap_verts(std::vector<float>& verts, uint32_t& vc, Pi3Ctexture &tex, const vec3f &pos, const vec2f &size, float mapHeight, const uint32_t xdivs, const uint32_t ydivs, int direction, const vec2f &uvsize, const uint32_t col)
+	void elevationMap_verts(std::vector<float>& verts, uint32_t& vc, Pi3Ctexture &tex, const vec3f &pos, const vec3f &size, const uint32_t xdivs, const uint32_t ydivs, int direction, const vec2f &uvsize, const uint32_t col)
 	{
 
 		uint32_t pitch = tex.GetPitch();
@@ -720,7 +720,7 @@ namespace Pi3Cshapes {
 		float v1[3], v2[3], v3[3], v4[3], v5[3];
 		int a = 0; int b = 1; int c = 2;
 		vec3f n(0, 0, -1.f);
-		vec2f sz = size;
+		vec2f sz = vec2f(size.x, size.z);
 
 		switch (direction) {
 		case 0: sz.x = -sz.x; break;
@@ -738,7 +738,7 @@ namespace Pi3Cshapes {
 		const float ux = xs * uvsize.x;
 		const float uy = ys * uvsize.y;
 
-		float mh = mapHeight / 255.f;
+		float mh = size.y / 255.f;
 
 		float xc = (wf-1.f) / (float)xdivs;
 		float yc = (hf-1.f) / (float)ydivs;
@@ -770,13 +770,13 @@ namespace Pi3Cshapes {
 
 				n = vec1.trinormal(vec2, vec3);
 				storeVNTC(verts, vc, pos + vec1, n, vec2f(xu + ux, yu + uy), col);
-				storeVNTC(verts, vc, pos + vec3, n, vec2f(xu, yu + uy), col);
 				storeVNTC(verts, vc, pos + vec2, n, vec2f(xu, yu), col);
+				storeVNTC(verts, vc, pos + vec3, n, vec2f(xu, yu + uy), col);
 
 				n = vec1.trinormal(vec4, vec2);
 				storeVNTC(verts, vc, pos + vec1, n, vec2f(xu + ux, yu + uy), col);
-				storeVNTC(verts, vc, pos + vec2, n, vec2f(xu, yu), col);
 				storeVNTC(verts, vc, pos + vec4, n, vec2f(xu + ux, yu), col);
+				storeVNTC(verts, vc, pos + vec2, n, vec2f(xu, yu), col);
 
 #else
 				float hh = (h00 + h01 + h10 + h11) / 4.0f; //avg height for centre point
@@ -820,13 +820,15 @@ namespace Pi3Cshapes {
 
 	}
 
-	Pi3Cmesh elevationMap(Pi3Ctexture &tex, const vec3f &pos, const vec2f &size, const float mapHeight, const uint32_t xdivs, const uint32_t ydivs, const int direction, const uint32_t col, const vec2f &uvsize)
+	Pi3Cmesh elevationMap(Pi3Ctexture &tex, const vec3f &pos, const vec3f &size, const uint32_t xdivs, const uint32_t ydivs, const int direction, const uint32_t col, const vec2f &uvsize)
 	{
 		Pi3Cmesh meshmap("Map");
 		meshmap.stride = 9;
 
+		const float mapHeight = size.y;
+
 		meshmap.verts.reserve((xdivs + 1)*(ydivs + 1) * 4 * 3 * 9);
-		elevationMap_verts(meshmap.verts, meshmap.vc, tex, pos, size, mapHeight, xdivs, ydivs, direction, uvsize, col);
+		elevationMap_verts(meshmap.verts, meshmap.vc, tex, pos, size, xdivs, ydivs, direction, uvsize, col);
 
 		meshmap.bbox.bboxFromVerts(meshmap.verts, 0, meshmap.vc, meshmap.stride);
 		meshmap.materialRef = 0;

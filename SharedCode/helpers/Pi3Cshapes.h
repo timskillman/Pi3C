@@ -62,7 +62,7 @@ namespace Pi3Cshapes {
 	Pi3Cmesh disk(const vec3f &pos, const float innerRad, const float outerRad, const uint32_t col = 0xffffffff, const int sides = Pi3C_SIDES);
 
 	Pi3Cmesh extrude(const std::string &name, const vec3f &pos, std::vector<std::vector<float>> &contours, const float depth, const uint32_t col = 0xffffffff, const uint16_t divs = 1);
-	Pi3Cmesh elevationMap(Pi3Ctexture &tex, const vec3f &pos, const vec2f &size, const float mapHeight, const uint32_t xdivs, const uint32_t ydivs, const int direction, const uint32_t col = 0xffffffff, const vec2f &uvsize = vec2f(1.f, 1.f));
+	Pi3Cmesh elevationMap(Pi3Ctexture &tex, const vec3f &pos, const vec3f &size, const uint32_t xdivs, const uint32_t ydivs, const int direction, const uint32_t col = 0xffffffff, const vec2f &uvsize = vec2f(1.f, 1.f));
 
 	//Pi3Cmesh capsule(vec3f pos, float radius, float midlength = 2.0f, int slices = Pi3C_SIDES, int sides = Pi3C_SIDES);
 
