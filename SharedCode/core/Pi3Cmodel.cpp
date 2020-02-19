@@ -40,16 +40,16 @@ Pi3Cmodel::Pi3Cmodel(Pi3Cresource *resource, const std::string &path, const std:
 	loadOBJfile(resource, path, modelfile, showProgressCB, asCollider);
 }
 
-Pi3Cmodel::Pi3Cmodel(Pi3Cresource *resource, const std::string &modelname, const std::string &path, const std::string &model, const std::string &collider, std::function<void(float)> showProgressCB)
+Pi3Cmodel::Pi3Cmodel(Pi3Cresource *resource, const std::string &modelname, const std::string &path, const std::string &modelfile, const std::string &collider, std::function<void(float)> showProgressCB)
 {
 	init();
-	loadModelAndCollider(resource, path, model, collider, showProgressCB);
+	loadModelAndCollider(resource, path, modelfile, collider, showProgressCB);
 	name = modelname;
 }
 
-void Pi3Cmodel::loadModelAndCollider(Pi3Cresource *resource, std::string path, std::string model, std::string collider, std::function<void(float)> showProgressCB)
+void Pi3Cmodel::loadModelAndCollider(Pi3Cresource *resource, std::string path, std::string modelfile, std::string collider, std::function<void(float)> showProgressCB)
 {
-	if (model != "") loadOBJfile(resource, path, model, showProgressCB, false);
+	if (modelfile != "") loadOBJfile(resource, path, modelfile, showProgressCB, false);
 	if (collider != "") {
 		Pi3Cmodel c1(resource, path, collider, true, showProgressCB);
 		this->appendCollider(c1);
@@ -227,6 +227,7 @@ Pi3Cmodel * Pi3Cmodel::appendLOD(Pi3Cmodel model, float LODfrom, float LODtoo, v
 	bbox.update(model.bbox, &model.matrix);
 	return &group.back();
 }
+
 
 void Pi3Cmodel::loadOBJfile(Pi3Cresource *resource, std::string path, std::string modelfile, std::function<void(float)> showProgressCB, bool asCollider)
 {	

@@ -130,11 +130,12 @@ int32_t Pi3Cmesh::touchPoint(Pi3Ctouch &touch, const Pi3Cmatrix &mtx, const std:
 		uint32_t i3 = i + stride + stride;
 
 		// Calc Z's and discard any triangle that has a point behind the viewer ...
-		float z1 = mtx.transformZ(&mverts[i]); if (touch.perspective != 0 && z1 > 0) continue;
-		float z2 = mtx.transformZ(&mverts[i2]); if (touch.perspective != 0 && z2 > 0) continue;
-		float z3 = mtx.transformZ(&mverts[i3]); if (touch.perspective != 0 && z3 > 0) continue;
+		float z1 = mtx.transformZ(&mverts[i]); //if (touch.perspective != 0 && z1 > 0) continue;
+		float z2 = mtx.transformZ(&mverts[i2]); //if (touch.perspective != 0 && z2 > 0) continue;
+		float z3 = mtx.transformZ(&mverts[i3]); //if (touch.perspective != 0 && z3 > 0) continue;
 
 		if (touch.perspective != 0) {
+			if (z1 > 0 && z2 > 0 && z3 > 0) continue;
 			w1 = touch.perspective / z1, w2 = touch.perspective / z2, w3 = touch.perspective / z3;
 		}
 

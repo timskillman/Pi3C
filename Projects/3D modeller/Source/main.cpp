@@ -61,7 +61,7 @@ int main(int argc, char *argv[])
 	{
 		modeller.handleKeys();
 		modeller.handleEvents();
-		modeller.touchScene();
+		//modeller.touchScene();
 		//modeller.tweens();
 		modeller.animate();
 

@@ -131,6 +131,9 @@ public:
 
 	bool keypress = false;
 	bool dragbar = false;
+	bool panning = false;
+	bool rotating = false;
+	bool zooming = false;
 
 	Pi3Ctouch touch;
 

@@ -1,6 +1,7 @@
 #include "Pi3Cscene.h"
 #include <algorithm>
 #include <cstring>
+#include "Pi3CfileOBJ.h"
 
 void Pi3Cscene::render(const float ticks, Pi3Cmatrix &projMatrix, Pi3Cmatrix &modelMatrix, std::vector<Pi3Cmodel> &mods, Pi3Cmaterial *materialOverride)
 {
@@ -66,20 +67,40 @@ std::string Pi3Cscene::getPathFile(std::string &file) const
 	return path;
 }
 
-int32_t Pi3Cscene::loadModelOBJ(const std::string &path, const std::string &file, const std::function<void(float)> showProgressCB)
+int32_t Pi3Cscene::loadModelOBJ(const std::string &path, const std::string &modelfile, bool grouped, const std::function<void(float)> showProgressCB)
 {
-	if (file == "") return -1;
-	std::string newfile = file;
+	if (modelfile == "") return -1;
+	std::string newfile = modelfile;
 	std::string newpath = (path == "") ? getPathFile(newfile) : path;
-	models.emplace_back();
-	Pi3Cmodel &model = models.back();
-	model.loadOBJfile(resource, newpath, newfile, showProgressCB, false);
+
+	if (grouped) {
+		models.emplace_back();
+		Pi3Cmodel &model = models.back();
+		model.loadOBJfile(resource, newpath, newfile, showProgressCB, false);
+	}
+	else
+	{
+		std::string error;
+		size_t meshStart = resource->meshes.size();
+		Pi3CfileOBJ::load(newpath, newfile, resource, showProgressCB, false, error);
+		size_t meshEnd = resource->meshes.size();
+
+		if (meshEnd - meshStart > 0) {
+			for (size_t i = meshStart; i < meshEnd; i++) {
+				Pi3Cmodel newModel;
+				newModel.meshRef = i;
+				newModel.material = resource->materials[resource->meshes[i].materialRef]; 	//copy material into group model so it can change;
+				newModel.bbox = resource->meshes[i].bbox;
+				models.push_back(newModel);
+			}
+		}
+	}
 	return models.size()-1;
 }
 
 int32_t Pi3Cscene::loadSkybox(const std::string &path, const std::string &file, const std::function<void(float)> showProgressCB, const float scale)
 {
-	int skybox = loadModelOBJ(path, file, showProgressCB); // loadbarCallback);
+	int skybox = loadModelOBJ(path, file, true, showProgressCB); // loadbarCallback);
 	models[skybox].matrix.SetScale(scale);
 	models[skybox].touchable = false;
 
@@ -129,7 +150,6 @@ Pi3Ctouch Pi3Cscene::touch(const vec3f &mousexyz, const bool calcPerspective) //
 {
 	//calc ray position and direction from x,y screen coords and transform into model world space
 	Pi3Ctouch touch;
-	return touch;
 
 	if (calcPerspective) {
 		touch.calcRay(mousexyz, perspective);

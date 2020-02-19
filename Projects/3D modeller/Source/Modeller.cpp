@@ -81,7 +81,7 @@ void Modeller::init()
 	//player.init(avparams);
 
 	// Load Skybox ...
-	skybox = scene.loadModelOBJ(opts.asString("skyboxPath"), opts.asString("skybox"), 0); // loadbarCallback);
+	skybox = scene.loadModelOBJ(opts.asString("skyboxPath"), opts.asString("skybox"), true, nullptr); // loadbarCallback);
 	scene.models[skybox].matrix.SetScale(opts.asFloat("skyboxScale"));
 	scene.models[skybox].touchable = false;
 
@@ -190,10 +190,17 @@ void Modeller::handleEvents()
 						}
 					}
 				case ED_SELECT:
+					touchScene();
 					if (touch.selmodel) editUndo.selectModel(scene.models, touch.selmodel, window->ctrlKey); else clearSelections();
 					break;
 				case ED_MOVE: 
-					if (touch.selmodel) editUndo.selectModel(scene.models, touch.selmodel, window->ctrlKey); else clearSelections();
+					touchScene();
+					SDL_Log("Touched %d ...", touch.selmodel);
+					if (touch.selmodel) {
+						editUndo.selectModel(scene.models, touch.selmodel, window->ctrlKey);
+						scene.models[touch.groupRefs[0]].selected = true;
+					}
+					else clearSelections();
 					break;
 				case ED_ROTATE: 
 					break;
@@ -204,28 +211,34 @@ void Modeller::handleEvents()
 
 			}
 			break;
+		case SDL_MOUSEBUTTONUP:
+			rotating = false;
+			panning = false;
+			zooming = false;
+			break;
 		case SDL_MOUSEMOTION:
 			if (window->mouse.anyButton() && currentView>=0 && !dragbar) {
 				vec3f mouseXYZ = vec3f(window->mouse.deltaXY.x, -window->mouse.deltaXY.y, 0);
 				if (window->mouse.MiddleButton) {
 					currentSelView = currentView;
 					view.pan += view.viewCoords(mouseXYZ);
+					panning = true;
 				}
 				if (window->mouse.LeftButton) {
 					switch (editMode) {
 					case ED_MOVE:
 						editUndo.moveSelections(scene.models, view.viewCoords(mouseXYZ));
+						SDL_Log("Dragging ...");
+						panning = true;
 						break;
 					case ED_ROTATE:
 						break;
 					case ED_SCALE:
-						{
-							vec3f sc = view.viewCoords(mouseXYZ) * 0.5f;
-							editUndo.scaleSelections(scene.models, vec3f(sc.x,sc.y,sc.z));
-						}
+						editUndo.scaleSelections(scene.models, view.viewCoords(mouseXYZ) * 0.5f);
 						break;
 					case ED_ROTATESCENE:
 						view.rot += vec3f(mouseXYZ.y, mouseXYZ.x, 0) * -0.01f;
+						rotating = true;
 						break;
 					}
 				}
@@ -235,6 +248,7 @@ void Modeller::handleEvents()
 			if (currentView >= 0) {
 				view.zoom += window->mouse.wheel * view.zoomFactor();
 				currentSelView = currentSelView;
+				zooming = true;
 			}
 			break;
 		case SDL_WINDOWEVENT:
@@ -258,6 +272,9 @@ void Modeller::handleEvents()
 			case SDL_SCANCODE_Y:
 				if (window->ctrlKey) editUndo.redo(scene.models);
 				break;
+			case SDL_SCANCODE_A:
+				if (window->ctrlKey) selectAll();
+				break;
 			case SDL_SCANCODE_P:
 				scene.renderOffscreen(800, 600);
 				break;
@@ -269,7 +286,7 @@ void Modeller::handleEvents()
 			std::string file = dropfile;
 			SDL_free(dropfile);
 			if (file.substr(file.size() - 4, 4) == ".obj") {
-				int32_t modelRef = scene.loadModelOBJ("", file, nullptr);  // loadbarCallback);
+				int32_t modelRef = scene.loadModelOBJ("", file, false, nullptr);  // loadbarCallback);
 				if (modelRef >= 0) {
 					//scene.models[modelRef].move(-currentPos);
 				}
@@ -351,17 +368,14 @@ void Modeller::touchScene()
 	//selGroup = nullptr;
 	//scene.models[brushref].visible = false;
 	//SDL_Cursor * newCursor = arrowCursor;
-	if (dragbar) return;
+	if (dragbar || panning || rotating || zooming) return;
 
 	if (currentView >= 0 && !mgui.somethingSelected()) {
 
 		viewInfo &vi = views[currentView];
-		if (vi.projection == PERSPECTIVE) {
-			touchPerspectiveView(vi);
-		}
-		else
-		{
-			touchOrthoView(vi);
+		switch (vi.projection) {
+		case PERSPECTIVE: touchPerspectiveView(vi); break;
+		case ORTHOGRAPHIC: touchOrthoView(vi); break;
 		}
 
 		if (editMode== ED_CREATE) setCursor(crossCursor);
