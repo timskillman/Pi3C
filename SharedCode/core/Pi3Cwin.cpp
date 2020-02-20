@@ -229,6 +229,12 @@ std::vector<uint32_t> Pi3Cwindow::event()
 				break;
 
 			}
+			break;
+		case SDL_DROPFILE:
+			char* dropFileCh = ev.drop.file;
+			dropfile = dropFileCh;
+			SDL_free(dropFileCh);
+			break;
 		}
 	}
 	return eventList;

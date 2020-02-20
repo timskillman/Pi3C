@@ -74,10 +74,12 @@ int32_t Pi3Cscene::loadModelOBJ(const std::string &path, const std::string &mode
 	std::string newpath = (path == "") ? getPathFile(newfile) : path;
 
 	if (grouped) {
-		models.emplace_back();
-		Pi3Cmodel &model = models.back();
-		model.loadOBJfile(resource, newpath, newfile, showProgressCB, false);
-		model.matrix.Translate(pos);
+		//models.emplace_back();
+		//Pi3Cmodel &model = models.back();
+		Pi3Cmodel newModel;
+		newModel.loadOBJfile(resource, newpath, newfile, showProgressCB, false);
+		newModel.matrix.move(pos);
+		models.push_back(newModel);
 	}
 	else
 	{

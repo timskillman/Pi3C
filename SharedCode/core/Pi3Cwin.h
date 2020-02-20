@@ -168,6 +168,8 @@ public:
 	bool ctrlKey = false;
 	bool shiftKey = false;
 
+	std::string dropfile;
+
 private:
 	const Uint8 *keys;
 	SDL_Window* mWindow;

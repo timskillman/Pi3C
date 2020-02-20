@@ -206,7 +206,12 @@ void Modeller::handleEvents(std::vector<uint32_t>& eventList)
 					break;
 				case ED_SELECT:
 					touchScene();
-					if (touch.selmodel) editUndo.selectModel(scene.models, touch.selmodel, window->ctrlKey); else clearSelections();
+					if (touch.selmodel) {
+						editUndo.selectModel(scene.models, touch.selmodel, window->ctrlKey);
+						scene.models[touch.groupRefs[0]].selected = touch.selmodel->selected;
+					}
+					else 
+						clearSelections();
 					break;
 				case ED_MOVE: 
 					touchScene();
@@ -273,7 +278,8 @@ void Modeller::handleEvents(std::vector<uint32_t>& eventList)
 			break;
 		case SDL_KEYDOWN:
 			switch (window->getKeyPress()) {
-			case SDL_SCANCODE_DELETE: editUndo.deleteSelection(scene.models); break;
+			case SDL_SCANCODE_DELETE: 
+				editUndo.deleteSelection(scene.models); break;
 			case SDL_SCANCODE_X: 
 				if (window->ctrlKey) editUndo.deleteSelection(scene.models);
 				break;
@@ -298,12 +304,10 @@ void Modeller::handleEvents(std::vector<uint32_t>& eventList)
 			}
 			//keyPress = ev.key.keysym.scancode;
 			break;
-		case SDL_DROPFILE:
-			char* dropfile = window->ev.drop.file;
-			std::string file = dropfile;
-			SDL_free(dropfile);
+		case SDL_DROPFILE: 
+			std::string file = window->dropfile;
 			if (file.substr(file.size() - 4, 4) == ".obj") {
-				int32_t modelRef = scene.loadModelOBJ("", file, touch.touched() ? touch.intersection : vec3f(0,0,0), false, nullptr);  // loadbarCallback);
+				int32_t modelRef = scene.loadModelOBJ("", file, touch.touched() ? touch.intersection : vec3f(0,0,0), true, nullptr);  // loadbarCallback);
 			}
 			break;
 		}
