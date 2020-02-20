@@ -150,7 +150,7 @@ void Modeller::handleKeys()
 void Modeller::createLandscape(const vec3f pos, const uint32_t colour)
 {
 	Pi3Ctexture maptex = Pi3Ctexture("maps/mountainsHgt2.png", false);
-	createShape(Pi3Cshapes::elevationMap(maptex, vec3f(0, 0, 0), vec3f(128.f, 20.f, 128.f), 128, 128, 1), pos, colour);
+	createShape(Pi3Cshapes::elevationMap(maptex, vec3f(0, -200.f, 0), vec3f(3000.f, 400.f, 3000.f), 128, 128, 1), pos, colour);
 }
 
 void Modeller::createShape(const Pi3Cmesh& mesh, const vec3f& pos, const uint32_t colour)

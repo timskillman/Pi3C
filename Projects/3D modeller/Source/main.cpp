@@ -59,15 +59,17 @@ int main(int argc, char *argv[])
 
 	while (!window.hasquit())
 	{
-		modeller.handleKeys();
-		modeller.handleEvents();
+		//modeller.handleKeys();
+		
 		//modeller.touchScene();
 		//modeller.tweens();
-		modeller.animate();
+		//modeller.animate();
 
 		window.clear();
 		modeller.render();
 
+		modeller.handleEvents();
+		
 		frames++;
 		window.SwapBuffers();	
 	}
