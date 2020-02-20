@@ -10,7 +10,7 @@ public:
 
 	//functions
 	void calcRay(vec3f touchPoint, float perspective);
-	bool touched() { return triRef >= 0; }
+	bool touched() { return triRef >= 0 && intersection.z>-1e8f; }
 	void reset() {
 		intersection = vec3f(0, 0, 0);
 		selmodel = nullptr;
