@@ -101,7 +101,7 @@ public:
 	void destroy();
 
 	int getEvent() { return SDL_PollEvent(&ev); }
-	int event();
+	std::vector<uint32_t> event(); //return a list of event handles (if any)
 	void SwapBuffers();
 	float getTicks() { return ticks; }
 	void setClearColour(const float red, const float green, const float blue);

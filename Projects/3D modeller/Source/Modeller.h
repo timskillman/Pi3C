@@ -66,7 +66,7 @@ public:
 	void setCreateTool(const CreateTool tool);
 	void setEditMode(const EditMode mode);
 	void handleKeys();
-	void handleEvents();
+	void handleEvents(std::vector<uint32_t>& eventList);
 	void handleIMGui();
 	void touchScene();
 	//void tweens();

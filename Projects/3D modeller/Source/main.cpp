@@ -59,16 +59,13 @@ int main(int argc, char *argv[])
 
 	while (!window.hasquit())
 	{
-		//modeller.handleKeys();
-		
-		//modeller.touchScene();
-		//modeller.tweens();
-		//modeller.animate();
+		//needs processing for render so that GUI has priority over events (before modeller.handleEvents)
+		std::vector<uint32_t> eventList = window.event(); 
 
 		window.clear();
 		modeller.render();
 
-		modeller.handleEvents();
+		modeller.handleEvents(eventList);
 		
 		frames++;
 		window.SwapBuffers();	

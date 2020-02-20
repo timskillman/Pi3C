@@ -107,10 +107,13 @@ void Pi3Cwindow::SwapBuffers() {
 	lastTime = SDL_GetTicks();
 }
 
-int Pi3Cwindow::event()
+std::vector<uint32_t> Pi3Cwindow::event()
 {
-	int p = SDL_PollEvent(&ev);
-	if (p) {
+	std::vector<uint32_t> eventList;
+
+	while (SDL_PollEvent(&ev) != 0) {
+		eventList.push_back(ev.type);
+
 		switch (ev.type) {
 		case SDL_QUIT:
 			quit = true;
@@ -228,7 +231,7 @@ int Pi3Cwindow::event()
 			}
 		}
 	}
-	return p;
+	return eventList;
 }
 
 //void drawRect(vec3f pos, vec3f size)

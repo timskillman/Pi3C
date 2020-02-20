@@ -176,19 +176,23 @@ bool Pi3C::do_events()
 
 	//SDL_Delay(10);
 
-	if (!window.event()) return false;
+	std::vector<uint32_t> eventList = window.event();
 
-	switch (window.ev.type)
-	{
-	case SDL_WINDOWEVENT:
-		switch (window.ev.window.event) {
-		case SDL_WINDOWEVENT_RESIZED:
-			resize_window();
+	if (eventList.size()==0) return false;
+
+	for (auto& ev : eventList) {
+		switch (ev)
+		{
+		case SDL_WINDOWEVENT:
+			switch (window.ev.window.event) {
+			case SDL_WINDOWEVENT_RESIZED:
+				resize_window();
+				break;
+			}
+			break;
+		case SDL_KEYDOWN:
 			break;
 		}
-		break;
-	case SDL_KEYDOWN:
-		break;
 	}
 	return true;
 

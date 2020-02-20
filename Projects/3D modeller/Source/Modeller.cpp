@@ -168,13 +168,15 @@ void Modeller::createShape(const Pi3Cmesh& mesh, const vec3f& pos, const uint32_
 	}
 }
 
-void Modeller::handleEvents()
+void Modeller::handleEvents(std::vector<uint32_t>& eventList)
 {
+	if (eventList.size() == 0) return;
+
 	// process window events ...
 	viewInfo& view = views[currentView];
 
-	while (window->event()) {
-		switch (window->ev.type)
+	for (auto& ev : eventList) {
+		switch (ev)
 		{
 		case SDL_MOUSEBUTTONDOWN:
 			if (currentView != -1 && window->mouse.LeftButton && !dragbar) {
