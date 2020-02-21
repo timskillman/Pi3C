@@ -23,7 +23,7 @@ public:
 
 	void setupGUI(std::string fontsPath, std::string fontName); // loadOptions &opts);
 	void handleKeys();
-	void handleEvents();
+	void handleEvents(std::vector<uint32_t>& eventList);
 	void handleIMGui();
 	void touchScene();
 	void tweens();

@@ -74,12 +74,10 @@ int32_t Pi3Cscene::loadModelOBJ(const std::string &path, const std::string &mode
 	std::string newpath = (path == "") ? getPathFile(newfile) : path;
 
 	if (grouped) {
-		//models.emplace_back();
-		//Pi3Cmodel &model = models.back();
-		Pi3Cmodel newModel;
-		newModel.loadOBJfile(resource, newpath, newfile, showProgressCB, false);
-		newModel.matrix.move(pos);
-		models.push_back(newModel);
+		models.emplace_back();
+		Pi3Cmodel &model = models.back();
+		model.loadOBJfile(resource, newpath, newfile, showProgressCB, false);
+		model.matrix.move(pos);
 	}
 	else
 	{
@@ -126,6 +124,17 @@ Pi3Cmodel * Pi3Cscene::find(const std::string &name)
 		if (found) return found;
 	}
 	return nullptr;
+}
+
+Pi3Cbbox3d Pi3Cscene::getSelectedBounds()
+{
+	Pi3Cbbox3d bbox;
+	for (auto &model : models) {
+		if (model.selected) {
+			bbox.update(model.bbox.bboxFromTVerts(&model.matrix));
+		}
+	}
+	return bbox;
 }
 
 int32_t Pi3Cscene::append3D(const Pi3Cmodel &model)
@@ -223,6 +232,27 @@ void Pi3Cscene::setViewport(const Pi3Crecti &rect)
 	glViewport(rect.x, rect.y, rect.width, rect.height);
 }
 
+void Pi3Cscene::renderView(const viewInfo& view, Pi3Cmaterial* outlines)
+{
+	setViewport(view.viewport);
+	switch (view.projection)
+	{
+	case viewInfo::PERSPECTIVE:
+		setMatrix(view.pan, vec3f(0, 0, -view.zoom), view.rot);
+		setPerspective3D(view.viewport.width, view.viewport.height, view.pspvalue, view.psp_nearz, view.psp_farz);
+		setSun(0xffffff, vec3f(1000.f, 1000.f, -1000.f)); //transform sun position into scene
+		render3D(view.ticks);
+		//scene.render3D(view.ticks, outlines);
+		break;
+	case viewInfo::ORTHOGRAPHIC:
+		setMatrix(view.pos + view.pan, vec3f(0, 0, 0), view.rot);
+		setOrthographic3D(view.viewport, view.zoom, view.ortho_nearz, view.ortho_farz);
+		setFixedLight(0xffffff, vec3f(1000.f, 1000.f, 1000.f));
+		render3D(view.ticks, outlines);
+		break;
+	}
+}
+
 void Pi3Cscene::setOrthographic3D(const Pi3Crecti &rect, const float zoom, const float znear, const float zfar)
 {
 	//projMatrix3D.SetOrtho(rect.x, rect.x + rect.width, rect.y + rect.height, rect.y , znear, zfar);
@@ -281,12 +311,13 @@ void Pi3Cscene::saveBufferToPNG(const char * filename, std::vector<uint8_t> &sna
 		SDL_FreeSurface(ss);
 }
 
-bool Pi3Cscene::snapShot(const Pi3Crecti &rect, std::vector<uint8_t> &snapShot)
+bool Pi3Cscene::snapShot(const viewInfo& viewinfo, std::vector<uint8_t> &snapShot)
 {
 	//SDL_Surface *sshot = SDL_CreateRGBSurface(0, rect.width, rect.height, 32, 0x00ff0000, 0x0000ff00, 0x000000ff, 0xff000000);
 	//SDL_RenderReadPixels(renderer, NULL, SDL_PIXELFORMAT_ARGB8888, sshot->pixels, sshot->pitch);
 	//SDL_SaveBMP(sshot, "screenshot.bmp");
 	//SDL_FreeSurface(sshot);
+	const Pi3Crecti &rect = viewinfo.viewport;
 
 	try {
 		uint32_t size = (uint32_t)(rect.width*rect.height * 4);
@@ -341,10 +372,13 @@ void Pi3Cscene::checkFBerrors()
 	}
 }
 
-void Pi3Cscene::renderOffscreen(const int width, const int height) //, const Pi3Cshader &shader
+void Pi3Cscene::renderOffscreen(const viewInfo& viewinfo) //, const Pi3Cshader &shader
 {
 //#ifdef __arm__
 	
+	int width = viewinfo.viewport.width;
+	int height = viewinfo.viewport.height;
+
 	GLuint fbo = 0, frame_buf = 0, colour_buf = 0, depth_buf = 0;
 
 	glGenRenderbuffers(1, &colour_buf);

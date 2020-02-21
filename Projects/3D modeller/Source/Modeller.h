@@ -10,6 +10,7 @@
 #include "Pi3Cgizmos.h"
 #include "Pi3Cediting.h"
 #include "Pi3CfileOBJ.h"
+#include "Pi3CviewInfo.h"
 
 class Modeller {
 public:
@@ -17,50 +18,8 @@ public:
 	Modeller(Pi3Cresource *resource, Pi3Cwindow *window);
 	~Modeller();
 
-	enum Projection { PERSPECTIVE, ORTHOGRAPHIC };
-	enum SceneLayout { TOPLEFT = 0, TOPRIGHT = 1, BOTTOMLEFT = 2, BOTTOMRIGHT = 3, FULL = 4 };
 	enum EditMode { ED_SELECT, ED_ROTATE, ED_MOVE, ED_SCALE, ED_CREATE, ED_CONTOUR, ED_ROTATESCENE };
-	enum ViewProject { VIEW_LEFT, VIEW_RIGHT, VIEW_TOP, VIEW_BOTTOM, VIEW_FRONT, VIEW_BACK, VIEW_FREE, VIEW_PERSPECTIVE };
 	enum CreateTool { CT_CUBOID, CT_SPHERE, CT_CYLINDER, CT_CONE, CT_TCONE, CT_TUBE, CT_TORUS, CT_WEDGE, CT_EXTRUDE, CT_LATHE, CT_TEXT, CT_LIBSHAPE, CT_LANDSCAPE, CT_NONE };
-
-	struct viewInfo {
-
-		void setRotMatrix(const vec3f &rot) {
-			rotInvertMatrix.setRotateXY(rot);
-			rotInvertMatrix = rotInvertMatrix.inverse();
-		}
-
-		void setRot(const vec3f &rot) {
-			setRotMatrix(rot);
-			this->rot = rot;
-		}
-
-		vec3f viewCoords(const vec3f& pos)
-		{
-			setRotMatrix(rot);
-			float iz = (projection == ORTHOGRAPHIC) ? 2.f / zoom : zoom / PSPVALUE;
-			return rotInvertMatrix.transformRotateVec(pos*iz);
-		}
-
-		/* calculate orthographic position of mouse in scene .. */
-		vec3f calcMouseXYZ(const int mx, const int my) {
-			vec3f cpos((float)(-(mx - viewport.x - viewport.width / 2)), (float)(-(my - viewport.y - viewport.height / 2)), 0);
-			return viewCoords(cpos) + pan;
-		}
-
-		float zoomFactor() {
-			return (projection == ORTHOGRAPHIC) ? zoom / 10.f : -5.f;
-		}
-
-		ViewProject viewProject;
-		Projection projection = PERSPECTIVE;
-		Pi3Crecti viewport;
-		Pi3Cmatrix rotInvertMatrix;
-		vec3f pos{ 0,0,0 };
-		vec3f rot{ 0,0,0 };
-		vec3f pan{ 0,0,0 };
-		float zoom = 100.f;
-	};
 
 	void setupGUI(loadOptions &opts);
 	void setCreateTool(const CreateTool tool);
@@ -82,8 +41,9 @@ public:
 
 	//void saveScene(const std::string &file, Pi3Cmodel *models);
 	void clearScene();
-	viewInfo setupView(const ViewProject view);
-	bool isPerspective() { return views[currentView].projection == PERSPECTIVE;  }
+	void clearGizmos();
+	viewInfo setupView(const viewInfo::ViewProject view);
+	bool isPerspective() { return views[currentView].projection == viewInfo::PERSPECTIVE;  }
 	bool initialised() { return (resource != nullptr); }
 	void createShape(const Pi3Cmesh& mesh, const vec3f& pos, const uint32_t colour = 0xffffffff);
 	void createLandscape(const vec3f pos, const uint32_t colour);
@@ -121,7 +81,6 @@ public:
 	//vec3f editpos{ 0, 0.f, -300.f };
 	//vec3f editrot{ .7f, .7f, 0 };
 	vec3f grid;
-	vec2f nearzfarz{ 1.f, 5000.f };
 	bool gridlock = false;
 	Pi3Cmodel *selGroup = nullptr;
 	//uint32_t currentSel = 1;
@@ -138,9 +97,9 @@ public:
 
 	Pi3Ctouch touch;
 
+	viewInfo views[5];
 	int32_t currentView = -1;
 	int32_t currentSelView = -1;
-	viewInfo views[5];
 	int32_t fullview = -1;
 
 	//float zoom = 1.f;
@@ -177,10 +136,13 @@ public:
 
 private:
 	MGui mgui;
-	
+	//Pi3Cbbox3d selbbox;
+
 	void touchPerspectiveView(viewInfo &vi);
 	void touchOrthoView(viewInfo &vi);
-	void touchObject(Pi3Cmodel& sbox, Pi3Cmodel& mgiz);
+	void touchObject(Pi3Cmodel& selmodel);
 	void setDragBar(bool on, SDL_Cursor * newCursor);
-
+	void setSelectionBox();
+	void moveSelections(const vec3f& vec);
+	void setCurrentSelView(int32_t selview);
 };

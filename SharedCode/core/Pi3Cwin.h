@@ -167,6 +167,7 @@ public:
 	bool keyDown = false;
 	bool ctrlKey = false;
 	bool shiftKey = false;
+	bool resized = false;
 
 	std::string dropfile;
 

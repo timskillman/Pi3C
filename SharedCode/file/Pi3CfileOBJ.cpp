@@ -1,4 +1,5 @@
 #include "Pi3CfileOBJ.h"
+//#include "Pi3Cgizmos.h"
 #include <vector>
 #include <fstream>
 #include <functional>
@@ -21,6 +22,9 @@ namespace Pi3CfileOBJ {
 		mesh.bbox.bboxFromVerts(mesh.verts, 0, mesh.vc, mesh.stride);
 		mesh.hasColliderGrid = mesh.createColliderGrid();
 		int32_t i = resource->addMesh(&mesh);
+
+		//Pi3Cmesh selMesh = Pi3Cgizmos::selectBoxGizmo(mesh.bbox.min, mesh.bbox.size(), 0xffffff);
+		//i = resource->addMesh(&selMesh);
 		//SDL_Log("Mesh %d: verts = %d,%d, material = %d", mesh.materialRef, mesh.vertOffset, mesh.vertSize, mesh.materialRef);
 	}
 	
