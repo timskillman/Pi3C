@@ -104,7 +104,14 @@ Pi3Cbbox3d Pi3Cbbox3d::bboxFromTVerts(const Pi3Cmatrix* mtx) const
 {
 	//Transforms a bounding box with a matrix
 	Pi3Cbbox3d tbox;
-	tbox.update(*this);
+	tbox.update(mtx->transformVec(min.x, min.y, min.z));
+	tbox.update(mtx->transformVec(max.x, min.y, min.z));
+	tbox.update(mtx->transformVec(min.x, max.y, min.z));
+	tbox.update(mtx->transformVec(max.x, max.y, min.z));
+	tbox.update(mtx->transformVec(min.x, min.y, max.z));
+	tbox.update(mtx->transformVec(max.x, min.y, max.z));
+	tbox.update(mtx->transformVec(min.x, max.y, max.z));
+	tbox.update(mtx->transformVec(max.x, max.y, max.z));
 	return tbox;
 }
 

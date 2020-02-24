@@ -83,11 +83,11 @@ void MGui::renderYellowBorder(uint32_t currentSelView)
 {
 	Pi3Crecti rec;
 	switch (currentSelView) {
-	case Modeller::TOPLEFT: rec = getRectTopLeft(); break;
-	case Modeller::TOPRIGHT:rec = getRectTopRight(); break;
-	case Modeller::BOTTOMLEFT:rec = getRectBottomLeft(); break;
-	case Modeller::BOTTOMRIGHT:rec = getRectBottomRight(); break;
-	case Modeller::FULL:rec = getRectFull(); break;
+	case viewInfo::TOPLEFT: rec = getRectTopLeft(); break;
+	case viewInfo::TOPRIGHT:rec = getRectTopRight(); break;
+	case viewInfo::BOTTOMLEFT:rec = getRectBottomLeft(); break;
+	case viewInfo::BOTTOMRIGHT:rec = getRectBottomRight(); break;
+	case viewInfo::FULL:rec = getRectFull(); break;
 	}
 
 	if (rec.width > 0) {

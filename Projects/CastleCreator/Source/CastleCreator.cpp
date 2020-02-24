@@ -59,14 +59,18 @@ int main(int argc, char *argv[])
 
 	while (!window.hasquit())
 	{
+		std::vector<uint32_t> eventList = window.event();
+
 		castleEditor.handleKeys();
-		castleEditor.handleEvents();
+		//castleEditor.handleEvents(eventList);
 		castleEditor.touchScene();
 		castleEditor.tweens();
 		castleEditor.animate();
 
 		window.clear();
 		castleEditor.render();
+
+		castleEditor.handleEvents(eventList);
 
 		frames++;
 		window.SwapBuffers();	

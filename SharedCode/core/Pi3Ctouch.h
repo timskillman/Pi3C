@@ -16,6 +16,7 @@ public:
 		selmodel = nullptr;
 		touching = false;
 	}
+	int32_t parent() { return groupRefs[0]; }
 
 	//input
 	vec3f touchPoint = { 0, 0, 0 };

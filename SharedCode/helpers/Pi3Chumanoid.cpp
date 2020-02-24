@@ -29,12 +29,12 @@ Pi3Cmodel Pi3Chumanoid::create(Pi3Cresource *resource, humanoidParams &hp)
 
 	Pi3Cmesh llowarm = (hp.llowerArm_file == "") ? Pi3Cshapes::cuboid(lowArmPivot, hp.lowerArmsSize) : loadMesh(hp.llowerArm_file, resource, lowArmPivot, hp.lowerArmsSize);
 	Pi3Cmodel mllowerArm = Pi3Cmodel(resource, "leftLowerArm", llowarm);
-	mllowerArm.append(mlhand, vec3f(0, -hp.lowerArmsSize.y, 0));
+	mllowerArm.append(resource, mlhand, vec3f(0, -hp.lowerArmsSize.y, 0));
 	mllowerArm.rotate(vec3f(-1.57f, 0, 0));
 	
 	Pi3Cmesh luparm = (hp.lupperArm_file == "") ? Pi3Cshapes::cuboid(upArmPivot, hp.upperArmsSize) : loadMesh(hp.lupperArm_file, resource, upArmPivot, hp.upperArmsSize);
 	Pi3Cmodel mlupperArm = Pi3Cmodel(resource, "leftUpperArm", luparm);
-	mlupperArm.append(mllowerArm, vec3f(0, -hp.upperArmsSize.y, 0));
+	mlupperArm.append(resource, mllowerArm, vec3f(0, -hp.upperArmsSize.y, 0));
 	mlupperArm.rotate(vec3f(0.5f, 0, 0));
 
 	Pi3Cmesh rhand = (hp.rhand_file == "") ? Pi3Cshapes::cuboid(handPivot, hp.handSize) : loadMesh(hp.rhand_file, resource, handPivot, hp.handSize);
@@ -42,11 +42,11 @@ Pi3Cmodel Pi3Chumanoid::create(Pi3Cresource *resource, humanoidParams &hp)
 
 	Pi3Cmesh rlowarm = (hp.rlowerArm_file == "") ? Pi3Cshapes::cuboid(lowArmPivot, hp.lowerArmsSize) : loadMesh(hp.rlowerArm_file, resource, lowArmPivot, hp.lowerArmsSize);
 	Pi3Cmodel mrlowerArm = Pi3Cmodel(resource, "rightLowerArm", rlowarm);
-	mrlowerArm.append(mrhand, vec3f(0, -hp.lowerArmsSize.y, 0));
+	mrlowerArm.append(resource, mrhand, vec3f(0, -hp.lowerArmsSize.y, 0));
 
 	Pi3Cmesh ruparm = (hp.rupperArm_file == "") ? Pi3Cshapes::cuboid(upArmPivot, hp.upperArmsSize) : loadMesh(hp.rupperArm_file, resource, upArmPivot, hp.upperArmsSize);
 	Pi3Cmodel mrupperArm = Pi3Cmodel(resource, "rightUpperArm", ruparm);
-	mrupperArm.append(mrlowerArm, vec3f(0, -hp.upperArmsSize.y, 0));
+	mrupperArm.append(resource, mrlowerArm, vec3f(0, -hp.upperArmsSize.y, 0));
 
 	//create legs ...
 	vec3f footPivot(0, -hp.footSize.y*0.5f, hp.footSize.z*0.25f);
@@ -58,12 +58,12 @@ Pi3Cmodel Pi3Chumanoid::create(Pi3Cresource *resource, humanoidParams &hp)
 
 	Pi3Cmesh llowleg = (hp.llowerleg_file == "") ? Pi3Cshapes::cuboid(lowLegPivot, hp.lowerLegsSize) : loadMesh(hp.llowerleg_file, resource, lowLegPivot, hp.lowerLegsSize);
 	Pi3Cmodel mllowerLeg = Pi3Cmodel(resource, "leftLowerLeg", llowleg);
-	mllowerLeg.append(mlfoot, vec3f(0, -hp.lowerLegsSize.y, 0));
+	mllowerLeg.append(resource, mlfoot, vec3f(0, -hp.lowerLegsSize.y, 0));
 	mllowerLeg.rotate(vec3f(1.f, 0, 0));
 
 	Pi3Cmesh lthigh = (hp.lthigh_file == "") ? Pi3Cshapes::cuboid(thighPivot, hp.thighSize) : loadMesh(hp.lthigh_file, resource, thighPivot, hp.thighSize);
 	Pi3Cmodel mlthigh = Pi3Cmodel(resource, "leftThigh", lthigh);
-	mlthigh.append(mllowerLeg, vec3f(0, -hp.thighSize.y, 0));
+	mlthigh.append(resource, mllowerLeg, vec3f(0, -hp.thighSize.y, 0));
 	mlthigh.rotate(vec3f(-0.5f, 0, 0));
 	
 	Pi3Cmesh rfoot = (hp.rfoot_file == "") ? Pi3Cshapes::cuboid(footPivot, hp.footSize) : loadMesh(hp.rfoot_file, resource, footPivot, hp.footSize);
@@ -71,11 +71,11 @@ Pi3Cmodel Pi3Chumanoid::create(Pi3Cresource *resource, humanoidParams &hp)
 
 	Pi3Cmesh rlowleg = (hp.rlowerleg_file == "") ? Pi3Cshapes::cuboid(lowLegPivot, hp.lowerLegsSize) : loadMesh(hp.rlowerleg_file, resource, lowLegPivot, hp.lowerLegsSize);
 	Pi3Cmodel mrlowerLeg = Pi3Cmodel(resource, "rightLowerLeg", rlowleg);
-	mrlowerLeg.append(mrfoot, vec3f(0, -hp.lowerLegsSize.y, 0));
+	mrlowerLeg.append(resource, mrfoot, vec3f(0, -hp.lowerLegsSize.y, 0));
 
 	Pi3Cmesh rthigh = (hp.rthigh_file == "") ? Pi3Cshapes::cuboid(thighPivot, hp.thighSize) : loadMesh(hp.rthigh_file, resource, thighPivot, hp.thighSize);
 	Pi3Cmodel mrthigh = Pi3Cmodel(resource, "rightThigh", rthigh);
-	mrthigh.append(mrlowerLeg, vec3f(0, -hp.thighSize.y,0));
+	mrthigh.append(resource, mrlowerLeg, vec3f(0, -hp.thighSize.y,0));
 
 	// head ...
 	Pi3Cmesh head = (hp.head_file == "") ? Pi3Cshapes::sphere(vec3f(0, 0, 0), 0.5f, 0.f, 10, 20) : loadMesh(hp.head_file, resource, vec3f(0, 0, 0),vec3f(1.f,1.f,1.f));
@@ -89,9 +89,9 @@ Pi3Cmodel Pi3Chumanoid::create(Pi3Cresource *resource, humanoidParams &hp)
 	Pi3Cmodel mtorso = Pi3Cmodel(resource, "torso", torso);
 	//mtorso.move(vec3f(0, torsoSize.y, 0));
 
-	mtorso.append(mhead, vec3f(0, hp.torsoSize.y + hp.headSize.y*0.5f, 0));
-	mtorso.append(mlupperArm, vec3f(-(hp.torsoSize.x + hp.upperArmsSize.x) / 2.f, hp.torsoSize.y, 0));
-	mtorso.append(mrupperArm, vec3f((hp.torsoSize.x + hp.upperArmsSize.x) / 2.f, hp.torsoSize.y, 0));
+	mtorso.append(resource, mhead, vec3f(0, hp.torsoSize.y + hp.headSize.y*0.5f, 0));
+	mtorso.append(resource, mlupperArm, vec3f(-(hp.torsoSize.x + hp.upperArmsSize.x) / 2.f, hp.torsoSize.y, 0));
+	mtorso.append(resource, mrupperArm, vec3f((hp.torsoSize.x + hp.upperArmsSize.x) / 2.f, hp.torsoSize.y, 0));
 	//mtorso.rotate(vec3f(0, 0.5f, 0));
 
 	// pelvis and attach torso and legs ...
@@ -99,12 +99,12 @@ Pi3Cmodel Pi3Chumanoid::create(Pi3Cresource *resource, humanoidParams &hp)
 	Pi3Cmesh pelvis = (hp.pelvis_file == "") ? Pi3Cshapes::cuboid(pelvisPivot, hp.pelvisSize) : loadMesh(hp.pelvis_file, resource, pelvisPivot, hp.pelvisSize);
 	Pi3Cmodel mpelvis = Pi3Cmodel(resource, "pelvis", pelvis);
 	//mpelvis.move(vec3f(0, footSize.y + lowerLegsSize.y + thighSize.y, 0));
-	mpelvis.append(mtorso, vec3f(0, hp.pelvisSize.y, 0));
-	mpelvis.append(mlthigh, vec3f((-hp.pelvisSize.x + hp.thighSize.x) / 2.f, 0, 0));
-	mpelvis.append(mrthigh, vec3f((hp.pelvisSize.x - hp.thighSize.x) / 2.f, 0, 0));
+	mpelvis.append(resource, mtorso, vec3f(0, hp.pelvisSize.y, 0));
+	mpelvis.append(resource, mlthigh, vec3f((-hp.pelvisSize.x + hp.thighSize.x) / 2.f, 0, 0));
+	mpelvis.append(resource, mrthigh, vec3f((hp.pelvisSize.x - hp.thighSize.x) / 2.f, 0, 0));
 
 	//Append all the parts to the body ...
-	body.append(mpelvis, vec3f(0, hp.footSize.y + hp.lowerLegsSize.y + hp.thighSize.y, 0)); // , vec3f(0, footSize.y + lowerLegsSize.y + thighSize.y, 0));
+	body.append(resource, mpelvis, vec3f(0, hp.footSize.y + hp.lowerLegsSize.y + hp.thighSize.y, 0)); // , vec3f(0, footSize.y + lowerLegsSize.y + thighSize.y, 0));
 
 	return body;
 }

@@ -102,10 +102,10 @@ public:
 	void createRect2D(Pi3Cresource *resource, const vec2f &pos = vec2f(0, -1.f), const vec2f &size = vec2f(1.f, 1.f), const uint32_t colour = 0xffffffff);
 	void textModel(Pi3Cresource *resource, Pi3Cfont *font, const std::string &text, const float wrapWidth, const Pi3Cfont::textReaderType textType = Pi3Cfont::RD_NONE);
 
-	Pi3Cmodel * append(Pi3Cmodel model, vec3f offset = vec3f(0, 0, 0), vec3f rotation = vec3f(0,0,0));
-	Pi3Cmodel * append(Pi3Cmodel model, Pi3Cmatrix matrix);
-	Pi3Cmodel * appendLOD(Pi3Cmodel model, float LODfrom, float LODtoo, vec3f offset = vec3f(0, 0, 0), vec3f rotation = vec3f(0, 0, 0));
-	Pi3Cmodel * appendCollider(Pi3Cmodel &model, vec3f offset = vec3f(0, 0, 0), vec3f rotation = vec3f(0, 0, 0));
+	Pi3Cmodel * append(Pi3Cresource *resource, Pi3Cmodel model, vec3f offset = vec3f(0, 0, 0), vec3f rotation = vec3f(0,0,0));
+	Pi3Cmodel * append(Pi3Cresource *resource, Pi3Cmodel model, Pi3Cmatrix matrix);
+	Pi3Cmodel * appendLOD(Pi3Cresource *resource, Pi3Cmodel model, float LODfrom, float LODtoo, vec3f offset = vec3f(0, 0, 0), vec3f rotation = vec3f(0, 0, 0));
+	Pi3Cmodel * appendCollider(Pi3Cresource *resource, Pi3Cmodel &model, vec3f offset = vec3f(0, 0, 0), vec3f rotation = vec3f(0, 0, 0));
 
 	void resize(vec3f size) { Pi3Cmatrix sm; sm.SetScales(size); matrix = matrix * sm; }
 	void move(const vec3f &vec) { matrix.move(vec); }
@@ -132,6 +132,7 @@ public:
 
 	uint32_t flags = 0;
 	int32_t meshRef = -1;			//mesh reference to mesh in resources (-1 is no ref - nothing to render)
+	//int32_t meshSel = -1;			//mesh reference to mesh selector in resources (-1 is no ref - nothing to render) - rendered if selected
 	int32_t materialRef = -1;		//material reference to original material in resource
 
 	bool visible = true;			//visible in scene
@@ -159,7 +160,7 @@ private:
 
 	bool collideSub(const Pi3Cresource *resource, const Pi3Cmatrix &pmat, const vec3f &pos, const vec3f &dir, const float radius) const;
 	float collideFloorSub(const Pi3Cresource *resource, const Pi3Cmatrix &pmat, const vec3f &pos, float &prevHeight, const bool onehit) const;
-
+	//void updateSelBox(Pi3Cresource *resource);
 };
 
 

@@ -212,11 +212,13 @@ void Editor::handleKeys()
 	player.updateAndCollide(&scene, window->getTicks());
 }
 
-void Editor::handleEvents()
+void Editor::handleEvents(std::vector<uint32_t>& eventList)
 {
+	if (eventList.size() == 0) return;
+
 	// process window events ...
-	while (window->event()) {
-		switch (window->ev.type)
+	for (auto& ev : eventList) {
+		switch (ev)
 		{
 		case SDL_MOUSEMOTION:
 			if (window->mouse.anyButton()) {
@@ -233,11 +235,11 @@ void Editor::handleEvents()
 			//editpos.z += window->mouse.wheel * 20.f;
 			break;
 		case SDL_WINDOWEVENT:
-			switch (window->ev.window.event) {
-			case SDL_WINDOWEVENT_RESIZED:
+			//switch (window->ev.window.event) {
+			if (window->resized) {
 				scene.setPerspective3D(window->getWidth(), window->getHeight(), 800.f, nearzfarz.x, nearzfarz.y);
 				scene.setViewport2D(Pi3Crecti(0, 0, (float)window->getWidth(), (float)window->getHeight()), 0.1f, 2000.f);
-				break;
+				window->resized = false;
 			}
 			break;
 		}
@@ -302,7 +304,7 @@ void Editor::touchScene()
 							newmod.matrix = rotmtx * newmod.matrix;
 							newmod.rotation.y += rotateBy;
 						}
-						scene.models[0].append(newmod);
+						scene.models[0].append(resource, newmod);
 					//}
 					window->mouse.up = false;
 				}
@@ -532,17 +534,17 @@ void Editor::loadModelLibraryJSON(const std::string &file)
 					std::string modelFile = LODmodels[j];
 					Pi3Cmodel modelLOD(resource, modelFile, modelPath, modelFile, colliderFile);
 					float lodToo = LODdists[j];
-					model.appendLOD(modelLOD, lodfrom, lodToo);
+					model.appendLOD(resource, modelLOD, lodfrom, lodToo);
 					lodfrom = lodToo;
 				}
-				models->append(model);
+				models->append(resource, model);
 			}
 		}
 	}
 
 	newScene(0);
 
-	skybox = scene.loadModelOBJ(skyboxpath, skyboxfile, 0);
+	skybox = scene.loadModelOBJ(skyboxpath, skyboxfile, vec3f(0,0,0), true, 0);
 	scene.models[skybox].matrix.SetScale(json.readFloat(vw, "skyboxScale"));
 	scene.models[skybox].touchable = false;
 
@@ -585,7 +587,7 @@ Pi3Cmodel Editor::loadSceneJSON(const std::string &file, vec3f &grid)
 				if (ob.HasMember("name")) objname = ob["name"].GetString();
 				if (ob.HasMember("matrix")) matrix = json.readMatrix(ob, "matrix");
 				Pi3Cmodel* m = findModel(objname);
-				if (m) model.append(*findModel(objname), matrix);
+				if (m) model.append(resource, *findModel(objname), matrix);
 			}
 		}
 	}

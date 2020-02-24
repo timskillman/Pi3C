@@ -44,6 +44,11 @@ void Modeller::clearScene()
 	for (auto &model : scene.models) {
 		if (model.touchable) model.deleted = true;
 	}
+	clearGizmos();
+}
+
+void Modeller::clearGizmos()
+{
 	touch.reset();
 	scene.models[brushref].visible = false;
 	scene.models[selboxRef].visible = false;
@@ -56,11 +61,11 @@ void Modeller::setupGUI(loadOptions &opts)
 
 	mgui.init(opts, resource, window);
 
-	views[TOPLEFT] = setupView(VIEW_FRONT);
-	views[TOPRIGHT] = setupView(VIEW_LEFT);
-	views[BOTTOMLEFT] = setupView(VIEW_TOP);
-	views[BOTTOMRIGHT] = setupView(VIEW_PERSPECTIVE);
-	views[FULL] = setupView(VIEW_PERSPECTIVE);
+	views[viewInfo::TOPLEFT] = setupView(viewInfo::VIEW_FRONT);
+	views[viewInfo::TOPRIGHT] = setupView(viewInfo::VIEW_LEFT);
+	views[viewInfo::BOTTOMLEFT] = setupView(viewInfo::VIEW_TOP);
+	views[viewInfo::BOTTOMRIGHT] = setupView(viewInfo::VIEW_PERSPECTIVE);
+	views[viewInfo::FULL] = setupView(viewInfo::VIEW_PERSPECTIVE);
 }
 
 void Modeller::init()
@@ -70,9 +75,9 @@ void Modeller::init()
 
 	setupGUI(opts);
 
-	nearzfarz = opts.asVec2f("nearzfarz");
+	//nearzfarz = opts.asVec2f("nearzfarz");
 	scene.setFog(0xffffff, 25000.f, 35000.f);
-	scene.setPerspective3D(window->getWidth(), window->getHeight(), PSPVALUE, nearzfarz.x, nearzfarz.y);
+	//scene.setPerspective3D(window->getWidth(), window->getHeight(), PSPVALUE, nearzfarz.x, nearzfarz.y);
 
 	// Setup player's avatar ...
 	//Pi3Cavatar::avatarParams avparams;
@@ -130,14 +135,14 @@ void Modeller::init()
 	currentCursor = arrowCursor;
 }
 
-Modeller::viewInfo Modeller::setupView(const ViewProject proj)
+viewInfo Modeller::setupView(const viewInfo::ViewProject proj)
 {
 	const static float PIDIV2 = PI / 2.f;
 	const static vec3f viewDir[8] = { { 0, PIDIV2, 0 }, { 0, -PIDIV2, 0 }, { PIDIV2, 0, 0 },{ -PIDIV2, 0, 0 },{}, { 0, PI, 0 },{ .7f, .7f, 0 },{ .7f, .7f, 0 } };
 
 	viewInfo view;
 	view.viewProject = proj;
-	view.projection = (proj==VIEW_PERSPECTIVE) ? PERSPECTIVE : ORTHOGRAPHIC;
+	view.projection = (proj== viewInfo::VIEW_PERSPECTIVE) ? viewInfo::PERSPECTIVE : viewInfo::ORTHOGRAPHIC;
 	view.setRot(viewDir[proj]);
 	return view;
 }
@@ -181,7 +186,7 @@ void Modeller::handleEvents(std::vector<uint32_t>& eventList)
 		case SDL_MOUSEBUTTONDOWN:
 			if (currentView != -1 && window->mouse.LeftButton && !dragbar) {
 				
-				currentSelView = currentView;
+				setCurrentSelView(currentView);
 
 				switch (editMode) {
 				case ED_CREATE:
@@ -207,8 +212,8 @@ void Modeller::handleEvents(std::vector<uint32_t>& eventList)
 				case ED_SELECT:
 					touchScene();
 					if (touch.selmodel) {
-						editUndo.selectModel(scene.models, touch.selmodel, window->ctrlKey);
-						scene.models[touch.groupRefs[0]].selected = touch.selmodel->selected;
+						editUndo.selectModel(scene.models, &scene.models[touch.parent()], window->ctrlKey);
+						//scene.models[touch.groupRefs[0]].selected = touch.selmodel->selected;
 					}
 					else 
 						clearSelections();
@@ -217,7 +222,7 @@ void Modeller::handleEvents(std::vector<uint32_t>& eventList)
 					touchScene();
 					if (touch.selmodel) {
 						editUndo.selectModel(scene.models, touch.selmodel, window->ctrlKey);
-						scene.models[touch.groupRefs[0]].selected = true;
+						scene.models[touch.parent()].selected = true;
 					}
 					else clearSelections();
 					break;
@@ -239,15 +244,14 @@ void Modeller::handleEvents(std::vector<uint32_t>& eventList)
 			if (window->mouse.anyButton() && currentView>=0 && !dragbar) {
 				vec3f mouseXYZ = vec3f(window->mouse.deltaXY.x, -window->mouse.deltaXY.y, 0);
 				if (window->mouse.MiddleButton) {
-					currentSelView = currentView;
+					setCurrentSelView(currentView);
 					view.pan += view.viewCoords(mouseXYZ);
 					panning = true;
 				}
 				if (window->mouse.LeftButton) {
 					switch (editMode) {
 					case ED_MOVE:
-						editUndo.moveSelections(scene.models, view.viewCoords(mouseXYZ));
-						panning = true;
+						moveSelections(view.viewCoords(mouseXYZ));
 						break;
 					case ED_ROTATE:
 						break;
@@ -265,7 +269,7 @@ void Modeller::handleEvents(std::vector<uint32_t>& eventList)
 		case SDL_MOUSEWHEEL:
 			if (currentView >= 0) {
 				view.zoom += window->mouse.wheel * view.zoomFactor();
-				currentSelView = currentSelView;
+				setCurrentSelView(currentView);
 				zooming = true;
 			}
 			break;
@@ -279,7 +283,9 @@ void Modeller::handleEvents(std::vector<uint32_t>& eventList)
 		case SDL_KEYDOWN:
 			switch (window->getKeyPress()) {
 			case SDL_SCANCODE_DELETE: 
-				editUndo.deleteSelection(scene.models); break;
+				editUndo.deleteSelection(scene.models); 
+				clearGizmos();
+				break;
 			case SDL_SCANCODE_X: 
 				if (window->ctrlKey) editUndo.deleteSelection(scene.models);
 				break;
@@ -299,7 +305,7 @@ void Modeller::handleEvents(std::vector<uint32_t>& eventList)
 				window->mouse.up = false;
 				break;
 			case SDL_SCANCODE_P:
-				scene.renderOffscreen(800, 600);
+				scene.renderOffscreen(views[currentSelView]);
 				break;
 			}
 			//keyPress = ev.key.keysym.scancode;
@@ -307,7 +313,7 @@ void Modeller::handleEvents(std::vector<uint32_t>& eventList)
 		case SDL_DROPFILE: 
 			std::string file = window->dropfile;
 			if (file.substr(file.size() - 4, 4) == ".obj") {
-				int32_t modelRef = scene.loadModelOBJ("", file, touch.touched() ? touch.intersection : vec3f(0,0,0), true, nullptr);  // loadbarCallback);
+				int32_t modelRef = scene.loadModelOBJ("", file, touch.touching ? touch.intersection : vec3f(0,0,0), true, nullptr);  // loadbarCallback);
 			}
 			break;
 		}
@@ -315,16 +321,30 @@ void Modeller::handleEvents(std::vector<uint32_t>& eventList)
 
 }
 
+void Modeller::moveSelections(const vec3f& vec)
+{
+	editUndo.moveSelections(scene.models, vec);
+	panning = true;
+}
+
+void Modeller::setCurrentSelView(int32_t selview)
+{
+	if (currentSelView != selview) {
+		//if (selview != viewInfo::TOPLEFT) scene.snapShot(viewInfo::TOPLEFT);
+		currentSelView = selview;
+	}
+}
+
 void Modeller::setFullScene()
 {
 	//currentSelView = currentView;
 	if (fullview < 0) {
 		fullview = currentSelView;
-		views[FULL] = views[currentSelView];
-		currentSelView = FULL;
+		views[viewInfo::FULL] = views[currentSelView];
+		setCurrentSelView(viewInfo::FULL);
 	}
 	else {
-		currentSelView = fullview;
+		setCurrentSelView(fullview);
 		fullview = -1;
 	}
 	window->mouse.up = false;
@@ -353,7 +373,7 @@ void Modeller::setDragBar(bool on, SDL_Cursor *newCursor)
 void Modeller::touchPerspectiveView(viewInfo &vi)
 {
 	scene.setMatrix(vi.pan, vec3f(0, 0, -vi.zoom), vi.rot);
-	scene.setPerspective3D(vi.viewport.width, vi.viewport.height, PSPVALUE, nearzfarz.x, nearzfarz.y);
+	scene.setPerspective3D(vi.viewport.width, vi.viewport.height, vi.pspvalue, vi.psp_nearz, vi.psp_farz);
 	float iy = window->getHeight() - window->mouse.y;
 	vec3f mousexyz(vi.viewport.width*0.5f - (window->mouse.x - vi.viewport.x), vi.viewport.height*0.5f - (iy - vi.viewport.y), 0);
 	touch = scene.touch(mousexyz, true);
@@ -362,23 +382,25 @@ void Modeller::touchPerspectiveView(viewInfo &vi)
 void Modeller::touchOrthoView(viewInfo &vi)
 {
 	scene.setMatrix(vi.pos, vec3f(0, 0, 0), vi.rot);
-	scene.setOrthographic3D(vi.viewport, vi.zoom, -2000.f, 2000.f);
+	scene.setOrthographic3D(vi.viewport, vi.zoom, vi.ortho_nearz, vi.ortho_farz);
 	vec3f mousexyz = -currentPos;
 	touch = scene.touch(mousexyz, false);
 }
 
-void Modeller::touchObject(Pi3Cmodel& sbox, Pi3Cmodel& mgiz)
+void Modeller::setSelectionBox()
 {
-	setCursor(handCursor);
+	Pi3Cbbox3d bbox = scene.getSelectedBounds();
+	vertsPtr vp = resource->getMeshVerts(scene.models[selboxRef].meshRef);
+	Pi3Cgizmos::select_box_verts(*vp.verts, vp.ptr, bbox.min, bbox.size(), 0xffffff);
+	resource->updateMesh(scene.models[selboxRef].meshRef);
+}
 
-	sbox.visible = true;
-	vertsPtr vp = resource->getMeshVerts(sbox.meshRef);
-	Pi3Cgizmos::select_box_verts(*vp.verts, vp.ptr, touch.selmodel->bbox.min + touch.selmodel->matrix.position(), touch.selmodel->bbox.size(), 0xffffff);
-	resource->updateMesh(sbox.meshRef);
-	selectedName = touch.selmodel->name;
-
-	mgiz.visible = true;
-	mgiz.matrix.move(touch.selmodel->bbox.center());
+void Modeller::touchObject(Pi3Cmodel& selmodel)
+{
+	//setCursor(handCursor);
+	setSelectionBox();
+	selectedName = selmodel.name;
+	scene.models[moveGizmoRef].matrix.move(selmodel.bbox.center());
 }
 
 void Modeller::touchScene()
@@ -392,24 +414,30 @@ void Modeller::touchScene()
 
 		viewInfo &vi = views[currentView];
 		switch (vi.projection) {
-		case PERSPECTIVE: touchPerspectiveView(vi); break;
-		case ORTHOGRAPHIC: touchOrthoView(vi); break;
+		case viewInfo::PERSPECTIVE: touchPerspectiveView(vi); break;
+		case viewInfo::ORTHOGRAPHIC: touchOrthoView(vi); break;
 		}
 
 		if (editMode== ED_CREATE) setCursor(crossCursor);
 
 		Pi3Cmodel& sbox = scene.models[selboxRef];
 		Pi3Cmodel& mgiz = scene.models[moveGizmoRef];
+		Pi3Cmodel& brush = scene.models[brushref];
+		Pi3Cmodel& selmodel = scene.models[touch.parent()];
 
 		if (touch.touched()) {
 
 			//move 3D pointer (sphere) to touch intersetion point ...
-			scene.models[brushref].matrix.move(touch.intersection);
-			scene.models[brushref].visible = true;
 			currentPos = -touch.intersection;
 
+			brush.matrix.move(touch.intersection);
+			brush.visible = true;
+			sbox.visible = true;
+			mgiz.visible = true;
+			selmodel.selected = true;
+
 			switch (editMode) {
-			case ED_SELECT: touchObject(sbox, mgiz); break;
+			case ED_SELECT: touchObject(selmodel); break;
 			case ED_MOVE: setCursor(moveCursor); break;
 			case ED_ROTATE: setCursor(handCursor); break;
 			case ED_SCALE: setCursor(handCursor); break;
@@ -417,6 +445,7 @@ void Modeller::touchScene()
 			
 		}
 		else {
+			brush.visible = false;
 			sbox.visible = false;
 			mgiz.visible = false;
 			selectedName = "";
@@ -461,25 +490,9 @@ void Modeller::handleIMGui()
 
 void Modeller::renderScene(viewInfo &view)
 {
-
-	scene.setViewport(view.viewport);
-	switch (view.projection)
-	{
-	case PERSPECTIVE:
-		scene.setMatrix(view.pan, vec3f(0,0,-view.zoom), view.rot);
-		scene.setPerspective3D(view.viewport.width, view.viewport.height, PSPVALUE, nearzfarz.x, nearzfarz.y);
-		scene.setSun(0xffffff, vec3f(1000.f, 1000.f, -1000.f)); //transform sun position into scene
-		scene.render3D(window->getTicks());
-		break;
-	case ORTHOGRAPHIC:
-		scene.setMatrix(view.pos + view.pan, vec3f(0,0,0), view.rot);
-		scene.setOrthographic3D(view.viewport, view.zoom, -2000.f, 2000.f);
-		scene.setFixedLight(0xffffff, vec3f(1000.f, 1000.f, 1000.f));
-		scene.render3D(window->getTicks(), &outlines);
-		break;
-	}
+	view.ticks = window->getTicks();
+	scene.renderView(view, &outlines);
 }
-
 
 void Modeller::render()
 {
@@ -492,30 +505,32 @@ void Modeller::render()
 	currentView = -1;
 
 	if (fullview >= 0) {
-		views[FULL].viewport = mgui.getRectFull();
-		currentView = FULL;
-		renderScene(views[FULL]);
+		views[viewInfo::FULL].viewport = mgui.getRectFull();
+		currentView = viewInfo::FULL;
+		renderScene(views[viewInfo::FULL]);
 	}
 	else {
 		//render perspective view (right lower)...
-		views[BOTTOMRIGHT].viewport = mgui.getRectBottomRight();
-		if (views[BOTTOMRIGHT].viewport.touch(mx, my)) currentView = BOTTOMRIGHT;
-		renderScene(views[BOTTOMRIGHT]);
+		
+		views[viewInfo::BOTTOMRIGHT].viewport = mgui.getRectBottomRight();
+		if (views[viewInfo::BOTTOMRIGHT].viewport.touch(mx, my)) currentView = viewInfo::BOTTOMRIGHT;
+		//if (currentSelView == viewInfo::BOTTOMRIGHT) 
+			renderScene(views[viewInfo::BOTTOMRIGHT]);
 
 		//render left lower ...
-		views[BOTTOMLEFT].viewport = mgui.getRectBottomLeft();
-		if (views[BOTTOMLEFT].viewport.touch(mx, my)) currentView = BOTTOMLEFT;
-		renderScene(views[BOTTOMLEFT]);
+		views[viewInfo::BOTTOMLEFT].viewport = mgui.getRectBottomLeft();
+		if (views[viewInfo::BOTTOMLEFT].viewport.touch(mx, my)) currentView = viewInfo::BOTTOMLEFT;
+		renderScene(views[viewInfo::BOTTOMLEFT]);
 
 		//render left top ...
-		views[TOPLEFT].viewport = mgui.getRectTopLeft();
-		if (views[TOPLEFT].viewport.touch(mx, my)) currentView = TOPLEFT;
-		renderScene(views[TOPLEFT]);
+		views[viewInfo::TOPLEFT].viewport = mgui.getRectTopLeft();
+		if (views[viewInfo::TOPLEFT].viewport.touch(mx, my)) currentView = viewInfo::TOPLEFT;
+		renderScene(views[viewInfo::TOPLEFT]);
 
 		//render right top ...
-		views[TOPRIGHT].viewport = mgui.getRectTopRight();
-		if (views[TOPRIGHT].viewport.touch(mx, my)) currentView = TOPRIGHT;
-		renderScene(views[TOPRIGHT]);
+		views[viewInfo::TOPRIGHT].viewport = mgui.getRectTopRight();
+		if (views[viewInfo::TOPRIGHT].viewport.touch(mx, my)) currentView = viewInfo::TOPRIGHT;
+		renderScene(views[viewInfo::TOPRIGHT]);
 	}
 
 	//Render 2D

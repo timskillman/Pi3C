@@ -96,7 +96,7 @@ void Pi3Cavatar::updateAndCollide(const Pi3Cscene *scene, const float ticks)
 	const vec3f footpos = negpos + vec3f(0, -1.0f, 0);
 	const vec3f headpos = negpos + vec3f(0, 2.0f, 0);
 
-	this->ticks = ticks/2.f;
+	this->ticks = ticks*30.f;
 
 	onground = false;
 

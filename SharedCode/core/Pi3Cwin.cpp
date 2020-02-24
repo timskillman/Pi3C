@@ -192,6 +192,7 @@ std::vector<uint32_t> Pi3Cwindow::event()
 				mWidth = ev.window.data1;
 				mHeight = ev.window.data2;
 				glViewport(0, 0, mWidth, mHeight);
+				resized = true;
 				break;
 
 			case SDL_WINDOWEVENT_ENTER:

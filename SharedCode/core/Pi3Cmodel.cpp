@@ -1,5 +1,6 @@
 #include "Pi3Cmodel.h"
 #include "Pi3CfileOBJ.h"
+//#include "Pi3Cgizmos.h"
 
 //Pi3Cmodel::Pi3Cmodel(const modelParams mp)
 //{
@@ -52,17 +53,19 @@ void Pi3Cmodel::loadModelAndCollider(Pi3Cresource *resource, std::string path, s
 	if (modelfile != "") loadOBJfile(resource, path, modelfile, showProgressCB, false);
 	if (collider != "") {
 		Pi3Cmodel c1(resource, path, collider, true, showProgressCB);
-		this->appendCollider(c1);
+		this->appendCollider(resource, c1);
 	}
 }
 
 void Pi3Cmodel::create(Pi3Cresource *resource, Pi3Cmesh *mesh, uint32_t diffuseColour)
 {	
 	meshRef = resource->addMesh(mesh);
-	//meshRef = resource->addMesh(*mesh, !deleteVerts, reserveBuffer, bufferSize);
 	material = *resource->defaultMaterial();
 	material.SetColDiffuse(diffuseColour);
 	bbox = resource->meshes[meshRef].bbox;
+	//Create a selection mesh ...
+	//Pi3Cmesh selMesh = Pi3Cgizmos::selectBoxGizmo(bbox.min, bbox.size(), 0xffffff);
+	//meshSel = resource->addMesh(&selMesh);
 }
 
 void Pi3Cmodel::init()
@@ -131,13 +134,23 @@ void Pi3Cmodel::appendMesh(Pi3Cresource *resource, Pi3Cmesh mesh, bool asCollide
 	if (group.size() == 0 && meshRef<0) {
 		meshRef = i;
 		bbox = resource->meshes[i].bbox;
+		//updateSelBox(resource);
 		return;
 	}
 	Pi3Cmodel newMesh;
 	newMesh.meshRef = i;
 	bbox.update(resource->meshes[i].bbox);
+	//updateSelBox(resource);
 	group.push_back(newMesh);
 }
+
+//void Pi3Cmodel::updateSelBox(Pi3Cresource *resource)
+//{
+//	if (meshSel < 0) return;
+//	vertsPtr vp = resource->getMeshVerts(meshSel);
+//	Pi3Cgizmos::select_box_verts(*vp.verts, vp.ptr, bbox.min, bbox.size(), 0xffffff);
+//	resource->updateMesh(meshSel);
+//}
 
 void Pi3Cmodel::updateMesh(Pi3Cresource* resource, const Pi3Cmesh &umesh)
 {
@@ -156,6 +169,7 @@ void Pi3Cmodel::updateMesh(Pi3Cresource* resource, const Pi3Cmesh &umesh)
 	}
 	resource->updateMesh(meshRef);
 	//bbox.update(resource->meshes[meshRef].bbox);
+	//updateSelBox(resource);
 }
 
 int32_t Pi3Cmodel::addTexture(Pi3Cresource *resource, const std::string &txfile)
@@ -189,7 +203,7 @@ int32_t Pi3Cmodel::addPicture(Pi3Cresource *resource, const std::shared_ptr<Pi3C
 	return addTexture(resource, texture);
 }
 
-Pi3Cmodel * Pi3Cmodel::append(Pi3Cmodel model, vec3f offset, vec3f rotation)
+Pi3Cmodel * Pi3Cmodel::append(Pi3Cresource *resource, Pi3Cmodel model, vec3f offset, vec3f rotation)
 {
 	if (!(offset.isZero() && rotation.isZero())) {
 		Pi3Cmatrix mm;
@@ -199,32 +213,36 @@ Pi3Cmodel * Pi3Cmodel::append(Pi3Cmodel model, vec3f offset, vec3f rotation)
 	}
 	group.push_back(model);
 	bbox.update(model.bbox, &model.matrix);
+	//updateSelBox(resource);
 	return &group.back();
 }
 
-Pi3Cmodel * Pi3Cmodel::append(Pi3Cmodel model, Pi3Cmatrix matrix)
+Pi3Cmodel * Pi3Cmodel::append(Pi3Cresource *resource, Pi3Cmodel model, Pi3Cmatrix matrix)
 {
 	model.matrix = matrix;
 	group.push_back(model);
 	bbox.update(model.bbox, &model.matrix);
+	//updateSelBox(resource);
 	return &group.back();
 }
 
-Pi3Cmodel * Pi3Cmodel::appendCollider(Pi3Cmodel &model, vec3f offset, vec3f rotation)
+Pi3Cmodel * Pi3Cmodel::appendCollider(Pi3Cresource *resource, Pi3Cmodel &model, vec3f offset, vec3f rotation)
 {
 	model.matrix.setMoveRotate(offset, rotation);
 	colliders.push_back(model);
 	bbox.update(model.bbox, &model.matrix);
+	//updateSelBox(resource);
 	return &colliders.back();
 }
 
-Pi3Cmodel * Pi3Cmodel::appendLOD(Pi3Cmodel model, float LODfrom, float LODtoo, vec3f offset, vec3f rotation)
+Pi3Cmodel * Pi3Cmodel::appendLOD(Pi3Cresource *resource, Pi3Cmodel model, float LODfrom, float LODtoo, vec3f offset, vec3f rotation)
 {
 	model.lodFrom = LODfrom;
 	model.lodToo = LODtoo;
 	model.matrix.setMoveRotate(offset, rotation);
 	group.push_back(model);
 	bbox.update(model.bbox, &model.matrix);
+	//updateSelBox(resource);
 	return &group.back();
 }
 
@@ -245,6 +263,7 @@ void Pi3Cmodel::loadOBJfile(Pi3Cresource *resource, std::string path, std::strin
 			newGroupModel.material = resource->materials[resource->meshes[i].materialRef]; 	//copy material into group model so it can change;
 			newGroupModel.bbox = resource->meshes[i].bbox;
 			bbox.update(resource->meshes[i].bbox);
+			//updateSelBox(resource);
 			group.push_back(newGroupModel);
 		}
 	}
@@ -478,6 +497,7 @@ void Pi3Cmodel::textModel(Pi3Cresource *resource, Pi3Cfont *font, const std::str
 	resource->updateMesh(meshRef, vertCount);								//upload updated verts to GPU
 	bbox.update(vec3f(size.x, size.y-size.height, 0));
 	bbox.update(vec3f(size.width, 0, 0));
+	//updateSelBox(resource);
 	matrix.move(vec3f(0, -size.height, 0));
 	material = font->fontsheet.sheetMaterial;
 }

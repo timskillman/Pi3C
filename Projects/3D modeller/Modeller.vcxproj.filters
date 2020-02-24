@@ -323,6 +323,9 @@
     <ClInclude Include="..\..\SharedCode\helpers\Pi3Ccontour.h">
       <Filter>Shared Code\helpers</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\SharedCode\core\Pi3CviewInfo.h">
+      <Filter>Shared Code\core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\fs1.glsl">

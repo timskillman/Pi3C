@@ -211,6 +211,7 @@ void Pi3Cmatrix::setModelMatrix(const vec3f &firstpos, const vec3f &thirdpos, co
 
 vec3f Pi3Cmatrix::getScale() const
 {
+	if (identity) return vec3f(1.f, 1.f, 1.f);
 	vec3f x(matrix[m00], matrix[m01], matrix[m02]);
 	vec3f y(matrix[m10], matrix[m11], matrix[m12]);
 	vec3f z(matrix[m20], matrix[m21], matrix[m22]);
@@ -254,7 +255,7 @@ vec3f Pi3Cmatrix::getRotation() const
 
 vec3f Pi3Cmatrix::transformVec(const vec3f &vec) const
 {
-	return vec3f(
+	return (identity) ? vec : vec3f(
 		matrix[m00] * vec.x + matrix[m10] * vec.y + matrix[m20] * vec.z + matrix[m30],
 		matrix[m01] * vec.x + matrix[m11] * vec.y + matrix[m21] * vec.z + matrix[m31],
 		matrix[m02] * vec.x + matrix[m12] * vec.y + matrix[m22] * vec.z + matrix[m32]);
@@ -262,7 +263,7 @@ vec3f Pi3Cmatrix::transformVec(const vec3f &vec) const
 
 vec3f Pi3Cmatrix::transformVec(const float * verts) const
 {
-	return vec3f(
+	return (identity) ? vec3f(verts[0], verts[1], verts[2]) : vec3f(
 		matrix[m00] * verts[0] + matrix[m10] * verts[1] + matrix[m20] * verts[2] + matrix[m30],
 		matrix[m01] * verts[0] + matrix[m11] * verts[1] + matrix[m21] * verts[2] + matrix[m31],
 		matrix[m02] * verts[0] + matrix[m12] * verts[1] + matrix[m22] * verts[2] + matrix[m32]);
@@ -270,7 +271,7 @@ vec3f Pi3Cmatrix::transformVec(const float * verts) const
 
 vec3f Pi3Cmatrix::transformVec(const float x, const float y, const float z) const
 {
-	return vec3f(
+	return (identity) ? vec3f(x, y, z) : vec3f(
 		matrix[m00] * x + matrix[m10] * y + matrix[m20] * z + matrix[m30],
 		matrix[m01] * x + matrix[m11] * y + matrix[m21] * z + matrix[m31],
 		matrix[m02] * x + matrix[m12] * y + matrix[m22] * z + matrix[m32]);
@@ -278,7 +279,7 @@ vec3f Pi3Cmatrix::transformVec(const float x, const float y, const float z) cons
 
 vec3f Pi3Cmatrix::transformRotateVec(const vec3f &vec) const
 {
-	return vec3f(
+	return (identity) ? vec : vec3f(
 		matrix[m00] * vec.x + matrix[m10] * vec.y + matrix[m20] * vec.z,
 		matrix[m01] * vec.x + matrix[m11] * vec.y + matrix[m21] * vec.z,
 		matrix[m02] * vec.x + matrix[m12] * vec.y + matrix[m22] * vec.z);
@@ -286,7 +287,7 @@ vec3f Pi3Cmatrix::transformRotateVec(const vec3f &vec) const
 
 vec3f Pi3Cmatrix::transformRotateVec(const float * verts) const
 {
-	return vec3f(
+	return (identity) ? vec3f(verts[0], verts[1], verts[2]) : vec3f(
 		matrix[m00] * verts[0] + matrix[m10] * verts[1] + matrix[m20] * verts[2],
 		matrix[m01] * verts[0] + matrix[m11] * verts[1] + matrix[m21] * verts[2],
 		matrix[m02] * verts[0] + matrix[m12] * verts[1] + matrix[m22] * verts[2]);
@@ -294,7 +295,7 @@ vec3f Pi3Cmatrix::transformRotateVec(const float * verts) const
 
 vec3f Pi3Cmatrix::transformRotateVec(const float x, const float y, const float z) const
 {
-	return vec3f(
+	return (identity) ? vec3f(x,y,z) : vec3f(
 		matrix[m00] * x + matrix[m10] * y + matrix[m20] * z,
 		matrix[m01] * x + matrix[m11] * y + matrix[m21] * z,
 		matrix[m02] * x + matrix[m12] * y + matrix[m22] * z);
@@ -302,7 +303,7 @@ vec3f Pi3Cmatrix::transformRotateVec(const float x, const float y, const float z
 
 vec3f Pi3Cmatrix::transposeRotateVec(const vec3f &vec) const
 {
-	return vec3f(
+	return (identity) ? vec : vec3f(
 		matrix[m00] * vec.x + matrix[m01] * vec.y + matrix[m02] * vec.z,
 		matrix[m10] * vec.x + matrix[m11] * vec.y + matrix[m12] * vec.z,
 		matrix[m20] * vec.x + matrix[m21] * vec.y + matrix[m22] * vec.z);
@@ -310,7 +311,7 @@ vec3f Pi3Cmatrix::transposeRotateVec(const vec3f &vec) const
 
 vec3f Pi3Cmatrix::transposeRotateVec(const float * verts) const
 {
-	return vec3f(
+	return (identity) ? vec3f(verts[0],verts[1],verts[2]) : vec3f(
 		matrix[m00] * verts[0] + matrix[m01] * verts[1] + matrix[m02] * verts[2],
 		matrix[m10] * verts[0] + matrix[m11] * verts[1] + matrix[m12] * verts[2],
 		matrix[m20] * verts[0] + matrix[m21] * verts[1] + matrix[m22] * verts[2]);
