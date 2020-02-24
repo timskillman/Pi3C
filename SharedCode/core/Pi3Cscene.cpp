@@ -171,7 +171,7 @@ Pi3Ctouch Pi3Cscene::touch(const vec3f &mousexyz, const bool calcPerspective) //
 		touch.calcRay(modelMatrix3D.transformRotateVec(mousexyz), 0);
 	}
 
-	int32_t level = 0;
+	//int32_t level = 0;
 	float dist = 1e8f;
 	for (size_t i = 0; i < models.size(); i++) {
 		models[i].touch(resource, &modelMatrix3D, touch, 1);
@@ -267,7 +267,7 @@ void Pi3Cscene::setViewport2D(const Pi3Crecti &rect, const float znear, const fl
 	//glViewport(left, top, right-left, top-bottom);
 	nearz2D = znear;
 	farz2D = zfar;
-	projMatrix2D.SetOrtho(rect.x, rect.x+rect.width, rect.y + rect.height, rect.y, znear, zfar);
+	projMatrix2D.SetOrtho((float)rect.x, (float)(rect.x+rect.width), (float)(rect.y + rect.height), (float)rect.y, znear, zfar);
 	//vec3f res1 = projMatrix2D.transformVec(vec3f(0, 0, 0));
 	//vec3f res2 = projMatrix2D.transformVec(vec3f(400, 300, 0));
 	//vec3f res3 = projMatrix2D.transformVec(vec3f(800, 600, 0));
@@ -277,7 +277,7 @@ void Pi3Cscene::setViewport2D(const Pi3Crecti &rect, const float znear, const fl
 void Pi3Cscene::resize(const Pi3Crecti &rect)
 {
 	projMatrix3D.SetPerspective(rect.width, rect.height, perspective, nearz3D, farz3D);
-	projMatrix2D.SetOrtho(rect.x, rect.x + rect.width, rect.y + rect.height, rect.y, nearz2D, farz2D);
+	projMatrix2D.SetOrtho((float)rect.x, (float)(rect.x + rect.width), (float)(rect.y + rect.height), (float)rect.y, nearz2D, farz2D);
 }
 
 //void Pi3Cscene::deleteSelection()
@@ -379,7 +379,7 @@ void Pi3Cscene::renderOffscreen(const viewInfo& viewinfo) //, const Pi3Cshader &
 	int width = viewinfo.viewport.width;
 	int height = viewinfo.viewport.height;
 
-	GLuint fbo = 0, frame_buf = 0, colour_buf = 0, depth_buf = 0;
+	GLuint frame_buf = 0, colour_buf = 0, depth_buf = 0;
 
 	glGenRenderbuffers(1, &colour_buf);
 	glBindRenderbuffer(GL_RENDERBUFFER, colour_buf);

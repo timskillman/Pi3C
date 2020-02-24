@@ -49,8 +49,8 @@ struct vertsPtr {
 	vertsPtr() : verts(nullptr), ptr(0) {}
 	vertsPtr(uint32_t ptr, std::vector<float> *verts) : ptr(ptr), verts(verts) {}
 
-	std::vector<float> *verts;
 	uint32_t ptr;
+	std::vector<float> *verts;
 };
 
 class Pi3Cresource {

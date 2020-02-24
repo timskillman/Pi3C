@@ -350,13 +350,13 @@ void Pi3Cmesh::updateNormals(const uint32_t min, const uint32_t max)
 	uint32_t sf = 3 * sizeof(float);
 
 	for (size_t i = min; i < newmax; i += stride*3) {
-		memcpy(&v0, &verts[i], sf);
-		memcpy(&v1, &verts[i + x2], sf);
-		memcpy(&v2, &verts[i + x3], sf);
+		memcpy(&v0, &verts[i], (size_t)sf);
+		memcpy(&v1, &verts[i + x2], (size_t)sf);
+		memcpy(&v2, &verts[i + x3], (size_t)sf);
 		vec3f n = -((v0 - v1) ^ (v1 - v2)).unit();
-		memcpy(&verts[i + 3], &n, sf);
-		memcpy(&verts[i + x2 + 3], &n, sf);
-		memcpy(&verts[i + x3 + 3], &n, sf);
+		memcpy(&verts[i + 3], &n, (size_t)sf);
+		memcpy(&verts[i + x2 + 3], &n, (size_t)sf);
+		memcpy(&verts[i + x3 + 3], &n, (size_t)sf);
 	}
 }
 
