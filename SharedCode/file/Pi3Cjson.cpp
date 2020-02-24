@@ -89,10 +89,10 @@ Pi3Cmatrix Pi3Cjson::readMatrix(const Value& doc, const char * key)
 	if (!doc.HasMember(key)) return matrix;
 	const Value& a = doc[key];
 	if (a.Size() != 12) return matrix;
-	matrix.set(a[0].GetDouble(), a[1].GetDouble(), a[2].GetDouble(), 0,
-		a[3].GetDouble(), a[4].GetDouble(), a[5].GetDouble(), 0,
-		a[6].GetDouble(), a[7].GetDouble(), a[8].GetDouble(), 0,
-		a[9].GetDouble(), a[10].GetDouble(), a[11].GetDouble(), 1.f);
+	matrix.set((float)a[0].GetDouble(), (float)a[1].GetDouble(), (float)a[2].GetDouble(), 0,
+		(float)a[3].GetDouble(), (float)a[4].GetDouble(), (float)a[5].GetDouble(), 0,
+		(float)a[6].GetDouble(), (float)a[7].GetDouble(), (float)a[8].GetDouble(), 0,
+		(float)a[9].GetDouble(), (float)a[10].GetDouble(), (float)a[11].GetDouble(), 1.f);
 	return matrix;
 }
 

@@ -95,7 +95,7 @@ bool Pi3Ctexture::resize(const uint32_t new_width, const uint32_t new_height, co
 	if (new_width > width || new_height > height) return false;
 
 	//save existing content ...
-	uint8_t * newpixels = new uint8_t(size);
+	uint8_t * newpixels = new uint8_t[size];
 	memcpy(&newpixels, pixels, size);
 	
 	//create new, resized pixel buffer ...

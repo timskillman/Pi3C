@@ -137,19 +137,25 @@ Pi3Cbbox3d Pi3Cscene::getSelectedBounds()
 	return bbox;
 }
 
-int32_t Pi3Cscene::append3D(const Pi3Cmodel &model)
+void Pi3Cscene::addTexture(Pi3Cmodel& model, const std::string &txfile, bool shaded)
 {
+	if (txfile != "") {
+		model.addTexture(resource, txfile);
+		model.material.illum = (shaded) ? 2 : 1; //non shaded illumination
+		model.material.alpha = (shaded) ? 1.f : 0.99f;
+	}
+}
+
+int32_t Pi3Cscene::append3D(Pi3Cmodel& model, const std::string &txfile)
+{
+	addTexture(model, txfile);
 	models.push_back(model); 
 	return models.size() - 1;
 }
 
 int32_t Pi3Cscene::append2D(Pi3Cmodel model, const std::string &txfile)
 {
-	if (txfile != "") {
-		model.addTexture(resource, txfile);
-		model.material.illum = 1; //non shaded illumination
-		model.material.alpha = 0.99f;
-	}
+	addTexture(model, txfile, false);
 	models2D.push_back(model);
 	return models2D.size() - 1;
 }

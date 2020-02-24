@@ -37,27 +37,22 @@
 
 int main(int argc, char *argv[])
 {
-	loadOptions opts("options.txt");
-	int screenWidth = opts.asInt("screenWidth");
-	int screenHeight = opts.asInt("screenHeight");
-	Pi3C pi3c(opts.asString("title"), screenWidth, screenHeight, opts.asBool("fullscreen"));
+	Pi3C pi3c("Extruded Shape", 800, 600);
 	
-	Pi3CmlinPath lpath(opts.asString("contourFile").c_str());
-
-	vec2f lpc = lpath.bbox.centre();
-	//uint32_t start_time = SDL_GetTicks();
+	Pi3CmlinPath lpath("raspberry");
 	std::vector<std::vector<float>> floatPath = lpath.asFloats();
-	Pi3Cmodel extrude(&pi3c.resource, Pi3Cshapes::extrude("", vec3f(-lpc.x, 0, -lpc.y), floatPath, 10.f), 0xff8030ff);
-	//SDL_Log("Extruder time = %d", SDL_GetTicks() - start_time);
-	uint32_t extrudeRef = pi3c.add_model_to_scene3D(extrude);
+	vec3f pathCenter = vec3f(-lpath.bbox.centre().x, 0, -lpath.bbox.centre().y);
+	float thickness = 10.f;
 
-	pi3c.scene.setFixedLight(0xffffff, vec3f(150.f, 150.f, 150.f)); //transform sun position into scene
+	pi3c.create_extrude(pathCenter, floatPath, thickness, Pi3Ccolours::White, "butterflies.png");
+	//pi3c.create_cuboid(vec3f(0, 80, 0), vec3f(50, 50, 50), Pi3Ccolours::Yellow);
+
+	pi3c.scene.setFixedLight(Pi3Ccolours::White, vec3f(150.f, 150.f, 150.f)); //transform sun position into scene
 
 	float roty = 0;
 
 	while (pi3c.is_running())
 	{
-		pi3c.do_events();
 		pi3c.clear_window();
 
 		//const uint8_t *keystate = pi3c.window.getKeys();
@@ -74,8 +69,9 @@ int main(int argc, char *argv[])
 		pi3c.render3D();
 
 		
-		//pi3c.render2D();
-		//pi3c.showFPS();
+		pi3c.render2D();
+		pi3c.showFPS();
+
 		pi3c.swap_buffers();
 	}
 

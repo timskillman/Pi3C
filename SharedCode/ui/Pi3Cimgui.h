@@ -64,6 +64,7 @@ public:
 	std::shared_ptr<Pi3Cfont> getFont(const std::string &fontName) {
 		auto fi = fonts.find(fontName);
 		if (fi != fonts.end()) return fi->second;
+		return nullptr;
 	}
 
 	void setSelectColour(const uint32_t selectColour) { this->currentParams.selectColour = selectColour; }

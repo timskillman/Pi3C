@@ -73,7 +73,7 @@ void Pi3C::init(const Pi3Cwindow::options& winopts)
 Pi3Cmodel Pi3C::create_model_from_text(const std::string &text, const uint32_t width, const uint32_t colour)
 {
 	Pi3Cmodel textModel;
-	textModel.textModel(&resource, gui.getFont(guifonts[0]).get(), text, width, Pi3Cfont::RD_HTML);
+	textModel.textModel(&resource, gui.getFont(guifonts[0]).get(), text, (float)width, Pi3Cfont::RD_HTML);
 	textModel.material.SetColDiffuse(colour);
 	return textModel;
 }
@@ -83,7 +83,7 @@ uint32_t Pi3C::create_background(const std::string &path, const std::string &fil
 	Pi3Cmodel background;
 
 	Pi3Cmesh rect;
-	rect.addRect(vec3f(0, winh, -20.f), vec2f(winw, winh));
+	rect.addRect(vec3f(0, (float)winh, -20.f), vec2f((float)winw, (float)winh));
 	//background.meshRef = resource.addMesh(rect);
 	background.meshRef = resource.addMesh(&rect);
 
@@ -175,7 +175,7 @@ void Pi3C::showFPS()
 void Pi3C::resize_window()
 {
 	winw = window.getWidth(); winh = window.getHeight();
-	scene.resize(Pi3Crecti(0, 0, (float)winw, (float)winh));
+	scene.resize(Pi3Crecti(0, 0, winw, winh));
 }
 
 std::vector<uint32_t> Pi3C::get_events()

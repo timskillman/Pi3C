@@ -515,7 +515,7 @@ bool Pi3Cimgui::InputText(const std::string &text, std::string &input, const int
 	}
 
 	//uint32_t col = (colour == 0) ? currentParams.textColour | 0xff000000 : colour;
-	resource->renderText(resource->lettersRef, currentFont, input, vec3f(pos.x, pos.y, zpos), 8000.f, currentParams.textColour);
+	resource->renderText(resource->lettersRef, currentFont, input, vec3f((float)pos.x, (float)pos.y, zpos), 8000.f, currentParams.textColour);
 
 	textID++;
 	return false;
@@ -577,9 +577,9 @@ bool Pi3Cimgui::Text(const std::string &text, const int minwidth, const int minh
 	if (text == "") return false;
 	uint32_t col = (colour == 0) ? currentParams.textColour | 0xff000000 : colour;
 	pos = nextPos;
-	Pi3Crect textSize = resource->renderText(resource->lettersRef, currentFont, text, vec3f(nextPos.x, nextPos.y, zpos), 8000.f, col);
-	size.x = (textSize.width > minwidth) ? textSize.width : minwidth;
-	size.y = (textSize.height > minheight) ? textSize.height : minheight;
+	Pi3Crect textSize = resource->renderText(resource->lettersRef, currentFont, text, vec3f((float)nextPos.x, (float)nextPos.y, zpos), 8000.f, col);
+	size.x = ((uint32_t)textSize.width > minwidth) ? (uint32_t)textSize.width : minwidth;
+	size.y = ((uint32_t)textSize.height > minheight) ? (uint32_t)textSize.height : minheight;
 	NextPos();
 	return false;
 }
@@ -588,8 +588,8 @@ bool Pi3Cimgui::TextArea(std::string &text, const int minwidth, const int minhei
 {
 	pos = nextPos;
 	Pi3Crect textSize = resource->renderText(resource->lettersRef, currentFont, text, vec3f(pos.x, pos.y, zpos), minwidth);
-	size.x = (textSize.width > minwidth) ? textSize.width : minwidth;
-	size.y = (textSize.height > minheight) ? textSize.height : minheight;
+	size.x = ((uint32_t)textSize.width > minwidth) ? (uint32_t)textSize.width : minwidth;
+	size.y = ((uint32_t)textSize.height > minheight) ? (uint32_t)textSize.height : minheight;
 	NextPos();
 	return false;
 }

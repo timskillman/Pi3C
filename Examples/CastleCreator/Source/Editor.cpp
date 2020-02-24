@@ -30,7 +30,7 @@ Editor::Editor(Pi3Cresource *resource, Pi3Cwindow *window)
 	// Setup scene ...
 	scene.resource = resource;
 	scene.selectShader(basicShaderRef);
-	scene.setViewport2D(Pi3Crecti(0, 0, (float)window->getWidth(), (float)window->getHeight()), 0.1f, 2000.f);
+	scene.setViewport2D(Pi3Crecti(0, 0, (int32_t)window->getWidth(), (int32_t)window->getHeight()), 0.1f, 2000.f);
 
 }
 
@@ -97,8 +97,8 @@ void Editor::setupGUI(std::string fontsPath, std::string fontName) // &opts)
 	bsMenu.font = guifonts[1];
 	bsMenu.textColour = 0xff303030;
 	bsMenu.buttonColour = 0xffffffff;
-	bsMenu.minHeight = 26.f;
-	bsMenu.minWidth = 70.f;
+	bsMenu.minHeight = 26;
+	bsMenu.minWidth = 70;
 	bsMenu.vertGap = 0;
 	bsMenu.left = 10.f;
 	bsMenu.highlightColour = 0xc0c0c0;
@@ -118,8 +118,8 @@ void Editor::setupGUI(std::string fontsPath, std::string fontName) // &opts)
 	bsItems.buttonAlpha = 0.8f;
 	bsItems.buttonColour = 0xffffffff;
 	bsItems.textColour = 0xff404040;
-	bsItems.minWidth = 200.f;
-	bsItems.minHeight= 40.f;
+	bsItems.minWidth = 200;
+	bsItems.minHeight= 40;
 	bsItems.justify = Pi3Cimgui::CENTRE;
 	bsItems.align = Pi3Cimgui::BOTTOM;
 	bsItems.selectColour = 0x808000;
@@ -238,7 +238,7 @@ void Editor::handleEvents(std::vector<uint32_t>& eventList)
 			//switch (window->ev.window.event) {
 			if (window->resized) {
 				scene.setPerspective3D(window->getWidth(), window->getHeight(), 800.f, nearzfarz.x, nearzfarz.y);
-				scene.setViewport2D(Pi3Crecti(0, 0, (float)window->getWidth(), (float)window->getHeight()), 0.1f, 2000.f);
+				scene.setViewport2D(Pi3Crecti(0, 0, (int32_t)window->getWidth(), (int32_t)window->getHeight()), 0.1f, 2000.f);
 				window->resized = false;
 			}
 			break;
@@ -389,12 +389,12 @@ void Editor::handleIMGui()
 		gui.EndMenuBar();
 	}
 
-	gui.movePosition(10.f, 3.f);
+	gui.movePosition(10, 3);
 
 	//Category buttons ...
 	gui.setButtonStyle(bsCategories);
 	for (auto &libname : libnames) {
-		if (gui.ButtonText(libname, libname == currentLib, (window->getWidth() - 32.f) / (float)(libnames.size()))) {
+		if (gui.ButtonText(libname, libname == currentLib, (window->getWidth() - 32) / (float)(libnames.size()))) {
 			currentLib = libname;
 			modelsLib = selectLib(libname);
 			currentModel = modelsLib->group[0].name;

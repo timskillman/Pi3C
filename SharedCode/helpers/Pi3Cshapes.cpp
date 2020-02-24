@@ -716,12 +716,16 @@ namespace Pi3Cshapes {
 		float wf = (float)w;
 		float hf = (float)h;
 
+
 		vec3f vec1, vec2, vec3, vec4, vec5;
-		float v1[3], v2[3], v3[3], v4[3], v5[3];
+		float v1[3], v2[3], v3[3], v4[3];
 		int a = 0; int b = 1; int c = 2;
 		vec3f n(0, 0, -1.f);
 		vec2f sz = vec2f(size.x, size.z);
 
+#ifndef twotris
+		float v5[3];
+#endif
 		switch (direction) {
 		case 0: sz.x = -sz.x; break;
 		case 1: n = vec3f(0, 0, 1.f); break;

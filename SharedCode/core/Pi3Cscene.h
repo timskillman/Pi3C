@@ -111,8 +111,10 @@ public:
 	bool collide(const vec3f &pos, const vec3f &dir, const float radius) const;
 	float collideFloor(const vec3f &pos) const;
 
-	int32_t append3D(const Pi3Cmodel &model);
+	void addTexture(Pi3Cmodel &model, const std::string &txfile = "", const bool shaded = true);
+	int32_t append3D(Pi3Cmodel &model, const std::string &txfile = "");
 	int32_t append2D(Pi3Cmodel model, const std::string &txfile = "");
+
 	int32_t addButton3D(Pi3Cmodel model, const std::string &fontfile, const std::string &text, const std::string &txtrfile);
 
 	Pi3Cmodel * find(const std::string &name);

@@ -53,7 +53,7 @@ public:
 		return asStringArray(id)[0];
 	}
 
-	float asBool(std::string id) const
+	bool asBool(std::string id) const
 	{
 		return asString(id)=="true";
 	}

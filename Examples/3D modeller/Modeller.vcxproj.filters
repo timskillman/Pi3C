@@ -308,9 +308,6 @@
     <ClInclude Include="..\..\SharedCode\editing\Pi3Cgizmos.h">
       <Filter>Shared Code\editing</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\SharedCode\editing\Pi3CselectBox.h">
-      <Filter>Shared Code\editing</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\SharedCode\editing\Pi3Cundo.h">
       <Filter>Shared Code\editing</Filter>
     </ClInclude>

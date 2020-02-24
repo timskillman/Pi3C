@@ -6,6 +6,7 @@
 #include "Pi3Cimgui.h"
 #include "Pi3Cmodel.h"
 #include "Pi3Ccolours.h"
+#include "Pi3Cshapes.h"
 #include <vector>
 
 // ==========================================================================
@@ -59,8 +60,8 @@ public:
 	uint32_t create_background(const std::string &path, const std::string &file = "");
 	int32_t load_model(const std::string &path, const std::string &file, const vec3f &pos = vec3f(0,0,0));
 	int32_t load_model_and_collider(const std::string& path, const std::string& model, const std::string& collider, const vec3f& pos = vec3f(0, 0, 0));
-	int32_t add_model_to_scene2D(const Pi3Cmodel &model) { return scene.append2D(model); }
-	int32_t add_model_to_scene3D(const Pi3Cmodel &model) { return scene.append3D(model); }
+	int32_t add_model_to_scene2D(const Pi3Cmodel &model) { return scene.append2D(model,""); }
+	int32_t add_model_to_scene3D(Pi3Cmodel &model) { return scene.append3D(model,""); }
 	//int32_t add_spriteArray(Pi3CspriteArray &spritearray, const std::string &file = "");
 
 	std::vector<float> * getMeshVerts(const uint32_t meshRef) { return &resource.vertBuffer[resource.meshes[meshRef].bufRef]; }
@@ -71,14 +72,47 @@ public:
 	//void update_sprite_transform(const uint32_t spritesRef, const uint32_t spriteRef, const vec3f &pos, const vec2f &size, const Pi3Cmatrix *scene_matrix, const vec2f &cent);
 	//void update_sprite_billboards(const uint32_t spritesRef, const uint32_t spriteRef, const uint32_t count, const vec3f &lookat);
 
+	int32_t create_cuboid(const vec3f& pos, const vec3f& size, const uint32_t colour, const std::string& texfile = "")
+	{
+		Pi3Cmodel cuboid(&resource, Pi3Cshapes::cuboid(pos, size), colour);
+		return scene.append3D(cuboid, texfile);
+	}
+
+	int32_t create_cylinder(const vec3f& pos, const float radius, const float height, const uint32_t colour, const std::string& texfile = "")
+	{
+		Pi3Cmodel cylinder(&resource, Pi3Cshapes::cylinder(pos, radius, height), colour);
+		return scene.append3D(cylinder, texfile);
+	}
+
+	int32_t create_cone(const vec3f& pos, const float radius, const float height, const uint32_t colour, const std::string& texfile = "")
+	{
+		Pi3Cmodel cone(&resource, Pi3Cshapes::cone(pos, radius, height), colour);
+		return scene.append3D(cone, texfile);
+	}
+
+	int32_t create_tube(const vec3f& pos, const float inner_radius, const float outer_radius, const float height, const uint32_t colour, const std::string& texfile = "")
+	{
+		Pi3Cmodel tube(&resource, Pi3Cshapes::tube(pos, inner_radius, outer_radius, height), colour);
+		return scene.append3D(tube, texfile);
+	}
+
+	int32_t create_sphere(const vec3f& pos, const float radius, const uint32_t colour, const std::string& texfile = "")
+	{
+		Pi3Cmodel sphere(&resource, Pi3Cshapes::sphere(pos, radius), colour);
+		return scene.append3D(sphere, texfile);
+	}
+
+	int32_t create_extrude(vec3f& pos, std::vector<std::vector<float>>& floatPath, float thickness, uint32_t colour, const std::string& texfile = "") {
+		Pi3Cmodel extrude(&resource, Pi3Cshapes::extrude("", pos, floatPath, thickness), colour);
+		return scene.append3D(extrude, texfile);
+	}
+
 	void render3D() { 
 		scene.render3D(window.getTicks()); 
-		//if (!scene.has2Dmodels()) do_events();
 	}
 
 	void render2D() { 
 		scene.render2D(window.getTicks());
-		//do_events();
 	}
 
 	bool is_running();
@@ -130,7 +164,7 @@ private:
 	uint32_t fps = 0;
 	uint32_t start_time = 0;
 	uint32_t last_time = 0;
-	uint32_t lastFPS = 0;
+	float lastFPS = 0;
 	uint32_t winw = 0;
 	uint32_t winh = 0;
 };
