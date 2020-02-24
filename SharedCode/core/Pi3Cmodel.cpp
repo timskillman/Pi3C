@@ -155,7 +155,7 @@ void Pi3Cmodel::appendMesh(Pi3Cresource *resource, Pi3Cmesh mesh, bool asCollide
 void Pi3Cmodel::updateMesh(Pi3Cresource* resource, const Pi3Cmesh &umesh)
 {
 	Pi3Cmesh& mesh = resource->meshes[meshRef];
-	uint32_t stride = mesh.stride;
+	//uint32_t stride = mesh.stride;
 	vertsPtr vp = resource->getMeshVerts(meshRef);
 
 	if (umesh.verts.size() != (*vp.verts).size()) return;

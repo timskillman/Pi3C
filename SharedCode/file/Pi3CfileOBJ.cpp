@@ -21,7 +21,7 @@ namespace Pi3CfileOBJ {
 		mesh.mode = GL_TRIANGLES;
 		mesh.bbox.bboxFromVerts(mesh.verts, 0, mesh.vc, mesh.stride);
 		mesh.hasColliderGrid = mesh.createColliderGrid();
-		int32_t i = resource->addMesh(&mesh);
+		resource->addMesh(&mesh); //int32_t i = 
 
 		//Pi3Cmesh selMesh = Pi3Cgizmos::selectBoxGizmo(mesh.bbox.min, mesh.bbox.size(), 0xffffff);
 		//i = resource->addMesh(&selMesh);
@@ -35,9 +35,9 @@ namespace Pi3CfileOBJ {
 			objmat.texID = resource->defaultMaterial()->texID;
 			objmat.texRef = resource->defaultMaterial()->texRef;
 		}
-		else if (objmat.texID >= 0) {
-			int32_t bpp = resource->textures[objmat.texRef]->GetDepth();
-		}
+		//else if (objmat.texID >= 0) {
+		//	int32_t bpp = resource->textures[objmat.texRef]->GetDepth();
+		//}
 
 		for (size_t i = 0; i < resource->materials.size(); i++) {
 			if (resource->materials[i].name == objmat.name) return;
@@ -149,7 +149,7 @@ namespace Pi3CfileOBJ {
 		temp_uvs.resize(MAXVALS);
 		
 		uint32_t meshStart = resource->meshCount();
-		uint32_t materialStart = resource->materials.size();
+		//uint32_t materialStart = resource->materials.size();
 
 		bool readFaces = false;
 		int readType = 0;
@@ -165,7 +165,7 @@ namespace Pi3CfileOBJ {
 		vec3f normal;
 		uint32_t tv = 0; uint32_t tn = 0; uint32_t tu = 0;
 		//uint32_t lineno = 0;
-		uint32_t meshc = 0;
+		//uint32_t meshc = 0;
 		std::string materialName = "";
 		std::string vals = "";
 		std::string s = "";
@@ -175,7 +175,7 @@ namespace Pi3CfileOBJ {
 		std::vector<Pi3Cmesh> meshModel;	//models are setup by material count
 
 		int32_t materialfound = -1;
-		GLfloat * cols = NULL; //[4] = { 0.2f, 0.2f, 1.f, 1.f };
+		//GLfloat * cols = NULL; //[4] = { 0.2f, 0.2f, 1.f, 1.f };
 		uint32_t col = 0xffffffff;
 		uint32_t tri = 0;
 

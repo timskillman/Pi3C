@@ -48,11 +48,11 @@ float Pi3Ccollision::rayPlaneIntersect(const vec3f &e1, const vec3f &e2, const v
 	if (a > -0.00001f && a < 0.00001f) return 0.f; //roughly zero
 
 	float f = 1.f / a;
-	float u = f * (e3.x * n.x + e3.y * n.y + e3.z * n.z);
+	//float u = f * (e3.x * n.x + e3.y * n.y + e3.z * n.z);
 	//if (u < 0.f || u > 1.f) return 0.f;
 
 	vec3f q(e3.y * e1.z - e1.y * e3.z, e3.z * e1.x - e1.z * e3.x, e3.x * e1.y - e1.x * e3.y);
-	float v = f * (dir.x * q.x + dir.y * q.y + dir.z * q.z);
+	//float v = f * (dir.x * q.x + dir.y * q.y + dir.z * q.z);
 	//if (v < 0.f || u + v > 1.f) return 0.f;
 
 	return f * (e2.x * q.x + e2.y * q.y + e2.z * q.z);  //distance from pos to triangle intersection
@@ -99,7 +99,7 @@ bool Pi3Ccollision::collideVector(const Pi3Cresource *resource, const uint32_t m
 
 	uint32_t stride = mesh.stride;
 
-	vec3f nextpos = pos + dir;
+	//vec3f nextpos = pos + dir;
 	vec3f v1, v2, v3;
 	uint32_t x2 = stride;
 	uint32_t x3 = stride * 2;
@@ -143,11 +143,11 @@ float Pi3Ccollision::collideFloor(const Pi3Cresource *resource, const uint32_t m
 	uint32_t stride = mesh.stride;
 
 	vec3f v1, v2, v3;
-	uint32_t x2 = stride; uint32_t z2 = stride + 2;
-	uint32_t x3 = stride * 2; uint32_t z3 = stride * 2 + 2;
+	uint32_t x2 = stride; //uint32_t z2 = stride + 2;
+	uint32_t x3 = stride * 2; //uint32_t z3 = stride * 2 + 2;
 
-	float px = pos.x;
-	float pz = pos.z;
+	//float px = pos.x;
+	//float pz = pos.z;
 
 	for (size_t sp = p; sp < p + size - stride * 3; sp += stride * 3) {
 

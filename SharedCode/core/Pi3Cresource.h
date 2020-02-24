@@ -46,11 +46,12 @@
 #define DEFAULT_STRIDE 9
 
 struct vertsPtr {
-	vertsPtr() : verts(nullptr), ptr(0) {}
-	vertsPtr(uint32_t ptr, std::vector<float> *verts) : ptr(ptr), verts(verts) {}
-
 	uint32_t ptr;
 	std::vector<float> *verts;
+
+	vertsPtr() : ptr(0), verts(nullptr) {}
+	vertsPtr(uint32_t ptr, std::vector<float> *verts) : ptr(ptr), verts(verts) {}
+
 };
 
 class Pi3Cresource {

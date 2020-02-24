@@ -29,7 +29,7 @@ std::shared_ptr<Pi3Ctexture> Pi3Cfont::asTexture(const std::string &text, const 
 	SDL_Surface* Surface = nullptr;
 	if (text == "") Surface = SDL_CreateRGBSurface(0, 8, 8, 32, 0x000000ff, 0x0000ff00, 0x00ff0000, 0xff000000);
 	else
-		Surface = TTF_RenderText_Blended_Wrapped(font, text.c_str(), SDL_Color{ colour & 255, (colour >> 8) & 255, (colour >> 16) & 255 }, 300);
+		Surface = TTF_RenderText_Blended_Wrapped(font, text.c_str(), SDL_Color{ (uint8_t)(colour & 255), (uint8_t)((colour >> 8) & 255), (uint8_t)((colour >> 16) & 255) }, 300);
 	if (Surface) {
 		std::shared_ptr<Pi3Ctexture> ttex(new Pi3Ctexture);
 		ttex->fromTextSurface(Surface);
@@ -188,7 +188,7 @@ uint32_t Pi3Cfont::textureRects(const std::string &text, std::vector<float> &ver
 	uint32_t spacei = 0;
 	uint32_t linep = 0;
 	float linex = 0;
-	uint32_t charsize = 6 * stride; //size of character rectangle
+	//uint32_t charsize = 6 * stride; //size of character rectangle
 	format.justify = Pi3CtextFormat::FULL_JUSTIFY;
 	float x = 0; float y = 0; 
 	float maxHeight = 0; float maxWidth = 0;
@@ -205,6 +205,7 @@ uint32_t Pi3Cfont::textureRects(const std::string &text, std::vector<float> &ver
 		else
 		{
 			switch (textReader) {
+			case RD_NONE: break;
 #ifdef READHTML
 			case RD_HTML: Pi3Chtml::readHTML(c, text, i, format); break;
 #endif
