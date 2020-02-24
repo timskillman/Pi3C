@@ -1,22 +1,19 @@
 #include "Pi3C.h"
 
-
 int main(int argc, char *argv[])
 {
-
 	Pi3C pi3c("PROJECT_NAME", 800, 600);
 
+	//Setup your scene here ...
+	
 	while (pi3c.is_running())
 	{
 		pi3c.clear_window();
 
-		//Draw your objects here ...
-
-		pi3c.render3D();
+		//Draw your scene here ...
 
 		pi3c.swap_buffers();
 	}
 
-	pi3c.window.destroy();
 	return 0;
 }
