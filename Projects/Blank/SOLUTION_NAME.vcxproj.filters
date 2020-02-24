@@ -299,9 +299,6 @@
     <ClInclude Include="..\..\SharedCode\helpers\Pi3Chtml.h">
       <Filter>Shared Code\helpers</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\SharedCode\helpers\Pi3Ccolours.h">
-      <Filter>Shared Code\helpers</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\fs1.glsl">

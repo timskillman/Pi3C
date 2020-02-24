@@ -15,8 +15,8 @@ sed -i s/SOLUTION_NAME/$1/g $1/$1.sln
 cp -p Blank/SOLUTION_NAME.vcxproj $1/$1.vcxproj
 sed -i s/SOLUTION_NAME/$1/g $1/$1.vcxproj
 
-cp -p Blank/SOLUTION_NAME.vcxproj $1/$1.filters
-sed -i s/SOLUTION_NAME/$1/g $1/$1.filters
+cp -p Blank/SOLUTION_NAME.vcxproj $1/$1.vcxproj.filters
+sed -i s/SOLUTION_NAME/$1/g $1/$1.vcxproj.filters
 
 cp -p Blank/SOLUTION_NAME.vcxproj.user $1/$1.vcxproj.user
 cp -p Blank/dependencies.props $1/dependencies.props
