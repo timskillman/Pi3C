@@ -11,7 +11,7 @@ Pi3Cwindow::Pi3Cwindow() {
 	mWidth = 0;
 	mHeight = 0;
 	mouse.reset();
-	clearColour = vec3f(0.f,0.f,0.f);
+	clearColour = 0x000000;
 	quit = false;
 }
 
@@ -337,13 +337,18 @@ void Pi3Cwindow::setAlpha(bool useAlpha)
 
 void Pi3Cwindow::setClearColour(const float red, const float green, const float blue)
 {
-	clearColour = vec3f(red, green, blue);
+	clearColour = (uint32_t)(red * 255.f) + ((uint32_t)(green * 255.f) << 8) + ((uint32_t)(green * 255.f) << 16);
 	glClearColor(red, green, blue, 1.f);
 }
 
 void Pi3Cwindow::setClearColour(const uint32_t clearColour)
 {
+	this->clearColour = clearColour;
 	setClearColour((clearColour & 255) / 255.f, ((clearColour >> 8) & 255) / 255.f, ((clearColour >> 16) & 255) / 255.f);
+}
+
+uint32_t Pi3Cwindow::getClearColour() {
+	return clearColour;
 }
 
 bool Pi3Cwindow::isMinimized()

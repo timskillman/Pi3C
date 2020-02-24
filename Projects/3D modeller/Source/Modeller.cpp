@@ -483,7 +483,7 @@ void Modeller::setEditMode(const EditMode mode)
 	editMode = mode;
 }
 
-void Modeller::handleIMGui()
+void Modeller::handleIMGUI()
 {
 	mgui.doIMGUI(this);
 }
@@ -539,6 +539,6 @@ void Modeller::render()
 	scene.setViewport2D(screenRect, 0.1f, 2000.f);
 	scene.render2D(window->getTicks());
 
-	handleIMGui(); //must be in the rendering loop with 2D setup
+	handleIMGUI(); //must be in the rendering loop with 2D setup
 
 }

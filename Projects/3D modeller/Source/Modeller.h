@@ -26,7 +26,7 @@ public:
 	void setEditMode(const EditMode mode);
 	void handleKeys();
 	void handleEvents(std::vector<uint32_t>& eventList);
-	void handleIMGui();
+	void handleIMGUI();
 	void touchScene();
 	//void tweens();
 	void render();

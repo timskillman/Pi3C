@@ -86,6 +86,8 @@ public:
 	void saveBufferToPNG(const char * filename, std::vector<uint8_t> &snapShot, const int width, const int height);
 	bool snapShot(const viewInfo& viewinfo, std::vector<uint8_t> &snapShot);
 
+	bool has2Dmodels() { return models2D.size() > 0; }
+
 	Pi3Cmodel * getSubModel(const int32_t * groupRefs, const int32_t maxlevel);
 	Pi3Cmatrix * getModelMatrix() { return &modelMatrix3D; }
 	Pi3Cbbox3d getSelectedBounds();

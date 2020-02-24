@@ -5,6 +5,7 @@
 #include "Pi3Cscene.h"
 #include "Pi3Cimgui.h"
 #include "Pi3Cmodel.h"
+#include "Pi3Ccolours.h"
 #include <vector>
 
 // ==========================================================================
@@ -40,10 +41,17 @@
 
 class Pi3C {
 public:
+	Pi3C();
 	Pi3C(const Pi3Cwindow::options& winopts);
-	Pi3C(const std::string& title = "Pi3C", const uint32_t width = 0, const uint32_t height = 0, const bool fullscreen = false);
+	Pi3C(const std::string, const uint32_t width = 800, const uint32_t height = 600, const bool fullscreen = false);
+
+	~Pi3C() 
+	{ 
+		window.destroy(); 
+	}
 
 	void init(const Pi3Cwindow::options& winopts);
+	void newWindow(const std::string &title, const uint32_t width, const uint32_t height, const bool fullscreen = false);
 
 	Pi3Cmodel create_model_from_mesh(const Pi3Cmesh &mesh, const uint32_t colour = 0xffffff) { return Pi3Cmodel(&resource, mesh, colour); }
 	Pi3Cmodel create_model_from_text(const std::string &text, const uint32_t width, const uint32_t colour = 0x303030);
@@ -57,19 +65,40 @@ public:
 
 	std::vector<float> * getMeshVerts(const uint32_t meshRef) { return &resource.vertBuffer[resource.meshes[meshRef].bufRef]; }
 	uint32_t getMeshVertPtr(const uint32_t meshRef) { return resource.meshes[meshRef].vertOffset*resource.meshes[meshRef].stride; }
+
 	//void update_sprite_position(const uint32_t spritesRef, const uint32_t spriteRef, const float x, const float y);
 	//void update_sprite_rotated(const uint32_t spritesRef, const uint32_t spriteRef, const vec2f &pos, const vec2f &size, const float angle);
 	//void update_sprite_transform(const uint32_t spritesRef, const uint32_t spriteRef, const vec3f &pos, const vec2f &size, const Pi3Cmatrix *scene_matrix, const vec2f &cent);
 	//void update_sprite_billboards(const uint32_t spritesRef, const uint32_t spriteRef, const uint32_t count, const vec3f &lookat);
 
-	void render3D() { scene.render3D(window.getTicks()); }
-	void render2D() { scene.render2D(window.getTicks()); }
+	void render3D() { 
+		scene.render3D(window.getTicks()); 
+		//if (!scene.has2Dmodels()) do_events();
+	}
+
+	void render2D() { 
+		scene.render2D(window.getTicks());
+		//do_events();
+	}
 
 	bool is_running();
 	bool do_events();
-	void clear_window() { window.clear(); }
+	std::vector<uint32_t> get_events();
+
+	void clear_window(uint32_t clearColour = 0xff800000)
+	{ 
+		if (clearColour != window.clearColour) window.setClearColour(clearColour);
+		window.clear(); 
+	}
+
 	void resize_window();
-	void swap_buffers() { frames++; fps++; window.SwapBuffers(); }
+
+	void swap_buffers() { 
+		frames++; fps++; 
+		window.SwapBuffers(); 
+		done_events = false; 
+	}
+
 	float getAverageFPS();
 	float getCurrentFPS();
 	void showFPS();
@@ -93,6 +122,9 @@ public:
 	Pi3Cimgui::rectStyle bsMenu;
 
 private:
+	std::vector<uint32_t> eventList;
+	bool done_events = false;
+
 	bool has_started = false;
 	uint32_t frames = 0;
 	uint32_t fps = 0;

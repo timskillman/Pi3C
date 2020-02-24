@@ -3,12 +3,21 @@
 Pi3Cwindow Pi3C::window;
 Pi3Cresource Pi3C::resource;
 
+Pi3C::Pi3C()
+{
+}
+
 Pi3C::Pi3C(const Pi3Cwindow::options& winopts)
 {
 	init(winopts);
 }
 
-Pi3C::Pi3C(const std::string &title, const uint32_t width, const uint32_t height, const bool fullscreen) 
+Pi3C::Pi3C(const std::string title, const uint32_t width, const uint32_t height, const bool fullscreen) 
+{
+	newWindow(title, width, height, fullscreen);
+}
+
+void Pi3C::newWindow(const std::string &title, const uint32_t width, const uint32_t height, const bool fullscreen)
 {
 	Pi3Cwindow::options winopts;
 	winopts.title = title;
@@ -19,7 +28,6 @@ Pi3C::Pi3C(const std::string &title, const uint32_t width, const uint32_t height
 	}
 	init(winopts);
 }
-
 
 void Pi3C::init(const Pi3Cwindow::options& winopts)
 {
@@ -135,6 +143,7 @@ bool Pi3C::is_running()
 		has_started = true;
 	}
 	resource.calls = 0;
+	do_events();
 	return !window.hasquit();
 }
 
@@ -169,14 +178,22 @@ void Pi3C::resize_window()
 	scene.resize(Pi3Crecti(0, 0, (float)winw, (float)winh));
 }
 
+std::vector<uint32_t> Pi3C::get_events()
+{
+	return eventList;
+}
+
 bool Pi3C::do_events()
 {
+	if (done_events) return false;
+	done_events = true;
+
 	const uint8_t * keystate = SDL_GetKeyboardState(NULL);
 	if (keystate[SDL_SCANCODE_ESCAPE]) window.setquit(true);
 
 	//SDL_Delay(10);
 
-	std::vector<uint32_t> eventList = window.event();
+	eventList = window.event();
 
 	if (eventList.size()==0) return false;
 
@@ -184,11 +201,7 @@ bool Pi3C::do_events()
 		switch (ev)
 		{
 		case SDL_WINDOWEVENT:
-			switch (window.ev.window.event) {
-			case SDL_WINDOWEVENT_RESIZED:
-				resize_window();
-				break;
-			}
+			if (window.resized) resize_window();
 			break;
 		case SDL_KEYDOWN:
 			break;

@@ -614,6 +614,9 @@ Pi3Cpointi Pi3Cimgui::getPosition()
 }
 
 void Pi3Cimgui::Begin() {
+	glClear(GL_DEPTH_BUFFER_BIT);
+	//TODO: IMGUI should have it's own basic shader and projection matrix ...
+	if (GUIshader>=0) resource->shaders[GUIshader].setProjectionMatrix(projMatrix);
 	setPosition(0, 0);
 	textID = 0;
 	if (!window->mouse.LeftButton) somethingSelected = false;
