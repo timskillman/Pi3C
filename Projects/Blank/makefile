@@ -1,4 +1,4 @@
-TARGET = MyPi3C
+TARGET = PROJECT_NAME
 
 CC = g++
 CFLAGS = -std=c++17 -Wall
