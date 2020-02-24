@@ -1,8 +1,5 @@
 #include "Pi3C.h"
-#include "Pi3CloadOptions.h"
-#include "Pi3Cshapes.h"
 #include "Pi3CmemContour.h"
-#include "Pi3Cbbox2d.h"
 
 // ==========================================================================
 // Pi3C Graphics Library Example - Extruder 2D example (by Tim Skillman)

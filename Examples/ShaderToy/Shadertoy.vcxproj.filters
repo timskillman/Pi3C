@@ -123,6 +123,9 @@
     <ClCompile Include="..\..\SharedCode\file\Pi3Cdirectory.cpp">
       <Filter>Shared Code\file</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\SharedCode\helpers\Pi3Chtml.cpp">
+      <Filter>Shared Code\helpers</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\SharedCode\glutess\dict.h">
@@ -232,6 +235,9 @@
     </ClInclude>
     <ClInclude Include="..\..\SharedCode\core\Pi3Ctextformat.h">
       <Filter>Shared Code\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\SharedCode\helpers\Pi3Chtml.h">
+      <Filter>Shared Code\helpers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

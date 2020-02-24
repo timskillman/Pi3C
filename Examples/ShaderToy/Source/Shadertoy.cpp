@@ -136,8 +136,11 @@ int main(int argc, char *argv[])
 
 	while (!window.hasquit())
 	{
-		while (window.event()) {
-			switch (window.ev.type)
+	
+		std::vector<uint32_t> eventList = window.event();
+
+		for (auto& ev : eventList) {
+			switch (ev)
 			{
 			case SDL_MOUSEBUTTONDOWN:
 			case SDL_MOUSEMOTION:

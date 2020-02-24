@@ -1,5 +1,5 @@
 title:ShaderToy ES3.0 for Pi4
-fullscreen:true
+fullscreen:false
 screenWidth:640	
 screenHeight:480
 

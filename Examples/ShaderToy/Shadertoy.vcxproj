@@ -238,6 +238,7 @@
     <ClCompile Include="..\..\SharedCode\glutess\tess.c" />
     <ClCompile Include="..\..\SharedCode\glutess\tessellate.cpp" />
     <ClCompile Include="..\..\SharedCode\glutess\tessmono.c" />
+    <ClCompile Include="..\..\SharedCode\helpers\Pi3Chtml.cpp" />
     <ClCompile Include="..\..\SharedCode\helpers\Pi3CloadOptions.cpp" />
     <ClCompile Include="..\..\SharedCode\ui\Pi3Cimgui.cpp" />
     <ClCompile Include="Source\Shadertoy.cpp" />
@@ -277,6 +278,7 @@
     <ClInclude Include="..\..\SharedCode\glutess\tess.h" />
     <ClInclude Include="..\..\SharedCode\glutess\tessellate.h" />
     <ClInclude Include="..\..\SharedCode\glutess\tessmono.h" />
+    <ClInclude Include="..\..\SharedCode\helpers\Pi3Chtml.h" />
     <ClInclude Include="..\..\SharedCode\helpers\Pi3CloadOptions.h" />
     <ClInclude Include="..\..\SharedCode\ui\Pi3Cimgui.h" />
   </ItemGroup>
