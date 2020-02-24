@@ -36,7 +36,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Source\Blank.cpp">
+    <ClCompile Include="Source\SOLUTION_NAME.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\SharedCode\glutess\dict.c">

@@ -251,7 +251,7 @@
     <ClCompile Include="..\..\SharedCode\helpers\Pi3Cutils.cpp" />
     <ClCompile Include="..\..\SharedCode\ui\Pi3Cimgui.cpp" />
     <ClCompile Include="..\..\SharedCode\ui\Pi3Cstring.cpp" />
-    <ClCompile Include="Source\SOLUTION_NAME.cpp" />
+    <ClCompile Include="Source\MyProject.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\SharedCode\core\Pi3Cbbox2d.h" />
