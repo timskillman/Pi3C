@@ -170,4 +170,8 @@ private:
 
 	//std::vector<containerStruct> containers;
 	std::map<std::string, containerStruct> containers;
+
+	int GUIshader = -1;
+	Pi3Cmatrix projMatrix;
+
 };

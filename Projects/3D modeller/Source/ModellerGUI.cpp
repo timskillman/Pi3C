@@ -108,7 +108,6 @@ void MGui::renderYellowBorder(uint32_t currentSelView)
 
 void MGui::doIMGUI(Modeller * md)
 {
-	glClear(GL_DEPTH_BUFFER_BIT);
 
 	gui.Begin();
 

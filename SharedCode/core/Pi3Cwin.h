@@ -106,6 +106,7 @@ public:
 	float getTicks() { return ticks; }
 	void setClearColour(const float red, const float green, const float blue);
 	void setClearColour(const uint32_t clearColour);
+	uint32_t getClearColour();
 	void clear();
 	void setAlpha(bool v);
 	int getWidth();
@@ -171,6 +172,8 @@ public:
 
 	std::string dropfile;
 
+	uint32_t clearColour;
+
 private:
 	const Uint8 *keys;
 	SDL_Window* mWindow;
@@ -185,8 +188,6 @@ private:
 
 	//void showProgressCB(std::string &message, float pcnt);
 
-	vec3f clearColour;
-	
 	//Window focus
 	bool mMouseFocus;
 	bool mKeyboardFocus;
