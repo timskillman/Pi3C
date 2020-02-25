@@ -83,8 +83,11 @@ int main(int argc, char *argv[])
 		//if (skybox >= 0) pi3c.scene.models[skybox].matrix.move(-player.getPosition());
 
 		// process window events ...
-		while (pi3c.do_events()) {
-			switch (pi3c.window.ev.type) {
+		std::vector<uint32_t> eventList = pi3c.get_events();
+		for (auto& ev : eventList) 
+		{
+			switch (ev) 
+			{
 			case SDL_MOUSEMOTION:
 				if (pi3c.window.mouse.RightButton) {
 					player.rotate(vec3f(pi3c.window.mouse.deltaXY.y / 300.f, -pi3c.window.mouse.deltaXY.x / 300.f, 0));
@@ -106,10 +109,6 @@ int main(int argc, char *argv[])
 		pi3c.swap_buffers();
 		
 	}
-
-	SDL_Log("Average FPS = %f ", pi3c.getAverageFPS());
-
-	pi3c.window.destroy();
 
 	return 0;
 }
