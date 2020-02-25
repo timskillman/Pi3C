@@ -52,15 +52,16 @@ int main(int argc, char *argv[])
 	loadOptions opts("options.txt");
 	Pi3Cwindow::options winopts;
 	winopts.title = opts.asString("title");
-	winopts.width = opts.asInt("screenWidth");
-	winopts.height = opts.asInt("screenHeight");
-	winopts.fullscreen = opts.asBool("fullscreen");
+	winopts.width = 800; // opts.asInt("screenWidth");
+	winopts.height = 600; // opts.asInt("screenHeight");
+	winopts.fullscreen = false; // opts.asBool("fullscreen");
 	//winopts.majorVsn = 3;
 	//winopts.minorVsn = 0;
 	//winopts.antialiasLevel = opts.asInt("antiAlias");
 	Pi3C pi3c(winopts);
 	int screenWidth = winopts.width;
 	int screenHeight = winopts.height;
+	//Pi3C pi3c("Invaders",screenWidth,screenHeight,false);
 
 	Pi3CGL::showGLinfo();
 	
