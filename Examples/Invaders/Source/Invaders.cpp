@@ -52,8 +52,8 @@ int main(int argc, char *argv[])
 	loadOptions opts("options.txt");
 	Pi3Cwindow::options winopts;
 	winopts.title = opts.asString("title");
-	winopts.width = 800; // opts.asInt("screenWidth");
-	winopts.height = 600; // opts.asInt("screenHeight");
+	winopts.width = opts.asInt("screenWidth");
+	winopts.height = opts.asInt("screenHeight");
 	winopts.fullscreen = true; // opts.asBool("fullscreen");
 	//winopts.majorVsn = 3;
 	//winopts.minorVsn = 0;

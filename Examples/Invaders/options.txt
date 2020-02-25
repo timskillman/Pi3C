@@ -3,7 +3,7 @@ fullscreen:true
 screenWidth:1440
 screenHeight:900
 
-trees:5000
+trees:50000
 fly:true
 lightpos:0.0 1.0 0.0
 startpos:0.0 -30 0.0
@@ -23,7 +23,7 @@ musicPath:../../Resources/music/RafaelKrux
 soundPath:../../Resources/sounds
 
 #Landscape selection: Mountains.obj, landscape.obj
-landscape:landscape.obj
+landscape:Mountains.obj
 skyboxPath:../../Resources/models/skyboxes
 skybox:stormy2.obj
 skyboxScale:25.0
