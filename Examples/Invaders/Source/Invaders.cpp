@@ -54,7 +54,7 @@ int main(int argc, char *argv[])
 	winopts.title = opts.asString("title");
 	winopts.width = 800; // opts.asInt("screenWidth");
 	winopts.height = 600; // opts.asInt("screenHeight");
-	winopts.fullscreen = false; // opts.asBool("fullscreen");
+	winopts.fullscreen = true; // opts.asBool("fullscreen");
 	//winopts.majorVsn = 3;
 	//winopts.minorVsn = 0;
 	//winopts.antialiasLevel = opts.asInt("antiAlias");
@@ -152,7 +152,10 @@ int main(int argc, char *argv[])
 	int mx = 100, my = 100;
 	Pi3Cimgui &gui = pi3c.gui;	//expose gui object from pi3c
 
-	if (winopts.fullscreen) SDL_WarpMouseInWindow(pi3c.window.handle(), 100, 100);
+	if (winopts.fullscreen) {
+		SDL_WarpMouseInWindow(pi3c.window.handle(), 100, 100);
+		SDL_ShowCursor(SDL_DISABLE);
+	}
 
 	while (pi3c.is_running())
 	{
@@ -176,6 +179,7 @@ int main(int argc, char *argv[])
 				takeoff = 0; player.flyspeed = 0;
 			}
 		}
+		float ticks = pi3c.window.getTicks()*30.f;
 
 		pi3c.model(sship)->visible = (ship==sship);
 		pi3c.model(cockpit)->visible = (ship==cockpit);
@@ -184,7 +188,7 @@ int main(int argc, char *argv[])
 		// Centre skybox and other 'infinite' geometry around player...
 		if (skybox >= 0) pi3c.model(skybox)->move(-player.getPosition());
 
-		float ts = 1.f / (float)(pi3c.window.getTicks());
+		float ts = 0.1f / ticks;
 		//if (pi3c.window.mouse.RightButton) {
 			//vec3f rotDelta(-pi3c.window.mouse.deltaXY.y / 300.f, pi3c.window.mouse.deltaXY.x / 300.f, 0);
 		vec3f rotDelta(-(float)(100 - my) / (50000.f*ts), (float)(100 - mx) / (50000.f*ts), 0);
@@ -198,8 +202,9 @@ int main(int argc, char *argv[])
 		vec3f offset = (ship == cockpit) ? vec3f(0, 0, 0) : -rmat.transformRotateVec(vec3f(0, shipbox.height()*1.5f, shipbox.depth()*1.5f));
 		bool moving = false;
 
-		while (pi3c.do_events()) {
-			switch (pi3c.window.ev.type)
+		std::vector<uint32_t> eventList = pi3c.get_events();
+		for (auto& ev : eventList) {
+			switch (ev)
 			{
 			case SDL_MOUSEMOTION:
 				SDL_GetMouseState(&mx, &my);
@@ -225,7 +230,7 @@ int main(int argc, char *argv[])
 		}
 		if (winopts.fullscreen) SDL_WarpMouseInWindow(pi3c.window.handle(), 100, 100);
 
-		shipRot.z *= 0.9f;			//dampened roll to 0
+		shipRot.z *= 0.95f;			//dampened roll to 0
 		prot = prot * 0.96f;
 		pi3c.model(ship)->move(-player.getPosition()+offset);
 		pi3c.model(ship)->matrix.setRotate(shipRot);
@@ -241,8 +246,9 @@ int main(int argc, char *argv[])
 		pi3c.render3D();
 		
 		//Render 2D
-		bullets.animate(&pi3c.scene, pi3c.window.getTicks());
-		aliens.animate(&pi3c.resource, &pi3c.scene, landRef, pi3c.window.getTicks());
+		bullets.animate(&pi3c.scene, ticks);
+
+		aliens.animate(&pi3c.resource, &pi3c.scene, landRef, ticks*3.f);
 		aliens.hit(&pi3c.resource, &pi3c.scene, bullets);
 
 		//pi3c.model(altref)->resizeRect2D(&pi3c.resource, vec2f(20, 20), vec2f(20, player.altitude));
@@ -258,7 +264,7 @@ int main(int argc, char *argv[])
 
 	//resource.clearAll();
 	SDL_Log("Average FPS = %f ", pi3c.getAverageFPS());
-
+	SDL_ShowCursor(SDL_SYSTEM_CURSOR_ARROW);
 	pi3c.window.destroy();
 
 	return 0;

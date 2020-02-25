@@ -115,9 +115,11 @@ public:
 		scene.render2D(window.getTicks());
 	}
 
-	bool is_running();
+	bool is_running(bool doEvents = true);
+
 	bool do_events();
-	std::vector<uint32_t> get_events();
+
+	std::vector<uint32_t> get_events() { return eventList; }
 
 	void clear_window(uint32_t clearColour = 0xff800000)
 	{ 

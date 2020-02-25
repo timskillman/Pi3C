@@ -61,7 +61,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v140</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
@@ -122,7 +122,7 @@
     <SourcePath>$(SourcePath)</SourcePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>$(ProjectDir)\..\..\ThirdParty\SDL2\include;$(ProjectDir)\..\..\ThirdParty\SDL2\include;$(ProjectDir)\..\..\ThirdParty\SDL2_image\include;$(ProjectDir)\..\..\ThirdParty\SDL2\include;$(ProjectDir)\..\..\ThirdParty\SDL2\include;$(ProjectDir)\..\..\ThirdParty\SDL2_image\include;$(ProjectDir)\..\..\ThirdParty\SDL2_net\include;$(ProjectDir)\..\..\ThirdParty\SDL2\include;$(ProjectDir)\..\..\ThirdParty\SDL2\include;$(ProjectDir)\..\..\ThirdParty\SDL2_image\include;$(ProjectDir)\..\..\ThirdParty\SDL2\include;$(ProjectDir)\..\..\ThirdParty\SDL2\include;$(ProjectDir)\..\..\ThirdParty\SDL2_image\include;$(ProjectDir)\..\..\ThirdParty\SDL2_net\include;$(ProjectDir)\Shared\SDLwin\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)\..\..\ThirdParty\SDL2\include;$(ProjectDir)\..\..\ThirdParty\SDL2_image\include;$(ProjectDir)\..\..\ThirdParty\SDL2_net\include;$(ProjectDir)\Shared\SDLwin\include;$(IncludePath)</IncludePath>
     <LibraryPath>$(ProjectDir)\..\..\ThirdParty\\SDL2_image\lib\x64;$(ProjectDir)\..\..\ThirdParty\\SDL2\lib\x64;$(ProjectDir)\..\..\ThirdParty\\SDL2_net\lib\x64;$(LibraryPath)</LibraryPath>
     <SourcePath>$(SourcePath)</SourcePath>
   </PropertyGroup>

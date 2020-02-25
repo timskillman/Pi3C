@@ -135,7 +135,7 @@ int32_t Pi3C::load_model_and_collider(const std::string& path, const std::string
 	return modelRef;
 }
 
-bool Pi3C::is_running()
+bool Pi3C::is_running(bool doEvents)
 {
 	if (!has_started) {
 		//resource.uploadMeshesToGPU();
@@ -143,7 +143,7 @@ bool Pi3C::is_running()
 		has_started = true;
 	}
 	resource.calls = 0;
-	do_events();
+	if (doEvents) do_events();
 	return !window.hasquit();
 }
 
@@ -174,13 +174,9 @@ void Pi3C::showFPS()
 
 void Pi3C::resize_window()
 {
-	winw = window.getWidth(); winh = window.getHeight();
+	winw = window.getWidth(); 
+	winh = window.getHeight();
 	scene.resize(Pi3Crecti(0, 0, winw, winh));
-}
-
-std::vector<uint32_t> Pi3C::get_events()
-{
-	return eventList;
 }
 
 bool Pi3C::do_events()
