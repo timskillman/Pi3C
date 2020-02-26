@@ -396,6 +396,14 @@ namespace Pi3CfileOBJ {
 		ss << "illum " << material.illum << "\n";
 		if (material.alpha < 1.f) ss << "Tr " << material.alpha << "\n";
 		if (material.texName != "" && material.texName != "default") ss << "map_Kd " << subPath << material.texName << "\n";
+		if (material.animvec.x != 0 || material.animvec.y != 0) {
+			if (material.animFrames == 0) {
+				ss << "animtex " << material.animsize.x << " " << material.animsize.y << " " << material.animvec.x << " " << material.animvec.y << "\n";
+			}
+			else {
+				ss << "animsheet " << (1.f / material.animvec.x) << " " << (1.f / material.animvec.y) << " " << material.animFrames << "\n";
+			}
+		}
 		ss << "\n";
 	}
 
@@ -478,7 +486,7 @@ namespace Pi3CfileOBJ {
 						ss << "vt " << newuvs[i] << " " << newuvs[i + 1] << "\n";
 
 					//output material reference ...
-					ss << "usemtl " << model.material.name << "_" << counter << "\n";
+					ss << "\n" << "usemtl " << model.material.name << "_" << counter << "\n";
 
 					//output triangle indices ...
 					for (size_t i = 0; i < vertindexes.size(); i += 3) {
@@ -524,10 +532,12 @@ namespace Pi3CfileOBJ {
 			}
 		}
 
+		//Save OBJ
 		std::string filestr = ss.str();
 		SDL_RWwrite(rw, &filestr[0], filestr.size(), 1);
 		SDL_RWclose(rw);
 
+		//Save MTL
 		filestr = ssmat.str();
 		SDL_RWops* rwmat = SDL_RWFromFile(matpath.c_str(), "w");
 		SDL_RWwrite(rwmat, &filestr[0], filestr.size(), 1);
