@@ -396,76 +396,104 @@ namespace Pi3CfileOBJ {
 		ss << "illum " << material.illum << "\n";
 		if (material.alpha < 1.f) ss << "Tr " << material.alpha << "\n";
 		if (material.texName != "" && material.texName != "default") ss << "map_Kd " << subPath << material.texName << "\n";
+		ss << "\n";
 	}
 
-	void saveModel(std::stringstream &ss, Pi3Cresource *resource, const Pi3Cmodel &model, const Pi3Cmatrix &mtx, uint32_t &voff, uint32_t &uoff, uint32_t counter)
+	void saveModel(std::stringstream &ss, std::stringstream &matstr, Pi3Cresource *resource, const Pi3Cmodel &model, const Pi3Cmatrix &mtx, uint32_t &voff, uint32_t &uoff, uint32_t &noff, uint32_t counter, bool saveTriangles)
 	{
 		Pi3Cmatrix tmtx = model.matrix * mtx;
 
 		if (model.group.size() > 0) {
 			for (auto &gmodel : model.group) {
-				saveModel(ss, resource, gmodel, tmtx, voff, uoff, counter);
+				saveModel(ss, matstr, resource, gmodel, tmtx, voff, uoff, noff, counter, saveTriangles);
 			}
 		}
 		else {
 			if (model.meshRef >= 0) {
 
+				saveMaterial(matstr, model.material, "", counter);
+
 				Pi3Cmesh &mesh = resource->meshes[model.meshRef];
 				std::vector<float> &verts = resource->vertBuffer[mesh.bufRef];
 
-				//if (mesh.verts.size() == 0) return; //no verts to save
+				if (saveTriangles) {
+					
+					uint32_t moff = mesh.vertOffset * mesh.stride;
 
-				////Output as triangles only ...
-				//for (size_t i = 0; i < mesh.vc; i += mesh.stride) {
-				//	vec3f v = tmtx.transformVec(vec3f(mesh.verts[i], mesh.verts[i + 1], mesh.verts[i + 2]));
-				//	ss << "v " << v.x << " " << v.z << " " << v.y << "\n";
-				//}
-
-				//for (size_t i = 0; i < mesh.vc; i += mesh.stride)
-				//	ss << "vt " << mesh.verts[i + 6] << " " << mesh.verts[i + 7] << "\n";
-
-				//uint32_t j = 0;
-				//for (size_t i = 0; i < mesh.vc; i += mesh.stride * 3) {
-				//	ss << "f " << j + voff + 1 << "/" << j + uoff + 1 << " "
-				//		<< j + voff + 2 << "/" << j + uoff + 2 << " "
-				//		<< j + voff + 3 << "/" << j + uoff + 3 << "\n";
-				//	j+=3;
-				//}
-
-				//voff += j;
-				//uoff += j;
-
-				//create shared index mesh ...
-				std::vector<uint32_t> vertindexes;
-				std::vector<float> newverts;
-				std::vector<uint32_t> uvindexes;
-				std::vector<float> newuvs;
-				mesh.createSharedTriangleList(verts, vertindexes, newverts, uvindexes, newuvs, 0.001f);
-
-				//output new, transformed vertices ... 
-				for (size_t i = 0; i < newverts.size(); i += 3) {
-					vec3f v = tmtx.transformVec(vec3f(newverts[i], newverts[i + 1], newverts[i + 2]));
-					ss << "v " << v.x << " " << v.z << " " << v.y << "\n";
-				}
-
-				//output new uv's
-				for (size_t i = 0; i < newuvs.size(); i += 2)
-					ss << "vt " << newuvs[i] << " " << newuvs[i + 1] << "\n";
-
-				//output material reference ...
-				ss << "usemtl " << model.material.name << "_" << counter << "\n";
-
-				//output triangle indices ...
-				for (size_t i = 0; i < vertindexes.size(); i+=3) {
-					if (vertindexes[i] != vertindexes[i + 1] && vertindexes[i] != vertindexes[i + 2] && vertindexes[i + 1] != vertindexes[i + 2]) {
-						ss << "f " << vertindexes[i] + voff + 1 << "/" << uvindexes[i] + uoff + 1 << " "
-							<< vertindexes[i + 1] + voff + 1 << "/" << uvindexes[i + 1] + uoff + 1 << " "
-							<< vertindexes[i + 2] + voff + 1 << "/" << uvindexes[i + 2] + uoff + 1 << "\n";
+					//Output as triangles only ...
+					for (size_t i = moff; i < (moff + mesh.vc); i += mesh.stride) {
+						vec3f v = tmtx.transformVec(vec3f(verts[i], verts[i + 1], verts[i + 2]));
+						ss << "v " << v.x << " " << v.y << " " << v.z << "\n";
 					}
-				}
 
-				voff += newverts.size() / 3;
-				uoff += newuvs.size() / 3;
+					for (size_t i = moff; i < (moff + mesh.vc); i += mesh.stride) {
+						vec3f n = tmtx.transformRotateVec(vec3f(verts[i + 3], verts[i + 4], verts[i + 5]));
+						ss << "vn " << n.x << " " << n.y << " " << n.z << "\n";
+					}
+
+					for (size_t i = moff; i < (moff + mesh.vc); i += mesh.stride)
+						ss << "vt " << verts[i + 6] << " " << verts[i + 7] << "\n";
+
+					//output material reference ...
+					ss << "usemtl " << model.material.name << "_" << counter << "\n";
+
+					uint32_t j = 0;
+					for (size_t i = 0; i < mesh.vc; i += mesh.stride * 3) {
+						ss << "f "
+							<< j + voff + 1 << "/" << j + uoff + 1 << "/" << j + noff + 1 << " "
+							<< j + voff + 2 << "/" << j + uoff + 2 << "/" << j + noff + 2 << " "
+							<< j + voff + 3 << "/" << j + uoff + 3 << "/" << j + noff + 3 << "\n";
+						j += 3;
+					}
+
+					voff += j;
+					uoff += j;
+					noff += j;
+
+				}
+				else {
+					//create shared index mesh ...
+					std::vector<uint32_t> vertindexes;
+					std::vector<float> newverts; 
+					std::vector<uint32_t> normindexes;
+					std::vector<float> newnorms;
+					std::vector<uint32_t> uvindexes;
+					std::vector<float> newuvs;
+					mesh.createSharedTriangleList(verts, vertindexes, newverts, normindexes, newnorms, uvindexes, newuvs, 0.001f);
+
+					//output new, transformed vertices ... 
+					for (size_t i = 0; i < newverts.size(); i += 3) {
+						vec3f v = tmtx.transformVec(vec3f(newverts[i], newverts[i + 1], newverts[i + 2]));
+						ss << "v " << v.x << " " << v.y << " " << v.z << "\n";
+					}
+
+					//output new, transformed normals ... 
+					for (size_t i = 0; i < newnorms.size(); i += 3) {
+						vec3f vn = tmtx.transformRotateVec(vec3f(newnorms[i], newnorms[i + 1], newnorms[i + 2]));
+						ss << "vn " << vn.x << " " << vn.y << " " << vn.z << "\n";
+					}
+
+					//output new uv's
+					for (size_t i = 0; i < newuvs.size(); i += 2)
+						ss << "vt " << newuvs[i] << " " << newuvs[i + 1] << "\n";
+
+					//output material reference ...
+					ss << "usemtl " << model.material.name << "_" << counter << "\n";
+
+					//output triangle indices ...
+					for (size_t i = 0; i < vertindexes.size(); i += 3) {
+						//if (vertindexes[i] != vertindexes[i + 1] && vertindexes[i] != vertindexes[i + 2] && vertindexes[i + 1] != vertindexes[i + 2]) {
+							ss << "f " << vertindexes[i] + voff + 1 << "/" << uvindexes[i] + uoff + 1 << "/" << normindexes[i] + noff + 1 << " "
+								<< vertindexes[i + 1] + voff + 1 << "/" << uvindexes[i + 1] + uoff + 1 << "/" << normindexes[i + 1] + noff + 1 << " "
+								<< vertindexes[i + 2] + voff + 1 << "/" << uvindexes[i + 2] + uoff + 1 << "/" << normindexes[i + 2] + noff + 1 << "\n";
+						//}
+					}
+
+					voff += newverts.size() / 3;
+					noff += newnorms.size() / 3;
+					uoff += newuvs.size() / 2;
+				}
+			
 			}
 		}
 	}
@@ -485,14 +513,13 @@ namespace Pi3CfileOBJ {
 		std::stringstream ssmat;
 		Pi3Cmatrix imtx;
 
-		uint32_t voff = 0, uoff = 0;
+		uint32_t voff = 0, uoff = 0, noff = 0;
 
 		ss << "mtllib ./" << matfilename << "\n";
 		uint32_t c = 1; //material counter
 		for (auto &model : scene->models) {
 			if (model.visible && !model.deleted && model.touchable && (!selected || (model.selected && selected))) {
-				saveMaterial(ssmat, model.material, "maps/", c);
-				saveModel(ss, scene->resource, model, imtx, voff, uoff, c);
+				saveModel(ss, ssmat, scene->resource, model, imtx, voff, uoff, noff, c, false);
 				c++;
 			}
 		}

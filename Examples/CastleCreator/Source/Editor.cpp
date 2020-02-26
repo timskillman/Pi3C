@@ -133,7 +133,7 @@ void Editor::loadModels(const std::string &modelsLibraryFile)
 	setupGUI("../../Resources/fonts/", "NotoSans-Regular.ttf");
 
 	// Load model library ...
-	loadModelLibraryJSON("CastleModels.json");
+	loadModelLibraryJSON(modelsLibraryFile);
 
 	for (auto &ln : modelLibrary) libnames.push_back(ln.first);
 
@@ -531,8 +531,8 @@ void Editor::loadModelLibraryJSON(const std::string &file)
 				float lodfrom = 0.f;
 				for (size_t j = 0; j < LODmodels.size(); j++) {
 					std::string colliderFile = (j == 0) ? collider : "";
-					std::string modelFile = LODmodels[j];
-					Pi3Cmodel modelLOD(resource, modelFile, modelPath, modelFile, colliderFile);
+					std::string modelName = LODmodels[j];
+					Pi3Cmodel modelLOD(resource, modelName, modelPath + "/" + category, modelName, colliderFile);
 					float lodToo = LODdists[j];
 					model.appendLOD(resource, modelLOD, lodfrom, lodToo);
 					lodfrom = lodToo;

@@ -28,6 +28,18 @@
 		"runSpeed":2.0
 	},
 	"models": [{
+			"category": "Animals",
+			"flags": "g",
+			"name": "Cow",
+			"id": "Cow",
+			"LOD0": { 
+				"file": "cow.obj",
+				"dist": 10000.0
+				},
+			"RandomScale": [0.9, 1.1],
+			"RandomRotation": [0.0, 360.0]
+		},
+		{
 			"category": "Castle",
 			"flags": "g",
 			"name": "Round Tower",
@@ -512,18 +524,6 @@
 				"dist": 10000.0
 				},
 			"colliderFile": "WaterTroughColl.obj"
-		},
-		{
-			"category": "Animals",
-			"flags": "g",
-			"name": "Cow",
-			"id": "Cow",
-			"LOD0": { 
-				"file": "cow2.obj",
-				"dist": 10000.0
-				},
-			"RandomScale": [0.9, 1.1],
-			"RandomRotation": [0.0, 360.0]
 		}
 	]
 

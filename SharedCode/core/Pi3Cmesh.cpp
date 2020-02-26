@@ -223,7 +223,10 @@ namespace std
 	};
 }
 
-void Pi3Cmesh::createSharedTriangleList(const std::vector<float> &mverts, std::vector<uint32_t> &vertindexes, std::vector<float> &newverts, std::vector<uint32_t> &uvindexes, std::vector<float> &newuvs, const float tolerance)
+void Pi3Cmesh::createSharedTriangleList(const std::vector<float> &mverts, 
+	std::vector<uint32_t> &vertindexes, std::vector<float> &newverts, 
+	std::vector<uint32_t> &normindexes, std::vector<float> &newnorms,
+	std::vector<uint32_t> &uvindexes, std::vector<float> &newuvs, const float tolerance)
 {
 	//From a soup of triangles, work out which triangles have matching vertices and count them as 'shared'
 
@@ -255,15 +258,45 @@ void Pi3Cmesh::createSharedTriangleList(const std::vector<float> &mverts, std::v
 		newverts[t] = it->x; newverts[t + 1] = it->y; newverts[t + 2] = it->z;
 	}
 
+
+	//Norms ...
+	std::unordered_set<std::mapvert> mapnorms;
+
+	index = 0;
+	for (size_t i = voff; i < (voff + vc); i += stride) {
+		float x = ((float)((int)(mverts[i + 3] * itol))) * tolerance;
+		float y = ((float)((int)(mverts[i + 4] * itol))) * tolerance;
+		float z = ((float)((int)(mverts[i + 5] * itol))) * tolerance;
+		std::mapvert v(x, y, z);
+		auto it = mapnorms.find(v);
+		if (it == mapnorms.end()) {
+			normindexes.push_back(index);
+			v.index = index++;
+			mapnorms.insert(v);
+		}
+		else {
+			normindexes.push_back(it->index);
+		}
+	}
+
+	newnorms.resize(mapnorms.size() * 3);
+	for (auto it = mapnorms.begin(); it != mapnorms.end(); ++it) {
+		uint32_t t = it->index * 3;
+		newnorms[t] = it->x; newnorms[t + 1] = it->y; newnorms[t + 2] = it->z;
+	}
+
 	std::unordered_set<std::mapuv> mapuvs;
 
 	index = 0;
 	for (size_t i = voff; i < (voff + vc); i += stride) {
-		std::mapuv v(mverts[i + 6], mverts[i + 7]);
+		float x = ((float)((int)(mverts[i + 6] * itol))) * tolerance;
+		float y = ((float)((int)(mverts[i + 7] * itol))) * tolerance;
+		std::mapuv v(x, y);
+
 		auto it = mapuvs.find(v);
 		if (it == mapuvs.end()) {
-			newuvs.push_back(mverts[i + 6]);
-			newuvs.push_back(mverts[i + 7]);
+			//newuvs.push_back(mverts[i + 6]);
+			//newuvs.push_back(mverts[i + 7]);
 			uvindexes.push_back(index);
 			v.index = index++;
 			mapuvs.insert(v);
@@ -271,6 +304,12 @@ void Pi3Cmesh::createSharedTriangleList(const std::vector<float> &mverts, std::v
 		else {
 			uvindexes.push_back(it->index);
 		}
+	}
+
+	newuvs.resize(mapuvs.size() * 2);
+	for (auto it = mapuvs.begin(); it != mapuvs.end(); ++it) {
+		uint32_t t = it->index * 2;
+		newuvs[t] = it->u; newuvs[t + 1] = it->v;
 	}
 }
 

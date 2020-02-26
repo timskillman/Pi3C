@@ -114,7 +114,7 @@ public:
 
 	void createOutlines();
 
-	void createSharedTriangleList(const std::vector<float>& verts, std::vector<uint32_t>& vertindexes, std::vector<float>& newverts, std::vector<uint32_t>& uvindexes, std::vector<float>& newuvs, const float tolerance = 0.0005f);
+	void createSharedTriangleList(const std::vector<float>& verts, std::vector<uint32_t>& vertindexes, std::vector<float>& newverts, std::vector<uint32_t> &normindexes, std::vector<float> &newnorms, std::vector<uint32_t>& uvindexes, std::vector<float>& newuvs, const float tolerance = 0.0005f);
 	void createSharedTriangleList(VertsIndsUVs* in, VertsIndsUVs* out, const float tolerance = 0.0005f);
 
 	//bool collideVector(bool bounce, vec3f &pos, vec3f &dir);	//returns hit and modified pos, dir vectors

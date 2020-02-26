@@ -243,6 +243,7 @@ void Modeller::handleEvents(std::vector<uint32_t>& eventList)
 		case SDL_MOUSEMOTION:
 			if (window->mouse.anyButton() && currentView>=0 && !dragbar) {
 				vec3f mouseXYZ = vec3f(window->mouse.deltaXY.x, -window->mouse.deltaXY.y, 0);
+				float sc = -window->mouse.deltaXY.y * 0.1f;
 				if (window->mouse.MiddleButton) {
 					setCurrentSelView(currentView);
 					view.pan += view.viewCoords(mouseXYZ);
@@ -256,7 +257,7 @@ void Modeller::handleEvents(std::vector<uint32_t>& eventList)
 					case ED_ROTATE:
 						break;
 					case ED_SCALE:
-						editUndo.scaleSelections(scene.models, view.viewCoords(mouseXYZ) * 0.5f);
+						editUndo.scaleSelections(scene.models, vec3f(sc,sc,sc)); //view.viewCoords(mouseXYZ)*0.5f
 						break;
 					case ED_ROTATESCENE:
 						view.rot += vec3f(mouseXYZ.y, mouseXYZ.x, 0) * -0.01f;

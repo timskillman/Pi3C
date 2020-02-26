@@ -45,7 +45,7 @@ public:
 	vec3f rot{ 0,0,0 };
 	vec3f pan{ 0,0,0 };
 	float psp_nearz = 1.f;
-	float psp_farz = 5000.f;
+	float psp_farz = 30000.f;
 	float ortho_nearz = -2000.f;
 	float ortho_farz = 2000.f;
 	float zoom = 100.f;

@@ -66,7 +66,7 @@ void Pi3Cedit::scaleSelections(std::vector<Pi3Cmodel>& models, const vec3f& scal
 {
 	undos.logScale(models, scale);
 	Pi3Cmatrix scmatrix;
-	scmatrix.SetScales((scale /2.f)+vec3f(1.f,1.f,1.f));
+	scmatrix.SetScales((scale / 2.f)+vec3f(1.f,1.f,1.f));
 	for (auto& model : models) {
 		if (model.selected && !model.deleted) {
 			model.matrix.Translate(-centre);

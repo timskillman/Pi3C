@@ -1,0 +1,232 @@
+newmtl grass
+Ka 0.500000 0.500000 0.500000
+Kd 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Tr 1.000000
+illum 2
+Ns 0.000000
+map_Kd ../maps/thickgrass.png
+
+newmtl clump
+Ka 0.500000 0.500000 0.500000
+Kd 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Tr 1.000000
+illum 2
+Ns 0.000000
+map_Kd ../maps/grassClump.png
+
+newmtl Fern
+Ka 0.500000 0.500000 0.500000
+Kd 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Tr 1.000000
+illum 2
+Ns 0.000000
+map_Kd ../maps/fern.png
+
+newmtl Palm
+Ka 0.500000 0.500000 0.500000
+Kd 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Tr 1.000000
+illum 2
+Ns 0.000000
+map_Kd ../maps/PalmFrond.png
+
+newmtl fernshadow
+Ka 0.500000 0.500000 0.500000
+Kd 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Tr 0.900000
+illum 2
+Ns 0.000000
+map_Kd ../maps/fernshadow.png
+
+newmtl treeshadow
+Ka 0.500000 0.500000 0.500000
+Kd 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Tr 0.900000
+illum 2
+Ns 0.000000
+map_Kd ../maps/treeshadow.png
+
+newmtl fence
+Ka 0.300000 0.300000 0.300000
+Kd 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Tr 1.000000
+illum 2
+Ns 0.000000
+map_Kd ../maps/fence.jpg
+
+newmtl fadewood
+Ka 0.300000 0.300000 0.300000
+Kd 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Tr 1.000000
+illum 2
+Ns 0.000000
+map_Kd ../maps/fadewood.png
+
+newmtl roof
+Ka 0.300000 0.300000 0.300000
+Kd 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Tr 1.000000
+illum 2
+Ns 0.000000
+map_Kd ../maps/tileroof.jpg
+
+newmtl offwhite
+Ka 0.300000 0.300000 0.300000
+Kd 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Tr 1.000000
+illum 2
+Ns 0.000000
+map_Kd ../maps/offwhite.jpg
+
+newmtl limestone
+Ka 0.300000 0.300000 0.300000
+Kd 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Tr 1.000000
+illum 2
+Ns 0.000000
+map_Kd ../maps/limestone.jpg
+
+newmtl rock
+Ka 0.300000 0.300000 0.300000
+Kd 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Tr 1.000000
+illum 2
+Ns 0.000000
+map_Kd ../maps/rock.jpg
+
+newmtl floor
+Ka 0.300000 0.300000 0.300000
+Kd 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Tr 1.000000
+illum 2
+Ns 0.000000
+map_Kd ../maps/plankfloor.jpg
+
+newmtl grill
+Ka 0.300000 0.300000 0.300000
+Kd 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Tr 1.000000
+illum 2
+Ns 0.000000
+map_Kd ../maps/grill.png
+
+newmtl straw
+Ka 0.500000 0.500000 0.500000
+Kd 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Tr 1.000000
+illum 2
+Ns 0.000000
+map_Kd ../maps/straw2.png
+
+newmtl cobble
+Ka 0.300000 0.300000 0.300000
+Kd 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Tr 1.000000
+illum 2
+Ns 0.000000
+map_Kd ../maps/cobble.jpg
+
+newmtl mudgrass
+Ka 0.300000 0.300000 0.300000
+Kd 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Tr 1.000000
+illum 1
+Ns 0.000000
+map_Kd ../maps/cobbleTexs.jpg
+
+newmtl cowmap
+Ka 0.300000 0.300000 0.300000
+Kd 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Tr 1.000000
+illum 2
+Ns 0.000000
+map_Kd ../maps/cowmap.png
+
+newmtl ashcanopy
+Ka 0.300000 0.300000 0.300000
+Kd 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Tr 1.000000
+illum 2
+Ns 0.000000
+map_Kd ../maps/ashcanopy.png
+
+newmtl oakcanopy
+Ka 0.300000 0.300000 0.300000
+Kd 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Tr 1.000000
+illum 2
+Ns 0.000000
+map_Kd ../maps/oakcanopy.png
+
+newmtl bark
+Ka 0.300000 0.300000 0.300000
+Kd 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Tr 1.000000
+illum 2
+Ns 0.000000
+map_Kd ../maps/barktile.jpg
+
+newmtl water
+Ka 0.300000 0.300000 0.300000
+Kd 0.200000 0.400000 1.000000
+Ks 0.800000 0.800000 0.800000
+Tr 0.800000
+illum 4
+Ns 0.000000
+
+newmtl fire
+Kd 1.000000 1.000000 1.000000
+Ke 1.0 1.0 1.0
+Tr 1.000000
+illum 1
+animsheet 8 7 51
+Ns 0.000000
+map_Kd ../maps/fire128x128x51.png
+
+newmtl germanFlag
+Ka 0.300000 0.300000 0.300000
+Kd 1.000000 1.000000 1.000000
+Ks 1.000000 1.000000 1.000000
+Tr 1.000000
+illum 2
+animsheet 16 13 201
+Ns 0.000000
+map_Kd ../maps/germanFlagAni.png
+
+newmtl churchWall
+Ka 0.300000 0.300000 0.300000
+Kd 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+illum 2
+Ns 0.000000
+map_Kd ../maps/blockwall2.jpg
+
+newmtl stainglass
+Ka 0.300000 0.300000 0.300000
+Kd 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Tr 0.800000
+illum 1
+Ns 0.000000
+map_Kd ../maps/stglass.png
