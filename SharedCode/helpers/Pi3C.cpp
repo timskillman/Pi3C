@@ -7,6 +7,11 @@ Pi3C::Pi3C()
 {
 }
 
+Pi3C::~Pi3C()
+{
+	window.destroy();
+}
+
 Pi3C::Pi3C(const Pi3Cwindow::options& winopts)
 {
 	init(winopts);
@@ -78,7 +83,7 @@ Pi3Cmodel Pi3C::create_model_from_text(const std::string &text, const uint32_t w
 	return textModel;
 }
 
-uint32_t Pi3C::create_background(const std::string &path, const std::string &file)
+uint32_t Pi3C::add_background(const std::string &path, const std::string &file)
 {
 	Pi3Cmodel background;
 
@@ -90,7 +95,24 @@ uint32_t Pi3C::create_background(const std::string &path, const std::string &fil
 	background.addTexture(&resource, (file!="" && path!="") ? path+"/"+file : path);
 	background.material.illum = 1;
 	background.material.alpha = 1.f;
-	return add_model_to_scene2D(background);
+	background.visible = false;
+
+	int bkgmodelRef = add_model_to_scene2D(background);
+	if (bkgmodelRef >= 0) {
+		currentBackground = backgrounds.size();
+		backgrounds.push_back(bkgmodelRef);
+	}
+	return currentBackground;
+}
+
+void Pi3C::showBackground(const int backgroundRef) {
+	scene.models2D[backgrounds[currentBackground % backgrounds.size()]].visible = false;
+	currentBackground = backgroundRef;
+	scene.models2D[backgrounds[currentBackground % backgrounds.size()]].visible = true;
+};
+
+void Pi3C::nextBackground() {
+	showBackground((currentBackground + 1) % backgrounds.size());
 }
 
 //void Pi3C::update_sprite_position(const uint32_t spritesRef, const uint32_t spriteRef, const float x, const float y)
@@ -177,6 +199,9 @@ void Pi3C::resize_window()
 	winw = window.getWidth(); 
 	winh = window.getHeight();
 	scene.resize(Pi3Crecti(0, 0, winw, winh));
+	for (uint32_t sc = 0; sc< backgrounds.size(); sc++) {
+		model2D(backgrounds[sc])->updateRect2D(&resource, vec2f(0, 0), vec2f((float)width(), (float)height()));
+	}
 }
 
 bool Pi3C::do_events()
@@ -207,6 +232,24 @@ bool Pi3C::do_events()
 
 }
 
+bool Pi3C::keyPress(char key) {
+	const uint8_t *keys = SDL_GetKeyboardState(NULL);
+	uint32_t scancode = SDL_GetScancodeFromKey(std::tolower(key));
+	return (keys[scancode] != 0);
+}
+
+void Pi3C::swap_buffers() {
+	frames++; fps++;
+	window.SwapBuffers();
+	done_events = false;
+}
+
+void Pi3C::clear_window(uint32_t clearColour)
+{
+	if (clearColour != window.clearColour) window.setClearColour(clearColour);
+	window.clear();
+}
+
 std::vector<std::string> Pi3C::get_dropfiles()
 {
 	std::vector<std::string> dropfiles;
@@ -228,3 +271,44 @@ std::vector<std::string> Pi3C::get_dropfiles()
 //	rectangles.material.alpha = 1.f;
 //	return add_model_to_scene3D(rectangles);
 //}
+
+int32_t Pi3C::create_cuboid(const vec3f& pos, const vec3f& size, const uint32_t colour, const std::string& texfile)
+{
+	Pi3Cmodel cuboid(&resource, Pi3Cshapes::cuboid(pos, size), colour);
+	return scene.append3D(cuboid, texfile);
+}
+
+int32_t Pi3C::create_cylinder(const vec3f& pos, const float radius, const float height, const uint32_t colour, const std::string& texfile)
+{
+	Pi3Cmodel cylinder(&resource, Pi3Cshapes::cylinder(pos, radius, height), colour);
+	return scene.append3D(cylinder, texfile);
+}
+
+int32_t Pi3C::create_cone(const vec3f& pos, const float radius, const float height, const uint32_t colour, const std::string& texfile)
+{
+	Pi3Cmodel cone(&resource, Pi3Cshapes::cone(pos, radius, height), colour);
+	return scene.append3D(cone, texfile);
+}
+
+int32_t Pi3C::create_tube(const vec3f& pos, const float inner_radius, const float outer_radius, const float height, const uint32_t colour, const std::string& texfile)
+{
+	Pi3Cmodel tube(&resource, Pi3Cshapes::tube(pos, inner_radius, outer_radius, height), colour);
+	return scene.append3D(tube, texfile);
+}
+
+int32_t Pi3C::create_torus(const vec3f& pos, const float radius, const float ring_radius, const uint32_t colour, const std::string& texfile)
+{
+	Pi3Cmodel torus(&resource, Pi3Cshapes::torus(pos, radius, ring_radius), colour);
+	return scene.append3D(torus, texfile);
+}
+
+int32_t Pi3C::create_sphere(const vec3f& pos, const float radius, const uint32_t colour, const std::string& texfile)
+{
+	Pi3Cmodel sphere(&resource, Pi3Cshapes::sphere(pos, radius), colour);
+	return scene.append3D(sphere, texfile);
+}
+
+int32_t Pi3C::create_extrude(vec3f& pos, std::vector<std::vector<float>>& floatPath, float thickness, uint32_t colour, const std::string& texfile) {
+	Pi3Cmodel extrude(&resource, Pi3Cshapes::extrude("", pos, floatPath, thickness), colour);
+	return scene.append3D(extrude, texfile);
+}

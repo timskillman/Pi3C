@@ -54,7 +54,6 @@ int main(int argc, char* argv[])
 	while (pi3c.is_running())
 	{
 		if (pi3c.window.resized) {
-			pi3c.model2D(bkg)->updateRect2D(&pi3c.resource, vec2f(0,0), vec2f((float)pi3c.width(), (float)pi3c.height()));
 			snowParticles.updateStartArea(Pi3Cparticles::ixyz(pi3c.width(), pi3c.height(),0));
 		}
 

@@ -107,7 +107,7 @@ int main(int argc, char *argv[])
 	int cockpit = pi3c.load_model(opts.asString("modelPath"), "sshipCockpit2.obj"); //sship //EagleTransporter // NMSship
 
 	int ship = sship;
-	Pi3Cbbox3d shipbox = pi3c.model(ship)->bbox;
+	Pi3Cbbox3d shipbox = pi3c.model3D(ship)->bbox;
 
 	pi3c.scene.setFog(opts.asHex("fogColour"), opts.asFloat("fogNear"), opts.asFloat("fogFar"));
 	pi3c.scene.setPerspective3D(screenWidth, screenHeight, opts.asFloat("perspective"), opts.asFloat("nearz"), opts.asFloat("farz"));
@@ -181,12 +181,12 @@ int main(int argc, char *argv[])
 		}
 		float ticks = pi3c.window.getTicks()*30.f;
 
-		pi3c.model(sship)->visible = (ship==sship);
-		pi3c.model(cockpit)->visible = (ship==cockpit);
+		pi3c.model3D(sship)->visible = (ship==sship);
+		pi3c.model3D(cockpit)->visible = (ship==cockpit);
 		player.updateAndCollide(&pi3c.scene, pi3c.window.getTicks());
 
 		// Centre skybox and other 'infinite' geometry around player...
-		if (skybox >= 0) pi3c.model(skybox)->move(-player.getPosition());
+		if (skybox >= 0) pi3c.model3D(skybox)->move(-player.getPosition());
 
 		float ts = 0.1f / ticks;
 		//if (pi3c.window.mouse.RightButton) {
@@ -232,8 +232,8 @@ int main(int argc, char *argv[])
 
 		shipRot.z *= 0.95f;			//dampened roll to 0
 		prot = prot * 0.96f;
-		pi3c.model(ship)->move(-player.getPosition()+offset);
-		pi3c.model(ship)->matrix.setRotate(shipRot);
+		pi3c.model3D(ship)->move(-player.getPosition()+offset);
+		pi3c.model3D(ship)->matrix.setRotate(shipRot);
 		//if (shipRot.z != 0) shipRot.z *= 0.95f;			//dampened roll to 0
 		//if (shipRot.x != 0 && ship == sship) shipRot.x *= 0.7f;			//dampened pitch to 0
 

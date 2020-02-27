@@ -61,7 +61,7 @@ int main(int argc, char *argv[])
 		//	pi3c.scene.setPerspective3D(screenWidth, screenHeight, opts.asFloat("perspective"), opts.asFloat("nearz"), opts.asFloat("farz"));
 		//} 
 		pi3c.scene.setMatrix(vec3f(0, 0, 0), vec3f(0, 0, -300.f), vec3f(roty,roty,0));
-		roty += 0.03f;
+		roty += 0.003f;
 
 		pi3c.render3D();
 
