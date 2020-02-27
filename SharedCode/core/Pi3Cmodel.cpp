@@ -534,6 +534,19 @@ void Pi3Cmodel::updateSpriteBillboard(Pi3Cresource *resource, const std::vector<
 	resource->updateMesh(meshRef);
 }
 
+void Pi3Cmodel::updateRect2D(Pi3Cresource* resource, const vec2f& pos, const vec2f& size)
+{
+	updateQuad(resource, vec3f(pos.x, pos.y, -20.f), vec3f(pos.x + size.x, pos.y, -20.f), vec3f(pos.x + size.x, pos.y + size.y, -20.f), vec3f(pos.x, pos.y + size.y, -20.f));
+}
+
+void Pi3Cmodel::updateQuad(Pi3Cresource* resource, const vec3f& p1, const vec3f& p2, const vec3f& p3, const vec3f& p4)
+{
+	Pi3Cmesh& mesh = resource->meshes[meshRef];
+	vertsPtr vp = resource->getMeshVerts(meshRef);
+	updateSpriteVerts(vp, mesh.stride, p1, p2, p3, p4);
+	resource->updateMesh(meshRef);
+}
+
 void Pi3Cmodel::updateLineQuad(Pi3Cresource *resource, const std::vector<vec3f> &pos, const std::vector<vec3f> &dir, const vec2f &size)
 {
 	//Transform pos into screen space ...
@@ -571,11 +584,11 @@ void Pi3Cmodel::updateLineQuad(Pi3Cresource *resource, const std::vector<vec3f> 
 void Pi3Cmodel::updateSpriteVerts(vertsPtr &vp, const uint32_t stride, const vec3f& p1, const vec3f& p2, const vec3f& p3, const vec3f& p4)
 {
 	updateCoordsXYZ(p1.x, p1.y, p1.z);
-	updateCoordsXYZ(p3.x, p3.y, p3.z);
 	updateCoordsXYZ(p2.x, p2.y, p2.z);
-	updateCoordsXYZ(p1.x, p1.y, p1.z);
-	updateCoordsXYZ(p4.x, p4.y, p4.z);
 	updateCoordsXYZ(p3.x, p3.y, p3.z);
+	updateCoordsXYZ(p1.x, p1.y, p1.z);
+	updateCoordsXYZ(p3.x, p3.y, p3.z);
+	updateCoordsXYZ(p4.x, p4.y, p4.z);
 }
 
 void Pi3Cmodel::updateSpriteCoordsRotated(Pi3Cresource *resource, const std::vector<vec3f> &pos, const std::vector<vec2f> &size, const std::vector<float> &angle)
@@ -597,11 +610,11 @@ void Pi3Cmodel::updateSpriteCoordsRotated(Pi3Cresource *resource, const std::vec
 		float ay = hw * sa + hh * ca;
 
 		updateCoordsXY(x - ax, y + ay);
-		updateCoordsXY(x + ax, y - ay);
 		updateCoordsXY(x - ay, y - ax);
-		updateCoordsXY(x - ax, y + ay);
-		updateCoordsXY(x + ay, y + ax);
 		updateCoordsXY(x + ax, y - ay);
+		updateCoordsXY(x - ax, y + ay);
+		updateCoordsXY(x + ax, y - ay);
+		updateCoordsXY(x + ay, y + ax);
 	}
 	resource->updateMesh(meshRef);
 }

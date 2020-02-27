@@ -416,7 +416,7 @@ void Pi3Cmesh::createOutlines()
 	}
 }
 
-#define CreateVertsXY(x,y,ux,uy)									\
+#define CreateVertsXY(x,y,ux,uy)								\
 		verts[vc++] = x; verts[vc++] = y; verts[vc++] = pos.z;	\
 		verts[vc++] = 0; verts[vc++] = -1.f; verts[vc++] = 0;	\
 		verts[vc++] = ux; verts[vc++] = 0.9999f-uy;				\
@@ -426,11 +426,11 @@ void Pi3Cmesh::addRect(const vec3f &pos, const vec2f &size, const vec2f &uv, con
 {
 	if (vc + stride * 6 > verts.size()) verts.resize(vc + stride * 6);
 	CreateVertsXY(pos.x, pos.y - size.y, uv.x, uv.y - us.y);
-	CreateVertsXY(pos.x + size.x, pos.y , uv.x + us.x, uv.y);
 	CreateVertsXY(pos.x + size.x, pos.y - size.y, uv.x + us.x, uv.y - us.y);
+	CreateVertsXY(pos.x + size.x, pos.y , uv.x + us.x, uv.y);
 	CreateVertsXY(pos.x, pos.y - size.y, uv.x, uv.y - us.y);
-	CreateVertsXY(pos.x, pos.y , uv.x, uv.y);
 	CreateVertsXY(pos.x + size.x, pos.y, uv.x + us.x, uv.y);
+	CreateVertsXY(pos.x, pos.y , uv.x, uv.y);
 
 	vertSize = vc / stride;
 	bbox.update(vec3f(pos.x, pos.y, pos.z));

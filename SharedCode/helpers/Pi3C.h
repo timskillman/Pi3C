@@ -144,7 +144,8 @@ public:
 
 	std::vector<std::string> get_dropfiles();
 
-	Pi3Cmodel * model(const uint32_t modelRef) { return &scene.models[modelRef]; }
+	Pi3Cmodel* model3D(const uint32_t modelRef) { return &scene.models[modelRef]; }
+	Pi3Cmodel* model2D(const uint32_t modelRef) { return &scene.models2D[modelRef]; }
 	//Pi3CspriteArray * getSpriteArray(const uint32_t spriteArrayRef) { return (Pi3CspriteArray*)(&resource.meshes[spriteArrayRef]); }
 
 	//Pi3Cwindow::options winopts;

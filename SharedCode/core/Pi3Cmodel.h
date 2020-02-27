@@ -111,6 +111,8 @@ public:
 	void move(const vec3f &vec) { matrix.move(vec); }
 	void rotate(const vec3f &rot) { matrix.rotate(rot); }
 
+	void updateRect2D(Pi3Cresource* resource, const vec2f& pos, const vec2f& size);
+	void updateQuad(Pi3Cresource* resource, const vec3f& p1, const vec3f& p2, const vec3f& p3, const vec3f& p4);
 	void updateSpriteVerts(vertsPtr& vp, const uint32_t stride, const vec3f& p1, const vec3f& p2, const vec3f& p3, const vec3f& p4);
 	void updateSpriteBillboard(Pi3Cresource *resource, const std::vector<vec3f> &pos, const std::vector<vec2f> &size, const vec3f &lookat);
 	void updateSpriteCoordsRotated(Pi3Cresource *resource, const std::vector<vec3f> &pos, const std::vector<vec2f> &size, const std::vector<float> &angles);

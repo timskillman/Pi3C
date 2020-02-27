@@ -33,26 +33,35 @@
 // =======================================================================
 
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
-	Pi3C pi3c("Snow", 1920, 1080, true);
-
+	uint32_t scw = 800;
+	uint32_t sch = 600;
+	Pi3C pi3c("Snow", scw, sch, false);
+	
 	uint32_t bkg = pi3c.create_background("../../Resources/models/maps/snowpath.jpg");  // wintersnow (must be rendered before snowflakes)
 
 	Pi3Cparticles snowParticles;
-	Pi3Cmodel snowmodel = snowParticles.create(&pi3c.resource, 4000,
-		vec3f(0, pi3c.height(), -10.f), Pi3Cparticles::ixyz(pi3c.width(), pi3c.height(), 0), 2, 8,
-		"../../Resources/models/maps/snowflakes4b.png", 4);
+	vec3f startpos = vec3f(0.f, (float)pi3c.height(), -10.f);
+	Pi3Cparticles::ixyz startsize = Pi3Cparticles::ixyz(scw, sch, 0);
 
-	int snowRef = pi3c.add_model_to_scene2D(snowmodel);
+	snowParticles.create(&pi3c.resource, 4000, startpos, startsize, 2, 8,
+		"../../Resources/models/maps/snowflakes4b.png", 4);
+	snowParticles.speed = 0.0001f;
+
+	int snowRef = pi3c.add_model_to_scene2D(snowParticles.model);
 
 	while (pi3c.is_running())
 	{
-		pi3c.do_events();
+		if (pi3c.window.resized) {
+			pi3c.model2D(bkg)->updateRect2D(&pi3c.resource, vec2f(0,0), vec2f((float)pi3c.width(), (float)pi3c.height()));
+			snowParticles.updateStartArea(Pi3Cparticles::ixyz(pi3c.width(), pi3c.height(),0));
+		}
+
 		pi3c.clear_window();
 
 		snowParticles.animate(0);
-		snowmodel.updateSpriteCoordsRotated(&pi3c.resource, snowParticles.position, snowParticles.sizes, snowParticles.angle);
+		snowParticles.updateParticleCoordsRotated(snowParticles.position, snowParticles.sizes, snowParticles.angle);
 
 		pi3c.render2D();
 

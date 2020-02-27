@@ -114,16 +114,10 @@
     <ClCompile Include="..\..\SharedCode\core\Pi3Cshader.cpp">
       <Filter>Shared Code\core</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\SharedCode\core\Pi3Cshapes.cpp">
-      <Filter>Shared Code\core</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\SharedCode\core\Pi3Ctexture.cpp">
       <Filter>Shared Code\core</Filter>
     </ClCompile>
     <ClCompile Include="..\..\SharedCode\core\Pi3Ctouch.cpp">
-      <Filter>Shared Code\core</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\SharedCode\core\Pi3Ctriangle.cpp">
       <Filter>Shared Code\core</Filter>
     </ClCompile>
     <ClCompile Include="..\..\SharedCode\core\Pi3Cwin.cpp">
@@ -148,6 +142,12 @@
       <Filter>Shared Code\ui</Filter>
     </ClCompile>
     <ClCompile Include="..\..\SharedCode\helpers\Pi3Cparticles.cpp">
+      <Filter>Shared Code\helpers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\SharedCode\helpers\Pi3Cshapes.cpp">
+      <Filter>Shared Code\helpers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\SharedCode\helpers\Pi3Cutils.cpp">
       <Filter>Shared Code\helpers</Filter>
     </ClCompile>
   </ItemGroup>
@@ -242,16 +242,10 @@
     <ClInclude Include="..\..\SharedCode\core\Pi3Cshader.h">
       <Filter>Shared Code\core</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\SharedCode\core\Pi3Cshapes.h">
-      <Filter>Shared Code\core</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\SharedCode\core\Pi3Ctexture.h">
       <Filter>Shared Code\core</Filter>
     </ClInclude>
     <ClInclude Include="..\..\SharedCode\core\Pi3Ctouch.h">
-      <Filter>Shared Code\core</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\SharedCode\core\Pi3Ctriangle.h">
       <Filter>Shared Code\core</Filter>
     </ClInclude>
     <ClInclude Include="..\..\SharedCode\core\Pi3Cvector.h">
@@ -285,6 +279,12 @@
       <Filter>Shared Code\ui</Filter>
     </ClInclude>
     <ClInclude Include="..\..\SharedCode\helpers\Pi3Cparticles.h">
+      <Filter>Shared Code\helpers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\SharedCode\helpers\Pi3Cshapes.h">
+      <Filter>Shared Code\helpers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\SharedCode\helpers\Pi3Cutils.h">
       <Filter>Shared Code\helpers</Filter>
     </ClInclude>
   </ItemGroup>
