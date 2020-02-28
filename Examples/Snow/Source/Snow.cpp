@@ -1,6 +1,7 @@
 #include "Pi3C.h"
 #include "Pi3Cstring.h"
 #include "Pi3Cparticles.h"
+#include "Pi3Csprite.h"
 
 // ==========================================================================
 // Pi3C Graphics Library Example - Snow 2D example (by Tim Skillman)
@@ -39,14 +40,21 @@ int main(int argc, char* argv[])
 	uint32_t sch = 600;
 	Pi3C pi3c("Snow", scw, sch, false);
 	
-	uint32_t bkg = pi3c.create_background("../../Resources/models/maps/snowpath.jpg");  // wintersnow (must be rendered before snowflakes)
+	uint32_t bkg = pi3c.add_background("../../Resources/models/maps/snowpath.jpg");
+	pi3c.showBackground(0);
 
 	Pi3Cparticles snowParticles;
 	vec3f startpos = vec3f(0.f, (float)pi3c.height(), -10.f);
 	Pi3Cparticles::ixyz startsize = Pi3Cparticles::ixyz(scw, sch, 0);
 
-	snowParticles.create(&pi3c.resource, 4000, startpos, startsize, 2, 8,
-		"../../Resources/models/maps/snowflakes4b.png", 4);
+	Pi3CspriteSheetInfo snowsprite;
+	snowsprite.filename = "../../Resources/models/maps/snowflakes4b.png";
+	snowsprite.tileX = 4;
+	snowsprite.tileY = 1;
+	snowsprite.frameCount = 4;
+
+	snowParticles.create(&pi3c.resource, 4000, startpos, startsize, 2, 8, snowsprite);
+
 	snowParticles.speed = 0.0001f;
 
 	int snowRef = pi3c.add_model_to_scene2D(snowParticles.model);

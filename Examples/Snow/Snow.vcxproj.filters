@@ -78,9 +78,6 @@
     <ClCompile Include="..\..\SharedCode\helpers\Pi3Cavatar.cpp">
       <Filter>Shared Code\helpers</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\SharedCode\helpers\Pi3Chumanoid.cpp">
-      <Filter>Shared Code\helpers</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\SharedCode\helpers\Pi3CloadOptions.cpp">
       <Filter>Shared Code\helpers</Filter>
     </ClCompile>
@@ -206,9 +203,6 @@
     <ClInclude Include="..\..\SharedCode\helpers\Pi3Cavatar.h">
       <Filter>Shared Code\helpers</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\SharedCode\helpers\Pi3Chumanoid.h">
-      <Filter>Shared Code\helpers</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\SharedCode\helpers\Pi3CloadOptions.h">
       <Filter>Shared Code\helpers</Filter>
     </ClInclude>
@@ -285,6 +279,9 @@
       <Filter>Shared Code\helpers</Filter>
     </ClInclude>
     <ClInclude Include="..\..\SharedCode\helpers\Pi3Cutils.h">
+      <Filter>Shared Code\helpers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\SharedCode\helpers\Pi3Csprite.h">
       <Filter>Shared Code\helpers</Filter>
     </ClInclude>
   </ItemGroup>

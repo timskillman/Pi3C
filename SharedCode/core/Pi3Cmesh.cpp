@@ -422,14 +422,14 @@ void Pi3Cmesh::createOutlines()
 		verts[vc++] = ux; verts[vc++] = 0.9999f-uy;				\
 		verts[vc++] = 65535.996f;								\
 
-void Pi3Cmesh::addRect(const vec3f &pos, const vec2f &size, const vec2f &uv, const vec2f &us)
+void Pi3Cmesh::addRect(const vec3f &pos, const vec2f &size, const vec2f &uv, const vec2f &uvsize)
 {
 	if (vc + stride * 6 > verts.size()) verts.resize(vc + stride * 6);
-	CreateVertsXY(pos.x, pos.y - size.y, uv.x, uv.y - us.y);
-	CreateVertsXY(pos.x + size.x, pos.y - size.y, uv.x + us.x, uv.y - us.y);
-	CreateVertsXY(pos.x + size.x, pos.y , uv.x + us.x, uv.y);
-	CreateVertsXY(pos.x, pos.y - size.y, uv.x, uv.y - us.y);
-	CreateVertsXY(pos.x + size.x, pos.y, uv.x + us.x, uv.y);
+	CreateVertsXY(pos.x, pos.y - size.y, uv.x, uv.y - uvsize.y);
+	CreateVertsXY(pos.x + size.x, pos.y - size.y, uv.x + uvsize.x, uv.y - uvsize.y);
+	CreateVertsXY(pos.x + size.x, pos.y , uv.x + uvsize.x, uv.y);
+	CreateVertsXY(pos.x, pos.y - size.y, uv.x, uv.y - uvsize.y);
+	CreateVertsXY(pos.x + size.x, pos.y, uv.x + uvsize.x, uv.y);
 	CreateVertsXY(pos.x, pos.y , uv.x, uv.y);
 
 	vertSize = vc / stride;

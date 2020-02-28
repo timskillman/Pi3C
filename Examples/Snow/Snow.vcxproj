@@ -242,7 +242,6 @@
     <ClCompile Include="..\..\SharedCode\helpers\Pi3C.cpp" />
     <ClCompile Include="..\..\SharedCode\helpers\Pi3Cavatar.cpp" />
     <ClCompile Include="..\..\SharedCode\helpers\Pi3Chtml.cpp" />
-    <ClCompile Include="..\..\SharedCode\helpers\Pi3Chumanoid.cpp" />
     <ClCompile Include="..\..\SharedCode\helpers\Pi3CloadOptions.cpp" />
     <ClCompile Include="..\..\SharedCode\helpers\Pi3Cparticles.cpp" />
     <ClCompile Include="..\..\SharedCode\helpers\Pi3Cshapes.cpp" />
@@ -290,10 +289,10 @@
     <ClInclude Include="..\..\SharedCode\helpers\Pi3C.h" />
     <ClInclude Include="..\..\SharedCode\helpers\Pi3Cavatar.h" />
     <ClInclude Include="..\..\SharedCode\helpers\Pi3Chtml.h" />
-    <ClInclude Include="..\..\SharedCode\helpers\Pi3Chumanoid.h" />
     <ClInclude Include="..\..\SharedCode\helpers\Pi3CloadOptions.h" />
     <ClInclude Include="..\..\SharedCode\helpers\Pi3Cparticles.h" />
     <ClInclude Include="..\..\SharedCode\helpers\Pi3Cshapes.h" />
+    <ClInclude Include="..\..\SharedCode\helpers\Pi3Csprite.h" />
     <ClInclude Include="..\..\SharedCode\helpers\Pi3Cutils.h" />
     <ClInclude Include="..\..\SharedCode\ui\Pi3Cimgui.h" />
     <ClInclude Include="..\..\SharedCode\ui\Pi3Cstring.h" />

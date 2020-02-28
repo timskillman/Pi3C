@@ -2,6 +2,7 @@
 
 #include <Pi3Cresource.h>
 #include <Pi3Cmodel.h>
+#include "Pi3Csprite.h"
 #include <vector>
 
 class Pi3Cparticles {
@@ -20,9 +21,9 @@ public:
 
 	}
 
-	void create(Pi3Cresource* resource, const uint32_t count, const vec3f& pos, const ixyz& area, const uint32_t minsize, const uint32_t maxsize, const std::string &tex, const uint32_t maxtypes);
+	void create(Pi3Cresource* resource, const uint32_t count, const vec3f& pos, const ixyz& area, const uint32_t minsize, const uint32_t maxsize, Pi3CspriteSheetInfo &spriteAni);
 	void update(const size_t ref, const vec2f size, const uint32_t type);
-	void createParticle(const vec3f& pos, const vec2f size, const uint32_t type, const ixyz& wandr);
+	void createParticle(const vec3f& pos, const vec2f size, const uint32_t tileRef, Pi3CspriteSheetInfo& spriteAni, const ixyz& wandr);
 	void animate(const float d);
 	void updateParticleCoordsRotated(const std::vector<vec3f>& pos, const std::vector<vec2f>& size, const std::vector<float>& angle);
 	void updateStartArea(const ixyz& area);
