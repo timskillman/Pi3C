@@ -3,11 +3,11 @@
 
 int main(int argc, char *argv[])
 {
-	Pi3C pi3c("SpriteAnimator", 1600, 900, true);
+	Pi3C pi3c("Carousel", 1600, 900, true);
 
 	//Load images from textures directory ...
 	vector<string> images = Pi3Cdirectory::readDirectory("Textures");
-	for (string image : images) {
+	for (string& image : images) {
 		if (image.find(".png") || image.find(".jpg")) {
 			pi3c.add_background("Textures/" + image);
 		}
