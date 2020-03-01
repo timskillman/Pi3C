@@ -1,7 +1,8 @@
 #include "Pi3C.h"
 #include "Pi3CperlinNoise.h"
 #include "Pi3CloadOptions.h"
-#include "Pi3Cshapes.h"
+//#include "Pi3Cshapes.h"
+#include "PerlinGUI.h"
 
 // ==========================================================================
 // Pi3C Graphics Library Example - Perlin 2D example (by Tim Skillman)
@@ -56,87 +57,40 @@ int main(int argc, char *argv[])
 	SDL_Log("Perlin time = %d", SDL_GetTicks() - start_time);
 	//ptex->saveAsPNG("pmap.png");
 	
-	Pi3Cmodel rect;
-	rect.createRect2D(&pi3c.resource, vec2f(30, 30), vec2f(width, height));
-	rect.addPicture(&pi3c.resource, ptex);
-	pi3c.add_model_to_scene2D(rect);
+	vec3f mapPos{ 0, -80.f, 0 };
+	vec3f mapSize = vec3f((float)ptex->GetWidth(), 100.f, (float)ptex->GetHeight());
 
-	Pi3Cmesh elevmap = Pi3Cshapes::elevationMap((*ptex), vec3f(0, -80, 0), vec2f(ptex->GetWidth(), ptex->GetHeight()), 100.f, 128, 128, 0, 0xffffffff);
-	Pi3Cmodel map; map.appendMesh(&pi3c.resource, elevmap, false);
-	map.material = (*pi3c.resource.defaultMaterial());  //The default material;
-	map.material.SetColDiffuse(0xffffff);
-	map.material.illum = 2;					//non shaded illumination
-	uint32_t mapref = pi3c.add_model_to_scene3D(map);
+	int32_t rect = pi3c.create_rect2D(vec2f(30.f, 30.f), vec2f((float)width, (float)height), Pi3Ccolours::White);
+	pi3c.model2D(rect)->addPicture(&pi3c.resource, ptex);
 
-	//pi3c.scene.setFog(opts.asHex("fogColour"), opts.asFloat("fogNear"), opts.asFloat("fogFar"));
+	int32_t mapref = pi3c.create_elevationMap(mapPos, mapSize, *ptex, 128, 128, Pi3Ccolours::White,"");
+
 	pi3c.scene.setPerspective3D(screenWidth, screenHeight, opts.asFloat("perspective"), opts.asFloat("nearz"), opts.asFloat("farz"));
+	pi3c.scene.setFixedLight(0xffffff, vec3f(1500.f, 1500.f, 1500.f)); //transform sun position into scene
+	pi3c.scene.setMatrix(vec3f(0, 0, 0), vec3f(0, 0, -300.f), vec3f(0.5f, 0, 0));
 
-	Pi3Cimgui& gui = pi3c.gui;
-	gui.setImagePath("icons");
-	Pi3Cimgui::rectStyle bsHeading;
-	bsHeading.textColour = 0xffffff;
-	bsHeading.highlightColour = 0x00ffff;
-	bsHeading.buttonColour = 0x808080;
-	bsHeading.top = 0;
-	bsHeading.bottom = 0;
-	bsHeading.left = 0;
-	bsHeading.right = 0;
+	perlinGUI perlingui(pi3c.gui);
 
-	float roty = 0;
 	bool updateMap = false;
+
 	while (pi3c.is_running())
 	{
-		pi3c.do_events();
-		pi3c.clear_window();
+		pi3c.clear_window(Pi3Ccolours::DeepSkyBlue);
 
-		pi3c.scene.setMatrix(vec3f(0, 0, 0), vec3f(0, 0, -300.f), vec3f(0.3f,roty,0));
-		//roty += 0.001f;
-
-		pi3c.scene.setFixedLight(0xffffff, vec3f(1500.f, -1500.f, -1500.f)); //transform sun position into scene
 		pi3c.render3D();
 
 		pi3c.render2D();
 
-		double v = (double)pamp;
-		gui.Begin();
-		gui.setButtonStyle(bsHeading);
-
-		gui.Label("Perlin Noise Map Generator");
-		gui.nextLine();
-
-		gui.Label("Smoothing:", 120);
-		gui.sameLine();
-		gui.SliderH("", 0, 2, v, 300, 24);
-		if ((float)v != pamp) { pamp = (float)v; updateMap = true; }
-		gui.nextLine();
-
-		gui.Label("Octaves:", 120);
-		gui.sameLine();
-		v = (double)octaves;
-		gui.SliderH("", 1, 10, v, 300, 24);
-		if ((uint8_t)v != octaves) { octaves = (uint8_t)v; updateMap = true; }
-		gui.nextLine();
-
-		gui.Label("Z position:", 120);
-		gui.sameLine();
-		v = (double)pz;
-		gui.SliderH("", 0, 100, v, 300, 24);
-		if ((uint8_t)v != pz) { pz = (uint8_t)v; updateMap = true; }
-		gui.nextLine();
-
-		gui.Label("Scale:", 120);
-		gui.sameLine();
-		v = (double)freq;
-		gui.SliderH("", 0, 100, v, 300, 24);
-		if ((uint8_t)v != freq) { freq = (uint8_t)v; updateMap = true; }
-		gui.nextLine();
+		perlingui.update(pi3c.gui, pamp, pz, freq, octaves, updateMap);
 
 		if (pi3c.window.mouseUp() && updateMap) {
 			pn.createMap(ptex->GetTexels(), width, height, pz, octaves, pamp, freq);
 			ptex->update();
-			pi3c.scene.models[mapref].updateMesh(&pi3c.resource, Pi3Cshapes::elevationMap((*ptex), vec3f(0, -80, 0), vec2f(ptex->GetWidth(), ptex->GetHeight()), 100.f, 128, 128, 0, 0xffffffff));
+			pi3c.model3D(mapref)->updateMesh(&pi3c.resource, Pi3Cshapes::elevationMap(*ptex, mapPos, mapSize, 128, 128, 0));
 			updateMap = false;
 		}
+
+		pi3c.model3D(mapref)->rotate(vec3f(0, 0.005f, 0));
 
 		//pi3c.showFPS();
 		pi3c.swap_buffers();

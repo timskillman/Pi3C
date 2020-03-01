@@ -11,7 +11,7 @@ void MGui::init(loadOptions &opts, Pi3Cresource * resource, Pi3Cwindow *window)
 	guifonts.push_back(gui.addFont(opts.asString("fontsPath").c_str(), opts.asString("font1").c_str(), 28));
 	guifonts.push_back(gui.addFont(opts.asString("fontsPath").c_str(), opts.asString("font1").c_str(), 16));
 
-	gui.setImagePath("icons");
+	gui.setImagePath("assets/icons");
 
 	uint32_t backColour = 0xcccccc;
 	uint32_t white = 0xffffff;

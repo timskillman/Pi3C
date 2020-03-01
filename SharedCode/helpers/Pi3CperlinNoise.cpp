@@ -95,7 +95,7 @@ float Pi3CperlinNoise::octave(float x, float y, float z, int octaves, float pers
 	return total / max;
 }
 
-#define fast (false)
+#define fast false
 
 float Pi3CperlinNoise::noise(float x, float y, float z) {
 	// Find the unit cube that contains the point
@@ -135,8 +135,6 @@ float Pi3CperlinNoise::noise(float x, float y, float z) {
 	float fff = ccc + u * (grad(p[BA + 1], x - 1.f, y, z - 1.f) - ccc);
 #endif
 
-	//float vvv = eee + v * (bbb + u * (grad(p[BB], x - 1.f, y - 1.f, z) - bbb) - eee);
-	//float www = ccc + v * (ddd + u * (grad(p[BB + 1], x - 1.f, y - 1.f, z - 1.f) - ddd) - ccc);
 	// Add blended results from 8 corners of cube
 	float res =
 		lerp(w,
@@ -146,13 +144,9 @@ float Pi3CperlinNoise::noise(float x, float y, float z) {
 			ccc + v * (ddd + u * (grad(p[BB + 1], x - 1.f, y - 1.f, z - 1.f) - ddd) - ccc));
 #else
 			lerp(v,
-			//	aaa + u * (grad(p[BA], x - 1.f, y, z) - aaa),
-			//	bbb + u * (grad(p[BB], x - 1.f, y - 1.f, z) - bbb)),
 			lerp(u, grad(p[AA], x, y, z), grad(p[BA], x - 1.f, y, z)), 
 			lerp(u, grad(p[AB], x, y - 1.f, z), grad(p[BB], x - 1.f, y - 1.f, z))),
 			lerp(v,
-			//	ccc + u * (grad(p[BA + 1], x - 1.f, y, z - 1.f) - ccc),
-			//	ddd + u * (grad(p[BB + 1], x - 1.f, y - 1.f, z - 1.f) - ddd)));
 				lerp(u, grad(p[AA + 1], x, y, z - 1.f), grad(p[BA + 1], x - 1.f, y, z - 1.f)),
 				lerp(u, grad(p[AB + 1], x, y - 1.f, z - 1.f), grad(p[BB + 1], x - 1.f, y - 1.f, z - 1.f))));
 #endif

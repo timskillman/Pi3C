@@ -262,8 +262,8 @@
     <ClInclude Include="..\..\SharedCode\ui\Pi3Cstring.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Shaders\fs1.glsl" />
-    <None Include="Shaders\vs1.glsl" />
+    <None Include="assets\shaders\fs1.glsl" />
+    <None Include="assets\shaders\vs1.glsl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -36,7 +36,7 @@ private:
 	int topbarHeight = 36;
 	int botbarHeight = 40;
 	int leftbarWidth = 50;
-	int rightbarWidth = 20;
+	int rightbarWidth = 120;
 
 	float dragBarX = 0.5f;
 	float dragBarY = 0.5f;

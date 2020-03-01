@@ -144,7 +144,7 @@ namespace Pi3CimageTools {
 	const float hr[16] = { 0, -0.5f, 0.5f, -0.5f, 0.5f, 0, 0.5f, 0.5f, 0, 0.5f, -0.5f, 0.5f, -0.5f, 0, -0.5f, -0.5f };
 	int points[1000000];
 
-	void crawlImage(uint32_t * image, uint32_t width, uint32_t height, Pi3ClinPath& contours, std::vector<uint32_t>& startPoints, uint32_t colour)
+	void traceImageSub(uint32_t * image, uint32_t width, uint32_t height, Pi3ClinPath& contours, std::vector<uint32_t>& startPoints, uint32_t colour)
 	{
 		int x = 0; int y = 0;
 		int px = 0; int py = 0;
@@ -265,7 +265,7 @@ namespace Pi3CimageTools {
 			count++;
 			finished = (c < 2 || count>50);
 
-			crawlImage(image, width, height, PathOut, startPoints, colour);
+			traceImageSub(image, width, height, PathOut, startPoints, colour);
 
 			for (uint32_t i = 0; i < imagesize; i++) {
 				if ((image[i] & 1) && (image[i] != 0xffffffff)) image[i] = 0;

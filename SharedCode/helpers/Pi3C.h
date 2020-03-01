@@ -83,15 +83,23 @@ public:
 	Pi3Cmodel* model3D(const uint32_t modelRef) { return &scene.models[modelRef]; }
 	Pi3Cmodel* model2D(const uint32_t modelRef) { return &scene.models2D[modelRef]; }
 	uint32_t getMeshVertPtr(const uint32_t meshRef) { return resource.meshes[meshRef].vertOffset*resource.meshes[meshRef].stride; }
+
 	Pi3Cmodel create_model_from_mesh(const Pi3Cmesh &mesh, const uint32_t colour = 0xffffff) { return Pi3Cmodel(&resource, mesh, colour); }
 	Pi3Cmodel create_model_from_text(const std::string &text, const uint32_t width, const uint32_t colour = 0x303030);
+	int32_t create_rect2D(const vec2f& pos, const vec2f& size, const uint32_t colour, const std::string& texfile = "");
 	int32_t create_cuboid(const vec3f& pos, const vec3f& size, const uint32_t colour, const std::string& texfile = "");
 	int32_t create_cylinder(const vec3f& pos, const float radius, const float height, const uint32_t colour, const std::string& texfile = "");
 	int32_t create_cone(const vec3f& pos, const float radius, const float height, const uint32_t colour, const std::string& texfile = "");
 	int32_t create_tube(const vec3f& pos, const float inner_radius, const float outer_radius, const float height, const uint32_t colour, const std::string& texfile = "");
+	int32_t create_tcone(const vec3f& pos, const float top_radius, const float bottom_radius, const float height, const uint32_t colour, const std::string& texfile = "");
 	int32_t create_sphere(const vec3f& pos, const float radius, const uint32_t colour, const std::string& texfile = "");
 	int32_t create_torus(const vec3f& pos, const float radius, const float ring_radius, const uint32_t colour, const std::string& texfile = "");
 	int32_t create_extrude(vec3f& pos, std::vector<std::vector<float>>& floatPath, float thickness, uint32_t colour, const std::string& texfile = "");
+	int32_t create_lathe(const vec3f &pos, std::vector<vec2f> &path, const int edges, uint32_t colour, const std::string& texfile = "");
+	int32_t create_spring(const vec3f& pos, const float radius, const float length, const int coils, const float coilradius, const int ringrots, const uint32_t colour, const std::string& texfile = "");
+	int32_t create_disk(const vec3f& pos, const float inner_radius, const float outer_radius, const uint32_t colour, const std::string& texfile);
+	int32_t create_plane(const vec3f& pos, const vec2f& size, const uint32_t xdivs, const uint32_t ydivs, int direction, const uint32_t colour, const std::string& texfile);
+	int32_t create_elevationMap(const vec3f &pos, const vec3f &size, Pi3Ctexture &tex, const uint32_t xdivs, const uint32_t ydivs, const uint32_t colour, const std::string& texfile);
 
 	//Render functions
 	void render3D() { scene.render3D(window.getTicks()); }

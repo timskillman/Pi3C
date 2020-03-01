@@ -32,27 +32,22 @@
 
 void useShader(uint32_t shaderRef, 
 	Pi3Cresource* resource, std::vector<int32_t>& shaderRefs,
-	int& res, int& iframe, int& itime, int& imouse,
+	int& resolution, int& iframe, int& itime, int& imouse,
 	uint32_t width, uint32_t height)
 {
 	if (shaderRefs[shaderRef] < 0) return;
 	Pi3Cshader& shader = resource->shaders[shaderRefs[shaderRef]];
 	shader.Use();
 
-	int texch0 = shader.GetUniformLocation("iChannel0");
-	int texch1 = shader.GetUniformLocation("iChannel1");
-	int texch2 = shader.GetUniformLocation("iChannel2");
-	int texch3 = shader.GetUniformLocation("iChannel3");
-
-	if (texch0 >= 0) glUniform1i(texch0, 0);
-	if (texch1 >= 0) glUniform1i(texch1, 1);
-	if (texch2 >= 0) glUniform1i(texch2, 2);
-	if (texch3 >= 0) glUniform1i(texch3, 3);
+	int texch0 = shader.GetSetUniformLocation("iChannel0",0);
+	int texch1 = shader.GetSetUniformLocation("iChannel1",1);
+	int texch2 = shader.GetSetUniformLocation("iChannel2",2);
+	int texch3 = shader.GetSetUniformLocation("iChannel3",3);
 
 	iframe = shader.GetSetf("iFrame", 0);
 	itime = shader.GetSetf("iTime", (float)SDL_GetTicks() / 1000.f);
 	imouse = shader.GetSet3f("iMouse", vec3f(0, 0, 0));  //x,y,button
-	res = shader.GetSet3f("iResolution", vec3f(width, height, width/height));
+	resolution = shader.GetSet3f("iResolution", vec3f(width, height, width/height));
 }
 
 int main(int argc, char *argv[])
@@ -93,42 +88,20 @@ int main(int argc, char *argv[])
 	Pi3Ctexture tex3(opts.asString("tex3").c_str());
 	Pi3Ctexture tex4(opts.asString("tex4").c_str());
 
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, tex1.textureID);
-	glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_2D, tex2.textureID);
-	glActiveTexture(GL_TEXTURE2);
-	glBindTexture(GL_TEXTURE_2D, tex3.textureID);
-	glActiveTexture(GL_TEXTURE3);
-	glBindTexture(GL_TEXTURE_2D, tex4.textureID);
-
+	tex1.mapToTextureUnit(0);
+	tex2.mapToTextureUnit(1);
+	tex3.mapToTextureUnit(2);
+	tex4.mapToTextureUnit(3);
 	
 	// Setup shader ..
-
-	int res, iframe, itime, imouse;
+	int resolution, iframe, itime, imouse;
 	uint32_t shaderSelect = 0;
-	useShader(shaderSelect, &resource, shaderRefs, res, iframe, itime, imouse, width, height);
+	useShader(shaderSelect, &resource, shaderRefs, resolution, iframe, itime, imouse, width, height);
 	window.setCaption("Shader: " + shaderFiles[shaderSelect]);
 
 	Pi3Cshader& shader = resource.shaders[shaderRefs[shaderSelect]];
-	//shader.Use();
 
-	//int texch0 = shader.GetUniformLocation("iChannel0");
-	//int texch1 = shader.GetUniformLocation("iChannel1");
-	//int texch2 = shader.GetUniformLocation("iChannel2");
-	//int texch3 = shader.GetUniformLocation("iChannel3");
-
-	//if (texch0 >= 0) glUniform1i(texch0, 0);
-	//if (texch1 >= 0) glUniform1i(texch1, 1);
-	//if (texch2 >= 0) glUniform1i(texch2, 2);
-	//if (texch3 >= 0) glUniform1i(texch3, 3);
-
-	//int res = shader.GetSet2f("iResolution", vec2f(width, height));
-	//int itime = shader.GetSetf("iTime", (float)SDL_GetTicks() / 1000.f);
-	//int imouse = shader.GetSet3f("iMouse", vec3f(0, 0, 0));  //x,y,button
-
-
-	Pi3Cmesh rectmesh = resource.createRect(vec3f(-1.f, -1.f, 0), vec2f(2.f, 2.f), 0xffffffff, vec2f(0, 0), vec2f(1.f, 1.f));
+	Pi3Cmesh rectmesh = resource.createRect(vec3f(-1.f, -1.f, 0), vec2f(2.f, 2.f), 0xffffffff);
 	int32_t rectmeshref = resource.addMesh(&rectmesh);
 
 	uint32_t frames = 0;
@@ -148,18 +121,16 @@ int main(int argc, char *argv[])
 					shader.Set3f(imouse, vec3f(window.mouse.x, window.getHeight()- window.mouse.y, (window.mouse.anyButton()) ? 1.f:0));
 				break;
 			case SDL_WINDOWEVENT:
-				switch (window.ev.window.event) {
-				case SDL_WINDOWEVENT_RESIZED:
+				if (window.resized) {
 					width = window.getWidth(); height = window.getHeight();
-					if (res>=0) shader.Set3f(res, vec3f(width, height, width/height));
-					break;
+					if (resolution >=0) shader.Set3f(resolution, vec3f(width, height, width/height));
 				}
 				break;
 			case SDL_KEYUP:
 				if (window.getKeyUp()==SDL_SCANCODE_SPACE) {
 					shaderSelect = (shaderSelect + 1) % shaderRefs.size();
-					useShader(shaderSelect, &resource, shaderRefs, res, iframe, itime, imouse, width, height);
-					if (res >= 0) shader.Set3f(res, vec3f(width, height, width / height));
+					useShader(shaderSelect, &resource, shaderRefs, resolution, iframe, itime, imouse, width, height);
+					if (resolution >= 0) shader.Set3f(resolution, vec3f(width, height, width / height));
 					frame = 0;
 					window.setCaption("Shader: " + shaderFiles[shaderSelect]);
 				}

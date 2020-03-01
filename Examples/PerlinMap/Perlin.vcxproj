@@ -113,7 +113,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <IncludePath>$(ProjectDir)\..\..\ThirdParty\SDL2\include;$(ProjectDir)\..\..\ThirdParty\SDL2_image\include;$(ProjectDir)\..\..\ThirdParty\SDL2_net\include;$(ProjectDir)\..\..\ThirdParty\SDL2_ttf\include;$(ProjectDir)\..\..\ThirdParty\glew\include;$(ProjectDir)\..\..\SharedCode\ui;$(ProjectDir)\..\..\ThirdParty\SDL2_mixer\include;$(ProjectDir)\..\..\SharedCode\file;$(ProjectDir)\..\..\SharedCode\core;$(ProjectDir)\..\..\SharedCode\helpers;$(ProjectDir)\..\..\SharedCode\glutess;$(IncludePath)</IncludePath>
-    <LibraryPath>$(ProjectDir)\..\..\ThirdParty\SDL2_image\lib\x86;$(ProjectDir)\..\..\ThirdParty\SDL2\lib\x86;$(ProjectDir)\..\..\ThirdParty\SDL2_net\lib\x86;$(ProjectDir)\..\..\ThirdParty\glew\lib\Release\Win32;$(ProjectDir)\..\..\ThirdParty\SDL2_mixer\lib\x86;$(ProjectDir)\..\..\ThirdParty\SDL2_ttf\lib\x86;$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(ProjectDir)\..\..\ThirdParty\SDL2_image\lib\x86;$(ProjectDir)\..\..\ThirdParty\SDL2\lib\x86;$(ProjectDir)\..\..\ThirdParty\SDL2_net\lib\x86;$(ProjectDir)\..\..\ThirdParty\glew\lib\x86;$(ProjectDir)\..\..\ThirdParty\SDL2_mixer\lib\x86;$(ProjectDir)\..\..\ThirdParty\SDL2_ttf\lib\x86;$(LibraryPath)</LibraryPath>
     <SourcePath>$(SourcePath)</SourcePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
@@ -250,6 +250,7 @@
     <ClCompile Include="..\..\SharedCode\ui\Pi3Cimgui.cpp" />
     <ClCompile Include="..\..\SharedCode\ui\Pi3Cstring.cpp" />
     <ClCompile Include="Source\Perlin.cpp" />
+    <ClCompile Include="Source\PerlinGUI.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\SharedCode\core\Pi3Cbbox3d.h" />
@@ -297,12 +298,13 @@
     <ClInclude Include="..\..\SharedCode\helpers\Pi3Cutils.h" />
     <ClInclude Include="..\..\SharedCode\ui\Pi3Cimgui.h" />
     <ClInclude Include="..\..\SharedCode\ui\Pi3Cstring.h" />
+    <ClInclude Include="Source\PerlinGUI.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\SharedCode\glutess\LICENSE" />
     <None Include="..\..\SharedCode\glutess\README.md" />
-    <None Include="Shaders\fs1.glsl" />
-    <None Include="Shaders\vs1.glsl" />
+    <None Include="assets\shaders\fs1.glsl" />
+    <None Include="assets\shaders\vs1.glsl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

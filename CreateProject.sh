@@ -9,13 +9,16 @@ Projects="MyProjects/$1"
 echo Creating Project MyProjects/$1 ...
 
 mkdir $Projects
-mkdir $Projects/Source
-mkdir $Projects/Shaders
+mkdir $Projects/source
+mkdir $Projects/assets
+mkdir $Projects/assets/shaders
+mkdir $Projects/assets/textures
+mkdir $Projects/assets/models
 
 echo -Copying Shaders ...
 echo -Creating makefile ...
 
-cp -p $Template/Shaders/*.glsl $Projects/Shaders
+cp -p $Template/assets/shaders/*.glsl $Projects/assets/shaders
 cp -p $Template/makefile $Projects/makefile
 sed -i s/PROJECT_NAME/$1/ $Projects/makefile
 

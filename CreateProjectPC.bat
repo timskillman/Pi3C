@@ -4,10 +4,13 @@ set Projects=MyProjects/%1
 echo Creating Project MyProjects/%1 ...
 
 mkdir "%Projects%"
-mkdir "%Projects%\Source"
-mkdir "%Projects%\Shaders"
+mkdir "%Projects%\source"
+mkdir "%Projects%\assets"
+mkdir "%Projects%\assets\shaders"
+mkdir "%Projects%\assets\textures"
+mkdir "%Projects%\assets\models"
 
-xcopy "%Template%\Shaders\*" "%Projects%\Shaders" /i
+xcopy "%Template%\assets\shaders\*" "%Projects%\assets\shaders" /i
 copy "%Template%\makefile" "%Projects%\makefile"
 powershell -Command "(gc %Projects%\makefile) -replace 'PROJECT_NAME','%1' | Out-File -encoding ASCII %Projects%\makefile"
 

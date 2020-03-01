@@ -285,7 +285,7 @@
   <ItemGroup>
     <None Include="..\..\SharedCode\glutess\LICENSE" />
     <None Include="..\..\SharedCode\glutess\README.md" />
-    <None Include="Shaders\vs1.glsl" />
+    <None Include="assets\shaders\vs1.glsl" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="options.txt" />

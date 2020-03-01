@@ -227,3 +227,9 @@ void Pi3Ctexture::changeTexels(uint8_t * texels, const GLint x, const GLint y, G
 	glBindTexture(GL_TEXTURE_2D, textureID);
 	glTexSubImage2D(GL_TEXTURE_2D, 0, x, y, (w==0) ? width : w, (h==0) ? height : h, format, GL_UNSIGNED_BYTE, texels);
 }
+
+void Pi3Ctexture::mapToTextureUnit(uint32_t unit)
+{
+	glActiveTexture(GL_TEXTURE0 + unit);
+	glBindTexture(GL_TEXTURE_2D, textureID);
+}

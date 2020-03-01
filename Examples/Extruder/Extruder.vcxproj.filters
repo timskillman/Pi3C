@@ -302,10 +302,10 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\fs1.glsl">
-      <Filter>assets</Filter>
+      <Filter>Assets</Filter>
     </None>
     <None Include="Shaders\vs1.glsl">
-      <Filter>assets</Filter>
+      <Filter>Assets</Filter>
     </None>
     <None Include="..\..\SharedCode\glutess\LICENSE">
       <Filter>Shared Code\glutess</Filter>

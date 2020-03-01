@@ -7,7 +7,7 @@
 Modeller::Modeller(Pi3Cresource *resource, Pi3Cwindow *window)
 {
 	// Setup shader ..
-	int32_t basicShaderRef = resource->addShader("Shaders/vs1.glsl", "Shaders/fs1.glsl");
+	int32_t basicShaderRef = resource->addShader("assets/shaders/vs1.glsl", "assets/shaders/fs1.glsl");
 	if (basicShaderRef < 0) {
 		window->showErrorMessage("Shader Error!", resource->error());
 		return;
@@ -96,7 +96,7 @@ void Modeller::init()
 	scene.models[skybox].touchable = false;
 
 	// Create a brush for touching objects ...
-	Pi3Cmodel brush = Pi3Cmodel(resource, Pi3Cshapes::sphere(vec3f(0, 0, 0.f), 0.5f, 0xffffff, 0.f, 10, 10), 0xff00ffff);
+	Pi3Cmodel brush = Pi3Cmodel(resource, Pi3Cshapes::sphere(vec3f(0, 0, 0.f), 0.5f, 0.f, 10, 10), 0xff00ffff);
 	brush.touchable = false;
 	brush.visible = false;
 	brushref = scene.append3D(brush);
@@ -154,8 +154,8 @@ void Modeller::handleKeys()
 
 void Modeller::createLandscape(const vec3f pos, const uint32_t colour)
 {
-	Pi3Ctexture maptex = Pi3Ctexture("maps/mountainsHgt2.png", false);
-	createShape(Pi3Cshapes::elevationMap(maptex, vec3f(0, -200.f, 0), vec3f(3000.f, 400.f, 3000.f), 128, 128, 1), pos, colour);
+	Pi3Ctexture maptex = Pi3Ctexture("assets/maps/mountainsHgt2.png", false);
+	createShape(Pi3Cshapes::elevationMap(maptex, vec3f(0, -200.f, 0), vec3f(3000.f, 400.f, 3000.f), 128, 128, 0), pos, colour);
 }
 
 void Modeller::createShape(const Pi3Cmesh& mesh, const vec3f& pos, const uint32_t colour)

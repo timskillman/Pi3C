@@ -55,6 +55,12 @@ public:
 
 	inline GLint GetUniformLocation(const char * name) { return glGetUniformLocation(program, name); }
 
+	GLint GetSetUniformLocation(const char * name, const GLint val) {
+		GLint ref = glGetUniformLocation(program, name);
+		Seti(ref, val);
+		return ref;
+	}
+
 	inline void Setf(const GLint ref, const float val) { if (ref >= 0) glUniform1f(ref, val); }
 
 	inline void Seti(const GLint ref, const GLint val) { if (ref >= 0) glUniform1i(ref, val); }

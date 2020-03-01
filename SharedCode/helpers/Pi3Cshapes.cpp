@@ -45,7 +45,7 @@ namespace Pi3Cshapes {
 		verts[vc++] = (float)(col & 255) / 256.f + (float)((col >> 8) & 255) + (float)((col >> 16) & 255) * 256.f; //range 65536.255
 	}
 
-	void rect_verts(std::vector<float>& verts, uint32_t& vc, const vec2f& pos, const vec2f& size, const vec2f& uvpos, const vec2f& uvsize, const uint32_t col)
+	void rect_verts(std::vector<float>& verts, uint32_t& vc, const vec2f& pos, const vec2f& size, const vec2f& uvpos, const vec2f& uvsize, uint32_t col)
 	{
 		vec3f n(0, -1.f, 0);
 		vec3f pos3(pos.x, pos.y, DEPTH2D);
@@ -59,10 +59,11 @@ namespace Pi3Cshapes {
 		storeVNTC(verts, vc, pos3 + vec3f(0, 0, 0), n, uvpos, col);
 	}
 
-	Pi3Cmesh rect(const vec2f& pos, const vec2f& size, const uint32_t col, const vec2f& uvpos, const vec2f& uvsize)
+	Pi3Cmesh rect(const vec2f& pos, const vec2f& size, const vec2f& uvpos, const vec2f& uvsize)
 	{
 		Pi3Cmesh rect("rect");
 		rect.stride = 9;
+		uint32_t col = 0xffffffff;
 
 		rect_verts(rect.verts, rect.vc, pos, size, uvpos, uvsize, col);
 
@@ -83,10 +84,11 @@ namespace Pi3Cshapes {
 		storeVNTC(verts, vc, p1, n, uvpos + uvsize, col);
 	}
 
-	Pi3Cmesh quad(const vec3f& p1, const vec3f& p2, const vec3f& p3, const vec3f& p4, const uint32_t col, const vec2f& uvpos, const vec2f& uvsize)
+	Pi3Cmesh quad(const vec3f& p1, const vec3f& p2, const vec3f& p3, const vec3f& p4, const vec2f& uvpos, const vec2f& uvsize)
 	{
 		Pi3Cmesh quad("quad");
 		quad.stride = 9;
+		uint32_t col = 0xffffffff;
 
 		quad_verts(quad.verts, quad.vc, p1, p2, p3, p4, uvpos, uvsize, col);
 
@@ -151,10 +153,11 @@ namespace Pi3Cshapes {
 		storeVNTC(verts, vc, pos3 + vec3f(thickness, thickness, 0), n, uvpos + vec2f(uvx, uvy), col); //9
 	}
 
-	Pi3Cmesh rectLine(const vec2f& pos, const vec2f& size, const float thickness, const uint32_t col, const vec2f& uvpos, const vec2f& uvsize)
+	Pi3Cmesh rectLine(const vec2f& pos, const vec2f& size, const float thickness, const vec2f& uvpos, const vec2f& uvsize)
 	{
 		Pi3Cmesh rect("rectline");
 		rect.stride = 9;
+		uint32_t col = 0xffffffff;
 
 		if (thickness == 0) {
 			rectLine_verts(rect.verts, rect.vc, pos, size, uvpos, uvsize, col);
@@ -215,10 +218,11 @@ namespace Pi3Cshapes {
 		}
 	}
 
-	Pi3Cmesh plane(const vec3f& pos, const vec2f& size, const uint32_t xdivs, const uint32_t ydivs, int direction, const uint32_t col, const vec2f& uvsize)
+	Pi3Cmesh plane(const vec3f& pos, const vec2f& size, const uint32_t xdivs, const uint32_t ydivs, int direction, const vec2f& uvsize)
 	{
 		Pi3Cmesh plane("Plane");
 		plane.stride = 9;
+		uint32_t col = 0xffffffff;
 
 		plane_verts(plane.verts, plane.vc, pos, size, xdivs, ydivs, direction, uvsize, col);
 
@@ -253,10 +257,11 @@ namespace Pi3Cshapes {
 		}
 	}
 
-	Pi3Cmesh cuboid(const vec3f& pos, const vec3f& size, const uint32_t col, const int divx, const int divy, const int divz)
+	Pi3Cmesh cuboid(const vec3f& pos, const vec3f& size, const int divx, const int divy, const int divz)
 	{
 		Pi3Cmesh cube("Cuboid");
 		cube.stride = 9;
+		uint32_t col = 0xffffffff;
 
 		cube_verts(cube.verts, cube.vc, pos, size, divx, divy, divz, col);
 
@@ -380,10 +385,11 @@ namespace Pi3Cshapes {
 
 	}
 
-	Pi3Cmesh disk(const vec3f &pos, const float innerRad, const float outerRad, const uint32_t col, const int sides)
+	Pi3Cmesh disk(const vec3f &pos, const float innerRad, const float outerRad, const int sides)
 	{
 		Pi3Cmesh model("disk");
 		model.stride = 9;
+		uint32_t col = 0xffffffff;
 
 		disk_verts(model.verts, model.vc, pos, innerRad, outerRad, sides, col);
 
@@ -463,10 +469,14 @@ namespace Pi3Cshapes {
 		}
 	}
 
-	Pi3Cmesh lathe(const std::string &name, const vec3f &pos, std::vector<vec2f> &path, const uint32_t col, const int edges, const float rise, const float startAngle, const float endAngle, const bool invert, const float creaseAngle, const vec2f &prevPoint, const vec2f &lastPoint, const uint32_t uvtype)
+	Pi3Cmesh lathe(const std::string &name, const vec3f &pos, std::vector<vec2f> &path, 
+		const int edges, const float rise, const float startAngle, 
+		const float endAngle, const bool invert, const float creaseAngle, 
+		const vec2f &prevPoint, const vec2f &lastPoint, const uint32_t uvtype)
 	{
 		Pi3Cmesh lathe(name);
 		lathe.stride = 9;
+		uint32_t col = 0xffffffff;
 
 		size_t sz = path.size();
 		if (sz < 2) return lathe;
@@ -478,7 +488,7 @@ namespace Pi3Cshapes {
 		return lathe;
 	}
 
-	Pi3Cmesh sphere(const vec3f &pos, const float radius, const uint32_t col, const float hemi, const int slices, const int sides, const bool invert)
+	Pi3Cmesh sphere(const vec3f &pos, const float radius, const float hemi, const int slices, const int sides, const bool invert)
 	{
 		std::vector<vec2f> path;
 		float st = (PI*(1.0f - hemi)) / static_cast<float>(slices);
@@ -487,20 +497,20 @@ namespace Pi3Cshapes {
 		for (int r = 0; r <= slices; r++) {
 			path.push_back(vec2f(radius*sin(static_cast<float>(r)*st+ho)*inv, radius*cos(static_cast<float>(r)*st+ho)));
 		}
-		return lathe("Sphere", pos, path, col, sides, 0.0f, 0.0f, 2.f*PI, false, 60.f, vec2f(1, path[0].y), vec2f(-1, path[path.size() - 1].y),UVMAP_SPHERE);
+		return lathe("Sphere", pos, path, sides, 0.0f, 0.0f, 2.f*PI, false, 60.f, vec2f(1, path[0].y), vec2f(-1, path[path.size() - 1].y),UVMAP_SPHERE);
 	}
 
-	Pi3Cmesh torus(const vec3f &pos, const float radius, const float ringradius, const uint32_t col, const int ringrots, const int sides)
+	Pi3Cmesh torus(const vec3f &pos, const float radius, const float ringradius, const int ringrots, const int sides)
 	{
 		std::vector<vec2f> path;
 		float st = PI2 / (float)ringrots;
 		for (int r = 0; r < (ringrots + 1); r++) {
 			path.push_back(vec2f(radius + ringradius*sin(r*st), ringradius*cos(r*st)));
 		}
-		return lathe("Torus", pos, path, col, sides, 0.0f, 0.0f, PI2, false, 60.f);
+		return lathe("Torus", pos, path, sides, 0.0f, 0.0f, PI2, false, 60.f);
 	}
 
-	Pi3Cmesh spring(const vec3f &pos, const float radius, const float length, const int coils, const float coilradius, const int ringrots, const uint32_t col, const int sides)
+	Pi3Cmesh spring(const vec3f &pos, const float radius, const float length, const int coils, const float coilradius, const int ringrots, const int sides)
 	{
 		std::vector<vec2f> path;
 		//float rise = length / coils;
@@ -508,39 +518,39 @@ namespace Pi3Cshapes {
 		for (int r = 0; r < (ringrots + 1); r++) {
 			path.push_back(vec2f(radius + coilradius*sin(r*st), coilradius*cos(r*st)));
 		}
-		return lathe("Spring",pos, path, col, sides, length, 0.0f, 2.f*PI*(float)coils);
+		return lathe("Spring",pos, path, sides, length, 0.0f, 2.f*PI*(float)coils);
 	}
 
-	Pi3Cmesh cone(const vec3f &pos, const float radius, const float height, const uint32_t col, const int sides)
+	Pi3Cmesh cone(const vec3f &pos, const float radius, const float height, const int sides)
 	{
 		std::vector<vec2f> path;
 		path.push_back(vec2f(0, height));
 		path.push_back(vec2f(radius, 0));
 		path.push_back(vec2f(0, 0));
-		return lathe("Cone",pos, path, col, sides, 0.0f, 0.0f, 2.f*PI, true, 60.0f, vec2f(-radius, height*2), vec2f(-radius, 0));
+		return lathe("Cone",pos, path, sides, 0.0f, 0.0f, 2.f*PI, true, 60.0f, vec2f(-radius, height*2), vec2f(-radius, 0));
 	}
 
-	Pi3Cmesh tcone(const vec3f &pos, const float botradius, const float topradius, const float height, const uint32_t col, const int sides)
+	Pi3Cmesh tcone(const vec3f &pos, const float botradius, const float topradius, const float height, const int sides)
 	{
 		std::vector<vec2f> path;
 		path.push_back(vec2f(0, height));
 		path.push_back(vec2f(topradius, height));
 		path.push_back(vec2f(botradius, 0));
 		path.push_back(vec2f(0, 0));
-		return lathe("Truncated Cone", pos, path, col, sides, 0.f, 0.0f, 2.f*PI, true, 60.0f, vec2f(-1.0f,height));
+		return lathe("Truncated Cone", pos, path, sides, 0.f, 0.0f, 2.f*PI, true, 60.0f, vec2f(-1.0f,height));
 	}
 
-	Pi3Cmesh cylinder(const vec3f &pos, const float radius, const float height, const uint32_t col, const int sides)
+	Pi3Cmesh cylinder(const vec3f &pos, const float radius, const float height, const int sides)
 	{
 		std::vector<vec2f> path;
 		path.push_back(vec2f(0, height));
 		path.push_back(vec2f(radius, height));
 		path.push_back(vec2f(radius, 0));
 		path.push_back(vec2f(0, 0));
-		return lathe("Cylinder", pos, path, col, sides, 0.0f, 0.0f, 2.f*PI, true, 60.0f, vec2f(-1.0f, height));
+		return lathe("Cylinder", pos, path, sides, 0.0f, 0.0f, 2.f*PI, true, 60.0f, vec2f(-1.0f, height));
 	}
 
-	Pi3Cmesh tube(const vec3f &pos, const float radius1, const float radius2, const float height, const uint32_t col, const int sides)
+	Pi3Cmesh tube(const vec3f &pos, const float radius1, const float radius2, const float height, const int sides)
 	{
 		std::vector<vec2f> path;
 		path.push_back(vec2f(radius1, height));
@@ -548,7 +558,7 @@ namespace Pi3Cshapes {
 		path.push_back(vec2f(radius2, 0));
 		path.push_back(vec2f(radius1, 0));
 		path.push_back(vec2f(radius1, height));
-		return lathe( "Tube", pos, path, col, sides, 0.0f, 0.0f, 2.f*PI, true, 60.0f, vec2f(0, 0), vec2f(0, 0), UVMAP_SPHERE);
+		return lathe( "Tube", pos, path, sides, 0.0f, 0.0f, 2.f*PI, true, 60.0f, vec2f(0, 0), vec2f(0, 0), UVMAP_SPHERE);
 	}
 	
 	void texMap(std::vector<float> &vertBuffer, uint32_t vc, uint32_t stride, uint32_t uvoffset, uint8_t x, uint8_t y)
@@ -687,10 +697,11 @@ namespace Pi3Cshapes {
 
 	}
 
-	Pi3Cmesh extrude(const std::string &name, const vec3f &pos, std::vector<std::vector<float>> &contours, const float depth, const uint32_t col, const uint16_t divs)
+	Pi3Cmesh extrude(const std::string &name, const vec3f &pos, std::vector<std::vector<float>> &contours, const float depth, const uint16_t divs)
 	{
 		Pi3Cmesh extrusion(name);
 		extrusion.stride = 9;
+		uint32_t col = 0xffffffff;
 
 		extrude_verts(extrusion.verts, extrusion.vc, pos, contours, depth, divs, col);
 
@@ -772,15 +783,15 @@ namespace Pi3Cshapes {
 				v4[a] = x + xd; v4[b] = h10; v4[c] = y;
 				memcpy(&vec4, &v4, sizeof(v4));
 
-				n = vec1.trinormal(vec2, vec3);
+				n = -vec1.trinormal(vec2, vec3);
 				storeVNTC(verts, vc, pos + vec1, n, vec2f(xu + ux, yu + uy), col);
-				storeVNTC(verts, vc, pos + vec2, n, vec2f(xu, yu), col);
 				storeVNTC(verts, vc, pos + vec3, n, vec2f(xu, yu + uy), col);
-
-				n = vec1.trinormal(vec4, vec2);
-				storeVNTC(verts, vc, pos + vec1, n, vec2f(xu + ux, yu + uy), col);
-				storeVNTC(verts, vc, pos + vec4, n, vec2f(xu + ux, yu), col);
 				storeVNTC(verts, vc, pos + vec2, n, vec2f(xu, yu), col);
+
+				n = -vec1.trinormal(vec4, vec2);
+				storeVNTC(verts, vc, pos + vec1, n, vec2f(xu + ux, yu + uy), col);
+				storeVNTC(verts, vc, pos + vec2, n, vec2f(xu, yu), col);
+				storeVNTC(verts, vc, pos + vec4, n, vec2f(xu + ux, yu), col);
 
 #else
 				float hh = (h00 + h01 + h10 + h11) / 4.0f; //avg height for centre point
@@ -824,10 +835,11 @@ namespace Pi3Cshapes {
 
 	}
 
-	Pi3Cmesh elevationMap(Pi3Ctexture &tex, const vec3f &pos, const vec3f &size, const uint32_t xdivs, const uint32_t ydivs, const int direction, const uint32_t col, const vec2f &uvsize)
+	Pi3Cmesh elevationMap(Pi3Ctexture &tex, const vec3f &pos, const vec3f &size, const uint32_t xdivs, const uint32_t ydivs, const int direction, const vec2f &uvsize)
 	{
 		Pi3Cmesh meshmap("Map");
 		meshmap.stride = 9;
+		uint32_t col = 0xffffffff;
 
 		const float mapHeight = size.y;
 

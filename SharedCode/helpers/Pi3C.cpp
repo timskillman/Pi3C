@@ -44,7 +44,7 @@ void Pi3C::init(const Pi3Cwindow::options& winopts)
 	resource.init(); //resource.init must be called after window creation
 
 	// Setup shader ..
-	int32_t basicShaderRef = resource.addShader("Shaders/vs1.glsl", "Shaders/fs1.glsl");
+	int32_t basicShaderRef = resource.addShader("assets/shaders/vs1.glsl", "assets/shaders/fs1.glsl");
 	if (basicShaderRef < 0) {
 		window.showErrorMessage("Shader Error!", resource.error());
 		return;
@@ -272,6 +272,12 @@ std::vector<std::string> Pi3C::get_dropfiles()
 //	return add_model_to_scene3D(rectangles);
 //}
 
+int32_t Pi3C::create_rect2D(const vec2f& pos, const vec2f& size, const uint32_t colour, const std::string& texfile)
+{
+	Pi3Cmodel rect(&resource, Pi3Cshapes::rect(pos, size), colour);
+	return scene.append2D(rect, texfile);
+}
+
 int32_t Pi3C::create_cuboid(const vec3f& pos, const vec3f& size, const uint32_t colour, const std::string& texfile)
 {
 	Pi3Cmodel cuboid(&resource, Pi3Cshapes::cuboid(pos, size), colour);
@@ -296,6 +302,12 @@ int32_t Pi3C::create_tube(const vec3f& pos, const float inner_radius, const floa
 	return scene.append3D(tube, texfile);
 }
 
+int32_t Pi3C::create_tcone(const vec3f& pos, const float top_radius, const float bottom_radius, const float height, const uint32_t colour, const std::string& texfile)
+{
+	Pi3Cmodel tcone(&resource, Pi3Cshapes::tcone(pos, bottom_radius, top_radius, height), colour);
+	return scene.append3D(tcone, texfile);
+}
+
 int32_t Pi3C::create_torus(const vec3f& pos, const float radius, const float ring_radius, const uint32_t colour, const std::string& texfile)
 {
 	Pi3Cmodel torus(&resource, Pi3Cshapes::torus(pos, radius, ring_radius), colour);
@@ -311,4 +323,30 @@ int32_t Pi3C::create_sphere(const vec3f& pos, const float radius, const uint32_t
 int32_t Pi3C::create_extrude(vec3f& pos, std::vector<std::vector<float>>& floatPath, float thickness, uint32_t colour, const std::string& texfile) {
 	Pi3Cmodel extrude(&resource, Pi3Cshapes::extrude("", pos, floatPath, thickness), colour);
 	return scene.append3D(extrude, texfile);
+}
+
+int32_t Pi3C::create_lathe(const vec3f &pos, std::vector<vec2f> &path, const int edges, uint32_t colour, const std::string& texfile) {
+	Pi3Cmodel lathe(&resource, Pi3Cshapes::lathe("", pos, path, colour, edges), colour);
+	return scene.append3D(lathe, texfile);
+}
+
+int32_t Pi3C::create_spring(const vec3f& pos, const float radius, const float length, const int coils, const float coilradius, const int ringrots, const uint32_t colour, const std::string& texfile) {
+	Pi3Cmodel spring(&resource, Pi3Cshapes::spring(pos, radius, length, coils, coilradius, ringrots), colour);
+	return scene.append3D(spring, texfile);
+}
+
+int32_t Pi3C::create_disk(const vec3f& pos, const float inner_radius, const float outer_radius, const uint32_t colour, const std::string& texfile) {
+	Pi3Cmodel disk(&resource, Pi3Cshapes::disk(pos, inner_radius, outer_radius), colour);
+	return scene.append3D(disk, texfile);
+}
+
+int32_t Pi3C::create_plane(const vec3f& pos, const vec2f& size, const uint32_t xdivs, const uint32_t ydivs, int direction, const uint32_t colour, const std::string& texfile) {
+	Pi3Cmodel plane(&resource, Pi3Cshapes::plane(pos, size, 1,1,0), colour);
+	return scene.append3D(plane, texfile);
+}
+
+int32_t Pi3C::create_elevationMap(const vec3f &pos, const vec3f &size, Pi3Ctexture &tex, const uint32_t xdivs, const uint32_t ydivs, const uint32_t colour, const std::string& texfile)
+{
+	Pi3Cmodel map(&resource, Pi3Cshapes::elevationMap(tex, pos, size, xdivs, ydivs, 0), colour);
+	return scene.append3D(map, texfile);
 }

@@ -241,8 +241,8 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Shaders\vs1.glsl">
-      <Filter>assets</Filter>
+    <None Include="assets\shaders\vs1.glsl">
+      <Filter>Assets</Filter>
     </None>
     <None Include="..\..\SharedCode\glutess\LICENSE">
       <Filter>Shared Code\glutess</Filter>

@@ -39,7 +39,7 @@ int main(int argc, char* argv[])
 	uint32_t sch = 600;
 	Pi3C pi3c("Snow", scw, sch, false);
 	
-	uint32_t bkg = pi3c.create_background("../../Resources/models/maps/snowpath.jpg");  // wintersnow (must be rendered before snowflakes)
+	uint32_t bkg = pi3c.add_background("../../Resources/models/maps/snowpath.jpg");  // wintersnow (must be rendered before snowflakes)
 
 	Pi3Cparticles snowParticles;
 	vec3f startpos = vec3f(0.f, (float)pi3c.height(), -10.f);
@@ -50,6 +50,8 @@ int main(int argc, char* argv[])
 	snowParticles.speed = 0.0001f;
 
 	int snowRef = pi3c.add_model_to_scene2D(snowParticles.model);
+
+	pi3c.showBackground(bkg);
 
 	while (pi3c.is_running())
 	{

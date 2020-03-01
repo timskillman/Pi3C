@@ -56,6 +56,7 @@ public:
 	//			uint8_t *dest_pixels, const Pi3Crecti *dst_rect, const uint32_t dest_pitch);	//Just blit the texture into another texture into rect position on the destination texture
 	void blit(Pi3Crecti *src_rect, Pi3Ctexture *dest_tex, Pi3Crecti *dst_rect);				//Just blit the texture into another texture into rect position on the destination texture
 	bool resize(const uint32_t new_width, const uint32_t new_height, const bool centre);
+	void mapToTextureUnit(uint32_t unit);
 	bool merge(Pi3Ctexture * mergetex, bool right_top);
 
 	inline uint32_t GetWidth() const { return width; }
