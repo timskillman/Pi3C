@@ -18,6 +18,7 @@ public:
 	Pi3Crecti getRectTopRight();
 	Pi3Crecti getRectTopLeft();
 	Pi3Crecti getRectFull();
+	void resize() { gui.resize(); }
 
 private:
 
@@ -30,13 +31,15 @@ private:
 	Pi3Cimgui::rectStyle bsButtons;
 	Pi3Cimgui::rectStyle bsItems;
 
-	std::vector<std::string> guifonts;
+	std::string smallFont;
+	std::string largeFont;
+	std::string mediumFont;
 
 	int menuHeight = 20;
 	int topbarHeight = 36;
 	int botbarHeight = 40;
 	int leftbarWidth = 50;
-	int rightbarWidth = 120;
+	int rightbarWidth = 40;
 
 	float dragBarX = 0.5f;
 	float dragBarY = 0.5f;
@@ -52,5 +55,6 @@ private:
 	float iby = 1.f - dragBarY;
 
 	void renderYellowBorder(uint32_t currentSelView);
+	
 
 };

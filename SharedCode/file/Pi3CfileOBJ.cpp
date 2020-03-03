@@ -509,7 +509,7 @@ namespace Pi3CfileOBJ {
 	void save(const std::string &path, const std::string &filename, Pi3Cscene *scene, const bool selected, const std::function<void(float)> showProgressCB, std::string &error)
 	{
 		const std::string gpath = (path.size() > 0 && *(path.end() - 1) != '/') ? path + "/" : path;
-		const std::string filepath = gpath + filename;
+		const std::string filepath = gpath + filename + ".obj";
 
 		std::string matfilename = filename + ".mtl";
 		const std::string matpath = gpath + matfilename;

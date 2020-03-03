@@ -317,40 +317,6 @@ void Pi3Cscene::saveBufferToPNG(const char * filename, std::vector<uint8_t> &sna
 		SDL_FreeSurface(ss);
 }
 
-bool Pi3Cscene::snapShot(const viewInfo& viewinfo, std::vector<uint8_t> &snapShot)
-{
-	//SDL_Surface *sshot = SDL_CreateRGBSurface(0, rect.width, rect.height, 32, 0x00ff0000, 0x0000ff00, 0x000000ff, 0xff000000);
-	//SDL_RenderReadPixels(renderer, NULL, SDL_PIXELFORMAT_ARGB8888, sshot->pixels, sshot->pitch);
-	//SDL_SaveBMP(sshot, "screenshot.bmp");
-	//SDL_FreeSurface(sshot);
-	const Pi3Crecti &rect = viewinfo.viewport;
-
-	try {
-		uint32_t size = (uint32_t)(rect.width*rect.height * 4);
-		if (snapShot.size() < size) snapShot.resize(size);
-		glViewport(rect.x, rect.y, rect.width, rect.height);
-		//glReadBuffer(GL_COLOR_ATTACHMENT0);
-		glReadPixels(rect.x, rect.y, rect.width, rect.height, GL_RGBA, GL_UNSIGNED_BYTE, &snapShot[0]);
-		saveBufferToPNG("snapshot.png",snapShot,rect.width, rect.height);
-		/*
-		std::vector<uint8_t> destimage;
-		destimage.resize(snapShot.size());
-		flipImage(snapShot, destimage, rect.width, rect.height);
-
-		SDL_Surface *ss = SDL_CreateRGBSurfaceFrom(&destimage[0], rect.width, rect.height, 32, rect.width * 4, 0x000000ff, 0x0000ff00, 0x00ff0000, 0xff000000);
-		SDL_RWops *fo = SDL_RWFromFile("snapshot.png", "wb");
-		IMG_SavePNG_RW(ss, fo, 0);
-		SDL_RWclose(fo);
-		SDL_FreeSurface(ss);
-		* */
-
-		return true;
-	}
-	catch (const std::bad_alloc&) {
-		return false;
-	}
-}
-
 void Pi3Cscene::checkFBerrors()
 {
 	GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
@@ -378,12 +344,14 @@ void Pi3Cscene::checkFBerrors()
 	}
 }
 
-void Pi3Cscene::renderOffscreen(const viewInfo& viewinfo) //, const Pi3Cshader &shader
+void Pi3Cscene::renderOffscreen(const viewInfo& viewinfo, Pi3Cmaterial* outlines) //, const Pi3Cshader &shader
 {
 //#ifdef __arm__
-	
+	viewInfo newview = viewinfo;
+	 
 	int width = viewinfo.viewport.width;
 	int height = viewinfo.viewport.height;
+	newview.viewport = Pi3Crecti(0, 0, width, height);
 
 	GLuint frame_buf = 0, colour_buf = 0, depth_buf = 0;
 
@@ -410,7 +378,7 @@ void Pi3Cscene::renderOffscreen(const viewInfo& viewinfo) //, const Pi3Cshader &
 	//glClearColor(0, 0, 0, 0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //Clear colour and Z buffer
 
-	render3D();
+	renderView(newview, outlines);
 	
 	std::vector<uint8_t> data(width*height * 4);
 	glReadPixels(0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, &data[0]);

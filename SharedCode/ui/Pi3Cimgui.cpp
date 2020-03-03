@@ -263,7 +263,7 @@ void Pi3Cimgui::setButtonBackground(Pi3Cmodel &rect, const bool mouseTouchRect)
 	rect.material.alpha = currentParams.buttonAlpha;
 }
 
-bool Pi3Cimgui::renderRect(const int width, const int height)
+bool Pi3Cimgui::renderRect(const int width, const int height, uint32_t colour)
 {
 	pos = nextPos;
 	//float dpi = window->dpi;
@@ -273,7 +273,8 @@ bool Pi3Cimgui::renderRect(const int width, const int height)
 	rect.createRect2D(resource, vec2f((float)pos.x, (float)(pos.y - size.y)), vec2f((float)(size.x), (float)(size.y)));
 	rect.matrix.setz(zpos-1.f);
 	//setButtonBackground(rect, mouseTouchRect);
-	rect.material.SetColDiffuse(currentParams.buttonColour);
+	if (colour != 0) rect.material.alpha = (float)((colour>>24) & 255)/255.f;
+	rect.material.SetColDiffuse((colour==0) ? currentParams.buttonColour : colour);
 	rect.renderBasic(resource, resource->shaders[0]);
 	return mouseTouchRect;
 }
@@ -316,9 +317,9 @@ bool Pi3Cimgui::renderIcon(const std::string &str, const int minwidth, const int
 	return renderIconImage(findCreateImage2(str, IMAGE), minwidth, minheight, true, currentParams.textColour);
 }
 
-bool Pi3Cimgui::renderText(const std::string &str, const int minwidth, const int minheight)
+bool Pi3Cimgui::renderText(const std::string &str, const int minwidth, const int minheight, uint32_t colour)
 {
-	return renderIconImage(findCreateImage2(str, TEXT), minwidth, minheight, false, currentParams.textColour);
+	return renderIconImage(findCreateImage2(str, TEXT), minwidth, minheight, false, (colour==0) ? currentParams.textColour : colour);
 }
 
 bool Pi3Cimgui::renderBackIcon(const std::string &str, const int minwidth, const int minheight)
@@ -480,16 +481,21 @@ bool Pi3Cimgui::SliderInt(const std::string &text, const int32_t from, const int
 	return false;
 }
 
-bool Pi3Cimgui::InputText(const std::string &text, std::string &input, const int minWidth, const int minHeight)
+bool Pi3Cimgui::InputText(const std::string &text, std::string &input, const int minWidth, const int minHeight, uint32_t colour)
 {
 	//Help from http://lazyfoo.net/tutorials/SDL/32_text_input_and_clipboard_handling/index.php
 
 	int mWidth = (minWidth == 0) ? currentParams.minWidth : minWidth; // / dpi;
 	int mHeight = (minHeight == 0) ? currentParams.minHeight : minHeight; // / dpi;
 
+	if (renderRect(mWidth, mHeight)) {
+
+	}
+
 	size = Pi3Cpointi(mWidth, mHeight);
 	bool touch = touched(size);
 	bool clicked = touch && window->mouse.LeftButton;
+	bool finished = false;
 
 	if (clicked) {
 		thisTextField = textID;
@@ -506,19 +512,42 @@ bool Pi3Cimgui::InputText(const std::string &text, std::string &input, const int
 
 		//add/remove characters from input ...
 		if (textEditing) {
+			if (window->getKeyUp() == SDL_SCANCODE_BACKSPACE)
+			{
+				if (input.length() > 0) input.pop_back();
+				window->resetKeyUp();
+			}
+			else if (window->getKeyUp() == SDLK_c && SDL_GetModState() & KMOD_CTRL)
+			{
+				SDL_SetClipboardText(input.c_str());
+			}
+			//Handle paste
+			else if (window->getKeyUp() == SDLK_v && SDL_GetModState() & KMOD_CTRL)
+			{
+				input = input + SDL_GetClipboardText();
+			}
+			else if (window->getKeyUp() == SDL_SCANCODE_RETURN) {
+				finished = true;
+			}
+
 			std::string text = window->getInput();
-			if (text!="" && !((text[0] == 'c' || text[0] == 'C') && (text[0] == 'v' || text[0] == 'V') && SDL_GetModState() & KMOD_CTRL)) {
+			if (text != "" && !((text[0] == 'c' || text[0] == 'C') && (text[0] == 'v' || text[0] == 'V') && SDL_GetModState() & KMOD_CTRL)) {
 				input += text;
 				window->clearInput();
 			}
 		}
+		
 	}
 
 	//uint32_t col = (colour == 0) ? currentParams.textColour | 0xff000000 : colour;
-	resource->renderText(resource->lettersRef, currentFont, input, vec3f((float)pos.x, (float)pos.y, zpos), 8000.f, currentParams.textColour);
-
+	if (input != "") {
+		resource->renderText(resource->lettersRef, currentFont, input, vec3f((float)pos.x, (float)pos.y, zpos), 8000.f, (colour==0) ? currentParams.textColour : colour); //(float)mWidth
+	}
 	textID++;
-	return false;
+
+	NextPos();
+
+	return finished;
 }
 
 bool Pi3Cimgui::InputFloat(const std::string &text, const float from, const float too, float &value)
@@ -622,6 +651,11 @@ void Pi3Cimgui::Begin() {
 	if (!window->mouse.LeftButton) somethingSelected = false;
 }
 
+void Pi3Cimgui::End()
+{
+	if (!takeSnapshot) snapshot();
+}
+
 bool Pi3Cimgui::BeginMenuBar()
 {
 	currentParams.selectable = false;
@@ -671,4 +705,58 @@ bool Pi3Cimgui::MenuItem(const std::string &menuItem, const std::string &itemHot
 	bool clicked = (touch && window->mouse.LeftButton);
 	if (clicked) { menuTouch = ""; somethingSelected = true; }
 	return clicked;
+}
+
+void Pi3Cimgui::snapshot()
+{
+	std::vector<uint8_t> snap;
+	Pi3Cutils::snapShot(Pi3Crecti(0, 0, window->getWidth(), window->getHeight()), snap);
+
+	std::shared_ptr<Pi3Ctexture> snaptex;
+	snaptex.reset(new Pi3Ctexture(window->getWidth(), window->getHeight(), snap, 4));
+
+	snapShotPic.createRect2D(resource, vec2f(0, 0), vec2f(window->getWidth(), window->getHeight()));
+	snapShotPic.addPicture(resource, snaptex);
+
+	takeSnapshot = true;
+}
+
+std::string Pi3Cimgui::OpenFileDialog()
+{   
+	//if (takeSnapshot < 2) {
+	//	takeSnapshot = 1; 
+	//	return;
+	//}
+
+	std::string inptext = "";
+	bool finished = false;
+	snapShotPic.matrix.setz(-30.f);
+	setGaps(3, 3);
+	currentParams.textColour = 0xff000000;
+	
+	while (!window->hasquit() && !finished) {
+
+		window->clear();
+		std::vector<uint32_t> events = window->event();
+
+		snapShotPic.renderBasic(resource, resource->shaders[0]);
+
+		Begin();
+		renderRect(window->getWidth(), window->getHeight(), 0xD0000000);
+
+		setPosition(100, 100);
+
+		renderText("Enter Filename:", 200, 0, 0xffffffff);
+		nextLine();
+
+		finished = InputText("Filename", inptext, 200, 0, 0xff000000);
+		
+		if (ButtonImage("butSave.png")) {
+			finished = true;
+		}
+
+		window->SwapBuffers();
+	}
+
+	return inptext;
 }

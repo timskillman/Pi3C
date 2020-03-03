@@ -51,6 +51,9 @@ public:
 		std::string err; Pi3CfileOBJ::save(path, filename, &scene, false, nullptr, err); 
 	}
 
+	void snapshot() {
+		scene.renderOffscreen(views[currentSelView], &outlines);
+	}
 	//vec3f getRelativeMove(const vec3f& pos);
 
 	void clearSelections();

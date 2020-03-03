@@ -67,7 +67,7 @@ private:
 	bool editMode = 0;
 	bool modeChange = true;
 	float edTransition = 0;
-	vec3f editpos{ 0, 0.f, -300.f };
+	vec3f editpos{ 0, 0.f, -800.f };
 	vec3f editrot{ .7f, .7f, 0 };
 	vec3f grid;
 	vec2f nearzfarz{ 1.f, 5000.f };

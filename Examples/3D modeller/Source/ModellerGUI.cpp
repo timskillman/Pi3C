@@ -8,8 +8,9 @@ void MGui::init(loadOptions &opts, Pi3Cresource * resource, Pi3Cwindow *window)
 
 	// Get GUI fonts
 	//resource->addFont(opts.asString("fontsPath").c_str(), opts.asString("font1").c_str(), 80);
-	guifonts.push_back(gui.addFont(opts.asString("fontsPath").c_str(), opts.asString("font1").c_str(), 28));
-	guifonts.push_back(gui.addFont(opts.asString("fontsPath").c_str(), opts.asString("font1").c_str(), 16));
+	largeFont = gui.addFont(opts.asString("fontsPath").c_str(), opts.asString("font1").c_str(), 28);
+	mediumFont = gui.addFont(opts.asString("fontsPath").c_str(), opts.asString("font1").c_str(), 20);
+	smallFont = gui.addFont(opts.asString("fontsPath").c_str(), opts.asString("font1").c_str(), 16);
 
 	gui.setImagePath("assets/icons");
 
@@ -19,7 +20,7 @@ void MGui::init(loadOptions &opts, Pi3Cresource * resource, Pi3Cwindow *window)
 	uint32_t selectColour = 0x00ffff;
 
 	// Setup GUI button styles ...
-	bsMenu.font = guifonts[1];
+	bsMenu.font = smallFont;
 	bsMenu.textColour = 0x0;
 	bsMenu.buttonAlpha = 1.f;
 	bsMenu.buttonColour = white;
@@ -29,7 +30,7 @@ void MGui::init(loadOptions &opts, Pi3Cresource * resource, Pi3Cwindow *window)
 	bsMenu.left = 5;
 	bsMenu.highlightColour = 0xc0c0c0;
 
-	bsHeading.font = guifonts[0];
+	bsHeading.font = largeFont;
 	bsHeading.textColour = white;
 	bsHeading.highlightColour = 0x00ffff;
 	bsHeading.buttonColour = backColour;
@@ -38,7 +39,7 @@ void MGui::init(loadOptions &opts, Pi3Cresource * resource, Pi3Cwindow *window)
 	bsHeading.left = 0;
 	bsHeading.right = 0;
 
-	bsIcons.font = guifonts[0];
+	bsIcons.font = largeFont;
 	bsIcons.textColour = white;
 	bsIcons.buttonColour = backColour;
 	bsIcons.highlightColour = highlight;
@@ -52,7 +53,7 @@ void MGui::init(loadOptions &opts, Pi3Cresource * resource, Pi3Cwindow *window)
 	bsIcons.sameLine = true;
 	bsIcons.selectColour = selectColour;
 
-	bsButtons.font = guifonts[0];
+	bsButtons.font = largeFont;
 	bsButtons.textColour = white;
 	bsButtons.buttonColour = backColour;
 	bsButtons.highlightColour = highlight;
@@ -68,7 +69,7 @@ void MGui::init(loadOptions &opts, Pi3Cresource * resource, Pi3Cwindow *window)
 	bsButtons.selectColour = selectColour;
 	//bsButtons.sameLine = true;
 
-	bsItems.font = guifonts[1];
+	bsItems.font = smallFont;
 	bsItems.buttonAlpha = 0.8f;
 	bsItems.buttonColour = white;
 	bsItems.textColour = 0x404040;
@@ -149,6 +150,8 @@ void MGui::doIMGUI(Modeller * md)
 	bool mb = md->window->mouse.LeftButton;
 	bool mu = md->window->mouse.up;
 
+	std::string inputText;
+
 	workWidth = hw - leftbarWidth - rightbarWidth;
 	workHeight = hh - menuHeight - topbarHeight - botbarHeight;
 
@@ -220,8 +223,17 @@ void MGui::doIMGUI(Modeller * md)
 
 		gui.renderBackIcon("rendl.png", icw, ich);
 		if (gui.ButtonImage("butNew.png") && mb) md->clearScene();
-		if (gui.ButtonImage("butOpen.png") && mb) {}
-		if (gui.ButtonImage("butSave.png") && mb) md->saveFile("D:/", "TestSave.obj");
+		if (gui.ButtonImage("butOpen.png") && mb) {
+			//gui.setFont(mediumFont);
+			//inputText = gui.OpenFileDialog();
+			//gui.setFont(largeFont);
+		}
+		if (gui.ButtonImage("butSave.png") && mb) {
+			gui.setFont(mediumFont);
+			std::string savefile = gui.OpenFileDialog();
+			gui.setFont(largeFont);
+			md->saveFile("../", savefile);
+		}
 		gui.renderBackIcon("butDiv.png", idw, ich);
 
 		if (gui.ButtonImage("butArrow.png", md->editMode == Modeller::ED_SELECT) && mb) md->setEditMode(Modeller::ED_SELECT);
@@ -234,7 +246,7 @@ void MGui::doIMGUI(Modeller * md)
 		if (gui.ButtonImage("butSelectAll.png") && mb) md->selectAll();
 		if (gui.ButtonImage("butCut.png") && mb) {}
 		if (gui.ButtonImage("butPaste.png") && mb) {}
-		if (gui.ButtonImage("butCopy.png") && mb) {}
+		if (gui.ButtonImage("butCopy.png") && mb) md->snapshot();
 
 		gui.renderBackIcon("butDiv.png", idw, ich);
 
@@ -302,7 +314,7 @@ void MGui::doIMGUI(Modeller * md)
 		}
 	}
 
-	
+	gui.End();
 }
 
 Pi3Crecti MGui::getRectBottomRight()

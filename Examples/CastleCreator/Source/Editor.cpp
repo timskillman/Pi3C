@@ -12,7 +12,7 @@
 Editor::Editor(Pi3Cresource *resource, Pi3Cwindow *window)
 {
 	// Setup shader ..
-	int32_t basicShaderRef = resource->addShader("Shaders/vs1.glsl", "Shaders/fs1.glsl");
+	int32_t basicShaderRef = resource->addShader("assets/shaders/vs1.glsl", "assets/shaders/fs1.glsl");
 	if (basicShaderRef < 0) {
 		window->showErrorMessage("Shader Error!", resource->error());
 		return;
@@ -76,10 +76,10 @@ void Editor::newScene(const uint32_t ref)
 	Pi3Cmodel sceneModel = *findModel("Landscape"); // createScene(1, 1, findModel("Landscape"), grid);
 	Pi3Cmodel &submod = sceneModel.group[0];
 	submod.edit = false;
-	if (scene.models.size() > 0)
-		scene.models[0] = sceneModel;
+	if (scene.models.size() == 0) 
+		scene.append3D(sceneModel); 
 	else
-		scene.models.push_back(sceneModel);
+		scene.models[0].group.push_back(sceneModel);
 }
 
 void Editor::setupGUI(std::string fontsPath, std::string fontName) // &opts)
@@ -144,7 +144,7 @@ void Editor::loadModels(const std::string &modelsLibraryFile)
 	brush.material.alpha = 0.5f;
 	ballbrushref = scene.append3D(brush);
 
-	Pi3Cmodel gridbrush = Pi3Cmodel(resource, Pi3Cshapes::cuboid(vec3f(0, 0, 0), vec3f(grid.x,1.f, grid.z), 0xffffff, 1,1,1), 0xffff00);
+	Pi3Cmodel gridbrush = Pi3Cmodel(resource, Pi3Cshapes::cuboid(vec3f(0, 0, 0), vec3f(grid.x,1.f, grid.z), 1,1,1), 0xffff00);
 	gridbrush.touchable = false;
 	gridbrush.visible = true;
 	gridbrush.material.alpha = 0.5f;
@@ -203,6 +203,7 @@ void Editor::handleKeys()
 			keypress = true;
 		}
 		if (keystate[SDL_SCANCODE_S] && ctrlKey) {
+			//std::string file = openFileSave("");
 			save("MyCastleScene");
 			keypress = true;
 		}
@@ -232,7 +233,7 @@ void Editor::handleEvents(std::vector<uint32_t>& eventList)
 			}
 			break;
 		case SDL_MOUSEWHEEL:
-			//editpos.z += window->mouse.wheel * 20.f;
+			//if (editMode) editpos.z += window->mouse.wheel * 20.f;
 			break;
 		case SDL_WINDOWEVENT:
 			//switch (window->ev.window.event) {
@@ -333,13 +334,21 @@ void Editor::touchScene()
 	}
 }
 
+vec3f nearestAngles(vec3f rot)
+{
+	float rx = ((float)((int)((rot.x * RAD2DEG)*1000.f) % 360000) / 1000.f)*DEG2RAD;
+	float ry = ((float)((int)((rot.y * RAD2DEG)*1000.f) % 360000) / 1000.f)*DEG2RAD;
+	float rz = ((float)((int)((rot.z * RAD2DEG)*1000.f) % 360000) / 1000.f)*DEG2RAD;
+	return vec3f(rx, ry, rx);
+}
+
 void Editor::tweens()
 {
 	if (edTransition > 0 && edTransition < 1.f) {
 		currentPos = vec3f(editpos.x, 0, editpos.y)*(1.f - edTransition) + player.getPosition() * edTransition;
 		current3rd = vec3f(0, 0, editpos.z)*(1.f - edTransition);
-		currentRot = editrot * (1.f - edTransition) + player.getRotation() * edTransition;
-		float speed = 0.01f*window->getTicks();
+		currentRot = nearestAngles(editrot) * (1.f - edTransition) + nearestAngles(player.getRotation()) * edTransition;
+		float speed = 0.01f*window->getTicks()*60.f;
 		if (editMode) edTransition -= speed; else edTransition += speed;
 	}
 	else {
@@ -554,7 +563,10 @@ void Editor::open()
 {
 	if (scene.models.size()>0) newScene(0); //scene.models[0].group.clear();
 	Pi3Cmodel sceneModel = loadSceneJSON("MyCastleScene.json", grid);
-	scene.models.push_back(sceneModel);
+	for (auto& model : sceneModel.group) {
+		scene.models[0].group.push_back(model);
+	}
+	//scene.models.push_back(sceneModel);
 	//scene.models[0] = sceneModel;
 }
 

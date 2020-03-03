@@ -7,6 +7,7 @@
 #include "Pi3Cfont.h"
 #include "Pi3Ctexture.h"
 #include "Pi3Crect.h"
+#include "Pi3Cutils.h"
 #include <string>
 #include <vector>
 
@@ -90,6 +91,7 @@ public:
 	std::string addFont(const char * path, const char * fontfile, const int pointSize);
 
 	void Begin();
+	void End();
 
 	//Widgets ...
 	bool Container(const std::string &name, const int minwidth = 0, const int minheight = 0);
@@ -103,7 +105,7 @@ public:
 	bool SliderDoubleV(const std::string &text, const double from, const double too, double &value, const int minwidth = 0, const int minheight = 0);
 	bool SliderFloat(const std::string &text, const float from, const float too, float &value);
 	bool SliderInt(const std::string &text, const int32_t from, const int32_t too, int32_t &value);
-	bool InputText(const std::string &text, std::string &input, const int minWidth = 0, const int minHeight = 0);
+	bool InputText(const std::string &text, std::string &input, const int minWidth = 0, const int minHeight = 0, uint32_t colour = 0);
 	bool InputFloat(const std::string &text, const float from, const float too, float &value);
 	bool InputDouble(const std::string &text, const double from, const double too, double &value);
 	bool InputInt(const std::string &text, const int32_t from, const int32_t too, int32_t &value);
@@ -113,6 +115,8 @@ public:
 	bool ComboIcons(const std::string &text, const std::string &images, uint32_t &currentSelection, const std::vector<std::string> &values);
 	bool ListBox(const std::string &text, uint32_t &currentSelection, const std::vector<std::string> &values, const int minwidth = 0.f, const int minheight = 0.f, const ListBoxFlags flags = ListBoxFlags::SCROLL_VERTICAL);
 
+	std::string OpenFileDialog();
+
 	//Menu bar widget ...
 	bool BeginMenuBar();
 	void EndMenuBar();
@@ -120,13 +124,15 @@ public:
 	bool MenuItem(const std::string &menuItem, const std::string &itemHotkey, const int minWidth = 200.f, const int minheight = 24.f);
 	void EndMenu();
 
-	bool renderRect(const int minwidth, const int minheight);
+	bool renderRect(const int minwidth, const int minheight, uint32_t colour = 0);
 	bool renderIcon(const std::string &str, const int minwidth = 0, const int minheight = 0);
-	bool renderText(const std::string &str, const int minwidth = 0, const int minheight = 0);
+	bool renderText(const std::string &str, const int minwidth = 0, const int minheight = 0, uint32_t colour = 0);
 	bool renderBackIcon(const std::string &str, const int minwidth = 0, const int minheight = 0);
 
 	bool somethingSelected = false;
+
 	Pi3Cresource * resource = nullptr;
+	void resize() { takeSnapshot = false; }
 
 private:
 
@@ -137,6 +143,7 @@ private:
 	void NextPos();
 	Pi3Cpointi calcImageSize(int tw, int th, const int minwidth, const int minheight, bool squash = false);
 	void setButtonBackground(Pi3Cmodel &rect, const bool mouseTouchRect);
+	void snapshot();
 	Pi3Cmodel * findCreateImage(const std::string &str, const ButtonType type);
 	Pi3Cmodel * findCreateImage2(const std::string &str, const ButtonType type);
 	Pi3Cmodel * createImage(const std::string &text, const std::shared_ptr<Pi3Ctexture> &ttex);
@@ -166,8 +173,13 @@ private:
 	bool selectingMenu = false;	//Ignore other hovers/selections while menu is open with this
 
 	bool textEditing = false;
+	bool getOpenFile = false;
+
 	int32_t textID = -1;
 	int32_t thisTextField = -1;
+	
+	Pi3Cmodel snapShotPic;
+	bool takeSnapshot = false;
 
 	//std::vector<containerStruct> containers;
 	std::map<std::string, containerStruct> containers;

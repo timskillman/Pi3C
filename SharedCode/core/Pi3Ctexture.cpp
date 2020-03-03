@@ -48,6 +48,12 @@ void Pi3Ctexture::createColour(uint32_t col)
 
 void Pi3Ctexture::create(uint32_t width, uint32_t height, uint32_t bytesPerPixel)
 {
+	std::vector<uint8_t> image;
+	fromImage(width, height, image, bytesPerPixel);
+}
+
+void Pi3Ctexture::fromImage(uint32_t width, uint32_t height, std::vector<uint8_t>& image, uint32_t bytesPerPixel)
+{
 	init();
 	textureID = 0;
 	this->width = width;
@@ -56,6 +62,7 @@ void Pi3Ctexture::create(uint32_t width, uint32_t height, uint32_t bytesPerPixel
 	pitch = width * bytesPerPixel;
 	size = height * pitch;
 	pixels = new uint8_t[size];
+	if (image.size()>0) memcpy(pixels, &image[0], size);
 	switch (bytesPerPixel) {
 	//case 1: format = GL_ALPHA8; break; //RPi doesnt understand this
 	case 2: format = GL_RGB565; break;

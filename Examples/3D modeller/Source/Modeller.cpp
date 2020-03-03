@@ -275,10 +275,8 @@ void Modeller::handleEvents(std::vector<uint32_t>& eventList)
 			}
 			break;
 		case SDL_WINDOWEVENT:
-			switch (window->ev.window.event) {
-			case SDL_WINDOWEVENT_RESIZED:
-
-				break;
+			if (window->resized) {
+				mgui.resize();
 			}
 			break;
 		case SDL_KEYDOWN:
@@ -306,7 +304,8 @@ void Modeller::handleEvents(std::vector<uint32_t>& eventList)
 				window->mouse.up = false;
 				break;
 			case SDL_SCANCODE_P:
-				scene.renderOffscreen(views[currentSelView]);
+				scene.renderOffscreen(views[currentSelView], &outlines);
+				window->mouse.up = false;
 				break;
 			}
 			//keyPress = ev.key.keysym.scancode;

@@ -48,4 +48,34 @@ namespace Pi3Cutils {
 		return triCount;	
 	}
 	
+	void flipImage(std::vector<uint8_t> &src, std::vector<uint8_t> &dest, uint32_t w, uint32_t h)
+	{
+		uint32_t span = w * 4;
+		uint8_t *pt = &src[0] + 0;
+		uint8_t *pb = &dest[0] + (h - 1) * span;
+		for (uint32_t y = 0; y < h; y++) {
+			std::memcpy(pb, pt, span);
+			pb -= span;
+			pt += span;
+		}
+	}
+
+	bool snapShot(const Pi3Crecti &rect, std::vector<uint8_t> &snapShot)
+	{
+		try {
+			uint32_t size = (uint32_t)(rect.width*rect.height * 4);
+			if (snapShot.size() < size) snapShot.resize(size);
+			glViewport(rect.x, rect.y, rect.width, rect.height);
+			std::vector<uint8_t> destimage;
+			destimage.resize(snapShot.size());
+			glReadPixels(rect.x, rect.y, rect.width, rect.height, GL_RGBA, GL_UNSIGNED_BYTE, &destimage[0]);
+			flipImage(destimage, snapShot, rect.width, rect.height);
+			//saveBufferToPNG("snapshot.png", snapShot, rect.width, rect.height);
+			return true;
+		}
+		catch (const std::bad_alloc&) {
+			return false;
+		}
+	}
+
 }

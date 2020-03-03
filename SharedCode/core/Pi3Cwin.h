@@ -124,6 +124,10 @@ public:
 	SDL_Scancode getKeyPress() { return keyPress; }
 	SDL_Scancode getKeyUp() { return keyUp; }
 	const uint8_t * getKeys() { keys = SDL_GetKeyboardState(NULL); return keys; }
+	void resetKeyUp() { 
+		keyUp = SDL_Scancode::SDL_SCANCODE_UNKNOWN; 
+		
+	}
 
 	bool mouseUp() {
 		bool u = mouse.up;

@@ -78,13 +78,12 @@ public:
 	void render3D(const float ticks = 1.f, Pi3Cmaterial *materialOverride = nullptr);
 	void render2D(const float ticks = 1.f);
 	void renderSkybox(const vec3f &pos, const int32_t skyboxref = 0, float ticks = 1.f);
-	void renderOffscreen(const viewInfo& viewinfo); //, const Pi3Cshader &shader
+	void renderOffscreen(const viewInfo& viewinfo, Pi3Cmaterial* outlines); //, const Pi3Cshader &shader
 	void renderView(const viewInfo& view, Pi3Cmaterial* outlines = nullptr);
 
 	void checkFBerrors();
 	void flipImage(std::vector<uint8_t> &src, std::vector<uint8_t> &dest, uint32_t w, uint32_t h);
 	void saveBufferToPNG(const char * filename, std::vector<uint8_t> &snapShot, const int width, const int height);
-	bool snapShot(const viewInfo& viewinfo, std::vector<uint8_t> &snapShot);
 
 	bool has2Dmodels() { return models2D.size() > 0; }
 
