@@ -1,56 +1,41 @@
-# Blender MTL File: 'None'
-# Material Count: 5
-
-newmtl Environment
-Ns 19.607843
-Ka 1.000000 1.000000 1.000000
-Kd 1.000000 1.000000 1.000000
-Ks 0.000000 0.000000 0.000000
-Ke 0.000000 0.000000 0.000000
-Ni 1.000000
-d 1.000000
+newmtl Fortress.mtl_Environment_1
+Kd 1 1 1
+Ks 0 0 0
+Ka 1 1 1
+Ke 0 0 0
 illum 2
 map_Kd textures/texture_environment.png
 
-newmtl Fortress
-Ns 19.607843
-Ka 1.000000 1.000000 1.000000
-Kd 1.000000 1.000000 1.000000
-Ks 0.000000 0.000000 0.000000
-Ke 0.000000 0.000000 0.000000
-Ni 1.000000
-d 1.000000
+newmtl Fortress.mtl_Fortress_1
+Kd 1 1 1
+Ks 0 0 0
+Ka 1 1 1
+Ke 0 0 0
 illum 2
 map_Kd textures/texture_building.png
 
-newmtl Sand
-Ns 19.607843
-Ka 1.000000 1.000000 1.000000
-Kd 1.000000 1.000000 1.000000
-Ks 0.000000 0.000000 0.000000
-Ke 0.000000 0.000000 0.000000
-Ni 1.000000
-d 1.000000
+newmtl Fortress.mtl_Sand_1
+Kd 1 1 1
+Ks 0 0 0
+Ka 1 1 1
+Ke 0 0 0
 illum 1
 map_Kd textures/texture_sand.jpg
 
-newmtl Sea
-Ns 19.607843
-Ka 1.000000 1.000000 1.000000
-Kd 1.000000 1.000000 1.000000
-Ks 0.000000 0.000000 0.000000
-Ke 0.000000 0.000000 0.000000
-d 0.999
-illum 2
-map_Kd textures/texture_sea.png
-
-newmtl Sky
-Ns 19.607843
-Ka 1.000000 1.000000 1.000000
-Kd 1.000000 1.000000 1.000000
-Ks 0.000000 0.000000 0.000000
-Ke 0.000000 0.000000 0.000000
-Ni 1.000000
-d 1.000000
+newmtl Fortress.mtl_Sky_1
+Kd 1 1 1
+Ks 0 0 0
+Ka 1 1 1
+Ke 0 0 0
 illum 1
 map_Kd textures/texture_sky.jpg
+
+newmtl Fortress.mtl_Sea_1
+Kd 1 1 1
+Ks 0 0 0
+Ka 1 1 1
+Ke 0 0 0
+illum 2
+Tr 0.999
+map_Kd textures/texture_sea.png
+

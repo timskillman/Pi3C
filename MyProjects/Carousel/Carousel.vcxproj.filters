@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="Source Files">
@@ -13,7 +13,7 @@
       <UniqueIdentifier>{2A9CF5DA-7433-EF49-AEB2-18C6C9D06AA0}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="Assets">
+    <Filter Include="assets">
       <UniqueIdentifier>{6678c446-5457-4565-9e43-a2ea2aafd732}</UniqueIdentifier>
     </Filter>
     <Filter Include="Shared Code">
@@ -301,10 +301,10 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Assets\Shaders\fs1.glsl">
+    <None Include="Shaders\fs1.glsl">
       <Filter>assets</Filter>
     </None>
-    <None Include="Assets\Shaders\vs1.glsl">
+    <None Include="Shaders\vs1.glsl">
       <Filter>assets</Filter>
     </None>
     <None Include="..\..\SharedCode\glutess\LICENSE">

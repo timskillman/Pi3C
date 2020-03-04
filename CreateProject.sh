@@ -24,8 +24,8 @@ sed -i s/PROJECT_NAME/$1/ $Projects/makefile
 
 echo -Creating VisualStudio Solution ...
 
-cp -p $Template/Source/SOLUTION_NAME.cpp $Projects/Source/$1.cpp
-sed -i s/PROJECT_NAME/$1/ $Projects/Source/$1.cpp
+cp -p $Template/source/SOLUTION_NAME.cpp $Projects/source/$1.cpp
+sed -i s/PROJECT_NAME/$1/ $Projects/source/$1.cpp
 
 cp -p $Template/SOLUTION_NAME.sln $Projects/$1.sln
 sed -i s/SOLUTION_NAME/$1/g $Projects/$1.sln
