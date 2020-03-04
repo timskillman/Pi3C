@@ -8,6 +8,7 @@
 #include "Pi3Ctexture.h"
 #include "Pi3Crect.h"
 #include "Pi3Cutils.h"
+#include "Pi3Ccolours.h"
 #include <string>
 #include <vector>
 
@@ -29,11 +30,11 @@ public:
 	};
 
 	struct rectStyle {
-		uint32_t textColour = 0xffffff;
-		uint32_t buttonColour = 0x504040;
-		uint32_t imageColour = 0xffffff;
-		uint32_t highlightColour = 0x606060;
-		uint32_t selectColour = 0x808000;
+		uint32_t textColour = Pi3Ccolours::White;
+		uint32_t buttonColour = Pi3Ccolours::DarkGray;
+		uint32_t imageColour = Pi3Ccolours::White;
+		uint32_t highlightColour = Pi3Ccolours::Gray;
+		uint32_t selectColour = Pi3Ccolours::Yellow;
 		Alignment justify = LEFT;
 		Alignment align = TOP;
 		float buttonAlpha = 1.f;
@@ -72,6 +73,7 @@ public:
 	void setButtonColour(const uint32_t buttonColour) { this->currentParams.buttonColour = buttonColour; }
 	void setHighlightColour(const uint32_t buttonColour) { this->currentParams.highlightColour = currentParams.highlightColour; }
 	void setTextColour(const uint32_t textColour) { this->currentParams.textColour = textColour; }
+	void setColour(Pi3Cmodel& model, uint32_t colour);
 	void setButtonStyle(const rectStyle &style);
 	void setGaps(const int hgap, const int vgap) { currentParams.horizGap = hgap; currentParams.vertGap = vgap; }
 	void Indent();
@@ -115,7 +117,12 @@ public:
 	bool ComboIcons(const std::string &text, const std::string &images, uint32_t &currentSelection, const std::vector<std::string> &values);
 	bool ListBox(const std::string &text, uint32_t &currentSelection, const std::vector<std::string> &values, const int minwidth = 0.f, const int minheight = 0.f, const ListBoxFlags flags = ListBoxFlags::SCROLL_VERTICAL);
 
-	std::string OpenFileDialog();
+	std::string OpenFileDialog(const rectStyle * style = nullptr);
+
+	bool BeginGroupHorizontal(const std::string &icon = "", const int icw = 0, const int ich = 0);
+	bool BeginGroupVertical(const std::string &icon = "", const int icw = 0, const int ich = 0);
+	void EndGroupHorizontal(const std::string &icon = "", const int icw = 0, const int ich = 0);
+	void EndGroupVertical(const std::string &icon = "", const int icw = 0, const int ich = 0);
 
 	//Menu bar widget ...
 	bool BeginMenuBar();
@@ -125,6 +132,7 @@ public:
 	void EndMenu();
 
 	bool renderRect(const int minwidth, const int minheight, uint32_t colour = 0);
+	void renderRectAt(Pi3Cpointi& size, Pi3Cpointi& pos, uint32_t colour);
 	bool renderIcon(const std::string &str, const int minwidth = 0, const int minheight = 0);
 	bool renderText(const std::string &str, const int minwidth = 0, const int minheight = 0, uint32_t colour = 0);
 	bool renderBackIcon(const std::string &str, const int minwidth = 0, const int minheight = 0);
@@ -187,4 +195,6 @@ private:
 	int GUIshader = -1;
 	Pi3Cmatrix projMatrix;
 
+	std::vector<Pi3Crecti> groupSize;
+	int groupCo = 0;
 };

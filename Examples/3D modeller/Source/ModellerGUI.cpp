@@ -78,6 +78,17 @@ void MGui::init(loadOptions &opts, Pi3Cresource * resource, Pi3Cwindow *window)
 	bsItems.justify = Pi3Cimgui::CENTRE;
 	bsItems.align = Pi3Cimgui::BOTTOM;
 	bsItems.selectColour = selectColour;
+
+	bsDialog.font = smallFont;
+	bsDialog.buttonAlpha = 0.8f;
+	bsDialog.buttonColour = backColour;
+	bsDialog.textColour = 0x404040;
+	bsDialog.minWidth = 32;
+	bsDialog.minHeight = 32;
+	bsDialog.justify = Pi3Cimgui::CENTRE;
+	bsDialog.align = Pi3Cimgui::CENTRE;
+	bsDialog.selectColour = selectColour;
+	bsDialog.highlightColour = Pi3Ccolours::Yellow;
 }
 
 void MGui::renderYellowBorder(uint32_t currentSelView)
@@ -107,66 +118,11 @@ void MGui::renderYellowBorder(uint32_t currentSelView)
 	}
 }
 
-void MGui::doIMGUI(Modeller * md)
+void MGui::dragViewportBars(Modeller * md, Pi3Cpointi& wpos, int midht)
 {
-
-	gui.Begin();
-
-	//Menubar ...
-	gui.setButtonStyle(bsMenu);
-	if (gui.BeginMenuBar()) {
-		if (gui.BeginMenu("File")) {
-			if (gui.MenuItem("New", "Ctrl+N")) md->clearScene();
-			if (gui.MenuItem("Open", "Ctrl+O")) {} // open();
-			if (gui.MenuItem("Save", "Ctrl+S")) {}
-			if (gui.MenuItem("Quit", "Esc")) md->window->setquit(true);
-			gui.EndMenu();
-		}
-		if (gui.BeginMenu("Edit")) {
-			if (gui.MenuItem("Select All", "Ctrl+A")) md->selectAll();
-			if (gui.MenuItem("Clear selections", "")) md->clearSelections();
-			if (gui.MenuItem("Copy", "Ctrl+C")) {}
-			if (gui.MenuItem("Paste", "Ctrl+V")) {}
-			if (gui.MenuItem("Delete", "Del")) {}
-			if (gui.MenuItem("Undo", "Ctrl+X")) {}
-			if (gui.MenuItem("Redo", "Ctrl+Y")) {}
-			gui.EndMenu();
-		}
-		if (gui.BeginMenu("Object")) {
-			if (gui.MenuItem("Create", "Ctrl+C")) {}
-			if (gui.MenuItem("Array tool", "Ctrl+V")) {}
-			if (gui.MenuItem("Delete", "Del")) {}
-			if (gui.MenuItem("Undo", "Ctrl+X")) {}
-			if (gui.MenuItem("Redo", "Ctrl+Y")) {}
-			gui.EndMenu();
-		}
-		gui.EndMenuBar();
-	}
-
-	int hw = md->window->getWidth();
-	int hh = md->window->getHeight();
+	bool mb = md->window->mouse.LeftButton;
 	int mx = md->window->mouse.x;
 	int my = md->window->mouse.y;
-	bool mb = md->window->mouse.LeftButton;
-	bool mu = md->window->mouse.up;
-
-	std::string inputText;
-
-	workWidth = hw - leftbarWidth - rightbarWidth;
-	workHeight = hh - menuHeight - topbarHeight - botbarHeight;
-
-	md->currentPos = md->views[md->currentView].calcMouseXYZ(mx, hh - my);
-
-	//Draw borders ...
-	gui.renderRect(hw, topbarHeight);
-	gui.nextLine(0);
-	Pi3Cpointi wpos = gui.getPosition();
-	int midht = hh - wpos.y - botbarHeight;
-	gui.renderRect(leftbarWidth, midht);
-	gui.movePosition(hw - rightbarWidth, 0);
-	gui.renderRect(rightbarWidth, midht);
-	gui.setPosition(0, wpos.y + midht);
-	gui.renderRect(hw, botbarHeight);
 
 	if (md->fullview < 0) {
 		//Drag bar horizontal ...
@@ -211,6 +167,70 @@ void MGui::doIMGUI(Modeller * md)
 			md->setDragBarH(false);
 		}
 	}
+}
+
+void MGui::doIMGUI(Modeller * md)
+{
+
+	gui.Begin();
+
+	//Menubar ...
+	gui.setButtonStyle(bsMenu);
+	if (gui.BeginMenuBar()) {
+		if (gui.BeginMenu("File")) {
+			if (gui.MenuItem("New", "Ctrl+N")) md->clearScene();
+			if (gui.MenuItem("Open", "Ctrl+O")) {} // open();
+			if (gui.MenuItem("Save", "Ctrl+S")) saveAll(md);
+			if (gui.MenuItem("Quit", "Esc")) md->window->setquit(true);
+			gui.EndMenu();
+		}
+		if (gui.BeginMenu("Edit")) {
+			if (gui.MenuItem("Select All", "Ctrl+A")) md->selectAll();
+			if (gui.MenuItem("Clear selections", "")) md->clearSelections();
+			if (gui.MenuItem("Copy", "Ctrl+C")) {}
+			if (gui.MenuItem("Paste", "Ctrl+V")) {}
+			if (gui.MenuItem("Delete", "Del")) {}
+			if (gui.MenuItem("Undo", "Ctrl+X")) {}
+			if (gui.MenuItem("Redo", "Ctrl+Y")) {}
+			gui.EndMenu();
+		}
+		if (gui.BeginMenu("Object")) {
+			if (gui.MenuItem("Create", "Ctrl+C")) {}
+			if (gui.MenuItem("Array tool", "Ctrl+V")) {}
+			if (gui.MenuItem("Delete", "Del")) {}
+			if (gui.MenuItem("Undo", "Ctrl+X")) {}
+			if (gui.MenuItem("Redo", "Ctrl+Y")) {}
+			gui.EndMenu();
+		}
+		gui.EndMenuBar();
+	}
+
+	int winWidth = md->window->getWidth();
+	int winHeight = md->window->getHeight();
+	int mx = md->window->mouse.x;
+	int my = md->window->mouse.y;
+	bool mb = md->window->mouse.LeftButton;
+	bool mu = md->window->mouse.up;
+
+	std::string inputText;
+
+	workWidth = winWidth - leftbarWidth - rightbarWidth;
+	workHeight = winHeight - menuHeight - topbarHeight - botbarHeight;
+
+	md->currentPos = md->views[md->currentView].calcMouseXYZ(mx, winHeight - my);
+
+	//Draw borders ...
+	gui.renderRect(winWidth, topbarHeight);
+	gui.nextLine(0);
+	Pi3Cpointi wpos = gui.getPosition();
+	int midht = winHeight - wpos.y - botbarHeight;
+	gui.renderRect(leftbarWidth, midht);
+	gui.movePosition(winWidth - rightbarWidth, 0);
+	gui.renderRect(rightbarWidth, midht);
+	gui.setPosition(0, wpos.y + midht);
+	gui.renderRect(winWidth, botbarHeight);
+
+	dragViewportBars(md, wpos, midht);
 
 	//Top menu bar icons ...
 	int icw = (int)((float)bsIcons.minWidth*0.5f);
@@ -221,19 +241,11 @@ void MGui::doIMGUI(Modeller * md)
 	gui.setPosition(wpos.x + leftbarWidth, wpos.y - topbarHeight);
 	//if (gui.Container("EditButton", 200, 32)) {
 
-		gui.renderBackIcon("rendl.png", icw, ich);
+	if (gui.BeginGroupHorizontal("rendl.png", icw,ich)) {
+
 		if (gui.ButtonImage("butNew.png") && mb) md->clearScene();
-		if (gui.ButtonImage("butOpen.png") && mb) {
-			//gui.setFont(mediumFont);
-			//inputText = gui.OpenFileDialog();
-			//gui.setFont(largeFont);
-		}
-		if (gui.ButtonImage("butSave.png") && mb) {
-			gui.setFont(mediumFont);
-			std::string savefile = gui.OpenFileDialog();
-			gui.setFont(largeFont);
-			md->saveFile("../", savefile);
-		}
+		if (gui.ButtonImage("butOpen.png") && mb) {}
+		if (gui.ButtonImage("butSave.png") && mb) saveAll(md);
 		gui.renderBackIcon("butDiv.png", idw, ich);
 
 		if (gui.ButtonImage("butArrow.png", md->editMode == Modeller::ED_SELECT) && mb) md->setEditMode(Modeller::ED_SELECT);
@@ -253,18 +265,20 @@ void MGui::doIMGUI(Modeller * md)
 		if (gui.ButtonImage("butUndo.png") && mb) {}
 		if (gui.ButtonImage("butRedo.png") && mb) {}
 
-		gui.renderBackIcon("rendr.png", icw, ich);
-		gui.sameLine(3);
-		gui.renderBackIcon("rendl.png", icw, ich);
+		gui.EndGroupHorizontal("rendr.png", icw, ich);
+	}
+	
+	gui.sameLine(3);
+
+	if (gui.BeginGroupHorizontal("rendl.png", icw, ich)) {
 
 		if (gui.ButtonImage("butMirror.png") && mb) {}
 		if (gui.ButtonImage("butFlip.png") && mb) {}
-		gui.renderBackIcon("rendr.png", icw, ich);
 
-		//gui.ContainerEnd("EditButton");
-	//}
+		gui.EndGroupHorizontal("rendr.png", icw, ich);
+	}
 
-	gui.setPosition(hw - rightbarWidth - 100, workHeight + topbarHeight + menuHeight + 3);
+	gui.setPosition(winWidth - rightbarWidth - 100, workHeight + topbarHeight + menuHeight + 3);
 	gui.renderBackIcon("rendl.png", icw, ich);
 	if (gui.ButtonImage("butBigwin.png") && mu) md->setFullScene();
 	if (gui.ButtonImage("butSceneRot.png", md->editMode == Modeller::ED_ROTATESCENE) && mb) md->setEditMode(Modeller::ED_ROTATESCENE);
@@ -286,10 +300,12 @@ void MGui::doIMGUI(Modeller * md)
 	if (gui.ButtonImage("wedge.png", md->createTool == Modeller::CT_WEDGE) && mb) md->setCreateTool(Modeller::CT_WEDGE);
 	if (gui.ButtonImage("torus.png", md->createTool == Modeller::CT_TORUS) && mb) md->setCreateTool(Modeller::CT_TORUS);
 	gui.renderBackIcon("butBot2.png", bsButtons.minWidth, btop);
+
 	gui.renderBackIcon("butTop2.png", bsButtons.minWidth, btop);
 	if (gui.ButtonImage("extrude.png", md->createTool == Modeller::CT_EXTRUDE) && mb) md->setCreateTool(Modeller::CT_EXTRUDE);
 	if (gui.ButtonImage("lathe.png", md->createTool == Modeller::CT_LATHE) && mb) md->setCreateTool(Modeller::CT_LATHE);
 	gui.renderBackIcon("butBot2.png", bsButtons.minWidth, btop);
+
 	gui.renderBackIcon("butTop2.png", bsButtons.minWidth, btop);
 	if (gui.ButtonImage("landscape.png", md->createTool == Modeller::CT_LANDSCAPE) && mb) md->setCreateTool(Modeller::CT_LANDSCAPE);
 	gui.renderBackIcon("butBot2.png", bsButtons.minWidth, btop);
@@ -304,7 +320,7 @@ void MGui::doIMGUI(Modeller * md)
 	if (md->currentView != -1) {
 		Pi3Crecti &rect = md->views[md->currentView].viewport;
 		gui.setButtonStyle(bsMenu);
-		//gui.setPosition(rect.x + 5, hh - rect.y - 26);
+		//gui.setPosition(rect.x + 5, winHeight - rect.y - 26);
 		gui.setPosition(leftbarWidth + 320, workHeight + topbarHeight + menuHeight + 3);
 		std::string tpos = "X:" + std::to_string(md->currentPos.x) + ", Y:" + std::to_string(md->currentPos.y) + ", Z:" + std::to_string(md->currentPos.z);
 		gui.Text(tpos, 0xffffffff);
@@ -315,6 +331,12 @@ void MGui::doIMGUI(Modeller * md)
 	}
 
 	gui.End();
+}
+
+void MGui::saveAll(Modeller * md)
+{
+	std::string savefile = gui.OpenFileDialog(&bsDialog);
+	if (savefile!="") md->saveFile("../", savefile);
 }
 
 Pi3Crecti MGui::getRectBottomRight()

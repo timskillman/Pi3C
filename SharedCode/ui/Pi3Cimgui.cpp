@@ -131,7 +131,11 @@ void Pi3Cimgui::NextPos()
 		nextPos = Pi3Cpointi(leftpos, pos.y - size.y - currentParams.vertGap); //next line
 }
 
-
+void Pi3Cimgui::setColour(Pi3Cmodel &model, uint32_t colour)
+{
+	model.material.SetColDiffuse(colour);
+	model.material.SetColAmbient(0);
+}
 
 bool Pi3Cimgui::renderButton(Pi3Cmodel *drawObj, const int minwidth, const int minheight)
 {
@@ -166,7 +170,7 @@ bool Pi3Cimgui::renderButton(Pi3Cmodel *drawObj, const int minwidth, const int m
 
 	//scale image and rectangle into button ...
 	image.matrix.moveScaleXY(xp, yp - (float)th, (float)tw, (float)th);
-	image.material.SetColDiffuse(currentParams.textColour);
+	setColour(image, currentParams.textColour);
 	image.matrix.setz(zpos);
 	
 	rect.matrix.moveScaleXY((float)pos.x, (float)(pos.y-size.y), (float)size.x, (float)size.y);
@@ -227,7 +231,7 @@ bool Pi3Cimgui::renderButton2(Pi3Cmodel *drawObj, const int minwidth, const int 
 
 	//scale image and rectangle into button ...
 	text.matrix.moveScaleXY(xp, yp - (float)th1, (float)tw1, (float)th1);
-	text.material.SetColDiffuse(currentParams.textColour);
+	setColour(text, currentParams.textColour);
 	text.matrix.setz(zpos);
 
 	xp = (float)(pos.x + currentParams.left + (float)(slideWidth - tw2) * (1.f - slx));
@@ -235,12 +239,13 @@ bool Pi3Cimgui::renderButton2(Pi3Cmodel *drawObj, const int minwidth, const int 
 
 	//scale image and rectangle into button ...
 	image.matrix.moveScaleXY(xp, yp - (float)th2, (float)tw2, (float)th2);
-	image.material.SetColDiffuse(currentParams.textColour);
+	setColour(image, currentParams.textColour);
 	image.matrix.setz(zpos);
 
 	rect.matrix.moveScaleXY((float)pos.x, (float)(pos.y - size.y), (float)size.x, (float)size.y);
 	rect.matrix.setz(zpos - 0.5f);
 	setButtonBackground(rect, mouseTouchRect);
+
 
 	//render ...
 	rect.renderBasic(resource, resource->shaders[0]);
@@ -260,23 +265,28 @@ void Pi3Cimgui::setButtonBackground(Pi3Cmodel &rect, const bool mouseTouchRect)
 		rect.material.SetColDiffuse(currentParams.selectColour);
 	else
 		rect.material.SetColDiffuse((mouseTouchRect && currentParams.selectable && menuSelect) ? currentParams.highlightColour : currentParams.buttonColour);
+	rect.material.SetColAmbient(0);
 	rect.material.alpha = currentParams.buttonAlpha;
 }
 
 bool Pi3Cimgui::renderRect(const int width, const int height, uint32_t colour)
 {
 	pos = nextPos;
-	//float dpi = window->dpi;
 	size = Pi3Cpointi(width, height);
 	bool mouseTouchRect = touched(size);
+	renderRectAt(size, pos, colour);
+	return mouseTouchRect;
+}
+
+void Pi3Cimgui::renderRectAt(Pi3Cpointi& size, Pi3Cpointi& pos, uint32_t colour)
+{
 	Pi3Cmodel rect;
 	rect.createRect2D(resource, vec2f((float)pos.x, (float)(pos.y - size.y)), vec2f((float)(size.x), (float)(size.y)));
 	rect.matrix.setz(zpos-1.f);
 	//setButtonBackground(rect, mouseTouchRect);
 	if (colour != 0) rect.material.alpha = (float)((colour>>24) & 255)/255.f;
-	rect.material.SetColDiffuse((colour==0) ? currentParams.buttonColour : colour);
+	setColour(rect, (colour == 0) ? currentParams.buttonColour : colour);
 	rect.renderBasic(resource, resource->shaders[0]);
-	return mouseTouchRect;
 }
 
 Pi3Cpointi Pi3Cimgui::calcImageSize(int tw, int th, const int minwidth, const int minheight, bool squash)
@@ -306,7 +316,7 @@ bool Pi3Cimgui::renderIconImage(Pi3Cmodel *image, const int width, const int hei
 	bool mouseTouchRect = touched(size);
 	image->matrix.move(vec3f((float)pos.x, (float)(pos.y-wh.y - currentParams.top),zpos));
 	image->matrix.SetScales(vec3f((float)wh.x, (float)wh.y, 1.f));
-	image->material.SetColDiffuse(colour);
+	setColour(*image, colour);
 	image->renderBasic(resource, resource->shaders[0]);
 	NextPos();
 	return mouseTouchRect;
@@ -481,6 +491,28 @@ bool Pi3Cimgui::SliderInt(const std::string &text, const int32_t from, const int
 	return false;
 }
 
+bool Pi3Cimgui::BeginGroupHorizontal(const std::string &icon, const int icw, const int ich)
+{
+	if (icon!="") renderBackIcon(icon, icw, ich);
+	return true;
+}
+
+bool Pi3Cimgui::BeginGroupVertical(const std::string &icon, const int icw, const int ich)
+{
+	if (icon != "") renderBackIcon(icon, icw, ich);
+	return true;
+}
+
+void Pi3Cimgui::EndGroupHorizontal(const std::string &icon, const int icw, const int ich)
+{
+	if (icon != "") renderBackIcon(icon, icw, ich);
+}
+
+void Pi3Cimgui::EndGroupVertical(const std::string &icon, const int icw, const int ich)
+{
+	if (icon != "") renderBackIcon(icon, icw, ich);
+}
+
 bool Pi3Cimgui::InputText(const std::string &text, std::string &input, const int minWidth, const int minHeight, uint32_t colour)
 {
 	//Help from http://lazyfoo.net/tutorials/SDL/32_text_input_and_clipboard_handling/index.php
@@ -488,12 +520,7 @@ bool Pi3Cimgui::InputText(const std::string &text, std::string &input, const int
 	int mWidth = (minWidth == 0) ? currentParams.minWidth : minWidth; // / dpi;
 	int mHeight = (minHeight == 0) ? currentParams.minHeight : minHeight; // / dpi;
 
-	if (renderRect(mWidth, mHeight)) {
-
-	}
-
-	size = Pi3Cpointi(mWidth, mHeight);
-	bool touch = touched(size);
+	bool touch = renderRect(mWidth, mHeight, Pi3Ccolours::White);
 	bool clicked = touch && window->mouse.LeftButton;
 	bool finished = false;
 
@@ -509,6 +536,9 @@ bool Pi3Cimgui::InputText(const std::string &text, std::string &input, const int
 
 	if (textID == thisTextField) {
 		//animate caret at text position...
+		int textWidth, textHeight;
+		currentFont->getStringSize(input, textWidth, textHeight);
+		renderRectAt(Pi3Cpointi(3, mHeight - 4), Pi3Cpointi(pos.x + textWidth, pos.y - 2), Pi3Ccolours::Red);
 
 		//add/remove characters from input ...
 		if (textEditing) {
@@ -647,6 +677,7 @@ void Pi3Cimgui::Begin() {
 	//TODO: IMGUI should have it's own basic shader and projection matrix ...
 	if (GUIshader>=0) resource->shaders[GUIshader].setProjectionMatrix(projMatrix);
 	setPosition(0, 0);
+	groupCo = 0;
 	textID = 0;
 	if (!window->mouse.LeftButton) somethingSelected = false;
 }
@@ -721,18 +752,16 @@ void Pi3Cimgui::snapshot()
 	takeSnapshot = true;
 }
 
-std::string Pi3Cimgui::OpenFileDialog()
+std::string Pi3Cimgui::OpenFileDialog(const rectStyle * style)
 {   
-	//if (takeSnapshot < 2) {
-	//	takeSnapshot = 1; 
-	//	return;
-	//}
+	rectStyle prevstyle = currentParams;
+	if (style) setButtonStyle(*style);
 
 	std::string inptext = "";
 	bool finished = false;
 	snapShotPic.matrix.setz(-30.f);
 	setGaps(3, 3);
-	currentParams.textColour = 0xff000000;
+	currentParams.textColour = Pi3Ccolours::Black;
 	
 	while (!window->hasquit() && !finished) {
 
@@ -742,21 +771,23 @@ std::string Pi3Cimgui::OpenFileDialog()
 		snapShotPic.renderBasic(resource, resource->shaders[0]);
 
 		Begin();
-		renderRect(window->getWidth(), window->getHeight(), 0xD0000000);
+		renderRect(window->getWidth(), window->getHeight(), Pi3Ccolours::TransparentBlack);
 
 		setPosition(100, 100);
 
-		renderText("Enter Filename:", 200, 0, 0xffffffff);
+		renderText("Enter Filename:", 200, 0, Pi3Ccolours::White);
 		nextLine();
 
-		finished = InputText("Filename", inptext, 200, 0, 0xff000000);
-		
-		if (ButtonImage("butSave.png")) {
-			finished = true;
+		finished = InputText("Filename", inptext, 203, 0, Pi3Ccolours::Black);
+		//sameLine();
+		if (ButtonText("Save",false,80)) finished = true;
+		sameLine();
+		if (ButtonText("Cancel",false,120)) {
+			inptext = ""; finished = true;
 		}
 
 		window->SwapBuffers();
 	}
-
+	setButtonStyle(prevstyle);
 	return inptext;
 }

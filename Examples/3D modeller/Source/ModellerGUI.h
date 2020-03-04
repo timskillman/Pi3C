@@ -30,6 +30,7 @@ private:
 	Pi3Cimgui::rectStyle bsIcons;
 	Pi3Cimgui::rectStyle bsButtons;
 	Pi3Cimgui::rectStyle bsItems;
+	Pi3Cimgui::rectStyle bsDialog;
 
 	std::string smallFont;
 	std::string largeFont;
@@ -55,6 +56,6 @@ private:
 	float iby = 1.f - dragBarY;
 
 	void renderYellowBorder(uint32_t currentSelView);
-	
-
+	void dragViewportBars(Modeller * md, Pi3Cpointi& wposm, int midht);
+	void saveAll(Modeller * md);
 };
