@@ -278,7 +278,7 @@ bool Pi3Cimgui::renderRect(const int width, const int height, uint32_t colour)
 	return mouseTouchRect;
 }
 
-void Pi3Cimgui::renderRectAt(Pi3Cpointi& size, Pi3Cpointi& pos, uint32_t colour)
+void Pi3Cimgui::renderRectAt(const Pi3Cpointi& size, const Pi3Cpointi& pos, const uint32_t colour)
 {
 	Pi3Cmodel rect;
 	rect.createRect2D(resource, vec2f((float)pos.x, (float)(pos.y - size.y)), vec2f((float)(size.x), (float)(size.y)));

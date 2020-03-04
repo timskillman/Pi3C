@@ -132,7 +132,7 @@ public:
 	void EndMenu();
 
 	bool renderRect(const int minwidth, const int minheight, uint32_t colour = 0);
-	void renderRectAt(Pi3Cpointi& size, Pi3Cpointi& pos, uint32_t colour);
+	void renderRectAt(const Pi3Cpointi& size, const Pi3Cpointi& pos, const uint32_t colour);
 	bool renderIcon(const std::string &str, const int minwidth = 0, const int minheight = 0);
 	bool renderText(const std::string &str, const int minwidth = 0, const int minheight = 0, uint32_t colour = 0);
 	bool renderBackIcon(const std::string &str, const int minwidth = 0, const int minheight = 0);
