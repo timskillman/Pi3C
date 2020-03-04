@@ -81,6 +81,11 @@ void Pi3Cmodel::init()
 	choice = -1;
 }
 
+void Pi3Cmodel::deleteTexture(Pi3Cresource *resource)
+{
+	if (material.texRef>=0) resource->textures[material.texRef]->Delete();
+}
+
 void Pi3Cmodel::renderBasic(Pi3Cresource *resource, Pi3Cshader &shader, const Pi3Cmatrix *parent_matrix, Pi3Cmaterial *materialOverride)
 {
 	//if (!visible || deleted) return;

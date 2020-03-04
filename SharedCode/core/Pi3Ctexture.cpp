@@ -15,8 +15,7 @@ Pi3Ctexture::Pi3Ctexture(const char* file, bool _upload)
 
 Pi3Ctexture::~Pi3Ctexture()
 {
-	if (uploaded) glDeleteTextures(1, &textureID);
-	if (pixels) delete pixels;
+	Delete();
 }
 
 void Pi3Ctexture::init()
@@ -32,6 +31,13 @@ void Pi3Ctexture::init()
 	uploaded = false;
 }
 
+void Pi3Ctexture::Delete()
+{
+	if (uploaded) glDeleteTextures(1, &textureID);
+	if (pixels) delete pixels;
+	init();
+}
+
 void Pi3Ctexture::createColour(uint32_t col)
 {
 	textureID = 0;
@@ -43,7 +49,6 @@ void Pi3Ctexture::createColour(uint32_t col)
 	pixels = new uint8_t[size];
 	memcpy(pixels, &col, size);
 	format = GL_RGBA;
-
 }
 
 void Pi3Ctexture::create(uint32_t width, uint32_t height, uint32_t bytesPerPixel)

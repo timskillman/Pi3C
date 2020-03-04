@@ -117,6 +117,7 @@ public:
 	void updateSpriteBillboard(Pi3Cresource *resource, const std::vector<vec3f> &pos, const std::vector<vec2f> &size, const vec3f &lookat);
 	void updateSpriteCoordsRotated(Pi3Cresource *resource, const std::vector<vec3f> &pos, const std::vector<vec2f> &size, const std::vector<float> &angles);
 	void updateLineQuad(Pi3Cresource *resource, const std::vector<vec3f> &pos, const std::vector<vec3f> &dir, const vec2f &size);
+	void deleteTexture(Pi3Cresource *resource);
 
 	Pi3Cmodel* find(const std::string &name); //searches model heirarchy and returns name if found (0 if not)
 

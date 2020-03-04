@@ -746,6 +746,7 @@ void Pi3Cimgui::snapshot()
 	std::shared_ptr<Pi3Ctexture> snaptex;
 	snaptex.reset(new Pi3Ctexture(window->getWidth(), window->getHeight(), snap, 4));
 
+	snapShotPic.deleteTexture(resource); //delete any previous snapshot texture
 	snapShotPic.createRect2D(resource, vec2f(0, 0), vec2f(window->getWidth(), window->getHeight()));
 	snapShotPic.addPicture(resource, snaptex);
 
