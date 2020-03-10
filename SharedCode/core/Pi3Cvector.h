@@ -276,6 +276,8 @@ public:
 
 	vec4f(float x, float y, float z, float w) : x(x), y(y), z(z), w(w) {}
 
+	vec4f(vec3f xyz, float w) : x(xyz.x), y(xyz.y), z(xyz.z), w(w) {}
+	
 	inline vec4f operator - ()
 	{
 		return vec4f(-x, -y, -z, -w);

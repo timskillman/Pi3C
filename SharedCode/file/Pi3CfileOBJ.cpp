@@ -60,6 +60,20 @@ namespace Pi3CfileOBJ {
 		return f;
 	}
 
+	vec3f readVec3f(std::string& vals)
+	{
+		static char vs1[128], vs2[128], vs3[128];
+		sscanf(vals.c_str(), "%s %s %s", vs1, vs2, vs3);
+		return vec3f(mystrtof(vs1),mystrtof(vs2),mystrtof(vs3));
+	}
+	
+	vec2f readVec2f(std::string& vals)
+	{
+		static char vs1[128], vs2[128];
+		sscanf(vals.c_str(), "%s %s", vs1, vs2);
+		return vec2f(mystrtof(vs1),mystrtof(vs2));
+	}
+	
 	void getMatLib(const std::string &path, const std::string &name, Pi3Cresource* resource)
 	{
 		std::string line;
@@ -89,14 +103,10 @@ namespace Pi3CfileOBJ {
 						if (objmat.name != "") addMaterial(resource, objmat);
 						objmat.init(name + "_" + vals);
 					}
-					else if (com == "Ka")
-						sscanf(vals.c_str(), "%f %f %f", &objmat.colAmbient.x, &objmat.colAmbient.y, &objmat.colAmbient.z);
-					else if (com == "Kd")
-						sscanf(vals.c_str(), "%f %f %f", &objmat.colDiffuse.x, &objmat.colDiffuse.y, &objmat.colDiffuse.z);
-					else if (com == "Ks")
-						sscanf(vals.c_str(), "%f %f %f", &objmat.colSpecular.x, &objmat.colSpecular.y, &objmat.colSpecular.z);
-					else if (com == "Ke")
-						sscanf(vals.c_str(), "%f %f %f", &objmat.colEmissive.x, &objmat.colEmissive.y, &objmat.colEmissive.z);
+					else if (com == "Ka") objmat.colAmbient = vec4f(readVec3f(vals), 1.f);
+					else if (com == "Kd") objmat.colDiffuse = vec4f(readVec3f(vals), 1.f);
+					else if (com == "Ks") objmat.colSpecular = vec4f(readVec3f(vals), 1.f);
+					else if (com == "Ke") objmat.colEmissive = vec4f(readVec3f(vals), 1.f);
 					else if (com == "Tr" || com == "d") //
 						sscanf(vals.c_str(), "%f", &objmat.alpha);
 					else if (com == "illum") {
@@ -183,9 +193,6 @@ namespace Pi3CfileOBJ {
 		uint32_t tri = 0;
 
 		uint32_t tm = SDL_GetTicks();
-		char vs1[128];
-		char vs2[128];
-		char vs3[128];
 		// Open OBJ file as string ...
 		SDL_RWops *rw = SDL_RWFromFile(filepath.c_str(), "r");
 		if (rw == NULL) return;
@@ -218,27 +225,19 @@ namespace Pi3CfileOBJ {
 				case 'v':
 					if (com.size()-j == 1) {
 						if (tv + 1 > temp_vertices.size()) temp_vertices.resize(temp_vertices.size() + MAXVALS);
-						sscanf(vals.c_str(), "%s %s %s", vs1, vs2, vs3); // &temp_vertices[tv].x, &temp_vertices[tv].y, &temp_vertices[tv].z);
-						temp_vertices[tv].x = mystrtof(vs1);
-						temp_vertices[tv].y = mystrtof(vs2);
-						temp_vertices[tv].z = mystrtof(vs3);
+						temp_vertices[tv] = readVec3f(vals);
 						tv++;
 					} 
 					else {
 						switch (com[j + 1]) {
 						case 't':
 							if (tu + 1 > temp_uvs.size()) temp_uvs.resize(temp_uvs.size() + MAXVALS);
-							sscanf(vals.c_str(), "%s %s", vs1, vs2);
-							temp_uvs[tu].x = mystrtof(vs1);
-							temp_uvs[tu].y = mystrtof(vs2);
+							temp_uvs[tu] = readVec2f(vals);
 							tu++;
 							break;
 						case 'n':
 							if (tn + 1 > temp_normals.size()) temp_normals.resize(temp_normals.size() + MAXVALS);
-							sscanf(vals.c_str(), "%s %s %s", vs1, vs2, vs3);
-							temp_normals[tn].x = mystrtof(vs1);
-							temp_normals[tn].y = mystrtof(vs2);
-							temp_normals[tn].z = mystrtof(vs3);
+							temp_normals[tn] = readVec3f(vals);
 							temp_normals[tn].normalise();
 							tn++;
 							break;
