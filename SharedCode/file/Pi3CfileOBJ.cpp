@@ -4,12 +4,15 @@
 #include <fstream>
 #include <functional>
 #include <sstream>
+#include "Pi3CfastRead.h"
 
 #define MAXVALS 1000	//vertice block size (increases by this amount if more to read)
 
 #ifdef _MSC_VER
 #pragma warning(disable:4996)
 #endif
+
+using namespace Pi3CfastRead;
 
 namespace Pi3CfileOBJ {
 
@@ -180,7 +183,9 @@ namespace Pi3CfileOBJ {
 		uint32_t tri = 0;
 
 		uint32_t tm = SDL_GetTicks();
-
+		char vs1[128];
+		char vs2[128];
+		char vs3[128];
 		// Open OBJ file as string ...
 		SDL_RWops *rw = SDL_RWFromFile(filepath.c_str(), "r");
 		if (rw == NULL) return;
@@ -213,19 +218,27 @@ namespace Pi3CfileOBJ {
 				case 'v':
 					if (com.size()-j == 1) {
 						if (tv + 1 > temp_vertices.size()) temp_vertices.resize(temp_vertices.size() + MAXVALS);
-						sscanf(vals.c_str(), "%f %f %f", &temp_vertices[tv].x, &temp_vertices[tv].y, &temp_vertices[tv].z);
+						sscanf(vals.c_str(), "%s %s %s", vs1, vs2, vs3); // &temp_vertices[tv].x, &temp_vertices[tv].y, &temp_vertices[tv].z);
+						temp_vertices[tv].x = mystrtof(vs1);
+						temp_vertices[tv].y = mystrtof(vs2);
+						temp_vertices[tv].z = mystrtof(vs3);
 						tv++;
 					} 
 					else {
 						switch (com[j + 1]) {
 						case 't':
 							if (tu + 1 > temp_uvs.size()) temp_uvs.resize(temp_uvs.size() + MAXVALS);
-							sscanf(vals.c_str(), "%f %f", &temp_uvs[tu].x, &temp_uvs[tu].y);
+							sscanf(vals.c_str(), "%s %s", vs1, vs2);
+							temp_uvs[tu].x = mystrtof(vs1);
+							temp_uvs[tu].y = mystrtof(vs2);
 							tu++;
 							break;
 						case 'n':
 							if (tn + 1 > temp_normals.size()) temp_normals.resize(temp_normals.size() + MAXVALS);
-							sscanf(vals.c_str(), "%f %f %f", &temp_normals[tn].x, &temp_normals[tn].y, &temp_normals[tn].z);
+							sscanf(vals.c_str(), "%s %s %s", vs1, vs2, vs3);
+							temp_normals[tn].x = mystrtof(vs1);
+							temp_normals[tn].y = mystrtof(vs2);
+							temp_normals[tn].z = mystrtof(vs3);
 							temp_normals[tn].normalise();
 							tn++;
 							break;

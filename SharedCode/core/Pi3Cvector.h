@@ -229,12 +229,26 @@ public:
 		return vec3f(x / l, y / l, z / l);
 	}
 	
+	float dot(const vec3f& v0) const
+	{
+		return x * v0.x + y * v0.y + z * v0.z;
+	}
+
 	void normalise() // normalised to a length of 1
 	{
 		float l = length();
 		if (l != 0.0) {
-			x = x / l; y = y / l; z = z / l;
+			x /= l; y /= l; z /= l;
 		}
+	}
+
+	vec3f norm() // normalised to a length of 1
+	{
+		float l = length();
+		if (l != 0.0) {
+			x /= l; y /= l; z /= l;
+		}
+		return *this;
 	}
 
 	inline vec3f trinormal(vec3f v2, vec3f v3) const //calculate triangle normal (normalised)
