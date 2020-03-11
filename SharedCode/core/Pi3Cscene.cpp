@@ -248,7 +248,7 @@ void Pi3Cscene::renderView(const viewInfo& view, Pi3Cmaterial* outlines)
 		setPerspective3D(view.viewport.width, view.viewport.height, view.pspvalue, view.psp_nearz, view.psp_farz);
 		setSun(0xffffff, vec3f(1000.f, 1000.f, -1000.f)); //transform sun position into scene
 		render3D(view.ticks);
-		//scene.render3D(view.ticks, outlines);
+		//render3D(view.ticks, outlines);
 		break;
 	case viewInfo::ORTHOGRAPHIC:
 		setMatrix(view.pos + view.pan, vec3f(0, 0, 0), view.rot);

@@ -1,8 +1,6 @@
 #include "Pi3Cmesh.h"
 #include "Pi3Ccollision.h"
-#include <algorithm>
-#include <unordered_set>
-#include <cmath>
+
 
 Pi3Cmesh::Pi3Cmesh(const std::string &name, const uint32_t stride) : name(name), stride(stride) {
 	reset();
@@ -101,6 +99,11 @@ void Pi3Cmesh::render(const GLenum rendermode) {
 	glDrawArrays(rendermode, vertOffset, vertSize);
 }
 
+void Pi3Cmesh::renderIndexed(const GLenum rendermode, uint32_t indexCo, uint32_t * indexes)
+{
+	glDrawElements(rendermode, indexCo, GL_UNSIGNED_INT, indexes);
+}
+
 //vec2f point3Dto2D(const vec3f vec, const float psp) const
 //{
 //	float zd = psp / vec.z;
@@ -182,6 +185,8 @@ int32_t Pi3Cmesh::touchPoint(Pi3Ctouch &touch, const Pi3Cmatrix &mtx, const std:
 
 namespace std
 {
+	//Map for vertex x,y,z coords ...
+
 	struct mapvert {
 		mapvert(const float x, const float y, const float z) : x(x), y(y), z(z) {}
 		friend bool operator== (const mapvert &a, const mapvert &b);
@@ -202,6 +207,8 @@ namespace std
 		}
 	};
 
+	//Map for texture u,v coords ...
+
 	struct mapuv {
 		mapuv(const float u, const float v) : u(u), v(v) {}
 		friend bool operator== (const mapuv &a, const mapuv &b);
@@ -219,6 +226,29 @@ namespace std
 	{
 		size_t operator()(const mapuv &v) const {
 			return hash<float>()(v.u) ^ hash<float>()(v.v);
+		}
+	};
+
+	//Map for triangle edge indices ...
+
+	struct mapedges {
+		mapedges(const float x1, const float y1, const float z1, const float x2, const float y2, const float z2) : x1(x1), y1(y1), z1(z1), x2(x2), y2(y2), z2(z2) {}
+		friend bool operator== (const mapedges &a, const mapedges &b);
+
+		uint32_t index;
+		float x1, y1, z1, x2, y2, z2;
+	};
+
+	bool operator== (const mapedges &a, const mapedges &b) { //check verts in both directions ...
+		return (a.x1 == b.x1 && a.y1 == b.y1 && a.z1 == b.z1 && a.x2 == b.x2 && a.y2 == b.y2 && a.z2 == b.z2) || 
+			(a.x1 == b.x2 && a.y1 == b.y2 && a.z1 == b.z2 && a.x2 == b.x1 && a.y2 == b.y1 && a.z2 == b.z1);
+	}
+
+	template <>
+	struct hash<mapedges>
+	{
+		size_t operator()(const mapedges &v) const {
+			return hash<float>()(v.x1) ^ hash<float>()(v.y1) ^ hash<float>()(v.z1) ^ hash<float>()(v.x2) ^ hash<float>()(v.y2) ^ hash<float>()(v.z2);
 		}
 	};
 }
@@ -362,6 +392,31 @@ void Pi3Cmesh::createSharedTriangleList(VertsIndsUVs *in, VertsIndsUVs *out, con
 	}
 }
 
+void checkEdge(std::unordered_set<std::mapedges>& mapEdges, std::vector<float> &verts, std::vector<uint32_t>& lineIndexes, uint32_t stride, size_t v1, size_t v2)
+{
+	uint32_t a = v1 * stride; 
+	uint32_t b = v2 * stride;
+	std::mapedges edge(verts[a], verts[a + 1], verts[a + 2], verts[b], verts[b + 1], verts[b + 2]);
+	auto it = mapEdges.find(edge);
+	if (it == mapEdges.end()) {
+		lineIndexes.push_back(v1);
+		lineIndexes.push_back(v2);
+		mapEdges.insert(edge);
+	}
+}
+
+void Pi3Cmesh::createTriangleEdges(std::vector<float> &verts)
+{
+	std::unordered_set<std::mapedges> mapedges;
+	lineIndexes.clear();
+
+	for (size_t i = vertOffset; i < (vertOffset + vertSize); i += 3) {
+		checkEdge(mapedges, verts, lineIndexes, stride, i, i + 1);
+		checkEdge(mapedges, verts, lineIndexes, stride, i + 1, i + 2);
+		checkEdge(mapedges, verts, lineIndexes, stride, i + 2, i);
+	}
+}
+
 float Pi3Cmesh::triArea(const vec3f &v1, const vec3f &v2, const vec3f &v3, float &maxLength) const
 {
 	//work out distances between points ...
@@ -399,22 +454,22 @@ void Pi3Cmesh::updateNormals(const uint32_t min, const uint32_t max)
 	}
 }
 
-void Pi3Cmesh::createOutlines()
-{
-	/* Create outline formed from 3x single lines per triangle (not very efficient!) */
-	overts.resize(verts.size() * 2);
-	uint32_t o = 0;
-	for (size_t v = 0; v < verts.size(); v += 3 * stride) {
-		memcpy(&overts[0] + o, &verts[0] + v, stride); o += stride;
-		memcpy(&overts[0] + o, &verts[0] + v + stride, stride); o += stride;
-
-		memcpy(&overts[0] + o, &verts[0] + v + stride, stride); o += stride;
-		memcpy(&overts[0] + o, &verts[0] + v + stride * 2, stride); o += stride;
-
-		memcpy(&overts[0] + o, &verts[0] + v + stride * 2, stride); o += stride;
-		memcpy(&overts[0] + o, &verts[0] + v, stride); o += stride;
-	}
-}
+//void Pi3Cmesh::createOutlines()
+//{
+//	/* Create outline formed from 3x single lines per triangle (not very efficient!) */
+//	overts.resize(verts.size() * 2);
+//	uint32_t o = 0;
+//	for (size_t v = 0; v < verts.size(); v += 3 * stride) {
+//		memcpy(&overts[0] + o, &verts[0] + v, stride); o += stride;
+//		memcpy(&overts[0] + o, &verts[0] + v + stride, stride); o += stride;
+//
+//		memcpy(&overts[0] + o, &verts[0] + v + stride, stride); o += stride;
+//		memcpy(&overts[0] + o, &verts[0] + v + stride * 2, stride); o += stride;
+//
+//		memcpy(&overts[0] + o, &verts[0] + v + stride * 2, stride); o += stride;
+//		memcpy(&overts[0] + o, &verts[0] + v, stride); o += stride;
+//	}
+//}
 
 #define CreateVertsXY(x,y,ux,uy)								\
 		verts[vc++] = x; verts[vc++] = y; verts[vc++] = pos.z;	\

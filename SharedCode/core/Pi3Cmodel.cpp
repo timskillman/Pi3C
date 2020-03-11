@@ -60,6 +60,7 @@ void Pi3Cmodel::loadModelAndCollider(Pi3Cresource *resource, std::string path, s
 void Pi3Cmodel::create(Pi3Cresource *resource, Pi3Cmesh *mesh, uint32_t diffuseColour)
 {	
 	meshRef = resource->addMesh(mesh);
+	if (mesh->mode==GL_TRIANGLES) resource->addMeshOutlines(meshRef);
 	material = *resource->defaultMaterial();
 	material.SetColDiffuse(diffuseColour);
 	bbox = resource->meshes[meshRef].bbox;

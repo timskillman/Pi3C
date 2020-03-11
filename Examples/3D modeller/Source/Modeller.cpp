@@ -122,7 +122,7 @@ void Modeller::init()
 	moveGizmoRef = scene.append3D(moveGizmo);
 
 	outlines = *resource->defaultMaterial();
-	outlines.rendermode = GL_LINE_STRIP;
+	outlines.rendermode = GL_LINES | GL_LINE_STRIP;
 	outlines.illum = 1;
 
 	handCursor = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_HAND);

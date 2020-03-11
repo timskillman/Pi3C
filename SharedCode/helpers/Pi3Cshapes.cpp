@@ -948,6 +948,7 @@ namespace Pi3Cshapes {
 
 		mesh.bbox.bboxFromVerts(mesh.verts, 0, mesh.vc, mesh.stride);
 		mesh.materialRef = 0;
+		mesh.mode = GL_LINE_STRIP;
 
 		return mesh;
 

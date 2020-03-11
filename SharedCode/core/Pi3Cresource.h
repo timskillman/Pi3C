@@ -78,6 +78,8 @@ public:
 	//int32_t addMesh(Pi3Cmesh &mesh, const bool deleteVerts = true, const bool dynamicBuffer = false, const uint32_t vertSize = 2000000);		//returns mesh reference (or -1 if failed)
 	int32_t addMesh(Pi3Cmesh * mesh, uint32_t maxsize = 500000);
 
+	void addMeshOutlines(uint32_t meshref);
+
 	vertsPtr getMeshVerts(uint32_t meshRef) {
 		return vertsPtr(meshes[meshRef].vertOffset * meshes[meshRef].stride, &vertBuffer[meshes[meshRef].bufRef]);
 	}
@@ -149,7 +151,7 @@ private:
 		return T();
 	}
 
-	//void addMeshVerts(const Pi3Cmesh &mesh, std::vector<float> &newverts, const uint32_t to, const uint32_t size, const uint32_t vertsize, const bool deleteVerts);
+void addMeshVerts(const Pi3Cmesh &mesh, std::vector<float> &newverts, const uint32_t to, const uint32_t size, const uint32_t vertsize, const bool deleteVerts);
 
 	GLuint VBOid[MAXVBO];
 	//uint32_t stride;

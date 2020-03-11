@@ -126,6 +126,12 @@ int32_t Pi3Cresource::loadTexture(const std::string &path, const std::string &te
 	return addTexture(Texture, texRef);
 }
 
+void Pi3Cresource::addMeshOutlines(uint32_t meshref)
+{
+	Pi3Cmesh &mesh = meshes[meshref];
+	mesh.createTriangleEdges(vertBuffer[mesh.bufRef]);
+}
+
 int32_t Pi3Cresource::addMesh(Pi3Cmesh * mesh, uint32_t maxsize)
 {
 	//Are we requesting too much?  Then attempt it ...
@@ -240,7 +246,13 @@ void Pi3Cresource::renderMesh(const int meshRef, const GLenum rendermode)
 {
 	Pi3Cmesh &mesh = meshes[meshRef];
 	setRenderBuffer(mesh.bufRef, mesh.stride);
-	mesh.render(rendermode);
+
+
+	if (rendermode == GL_TRIANGLES || (mesh.mode & GL_LINE_STRIP)) mesh.render(rendermode);
+
+	if (mesh.lineIndexes.size()>0 && (rendermode & GL_LINES))
+		mesh.renderIndexed(GL_LINES, mesh.lineIndexes.size(), &mesh.lineIndexes[0]);
+
 	calls++; //used for debugging
 }
 

@@ -23,12 +23,10 @@ namespace Pi3CfileOBJ {
 		//SDL_Log("Meshes %d,%d,%d,%d,%d",resource->meshes.size(),resource->materials.size(),resource->textures.size(),resource->vertBuffer.size(),resource->currentBuffer);
 		mesh.mode = GL_TRIANGLES;
 		mesh.bbox.bboxFromVerts(mesh.verts, 0, mesh.vc, mesh.stride);
-		mesh.hasColliderGrid = mesh.createColliderGrid();
-		resource->addMesh(&mesh); //int32_t i = 
+		//mesh.hasColliderGrid = mesh.createColliderGrid();
+		int meshref = resource->addMesh(&mesh);
+		resource->addMeshOutlines(meshref);
 
-		//Pi3Cmesh selMesh = Pi3Cgizmos::selectBoxGizmo(mesh.bbox.min, mesh.bbox.size(), 0xffffff);
-		//i = resource->addMesh(&selMesh);
-		//SDL_Log("Mesh %d: verts = %d,%d, material = %d", mesh.materialRef, mesh.vertOffset, mesh.vertSize, mesh.materialRef);
 	}
 	
 	void addMaterial(Pi3Cresource* resource, Pi3Cmaterial &objmat)
@@ -355,7 +353,7 @@ namespace Pi3CfileOBJ {
 
 						if (materialfound < 0) {
 							SDL_Log("ERROR! - Material '%s' not found", materialName.c_str());
-							//meshModel.resize(1);
+							if (meshModel.size()==0) meshModel.resize(1);
 							materialfound = 0; //use default
 						}
 						else {
@@ -392,7 +390,7 @@ namespace Pi3CfileOBJ {
 			}
 		}
 		
-		SDL_Log("Total time = %d, triangles = %d, mesh parts = %d, total = %d", (SDL_GetTicks() - tm) / 1000, tri, resource->meshCount() - meshStart, resource->meshCount()); //, bbox.width(),bbox.height(),bbox.depth());
+		SDL_Log("Total time = %f secs, triangles = %d, mesh parts = %d, total = %d", (float)(SDL_GetTicks() - tm) / 1000.f, tri, resource->meshCount() - meshStart, resource->meshCount()); //, bbox.width(),bbox.height(),bbox.depth());
 
 	}
 

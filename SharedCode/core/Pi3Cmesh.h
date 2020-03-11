@@ -8,6 +8,9 @@
 #include <string>
 #include <stdint.h>
 #include <vector>
+#include <algorithm>
+#include <unordered_set>
+#include <cmath>
 
 // =======================================================================
 // Pi3C Graphics Library
@@ -65,7 +68,8 @@ public:
 	Pi3Cbbox3d bbox;
 	uint16_t mode;
 	std::vector<float> verts;
-	std::vector<float> overts;	//outline vertices
+	//std::vector<float> overts;	//outline vertices
+	std::vector<uint32_t> lineIndexes;
 	GLint vertOffset;
 	uint32_t vertSize;
 	uint32_t stride;
@@ -82,6 +86,7 @@ public:
 		std::vector<uint32_t>& uvindexes;
 	};
 
+
 /// FUNCTIONS ...
 
 	void addPackedVert(const vec3f &position, const vec3f &normal, const vec2f &uv, const uint32_t col);
@@ -90,7 +95,8 @@ public:
 	void resize(const vec3f &pos, const vec3f &size, const std::vector<float> &mverts);
 	void reset();
 
-	void render(const GLenum mode = GL_TRIANGLES);
+	void render(const GLenum rendermode = GL_TRIANGLES);
+	void renderIndexed(const GLenum rendermode, uint32_t indexCo, uint32_t * indexes);
 
 	int32_t touchPoint(Pi3Ctouch &touchObj, const Pi3Cmatrix &mtx, const std::vector<float> &mverts) const;		//returns the index of triangle touched and the intersection point
 
@@ -112,10 +118,11 @@ public:
 	float checkColliderGrid(const vec3f &p, const Pi3Cmatrix &mtx, float prevHeight);
 	bool createColliderGrid();
 
-	void createOutlines();
+	//void createOutlines();
 
 	void createSharedTriangleList(const std::vector<float>& verts, std::vector<uint32_t>& vertindexes, std::vector<float>& newverts, std::vector<uint32_t> &normindexes, std::vector<float> &newnorms, std::vector<uint32_t>& uvindexes, std::vector<float>& newuvs, const float tolerance = 0.0005f);
 	void createSharedTriangleList(VertsIndsUVs* in, VertsIndsUVs* out, const float tolerance = 0.0005f);
+	void createTriangleEdges(std::vector<float> &verts);
 
 	//bool collideVector(bool bounce, vec3f &pos, vec3f &dir);	//returns hit and modified pos, dir vectors
 	//float collideFloor(vec3f pos, float &prevHeight); 			//returns height above the floor
@@ -136,7 +143,7 @@ private:
 	}
 
 	float triArea(const vec3f &v1, const vec3f &v2, const vec3f &v3, float &maxLength) const;
-	
+
 	std::vector<float> xgrid[10][10]; //collider grid ... stores triangles grouped in a 10x10 area
 
 };
