@@ -280,6 +280,7 @@ void MGui::doIMGUI(Modeller * md)
 
 	gui.setPosition(winWidth - rightbarWidth - 100, workHeight + topbarHeight + menuHeight + 3);
 	gui.renderBackIcon("rendl.png", icw, ich);
+	if (gui.ButtonImage("butDropMan.png") && mu) md->dropMan();
 	if (gui.ButtonImage("butBigwin.png") && mu) md->setFullScene();
 	if (gui.ButtonImage("butSceneRot.png", md->editMode == Modeller::ED_ROTATESCENE) && mb) md->setEditMode(Modeller::ED_ROTATESCENE);
 	gui.renderBackIcon("rendr.png", icw, ich);

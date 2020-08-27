@@ -37,6 +37,7 @@ public:
 	void setCursor(SDL_Cursor *newCursor);
 	void setDragBarH(bool on) { setDragBar(on, WECursor); };
 	void setDragBarV(bool on) { setDragBar(on, NSCursor); };
+	void dropMan();
 	void setFullScene();
 
 	//void saveScene(const std::string &file, Pi3Cmodel *models);
@@ -143,6 +144,7 @@ private:
 	MGui mgui;
 	//Pi3Cbbox3d selbbox;
 
+	void touchView(viewInfo &vi);
 	void touchPerspectiveView(viewInfo &vi);
 	void touchOrthoView(viewInfo &vi);
 	void touchObject(Pi3Cmodel& selmodel);

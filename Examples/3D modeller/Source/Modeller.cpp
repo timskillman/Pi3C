@@ -80,15 +80,15 @@ void Modeller::init()
 	//scene.setPerspective3D(window->getWidth(), window->getHeight(), PSPVALUE, nearzfarz.x, nearzfarz.y);
 
 	// Setup player's avatar ...
-	//Pi3Cavatar::avatarParams avparams;
-	//avparams.movement = Pi3Cavatar::move_walk;
-	//avparams.position = opts.asVec3f("startpos");
-	//avparams.rotation = opts.asVec3f("rotation");
-	//avparams.size = { 1.f, opts.asFloat("avatarHeight"), 1.f };
-	//avparams.walkSpeed = opts.asFloat("avatarWalkSpeed");
-	//avparams.runSpeed = opts.asFloat("avatarRunSpeed");
-	//avparams.fallSpeed = opts.asFloat("avatarFallSpeed");
-	//player.init(avparams);
+	Pi3Cavatar::avatarParams avparams;
+	avparams.movement = Pi3Cavatar::move_walk;
+	avparams.position = opts.asVec3f("startpos");
+	avparams.rotation = opts.asVec3f("rotation");
+	avparams.size = { 1.f, opts.asFloat("avatarHeight"), 1.f };
+	avparams.walkSpeed = opts.asFloat("avatarWalkSpeed");
+	avparams.runSpeed = opts.asFloat("avatarRunSpeed");
+	avparams.fallSpeed = opts.asFloat("avatarFallSpeed");
+	player.init(avparams);
 
 	// Load Skybox ...
 	skybox = scene.loadModelOBJ(opts.asString("skyboxPath"), opts.asString("skybox"), vec3f(0,0,0), true, nullptr); // loadbarCallback);
@@ -333,6 +333,11 @@ void Modeller::setCurrentSelView(int32_t selview)
 		//if (selview != viewInfo::TOPLEFT) scene.snapShot(viewInfo::TOPLEFT);
 		currentSelView = selview;
 	}
+}
+
+void Modeller::dropMan()
+{
+
 }
 
 void Modeller::setFullScene()
