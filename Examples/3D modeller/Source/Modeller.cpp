@@ -226,6 +226,9 @@ void Modeller::handleEvents(std::vector<uint32_t>& eventList)
 					}
 					else clearSelections();
 					break;
+				case ED_DROPMAN:
+					touchScene();
+					break;
 				case ED_ROTATE: 
 					break;
 				case ED_SCALE:
@@ -337,7 +340,10 @@ void Modeller::setCurrentSelView(int32_t selview)
 
 void Modeller::dropMan()
 {
-
+	viewInfo& view = views[currentView];
+	view.pos = vec3f(0, 0, 0);
+	view.zoom = 2.f;
+	view.pan = currentPos;
 }
 
 void Modeller::setFullScene()
@@ -408,6 +414,14 @@ void Modeller::touchObject(Pi3Cmodel& selmodel)
 	scene.models[moveGizmoRef].matrix.move(selmodel.bbox.center());
 }
 
+void Modeller::touchView(viewInfo &vi)
+{
+	switch (vi.projection) {
+	case viewInfo::PERSPECTIVE: touchPerspectiveView(vi); break;
+	case viewInfo::ORTHOGRAPHIC: touchOrthoView(vi); break;
+	}
+}
+
 void Modeller::touchScene()
 {
 	//selGroup = nullptr;
@@ -417,11 +431,7 @@ void Modeller::touchScene()
 
 	if (currentView >= 0 && !mgui.somethingSelected()) {
 
-		viewInfo &vi = views[currentView];
-		switch (vi.projection) {
-		case viewInfo::PERSPECTIVE: touchPerspectiveView(vi); break;
-		case viewInfo::ORTHOGRAPHIC: touchOrthoView(vi); break;
-		}
+		touchView(views[currentView]);
 
 		if (editMode== ED_CREATE) setCursor(crossCursor);
 
@@ -446,6 +456,7 @@ void Modeller::touchScene()
 			case ED_MOVE: setCursor(moveCursor); break;
 			case ED_ROTATE: setCursor(handCursor); break;
 			case ED_SCALE: setCursor(handCursor); break;
+			case ED_DROPMAN: dropMan(); break;
 			}
 			
 		}
