@@ -152,6 +152,43 @@ void Modeller::handleKeys()
 	const uint8_t *keystate = window->getKeys();
 }
 
+void Modeller::handleKeyPresses()
+{
+	switch (window->getKeyPress()) {
+	case SDL_SCANCODE_DELETE:
+		editUndo.deleteSelection(scene.models);
+		clearGizmos();
+		break;
+	case SDL_SCANCODE_X:
+		if (window->ctrlKey) editUndo.deleteSelection(scene.models);
+		break;
+	case SDL_SCANCODE_Z:
+		if (window->ctrlKey) {
+			if (window->shiftKey) editUndo.redo(scene.models); else editUndo.undo(scene.models);
+		}
+		break;
+	case SDL_SCANCODE_Y:
+		if (window->ctrlKey) editUndo.redo(scene.models);
+		break;
+	case SDL_SCANCODE_A:
+		if (window->ctrlKey) selectAll();
+		break;
+	case SDL_SCANCODE_G:
+		scene.models[gridRef].visible = !scene.models[gridRef].visible;
+		window->mouse.up = false;
+		break;
+	case SDL_SCANCODE_P:
+		scene.renderOffscreen(views[currentSelView], &outlines);
+		window->mouse.up = false;
+		break;
+	case SDL_SCANCODE_T:
+		scene.renderOffscreen(views[currentSelView], &outlines, 160, 128);
+		window->mouse.up = false;
+		break;
+	}
+	//keyPress = ev.key.keysym.scancode;
+}
+
 void Modeller::createLandscape(const vec3f pos, const uint32_t colour)
 {
 	Pi3Ctexture maptex = Pi3Ctexture("assets/maps/mountainsHgt2.png", false);
@@ -173,6 +210,107 @@ void Modeller::createShape(const Pi3Cmesh& mesh, const vec3f& pos, const uint32_
 	}
 }
 
+void Modeller::createShapes()
+{
+	if (createTool != CT_NONE) {
+		currentColour = rand() % 0xffffff;
+		vec3f pos = -currentPos;
+		switch (createTool) {
+		case CT_CUBOID: createShape(Pi3Cshapes::cuboid(vec3f(0, 0, 0.f), vec3f(2.f, 2.f, 2.f)), pos, currentColour); break;
+		case CT_CYLINDER: createShape(Pi3Cshapes::cylinder(vec3f(0, 0, 0.f), 1.f, 2.f), pos, currentColour); break;
+		case CT_TUBE: createShape(Pi3Cshapes::tube(vec3f(0, 0, 0.f), 0.5f, 1.f, 2.f), pos, currentColour); break;
+		case CT_CONE: createShape(Pi3Cshapes::cone(vec3f(0, 0, 0.f), 1.f, 2.f), pos, currentColour); break;
+		case CT_TCONE: createShape(Pi3Cshapes::tcone(vec3f(0, 0, 0.f), 1.f, 0.7f, 2.f), pos, currentColour); break;
+		case CT_SPHERE: createShape(Pi3Cshapes::sphere(vec3f(0, 0, 0.f), 1.f), pos, currentColour); break;
+		case CT_TORUS: createShape(Pi3Cshapes::torus(vec3f(0, 0, 0.f), 2.f, 1.f), pos, currentColour); break;
+		case CT_WEDGE: break;
+		case CT_EXTRUDE: break;
+		case CT_LATHE: break;
+		case CT_LANDSCAPE: createLandscape(pos, currentColour); break;
+		}
+	}
+}
+
+void Modeller::MouseButtonUp()
+{
+	rotating = false;
+	panning = false;
+	zooming = false;
+}
+
+void Modeller::DragMiddleMouseButton(viewInfo& view, vec3f& mouseXYZ)
+{
+	if (window->mouse.MiddleButton) {
+		setCurrentSelView(currentView);
+		view.pan += view.viewCoords(mouseXYZ);
+		panning = true;
+	}
+}
+
+void Modeller::DragLeftMouseButton(viewInfo& view, vec3f& mouseXYZ)
+{
+	if (window->mouse.LeftButton) {
+		switch (editMode) {
+		case ED_MOVE:
+			moveSelections(view.viewCoords(mouseXYZ));
+			break;
+		case ED_ROTATE:
+			break;
+		case ED_SCALE:
+			{
+				float sc = -window->mouse.deltaXY.y * 0.1f;
+				editUndo.scaleSelections(scene.models, vec3f(sc, sc, sc)); //view.viewCoords(mouseXYZ)*0.5f
+			}
+			break;
+		case ED_ROTATESCENE:
+			view.rot += vec3f(mouseXYZ.y, mouseXYZ.x, 0) * -0.01f;
+			rotating = true;
+			break;
+		}
+	}
+}
+
+void Modeller::LeftMouseButton(viewInfo& view)
+{
+	if (currentView != -1 && window->mouse.LeftButton && !dragbar) {
+
+		setCurrentSelView(currentView);
+
+		switch (editMode) {
+		case ED_CREATE:
+			createShapes();
+			window->mouse.up = false;
+			break;
+		case ED_SELECT:
+			touchScene();
+			if (touch.selmodel) {
+				editUndo.selectModel(scene.models, &scene.models[touch.parent()], window->ctrlKey);
+				//scene.models[touch.groupRefs[0]].selected = touch.selmodel->selected;
+			}
+			else
+				clearSelections();
+			break;
+		case ED_MOVE:
+			touchScene();
+			if (touch.selmodel) {
+				editUndo.selectModel(scene.models, touch.selmodel, window->ctrlKey);
+				scene.models[touch.parent()].selected = true;
+			}
+			else clearSelections();
+			break;
+		case ED_DROPMAN:
+			touchScene();
+			break;
+		case ED_ROTATE:
+			break;
+		case ED_SCALE:
+			editUndo.setSelectionCentre(scene.models);
+			break;
+		}
+
+	}
+}
+
 void Modeller::handleEvents(std::vector<uint32_t>& eventList)
 {
 	if (eventList.size() == 0) return;
@@ -184,90 +322,17 @@ void Modeller::handleEvents(std::vector<uint32_t>& eventList)
 		switch (ev)
 		{
 		case SDL_MOUSEBUTTONDOWN:
-			if (currentView != -1 && window->mouse.LeftButton && !dragbar) {
-				
-				setCurrentSelView(currentView);
-
-				switch (editMode) {
-				case ED_CREATE:
-					if (createTool != CT_NONE) {
-						currentColour = rand() % 0xffffff;
-						vec3f pos = -currentPos;
-						switch (createTool) {
-						case CT_CUBOID: createShape(Pi3Cshapes::cuboid(vec3f(0, 0, 0.f), vec3f(2.f, 2.f, 2.f)), pos, currentColour); break;
-						case CT_CYLINDER: createShape(Pi3Cshapes::cylinder(vec3f(0, 0, 0.f), 1.f, 2.f), pos, currentColour); break;
-						case CT_TUBE: createShape(Pi3Cshapes::tube(vec3f(0, 0, 0.f), 0.5f, 1.f, 2.f), pos, currentColour); break;
-						case CT_CONE: createShape(Pi3Cshapes::cone(vec3f(0, 0, 0.f), 1.f, 2.f), pos, currentColour); break;
-						case CT_TCONE: createShape(Pi3Cshapes::tcone(vec3f(0, 0, 0.f), 1.f, 0.7f, 2.f), pos, currentColour); break;
-						case CT_SPHERE: createShape(Pi3Cshapes::sphere(vec3f(0, 0, 0.f), 1.f), pos, currentColour); break;
-						case CT_TORUS: createShape(Pi3Cshapes::torus(vec3f(0, 0, 0.f), 2.f, 1.f), pos, currentColour); break;
-						case CT_WEDGE: break;
-						case CT_EXTRUDE: break;
-						case CT_LATHE: break;
-						case CT_LANDSCAPE: createLandscape(pos, currentColour); break;
-						}
-					}
-					window->mouse.up = false;
-					break;
-				case ED_SELECT:
-					touchScene();
-					if (touch.selmodel) {
-						editUndo.selectModel(scene.models, &scene.models[touch.parent()], window->ctrlKey);
-						//scene.models[touch.groupRefs[0]].selected = touch.selmodel->selected;
-					}
-					else 
-						clearSelections();
-					break;
-				case ED_MOVE: 
-					touchScene();
-					if (touch.selmodel) {
-						editUndo.selectModel(scene.models, touch.selmodel, window->ctrlKey);
-						scene.models[touch.parent()].selected = true;
-					}
-					else clearSelections();
-					break;
-				case ED_DROPMAN:
-					touchScene();
-					break;
-				case ED_ROTATE: 
-					break;
-				case ED_SCALE:
-					editUndo.setSelectionCentre(scene.models);
-					break;
-				}
-
-			}
+			LeftMouseButton(view);
 			break;
 		case SDL_MOUSEBUTTONUP:
-			rotating = false;
-			panning = false;
-			zooming = false;
+			MouseButtonUp();
 			break;
 		case SDL_MOUSEMOTION:
 			if (window->mouse.anyButton() && currentView>=0 && !dragbar) {
 				vec3f mouseXYZ = vec3f(window->mouse.deltaXY.x, -window->mouse.deltaXY.y, 0);
-				float sc = -window->mouse.deltaXY.y * 0.1f;
-				if (window->mouse.MiddleButton) {
-					setCurrentSelView(currentView);
-					view.pan += view.viewCoords(mouseXYZ);
-					panning = true;
-				}
-				if (window->mouse.LeftButton) {
-					switch (editMode) {
-					case ED_MOVE:
-						moveSelections(view.viewCoords(mouseXYZ));
-						break;
-					case ED_ROTATE:
-						break;
-					case ED_SCALE:
-						editUndo.scaleSelections(scene.models, vec3f(sc,sc,sc)); //view.viewCoords(mouseXYZ)*0.5f
-						break;
-					case ED_ROTATESCENE:
-						view.rot += vec3f(mouseXYZ.y, mouseXYZ.x, 0) * -0.01f;
-						rotating = true;
-						break;
-					}
-				}
+				//float sc = -window->mouse.deltaXY.y * 0.1f;
+				DragMiddleMouseButton(view, mouseXYZ);
+				DragLeftMouseButton(view, mouseXYZ);
 			}
 			break;
 		case SDL_MOUSEWHEEL:
@@ -283,35 +348,7 @@ void Modeller::handleEvents(std::vector<uint32_t>& eventList)
 			}
 			break;
 		case SDL_KEYDOWN:
-			switch (window->getKeyPress()) {
-			case SDL_SCANCODE_DELETE: 
-				editUndo.deleteSelection(scene.models); 
-				clearGizmos();
-				break;
-			case SDL_SCANCODE_X: 
-				if (window->ctrlKey) editUndo.deleteSelection(scene.models);
-				break;
-			case SDL_SCANCODE_Z: 
-				if (window->ctrlKey) {
-					if (window->shiftKey) editUndo.redo(scene.models); else editUndo.undo(scene.models);
-				}
-				break;
-			case SDL_SCANCODE_Y:
-				if (window->ctrlKey) editUndo.redo(scene.models);
-				break;
-			case SDL_SCANCODE_A:
-				if (window->ctrlKey) selectAll();
-				break;
-			case SDL_SCANCODE_G:
-				scene.models[gridRef].visible = !scene.models[gridRef].visible;
-				window->mouse.up = false;
-				break;
-			case SDL_SCANCODE_P:
-				scene.renderOffscreen(views[currentSelView], &outlines);
-				window->mouse.up = false;
-				break;
-			}
-			//keyPress = ev.key.keysym.scancode;
+			handleKeyPresses();
 			break;
 		case SDL_DROPFILE: 
 			std::string file = window->dropfile;

@@ -152,4 +152,10 @@ private:
 	void setSelectionBox();
 	void moveSelections(const vec3f& vec);
 	void setCurrentSelView(int32_t selview);
+	void handleKeyPresses();
+	void createShapes();
+	void LeftMouseButton(viewInfo& view);
+	void MouseButtonUp();
+	void DragLeftMouseButton(viewInfo& view, vec3f& mouseXYZ);
+	void DragMiddleMouseButton(viewInfo& view, vec3f& mouseXYZ);
 };

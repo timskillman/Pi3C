@@ -344,13 +344,16 @@ void Pi3Cscene::checkFBerrors()
 	}
 }
 
-void Pi3Cscene::renderOffscreen(const viewInfo& viewinfo, Pi3Cmaterial* outlines) //, const Pi3Cshader &shader
+void Pi3Cscene::renderOffscreen(const viewInfo& viewinfo, Pi3Cmaterial* outlines, int width, int height) //, const Pi3Cshader &shader
 {
 //#ifdef __arm__
 	viewInfo newview = viewinfo;
 	 
-	int width = viewinfo.viewport.width;
-	int height = viewinfo.viewport.height;
+	if (width <= 0 || height <= 0) {
+		width = viewinfo.viewport.width;
+		height = viewinfo.viewport.height;
+	}
+
 	newview.viewport = Pi3Crecti(0, 0, width, height);
 
 	GLuint frame_buf = 0, colour_buf = 0, depth_buf = 0;
