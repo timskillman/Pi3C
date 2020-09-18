@@ -164,7 +164,10 @@ void Modeller::handleKeyPresses()
 		break;
 	case SDL_SCANCODE_Z:
 		if (window->ctrlKey) {
-			if (window->shiftKey) editUndo.redo(scene.models); else editUndo.undo(scene.models);
+			if (window->shiftKey) 
+				editUndo.redo(scene.models); 
+			else 
+				editUndo.undo(scene.models);
 		}
 		break;
 	case SDL_SCANCODE_Y:
@@ -248,6 +251,7 @@ void Modeller::DragLeftMouseButton(viewInfo& view, vec3f& mouseXYZ)
 	switch (editMode) {
 	case ED_MOVE:
 		moveSelections(view.viewCoords(mouseXYZ));
+		setSelectionBox();
 		break;
 	case ED_ROTATE:
 		break;
@@ -255,6 +259,7 @@ void Modeller::DragLeftMouseButton(viewInfo& view, vec3f& mouseXYZ)
 		{
 			float sc = -window->mouse.deltaXY.y * 0.1f;
 			editUndo.scaleSelections(scene.models, vec3f(sc, sc, sc)); //view.viewCoords(mouseXYZ)*0.5f
+			setSelectionBox();
 		}
 		break;
 	case ED_ROTATESCENE:
@@ -265,7 +270,7 @@ void Modeller::DragLeftMouseButton(viewInfo& view, vec3f& mouseXYZ)
 	}
 }
 
-void Modeller::LeftMouseButton(viewInfo& view)
+void Modeller::ClickLeftMouseButton(viewInfo& view)
 {
 	if (currentViewIsActive() && window->mouse.LeftButton && sceneAction != SA_DRAGBAR) {
 
@@ -279,6 +284,7 @@ void Modeller::LeftMouseButton(viewInfo& view)
 		case ED_SELECT:
 			touchScene();
 			if (touch.selmodel) {
+				scene.models[brushref].matrix.move(touch.intersection);
 				editUndo.selectModel(scene.models, &scene.models[touch.parent()], window->ctrlKey);
 				//scene.models[touch.groupRefs[0]].selected = touch.selmodel->selected;
 			}
@@ -300,9 +306,51 @@ void Modeller::LeftMouseButton(viewInfo& view)
 			break;
 		case ED_SCALE:
 			editUndo.setSelectionCentre(scene.models);
+			//scene.models[selboxRef].visible = false;
 			break;
 		}
 
+	}
+}
+
+void Modeller::touchScene()
+{
+	if (sceneAction != SA_NONE) return;
+
+	if (currentViewIsActive() && !mgui.somethingSelected()) {
+
+		touchView(views[currentView]);
+
+		if (editMode == ED_CREATE) setCursor(crossCursor);
+
+		//Pi3Cmodel& brush = scene.models[brushref];
+		//Pi3Cmodel& selmodel = scene.models[touch.parent()];
+
+		if (touch.selmodel) {
+
+			//move 3D pointer (sphere) to touch intersetion point ...
+			currentPos = -touch.intersection;
+
+			//scene.models[brushref].matrix.move(touch.intersection);
+			setTouchFlags(true);
+			touch.selmodel->selected = true;
+
+			switch (editMode) {
+			case ED_SELECT: touchObject(*touch.selmodel); break;
+			case ED_MOVE: setCursor(moveCursor); break;
+			case ED_ROTATE: setCursor(handCursor); break;
+			case ED_SCALE: setCursor(handCursor); break;
+			case ED_DROPMAN: dropMan(); break;
+			}
+
+		}
+		else {
+			setTouchFlags(false);
+			selectedName = "";
+		}
+	}
+	else {
+		setCursor(arrowCursor);
 	}
 }
 
@@ -317,7 +365,7 @@ void Modeller::handleEvents(std::vector<uint32_t>& eventList)
 		switch (ev)
 		{
 		case SDL_MOUSEBUTTONDOWN:
-			LeftMouseButton(view);
+			ClickLeftMouseButton(view);
 			break;
 		case SDL_MOUSEBUTTONUP:
 			MouseButtonUp();
@@ -460,46 +508,7 @@ void Modeller::setTouchFlags(bool val)
 	scene.models[moveGizmoRef].visible = val;
 }
 
-void Modeller::touchScene()
-{
-	if (sceneAction != SA_NONE) return;
 
-	if (currentViewIsActive() && !mgui.somethingSelected()) {
-
-		touchView(views[currentView]);
-
-		if (editMode== ED_CREATE) setCursor(crossCursor);
-
-		Pi3Cmodel& brush = scene.models[brushref];
-		Pi3Cmodel& selmodel = scene.models[touch.parent()];
-
-		if (touch.touched()) {
-
-			//move 3D pointer (sphere) to touch intersetion point ...
-			currentPos = -touch.intersection;
-
-			brush.matrix.move(touch.intersection);
-			setTouchFlags(true);
-			selmodel.selected = true;
-
-			switch (editMode) {
-			case ED_SELECT: touchObject(selmodel); break;
-			case ED_MOVE: setCursor(moveCursor); break;
-			case ED_ROTATE: setCursor(handCursor); break;
-			case ED_SCALE: setCursor(handCursor); break;
-			case ED_DROPMAN: dropMan(); break;
-			}
-			
-		}
-		else {
-			setTouchFlags(false);
-			selectedName = "";
-		}
-	}
-	else {
-		setCursor(arrowCursor);
-	}
-}
 
 void Modeller::clearSelections()
 {

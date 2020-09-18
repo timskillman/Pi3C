@@ -133,10 +133,17 @@ int32_t Pi3Cmesh::touchPoint(Pi3Ctouch &touch, const Pi3Cmatrix &mtx, const std:
 		uint32_t i3 = i + stride + stride;
 		bool touchPsp = touch.perspective != 0;
 
-		// Calc Z's and discard any triangle that has a point behind the viewer ...
-		float z1 = mtx.transformZ(&mverts[i]); if (touchPsp && z1 > 0) continue;
-		float z2 = mtx.transformZ(&mverts[i2]); if (touchPsp && z2 > 0) continue;
-		float z3 = mtx.transformZ(&mverts[i3]); if (touchPsp && z3 > 0) continue;
+		// Calc Z's and discard any triangle that is behind the viewer ...
+		int crossViewer = 0;
+		float z1 = mtx.transformZ(&mverts[i]); if (touchPsp && z1 > 0) crossViewer = crossViewer | 1;
+		float z2 = mtx.transformZ(&mverts[i2]); if (touchPsp && z2 > 0) crossViewer = crossViewer | 2;
+		float z3 = mtx.transformZ(&mverts[i3]); if (touchPsp && z3 > 0) crossViewer = crossViewer | 4;
+		if (crossViewer == 7) continue;
+
+		if (crossViewer != 0) {
+			//Triangle needs clipping or splitting into two triangles...
+			crossViewer = crossViewer;
+		}
 
 		if (touchPsp) {
 			//if (z1 > 0 && z2 > 0 && z3 > 0) continue;
