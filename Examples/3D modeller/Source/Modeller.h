@@ -20,6 +20,7 @@ public:
 
 	enum EditMode { ED_SELECT, ED_ROTATE, ED_MOVE, ED_SCALE, ED_CREATE, ED_CONTOUR, ED_ROTATESCENE, ED_DROPMAN };
 	enum CreateTool { CT_CUBOID, CT_SPHERE, CT_CYLINDER, CT_CONE, CT_TCONE, CT_TUBE, CT_TORUS, CT_WEDGE, CT_EXTRUDE, CT_LATHE, CT_TEXT, CT_LIBSHAPE, CT_LANDSCAPE, CT_NONE };
+	enum SceneAction { SA_NONE, SA_PANNING, SA_ZOOMING, SA_ROTATING, SA_DRAGBAR };
 
 	void setupGUI(loadOptions &opts);
 	void setCreateTool(const CreateTool tool);
@@ -52,6 +53,8 @@ public:
 		std::string err; Pi3CfileOBJ::save(path, filename, &scene, selected, nullptr, err); 
 	}
 
+	bool currentViewIsActive() { return currentView != viewInfo::INACTIVE; }
+
 	void snapshot() {
 		scene.renderOffscreen(views[currentSelView], &outlines);
 	}
@@ -80,6 +83,8 @@ public:
 	vec4f lastCol { 0, 0, 0, 0 };
 	EditMode editMode = ED_SELECT;
 	CreateTool createTool = CT_CUBOID;
+	SceneAction sceneAction = SceneAction::SA_NONE;
+
 	std::string libShape;				//Create tool library shape file
 
 	//bool modeChange = true;
@@ -94,22 +99,15 @@ public:
 	std::string currentModel;
 	uint32_t currentColour = 0xffffff;
 	Pi3Cmaterial outlines;
-
 	bool keypress = false;
-	bool dragbar = false;
-	bool panning = false;
-	bool rotating = false;
-	bool zooming = false;
 
 	Pi3Ctouch touch;
 
 	viewInfo views[5];
-	int32_t currentView = -1;
-	int32_t currentSelView = -1;
+	int32_t currentView = viewInfo::BOTTOMRIGHT;
+	int32_t currentSelView = currentView;
 	int32_t fullview = -1;
 
-	//float zoom = 1.f;
-	//vec2f pan{ 0,0 };
 
 	//scene model refs ..
 	int32_t brushref = -1;
@@ -158,4 +156,5 @@ private:
 	void MouseButtonUp();
 	void DragLeftMouseButton(viewInfo& view, vec3f& mouseXYZ);
 	void DragMiddleMouseButton(viewInfo& view, vec3f& mouseXYZ);
+	void setTouchFlags(bool val);
 };

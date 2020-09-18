@@ -7,7 +7,7 @@ class viewInfo {
 public:
 
 	enum Projection { PERSPECTIVE, ORTHOGRAPHIC };
-	enum SceneLayout { TOPLEFT = 0, TOPRIGHT = 1, BOTTOMLEFT = 2, BOTTOMRIGHT = 3, FULL = 4 };
+	enum SceneLayout { INACTIVE = -1, TOPLEFT = 0, TOPRIGHT = 1, BOTTOMLEFT = 2, BOTTOMRIGHT = 3, FULL = 4 };
 	enum ViewProject { VIEW_LEFT, VIEW_RIGHT, VIEW_TOP, VIEW_BOTTOM, VIEW_FRONT, VIEW_BACK, VIEW_FREE, VIEW_PERSPECTIVE };
 
 	void setRotMatrix(const vec3f &rot) {
@@ -44,8 +44,8 @@ public:
 	vec3f pos{ 0,0,0 };
 	vec3f rot{ 0,0,0 };
 	vec3f pan{ 0,0,0 };
-	float psp_nearz = 1.f;
-	float psp_farz = 30000.f;
+	float psp_nearz = 0.2f;
+	float psp_farz = 20000.f;
 	float ortho_nearz = -2000.f;
 	float ortho_farz = 2000.f;
 	float zoom = 100.f;

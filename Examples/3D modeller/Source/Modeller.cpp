@@ -233,46 +233,41 @@ void Modeller::createShapes()
 
 void Modeller::MouseButtonUp()
 {
-	rotating = false;
-	panning = false;
-	zooming = false;
+	sceneAction = SA_NONE;
 }
 
 void Modeller::DragMiddleMouseButton(viewInfo& view, vec3f& mouseXYZ)
 {
-	if (window->mouse.MiddleButton) {
-		setCurrentSelView(currentView);
-		view.pan += view.viewCoords(mouseXYZ);
-		panning = true;
-	}
+	setCurrentSelView(currentView);
+	view.pan += view.viewCoords(mouseXYZ);
+	sceneAction = SA_PANNING;
 }
 
 void Modeller::DragLeftMouseButton(viewInfo& view, vec3f& mouseXYZ)
 {
-	if (window->mouse.LeftButton) {
-		switch (editMode) {
-		case ED_MOVE:
-			moveSelections(view.viewCoords(mouseXYZ));
-			break;
-		case ED_ROTATE:
-			break;
-		case ED_SCALE:
-			{
-				float sc = -window->mouse.deltaXY.y * 0.1f;
-				editUndo.scaleSelections(scene.models, vec3f(sc, sc, sc)); //view.viewCoords(mouseXYZ)*0.5f
-			}
-			break;
-		case ED_ROTATESCENE:
-			view.rot += vec3f(mouseXYZ.y, mouseXYZ.x, 0) * -0.01f;
-			rotating = true;
-			break;
+	switch (editMode) {
+	case ED_MOVE:
+		moveSelections(view.viewCoords(mouseXYZ));
+		break;
+	case ED_ROTATE:
+		break;
+	case ED_SCALE:
+		{
+			float sc = -window->mouse.deltaXY.y * 0.1f;
+			editUndo.scaleSelections(scene.models, vec3f(sc, sc, sc)); //view.viewCoords(mouseXYZ)*0.5f
 		}
+		break;
+	case ED_ROTATESCENE:
+		view.rot += vec3f(mouseXYZ.y, mouseXYZ.x, 0) * -0.01f;
+		sceneAction = SA_ROTATING;
+		//rotating = true;
+		break;
 	}
 }
 
 void Modeller::LeftMouseButton(viewInfo& view)
 {
-	if (currentView != -1 && window->mouse.LeftButton && !dragbar) {
+	if (currentViewIsActive() && window->mouse.LeftButton && sceneAction != SA_DRAGBAR) {
 
 		setCurrentSelView(currentView);
 
@@ -328,18 +323,18 @@ void Modeller::handleEvents(std::vector<uint32_t>& eventList)
 			MouseButtonUp();
 			break;
 		case SDL_MOUSEMOTION:
-			if (window->mouse.anyButton() && currentView>=0 && !dragbar) {
+			if (window->mouse.anyButton() && currentViewIsActive() && sceneAction != SA_DRAGBAR) {
 				vec3f mouseXYZ = vec3f(window->mouse.deltaXY.x, -window->mouse.deltaXY.y, 0);
 				//float sc = -window->mouse.deltaXY.y * 0.1f;
-				DragMiddleMouseButton(view, mouseXYZ);
-				DragLeftMouseButton(view, mouseXYZ);
+				if (window->mouse.MiddleButton) DragMiddleMouseButton(view, mouseXYZ);
+				if (window->mouse.LeftButton) DragLeftMouseButton(view, mouseXYZ);
 			}
 			break;
 		case SDL_MOUSEWHEEL:
-			if (currentView >= 0) {
+			if (currentViewIsActive()) {
 				view.zoom += window->mouse.wheel * view.zoomFactor();
 				setCurrentSelView(currentView);
-				zooming = true;
+				sceneAction = SA_ZOOMING;
 			}
 			break;
 		case SDL_WINDOWEVENT:
@@ -364,7 +359,7 @@ void Modeller::handleEvents(std::vector<uint32_t>& eventList)
 void Modeller::moveSelections(const vec3f& vec)
 {
 	editUndo.moveSelections(scene.models, vec);
-	panning = true;
+	sceneAction = SA_ZOOMING;
 }
 
 void Modeller::setCurrentSelView(int32_t selview)
@@ -385,15 +380,14 @@ void Modeller::dropMan()
 
 void Modeller::setFullScene()
 {
-	//currentSelView = currentView;
-	if (fullview < 0) {
+	if (fullview == viewInfo::INACTIVE) {
 		fullview = currentSelView;
 		views[viewInfo::FULL] = views[currentSelView];
 		setCurrentSelView(viewInfo::FULL);
 	}
 	else {
 		setCurrentSelView(fullview);
-		fullview = -1;
+		fullview = viewInfo::INACTIVE;
 	}
 	window->mouse.up = false;
 }
@@ -408,12 +402,12 @@ void Modeller::setCursor(SDL_Cursor *newCursor)
 
 void Modeller::setDragBar(bool on, SDL_Cursor *newCursor)
 {
-	if (on && !dragbar) {
-		dragbar = true;
+	if (on && sceneAction != SA_DRAGBAR) {
+		sceneAction = SA_DRAGBAR;
 		SDL_SetCursor(newCursor);
 	}
-	else if (!on && dragbar) {
-		dragbar = false;
+	else if (!on && sceneAction == SA_DRAGBAR) {
+		sceneAction = SA_NONE;
 		SDL_SetCursor(currentCursor);
 	}
 }
@@ -459,21 +453,23 @@ void Modeller::touchView(viewInfo &vi)
 	}
 }
 
+void Modeller::setTouchFlags(bool val)
+{
+	scene.models[brushref].visible = val;
+	scene.models[selboxRef].visible = val;
+	scene.models[moveGizmoRef].visible = val;
+}
+
 void Modeller::touchScene()
 {
-	//selGroup = nullptr;
-	//scene.models[brushref].visible = false;
-	//SDL_Cursor * newCursor = arrowCursor;
-	if (dragbar || panning || rotating || zooming) return;
+	if (sceneAction != SA_NONE) return;
 
-	if (currentView >= 0 && !mgui.somethingSelected()) {
+	if (currentViewIsActive() && !mgui.somethingSelected()) {
 
 		touchView(views[currentView]);
 
 		if (editMode== ED_CREATE) setCursor(crossCursor);
 
-		Pi3Cmodel& sbox = scene.models[selboxRef];
-		Pi3Cmodel& mgiz = scene.models[moveGizmoRef];
 		Pi3Cmodel& brush = scene.models[brushref];
 		Pi3Cmodel& selmodel = scene.models[touch.parent()];
 
@@ -483,9 +479,7 @@ void Modeller::touchScene()
 			currentPos = -touch.intersection;
 
 			brush.matrix.move(touch.intersection);
-			brush.visible = true;
-			sbox.visible = true;
-			mgiz.visible = true;
+			setTouchFlags(true);
 			selmodel.selected = true;
 
 			switch (editMode) {
@@ -498,9 +492,7 @@ void Modeller::touchScene()
 			
 		}
 		else {
-			brush.visible = false;
-			sbox.visible = false;
-			mgiz.visible = false;
+			setTouchFlags(false);
 			selectedName = "";
 		}
 	}
@@ -555,7 +547,7 @@ void Modeller::render()
 	int mx = window->mouse.x;
 	int my = window->getHeight() - window->mouse.y;
 
-	currentView = -1;
+	currentView = viewInfo::INACTIVE;
 
 	if (fullview >= 0) {
 		views[viewInfo::FULL].viewport = mgui.getRectFull();
@@ -566,9 +558,8 @@ void Modeller::render()
 		//render perspective view (right lower)...
 		
 		views[viewInfo::BOTTOMRIGHT].viewport = mgui.getRectBottomRight();
-		if (views[viewInfo::BOTTOMRIGHT].viewport.touch(mx, my)) currentView = viewInfo::BOTTOMRIGHT;
-		//if (currentSelView == viewInfo::BOTTOMRIGHT) 
-			renderScene(views[viewInfo::BOTTOMRIGHT]);
+		if (views[viewInfo::BOTTOMRIGHT].viewport.touch(mx, my)) currentView = viewInfo::BOTTOMRIGHT; 
+		renderScene(views[viewInfo::BOTTOMRIGHT]);
 
 		//render left lower ...
 		views[viewInfo::BOTTOMLEFT].viewport = mgui.getRectBottomLeft();
