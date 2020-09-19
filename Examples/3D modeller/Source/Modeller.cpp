@@ -597,5 +597,5 @@ void Modeller::render()
 }
 
 void Modeller::snapshot() {
-	//scene.renderOffscreen(views[currentSelView], &outlines);
+	scene.renderOffscreen(views[currentSelView], &outlines);
 }
