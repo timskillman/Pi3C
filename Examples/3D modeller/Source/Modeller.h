@@ -55,9 +55,7 @@ public:
 
 	bool currentViewIsActive() { return currentView != viewInfo::INACTIVE; }
 
-	void snapshot() {
-		scene.renderOffscreen(views[currentSelView], &outlines);
-	}
+	void snapshot();
 	//vec3f getRelativeMove(const vec3f& pos);
 
 	void clearSelections();

@@ -595,3 +595,7 @@ void Modeller::render()
 	handleIMGUI(); //must be in the rendering loop with 2D setup
 
 }
+
+void Modeller::snapshot() {
+	scene.renderOffscreen(views[currentSelView], &outlines);
+}
