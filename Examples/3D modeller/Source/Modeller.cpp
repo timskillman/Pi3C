@@ -154,7 +154,8 @@ void Modeller::handleKeys()
 
 void Modeller::handleKeyPresses()
 {
-	switch (window->getKeyPress()) {
+	SDL_Scancode kp = window->getKeyPress();
+	switch (kp) {
 	case SDL_SCANCODE_DELETE:
 		editUndo.deleteSelection(scene.models);
 		clearGizmos();
@@ -187,6 +188,23 @@ void Modeller::handleKeyPresses()
 	case SDL_SCANCODE_T:
 		scene.renderOffscreen(views[currentSelView], &outlines, 160, 128);
 		window->mouse.up = false;
+		break;
+	case SDL_SCANCODE_W:
+	case SDL_SCANCODE_S:
+		if (currentViewIsActive()) {
+			viewInfo& view = views[currentView];
+			float dir = (kp == SDL_SCANCODE_W) ? 1.f : -1.f;
+			//view.zoom += dir * view.zoomFactor();
+			//view.pan += view.rot*dir;
+			view.pos = vec3f(0, 0, 0);
+			if (view.zoom != 0) {
+				view.pan += view.rotInvertMatrix.transformRotateVec(vec3f(0, 0, -dir*view.zoom));
+				view.zoom = 0;
+			}
+			view.pan += view.rotInvertMatrix.transformRotateVec(vec3f(0, 0, dir));
+			setCurrentSelView(currentView);
+			//sceneAction = SA_ZOOMING;
+		}
 		break;
 	}
 	//keyPress = ev.key.keysym.scancode;
@@ -422,8 +440,8 @@ void Modeller::dropMan()
 {
 	viewInfo& view = views[currentView];
 	view.pos = vec3f(0, 0, 0);
-	view.zoom = 2.f;
-	view.pan = currentPos;
+	view.zoom = 0.f;
+	view.pan = currentPos + vec3f(0,-2.f,0);
 }
 
 void Modeller::setFullScene()
