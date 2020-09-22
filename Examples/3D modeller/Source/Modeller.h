@@ -158,4 +158,5 @@ private:
 	void DragLeftMouseButton(viewInfo& view, vec3f& mouseXYZ);
 	void DragMiddleMouseButton(viewInfo& view, vec3f& mouseXYZ);
 	void setTouchFlags(bool val);
+	void resetZoom();
 };

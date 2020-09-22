@@ -152,61 +152,79 @@ void Modeller::handleKeys()
 	const uint8_t *keystate = window->getKeys();
 }
 
+void Modeller::resetZoom()
+{
+	viewInfo& view = views[currentView];
+	view.pos = vec3f(0, 0, 0);
+	if (view.zoom != 0) {
+		view.pan += view.rotInvertMatrix.transformRotateVec(vec3f(0, 0, -view.zoom));
+		view.zoom = 0;
+	}
+}
+
 void Modeller::handleKeyPresses()
 {
 	SDL_Scancode kp = window->getKeyPress();
-	switch (kp) {
-	case SDL_SCANCODE_DELETE:
-		editUndo.deleteSelection(scene.models);
-		clearGizmos();
-		break;
-	case SDL_SCANCODE_X:
-		if (window->ctrlKey) editUndo.deleteSelection(scene.models);
-		break;
-	case SDL_SCANCODE_Z:
-		if (window->ctrlKey) {
-			if (window->shiftKey) 
-				editUndo.redo(scene.models); 
-			else 
+	if (window->ctrlKey) {
+		switch (kp) {
+		case SDL_SCANCODE_X:
+			editUndo.deleteSelection(scene.models);
+			break;
+		case SDL_SCANCODE_Z:
+			if (window->shiftKey)
+				editUndo.redo(scene.models);
+			else
 				editUndo.undo(scene.models);
+			break;
+		case SDL_SCANCODE_Y:
+			editUndo.redo(scene.models);
+			break;
+		case SDL_SCANCODE_A:
+			selectAll();
+			break;
 		}
-		break;
-	case SDL_SCANCODE_Y:
-		if (window->ctrlKey) editUndo.redo(scene.models);
-		break;
-	case SDL_SCANCODE_A:
-		if (window->ctrlKey) selectAll();
-		break;
-	case SDL_SCANCODE_G:
-		scene.models[gridRef].visible = !scene.models[gridRef].visible;
-		window->mouse.up = false;
-		break;
-	case SDL_SCANCODE_P:
-		scene.renderOffscreen(views[currentSelView], &outlines);
-		window->mouse.up = false;
-		break;
-	case SDL_SCANCODE_T:
-		scene.renderOffscreen(views[currentSelView], &outlines, 160, 128);
-		window->mouse.up = false;
-		break;
-	case SDL_SCANCODE_W:
-	case SDL_SCANCODE_S:
-		if (currentViewIsActive()) {
-			viewInfo& view = views[currentView];
-			float speed = (window->shiftKey) ? 10.f : 1.f;
-			float dir = (kp == SDL_SCANCODE_W) ? speed : -speed;
-			//view.zoom += dir * view.zoomFactor();
-			//view.pan += view.rot*dir;
-			view.pos = vec3f(0, 0, 0);
-			if (view.zoom != 0) {
-				view.pan += view.rotInvertMatrix.transformRotateVec(vec3f(0, 0, -dir*view.zoom));
-				view.zoom = 0;
+	}
+	else {
+		switch (kp) {
+		case SDL_SCANCODE_DELETE:
+			editUndo.deleteSelection(scene.models);
+			clearGizmos();
+			break;
+		case SDL_SCANCODE_G:
+			scene.models[gridRef].visible = !scene.models[gridRef].visible;
+			window->mouse.up = false;
+			break;
+		case SDL_SCANCODE_P:
+			scene.renderOffscreen(views[currentSelView], &outlines);
+			window->mouse.up = false;
+			break;
+		case SDL_SCANCODE_T:
+			scene.renderOffscreen(views[currentSelView], &outlines, 160, 128);
+			window->mouse.up = false;
+			break;
+		case SDL_SCANCODE_W:
+		case SDL_SCANCODE_S:
+			if (currentViewIsActive()) {
+				viewInfo& view = views[currentView];
+				float speed = (window->shiftKey) ? 10.f : 1.f;
+				float dir = (kp == SDL_SCANCODE_W) ? speed : -speed;
+				resetZoom();
+				view.pan += view.rotInvertMatrix.transformRotateVec(vec3f(0, 0, dir));
+				setCurrentSelView(currentView);
 			}
-			view.pan += view.rotInvertMatrix.transformRotateVec(vec3f(0, 0, dir));
-			setCurrentSelView(currentView);
-			//sceneAction = SA_ZOOMING;
+			break;
+		case SDL_SCANCODE_A:
+		case SDL_SCANCODE_D:
+			if (currentViewIsActive()) {
+				viewInfo& view = views[currentView];
+				float speed = (window->shiftKey) ? 10.f : 1.f;
+				float dir = (kp == SDL_SCANCODE_A) ? speed : -speed;
+				resetZoom();
+				view.pan += view.rotInvertMatrix.transformRotateVec(vec3f(dir, 0, 0));
+				setCurrentSelView(currentView);
+			}
+			break;
 		}
-		break;
 	}
 	//keyPress = ev.key.keysym.scancode;
 }
