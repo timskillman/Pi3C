@@ -53,6 +53,10 @@ public:
 		bool selectable = true;
 		bool disabled = false;
 		std::string font;
+
+		float halfWidth() { return minWidth * 0.5f; }
+		float thirdWidth() { return minWidth * 0.3f; }
+
 	};
 
 	void init(Pi3Cresource * resource, Pi3Cwindow *window) { this->resource = resource; this->window = window; }

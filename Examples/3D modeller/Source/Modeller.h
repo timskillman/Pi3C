@@ -40,6 +40,9 @@ public:
 	void setDragBarV(bool on) { setDragBar(on, NSCursor); };
 	void dropMan();
 	void setFullScene();
+	void setMousePosition(int x, int y) {
+		currentPos = views[currentView].calcMouseXYZ(x, y);
+	}
 
 	//void saveScene(const std::string &file, Pi3Cmodel *models);
 	void clearScene();
@@ -104,7 +107,7 @@ public:
 	viewInfo views[5];
 	int32_t currentView = viewInfo::BOTTOMRIGHT;
 	int32_t currentSelView = currentView;
-	int32_t fullview = -1;
+	int32_t fullview = viewInfo::INACTIVE;
 
 
 	//scene model refs ..

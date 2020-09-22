@@ -333,6 +333,9 @@ namespace Pi3CfileOBJ {
 						}
 					}
 					break;
+				case 'g':
+
+					break;
 				case 'm': //get material library
 					if (com == "mtllib") {
 						matlibname = vals;

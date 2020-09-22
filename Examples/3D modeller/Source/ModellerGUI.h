@@ -58,4 +58,13 @@ private:
 	void renderYellowBorder(uint32_t currentSelView);
 	void dragViewportBars(Modeller * md, Pi3Cpointi& wposm, int midht);
 	void saveAll(Modeller * md);
+	std::string ftostrdp(float n, int decimalPlaces);
+	bool draggingBars();
+
+	void drawBorders(Modeller * md, Pi3Cpointi& wpos);
+	void doMenus(Modeller * md);
+	void doEditToolbar(Modeller * md, Pi3Cimgui::rectStyle& iconstyle, bool mb);
+	void doTransformToolbar(Modeller * md, Pi3Cimgui::rectStyle& iconstyle, bool mb);
+	void doSceneToolbar(Modeller * md, Pi3Cimgui::rectStyle& iconstyle, bool mb, bool mu);
+	void doShapesToolbar(Modeller * md, Pi3Cimgui::rectStyle& iconstyle, bool mb, bool mu);
 };

@@ -179,8 +179,8 @@ bool Pi3Cimgui::renderButton(Pi3Cmodel *drawObj, const int minwidth, const int m
 	setButtonBackground(rect, mouseTouchRect);
 
 	//render ...
-	rect.renderBasic(resource, resource->shaders[0]);
-	image.renderBasic(resource, resource->shaders[0]);
+	rect.renderBasic(resource);
+	image.renderBasic(resource);
 
 	NextPos();
 
@@ -248,9 +248,9 @@ bool Pi3Cimgui::renderButton2(Pi3Cmodel *drawObj, const int minwidth, const int 
 
 
 	//render ...
-	rect.renderBasic(resource, resource->shaders[0]);
-	image.renderBasic(resource, resource->shaders[0]);
-	text.renderBasic(resource, resource->shaders[0]);
+	rect.renderBasic(resource);
+	image.renderBasic(resource);
+	text.renderBasic(resource);
 
 	NextPos();
 
@@ -286,7 +286,7 @@ void Pi3Cimgui::renderRectAt(const Pi3Cpointi& size, const Pi3Cpointi& pos, cons
 	//setButtonBackground(rect, mouseTouchRect);
 	if (colour != 0) rect.material.alpha = (float)((colour>>24) & 255)/255.f;
 	setColour(rect, (colour == 0) ? currentParams.buttonColour : colour);
-	rect.renderBasic(resource, resource->shaders[0]);
+	rect.renderBasic(resource);
 }
 
 Pi3Cpointi Pi3Cimgui::calcImageSize(int tw, int th, const int minwidth, const int minheight, bool squash)
@@ -317,7 +317,7 @@ bool Pi3Cimgui::renderIconImage(Pi3Cmodel *image, const int width, const int hei
 	image->matrix.move(vec3f((float)pos.x, (float)(pos.y-wh.y - currentParams.top),zpos));
 	image->matrix.SetScales(vec3f((float)wh.x, (float)wh.y, 1.f));
 	setColour(*image, colour);
-	image->renderBasic(resource, resource->shaders[0]);
+	image->renderBasic(resource);
 	NextPos();
 	return mouseTouchRect;
 }
@@ -769,7 +769,7 @@ std::string Pi3Cimgui::OpenFileDialog(const rectStyle * style)
 		window->clear();
 		std::vector<uint32_t> events = window->event();
 
-		snapShotPic.renderBasic(resource, resource->shaders[0]);
+		snapShotPic.renderBasic(resource);
 
 		Begin();
 		renderRect(window->getWidth(), window->getHeight(), Pi3Ccolours::TransparentBlack);

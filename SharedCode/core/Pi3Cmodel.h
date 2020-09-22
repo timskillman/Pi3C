@@ -88,7 +88,7 @@ public:
 	void init();
 	void create(Pi3Cresource *resource, Pi3Cmesh *mesh, uint32_t diffuseColour = 0xffffffff);
 	void render(Pi3Cresource *resource, Pi3Cshader &shader, const Pi3Cmatrix *parent_matrix = nullptr, Pi3Cmaterial *materialOverride = nullptr);
-	void renderBasic(Pi3Cresource *resource, Pi3Cshader &shader, const Pi3Cmatrix *parent_matrix = nullptr, Pi3Cmaterial *materialOverride = nullptr);
+	void renderBasic(Pi3Cresource *resource, Pi3Cshader * shader = nullptr, const Pi3Cmatrix *parent_matrix = nullptr, Pi3Cmaterial *materialOverride = nullptr);
 	void appendMesh(Pi3Cresource *resource, Pi3Cmesh mesh, bool asCollider);
 	void updateMesh(Pi3Cresource* resource, const Pi3Cmesh& umesh);
 	void loadOBJfile(Pi3Cresource *resource, std::string path, std::string modelfile, std::function<void(float)> showProgressCB, bool asCollider);

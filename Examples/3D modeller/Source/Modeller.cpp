@@ -193,7 +193,8 @@ void Modeller::handleKeyPresses()
 	case SDL_SCANCODE_S:
 		if (currentViewIsActive()) {
 			viewInfo& view = views[currentView];
-			float dir = (kp == SDL_SCANCODE_W) ? 1.f : -1.f;
+			float speed = (window->shiftKey) ? 10.f : 1.f;
+			float dir = (kp == SDL_SCANCODE_W) ? speed : -speed;
 			//view.zoom += dir * view.zoomFactor();
 			//view.pan += view.rot*dir;
 			view.pos = vec3f(0, 0, 0);

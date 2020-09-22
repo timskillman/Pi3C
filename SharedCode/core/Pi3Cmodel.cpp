@@ -87,18 +87,19 @@ void Pi3Cmodel::deleteTexture(Pi3Cresource *resource)
 	if (material.texRef>=0) resource->textures[material.texRef]->Delete();
 }
 
-void Pi3Cmodel::renderBasic(Pi3Cresource *resource, Pi3Cshader &shader, const Pi3Cmatrix *parent_matrix, Pi3Cmaterial *materialOverride)
+void Pi3Cmodel::renderBasic(Pi3Cresource *resource, Pi3Cshader * shader, const Pi3Cmatrix *parent_matrix, Pi3Cmaterial *materialOverride)
 {
 	//if (!visible || deleted) return;
 
 	//Pi3Cmatrix newmatrix = (parent_matrix) ? matrix * *parent_matrix : matrix;
 
 	//for (auto &sg : group) sg.renderBasic(resource, shader, &newmatrix, materialOverride);
+	if (shader == nullptr) shader = &resource->shaders[0];
 
 	if (meshRef >= 0) {
 		Pi3Cmaterial *selectedMaterial = (materialOverride) ? materialOverride : &material;
-		shader.SetModelMatrix(matrix);
-		shader.setMaterial(selectedMaterial);
+		shader->SetModelMatrix(matrix);
+		shader->setMaterial(selectedMaterial);
 		resource->renderMesh(meshRef, selectedMaterial->rendermode);
 	}
 }
