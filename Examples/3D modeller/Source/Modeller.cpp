@@ -165,6 +165,7 @@ void Modeller::resetZoom()
 void Modeller::handleKeyPresses()
 {
 	SDL_Scancode kp = window->getKeyPress();
+
 	if (window->ctrlKey) {
 		switch (kp) {
 		case SDL_SCANCODE_X:
@@ -204,29 +205,32 @@ void Modeller::handleKeyPresses()
 			break;
 		case SDL_SCANCODE_W:
 		case SDL_SCANCODE_S:
-			if (currentViewIsActive()) {
-				viewInfo& view = views[currentView];
-				float speed = (window->shiftKey) ? 10.f : 1.f;
-				float dir = (kp == SDL_SCANCODE_W) ? speed : -speed;
-				resetZoom();
-				view.pan += view.rotInvertMatrix.transformRotateVec(vec3f(0, 0, dir));
-				setCurrentSelView(currentView);
-			}
+			navikeys(kp, SDL_SCANCODE_W, SDL_SCANCODE_S);
 			break;
 		case SDL_SCANCODE_A:
 		case SDL_SCANCODE_D:
-			if (currentViewIsActive()) {
-				viewInfo& view = views[currentView];
-				float speed = (window->shiftKey) ? 10.f : 1.f;
-				float dir = (kp == SDL_SCANCODE_A) ? speed : -speed;
-				resetZoom();
-				view.pan += view.rotInvertMatrix.transformRotateVec(vec3f(dir, 0, 0));
-				setCurrentSelView(currentView);
-			}
+			navikeys(kp, SDL_SCANCODE_A, SDL_SCANCODE_D);
+			break;
+		case SDL_SCANCODE_R:
+		case SDL_SCANCODE_F:
+			navikeys(kp, SDL_SCANCODE_F, SDL_SCANCODE_R);
 			break;
 		}
 	}
 	//keyPress = ev.key.keysym.scancode;
+} 
+
+void Modeller::navikeys(SDL_Scancode key, SDL_Scancode keyA, SDL_Scancode KeyB)
+{
+	if (currentViewIsActive()) {
+		viewInfo& view = views[currentView];
+		float speed = (window->shiftKey) ? 10.f : 1.f;
+		float dirspd = (key == keyA) ? speed : -speed;
+		vec3f dir = (keyA == SDL_SCANCODE_F) ? vec3f(0, dirspd, 0) : (keyA == SDL_SCANCODE_A) ? vec3f(dirspd, 0, 0) : vec3f(0, 0, dirspd);
+		resetZoom();
+		view.pan += view.rotInvertMatrix.transformRotateVec(dir);
+		setCurrentSelView(currentView);
+	}
 }
 
 void Modeller::createLandscape(const vec3f pos, const uint32_t colour)

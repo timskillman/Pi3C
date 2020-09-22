@@ -159,4 +159,5 @@ private:
 	void DragMiddleMouseButton(viewInfo& view, vec3f& mouseXYZ);
 	void setTouchFlags(bool val);
 	void resetZoom();
+	void navikeys(SDL_Scancode key, SDL_Scancode keyA, SDL_Scancode KeyB);
 };
