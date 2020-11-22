@@ -91,6 +91,7 @@ public:
 	Pi3Cmesh currentShape;
 	vec3f createFirstPoint;
 	vec3f oldPos;
+	vec3f oldPos2;
 	std::vector<vec3f> line;
 
 	std::string libShape;				//Create tool library shape file
@@ -170,4 +171,5 @@ private:
 	void resetZoom();
 	void navikeys(SDL_Scancode key, SDL_Scancode keyA, SDL_Scancode KeyB);
 	void finishLine();
+	vec3f Modeller::getShapeHeight(vec3f pos);
 };

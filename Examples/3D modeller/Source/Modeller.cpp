@@ -246,7 +246,10 @@ void Modeller::createShape(const Pi3Cmesh& mesh, const vec3f& pos, const uint32_
 		clearSelections();
 		//Give unique name for each shape ...
 		shapeCounts[createTool]++;
-		shape.name = resource->meshes[shape.meshRef].name + std::to_string(shapeCounts[createTool]);
+		Pi3Cmesh& mesh = resource->meshes[shape.meshRef];
+		vertsPtr vp = resource->getMeshVerts(shape.meshRef);
+		mesh.updateBounds(&vp);
+		shape.name = mesh.name + std::to_string(shapeCounts[createTool]);
 		shape.move(pos);
 		shape.selected = true;
 		int32_t modelRef = scene.append3D(shape);
@@ -257,14 +260,17 @@ void Modeller::createShape(const Pi3Cmesh& mesh, const vec3f& pos, const uint32_
 void Modeller::createShapes()
 {
 	if (createTool != CT_NONE) {
-		currentColour = rand() % 0xffffff;
+		uint32_t r = (rand() % 255);// +55;
+		uint32_t g = (rand() % 255);// +55;
+		uint32_t b = (rand() % 255);// +55;
+		currentColour = r + (g<<8) + (b<<16);
 		vec3f pos = -currentPos;
 		createFirstPoint = pos;
 
 		switch (createTool) {
 		case CT_CUBOID: createShape(Pi3Cshapes::cuboid(vec3f(0, 0, 0.f), vec3f(1.f, 1.f, 1.f)), pos, currentColour); maxSteps = 2; break;
-		case CT_CYLINDER: createShape(Pi3Cshapes::cylinder(vec3f(0, 0, 0.f), 1.f, 2.f), pos, currentColour); maxSteps = 1; break;
-		case CT_TUBE: createShape(Pi3Cshapes::tube(vec3f(0, 0, 0.f), 0.5f, 1.f, 2.f), pos, currentColour); maxSteps = 2; break;
+		case CT_CYLINDER: createShape(Pi3Cshapes::cylinder(vec3f(0, 0, 0.f), 1.f, 2.f), pos, currentColour); maxSteps = 2; break;
+		case CT_TUBE: createShape(Pi3Cshapes::tube(vec3f(0, 0, 0.f), 0.5f, 1.f, 2.f), pos, currentColour); maxSteps = 3; break;
 		case CT_CONE: createShape(Pi3Cshapes::cone(vec3f(0, 0, 0.f), 1.f, 2.f), pos, currentColour); maxSteps = 1; break;
 		case CT_TCONE: createShape(Pi3Cshapes::tcone(vec3f(0, 0, 0.f), 1.f, 0.7f, 2.f), pos, currentColour); maxSteps = 2; break;
 		case CT_SPHERE: createShape(Pi3Cshapes::sphere(vec3f(0, 0, 0.f), 0.05f), pos, currentColour); maxSteps = 1; break;
@@ -278,6 +284,20 @@ void Modeller::createShapes()
 
 		//createCount = 1;
 	}
+}
+
+vec3f Modeller::getShapeHeight(vec3f pos)
+{
+	if (abs(oldPos.x - createFirstPoint.x) < 0.001f) {
+		pos.x = -(pos.y - oldPos.y); pos.y = oldPos.y; pos.z = oldPos.z;
+	}
+	if (abs(oldPos.y - createFirstPoint.y) < 0.001f) {
+		pos.y = -(pos.z - oldPos.z); pos.x = oldPos.x; pos.z = oldPos.z;
+	}
+	if (abs(oldPos.z - createFirstPoint.z) < 0.001f) {
+		pos.z = -(pos.y - oldPos.y); pos.y = oldPos.y; pos.x = oldPos.x;
+	}
+	return pos;
 }
 
 void Modeller::creatingShape(bool nextStep)
@@ -298,37 +318,53 @@ void Modeller::creatingShape(bool nextStep)
 	if (createCount == 1) {
 		switch (createTool) {
 		case CT_CUBOID:Pi3Cshapes::cube_verts(*vp.verts, vp.offset, (pos - createFirstPoint)/2.f, (pos - createFirstPoint), 1, 1, 1, currentColour); break;
-		case CT_CYLINDER:Pi3Cshapes::cylinder_verts(*vp.verts, vp.offset, vec3f(0, 0, 0), pos.x - createFirstPoint.x, pos.y - createFirstPoint.y); break;
+		case CT_CYLINDER:Pi3Cshapes::cylinder_verts(*vp.verts, vp.offset, vec3f(0, 0, 0), (pos - createFirstPoint).length(), 0.1f); break;
 		case CT_SPHERE:Pi3Cshapes::sphere_verts(*vp.verts, vp.offset, vec3f(0, 0, 0), (pos - createFirstPoint).length()); break;
-		case CT_TORUS:Pi3Cshapes::torus_verts(*vp.verts, vp.offset, vec3f(0, 0, 0), (pos - createFirstPoint).length(), 0.7f); break;
+		case CT_TORUS:Pi3Cshapes::torus_verts(*vp.verts, vp.offset, vec3f(0, 0, 0), (pos - createFirstPoint).length(), 0.1f); break;
 		case CT_CONE:Pi3Cshapes::cone_verts(*vp.verts, vp.offset, vec3f(0, 0, 0), pos.x - createFirstPoint.x, pos.y-createFirstPoint.y); break;
 		case CT_TCONE:Pi3Cshapes::tcone_verts(*vp.verts, vp.offset, vec3f(0, 0, 0), pos.x - createFirstPoint.x, (pos.x - createFirstPoint.x)*1.0f, pos.y - createFirstPoint.y); break;
-		case CT_TUBE:Pi3Cshapes::tube_verts(*vp.verts, vp.offset, vec3f(0, 0, 0), (pos.x - createFirstPoint.x)*0.9f, pos.x - createFirstPoint.x, pos.y - createFirstPoint.y); break;
+		case CT_TUBE:Pi3Cshapes::tube_verts(*vp.verts, vp.offset, vec3f(0, 0, 0), (pos - createFirstPoint).length(), (pos - createFirstPoint).length()*1.01f, 0.1f); break;
 		}
 		oldPos = pos;
 	}
 	else if (createCount == 2) {
 		switch (createTool) {
 		case CT_CUBOID:
-		{
-			if (abs(oldPos.x - createFirstPoint.x) < 0.001f) {
-				pos.x = (pos.y - createFirstPoint.y); pos.y = oldPos.y; pos.z = oldPos.z;
-			}
-			if (abs(oldPos.y - createFirstPoint.y) < 0.001f) {
-				pos.y = (pos.z - createFirstPoint.z); pos.x = oldPos.x; pos.z = oldPos.z;
-			}
-			if (abs(oldPos.z - createFirstPoint.z) < 0.001f) {
-				pos.z = (pos.y - createFirstPoint.y); pos.y = oldPos.y; pos.x = oldPos.x;
-			}
+			pos = getShapeHeight(pos);
 			Pi3Cshapes::cube_verts(*vp.verts, vp.offset, (pos - createFirstPoint) / 2.f, (pos - createFirstPoint), 1, 1, 1, currentColour);
+			break;
+		case CT_CYLINDER:
+			pos = getShapeHeight(pos);
+			Pi3Cshapes::cylinder_verts(*vp.verts, vp.offset, vec3f(0, 0, 0), (oldPos - createFirstPoint).length(), pos.y - oldPos.y); break;
+			break;
+		case CT_TORUS:Pi3Cshapes::torus_verts(*vp.verts, vp.offset, vec3f(0, 0, 0), (oldPos - createFirstPoint).length(), (pos - oldPos).length()); break;
+		case CT_TCONE:Pi3Cshapes::tcone_verts(*vp.verts, vp.offset, vec3f(0, 0, 0), oldPos.x - createFirstPoint.x, (pos.x - createFirstPoint.x), pos.y - createFirstPoint.y); break;
+		case CT_TUBE:
+			{
+				float r1 = (oldPos - createFirstPoint).length();
+				float r2 = (oldPos2 - createFirstPoint).length();
+				if (r1 > r2) std::swap(r1, r2);
+				Pi3Cshapes::tube_verts(*vp.verts, vp.offset, vec3f(0, 0, 0), r1, r2, .1f); break;
+			}
+			break;
+		}
+		oldPos2 = pos;
+	}
+	else if (createCount == 3) {
+		switch (createTool) {
+		case CT_TUBE:
+		{
+			float r1 = (oldPos - createFirstPoint).length();
+			float r2 = (oldPos2 - createFirstPoint).length();
+			if (r1 > r2) std::swap(r1, r2);
+			Pi3Cshapes::tube_verts(*vp.verts, vp.offset, vec3f(0, 0, 0), r1, r2, (pos - oldPos2).length()); break;
 		}
 		break;
-		case CT_TORUS:Pi3Cshapes::torus_verts(*vp.verts, vp.offset, vec3f(0, 0, 0), (oldPos - createFirstPoint).length(), (pos - createFirstPoint).length()); break;
-		case CT_TCONE:Pi3Cshapes::tcone_verts(*vp.verts, vp.offset, vec3f(0, 0, 0), oldPos.x - createFirstPoint.x, (pos.x - createFirstPoint.x), pos.y - createFirstPoint.y); break;
-		case CT_TUBE:Pi3Cshapes::tube_verts(*vp.verts, vp.offset, vec3f(0, 0, 0), pos.x - createFirstPoint.x, oldPos.x - createFirstPoint.x, oldPos.y - createFirstPoint.y); break;
 		}
 	}
-	mesh.bbox.bboxFromVerts(*vp.verts, vp.offset, mesh.vc, mesh.stride);
+	vp = resource->getMeshVerts(model.meshRef);
+	mesh.updateBounds(&vp);
+	//mesh.bbox.bboxFromVerts(*vp.verts, vp.offset, mesh.vc, mesh.stride);
 	resource->updateMesh(model.meshRef);
 
 	//if (nextStep) createCount++;

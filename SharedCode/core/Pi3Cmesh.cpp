@@ -1,7 +1,6 @@
 #include "Pi3Cmesh.h"
 #include "Pi3Ccollision.h"
 
-
 Pi3Cmesh::Pi3Cmesh(const std::string &name, const uint32_t stride) : name(name), stride(stride) {
 	reset();
 }
@@ -18,9 +17,12 @@ void Pi3Cmesh::reset()
 	stride = 9;
 }
 
-void Pi3Cmesh::updateBounds()
+void Pi3Cmesh::updateBounds(const vertsPtr* vp)
 {
-	bbox.bboxFromVerts(verts, 0, vc, stride);
+	if (vp==nullptr)
+		bbox.bboxFromVerts(verts, 0, vc, stride);
+	else
+		bbox.bboxFromVerts(*vp->verts, vp->offset, vc, stride);
 }
 
 void Pi3Cmesh::addPackedVert(const vec3f &position, const vec3f &normal, const vec2f &uv, const uint32_t col)

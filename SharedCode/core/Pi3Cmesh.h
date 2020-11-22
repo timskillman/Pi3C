@@ -5,6 +5,7 @@
 #include "Pi3Cmatrix.h"
 #include "Pi3Cbbox3d.h"
 #include "Pi3Ctouch.h"
+#include "Pi3CvertsPtr.h"
 #include <string>
 #include <stdint.h>
 #include <vector>
@@ -113,7 +114,7 @@ public:
 	uint32_t calcRectPtr(uint32_t ref) { return (vertOffset + ref * 6) * stride; }
 
 	void updateNormals(const uint32_t min, const uint32_t max);
-	void updateBounds();
+	void updateBounds(const vertsPtr* vp = nullptr);
 
 	bool hasColliderGrid = false;
 	float checkColliderGrid(const vec3f &p, const Pi3Cmatrix &mtx, float prevHeight);
