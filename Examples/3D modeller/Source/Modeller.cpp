@@ -259,20 +259,79 @@ void Modeller::createShapes()
 	if (createTool != CT_NONE) {
 		currentColour = rand() % 0xffffff;
 		vec3f pos = -currentPos;
+		createFirstPoint = pos;
+
 		switch (createTool) {
-		case CT_CUBOID: createShape(Pi3Cshapes::cuboid(vec3f(0, 0, 0.f), vec3f(2.f, 2.f, 2.f)), pos, currentColour); break;
-		case CT_CYLINDER: createShape(Pi3Cshapes::cylinder(vec3f(0, 0, 0.f), 1.f, 2.f), pos, currentColour); break;
-		case CT_TUBE: createShape(Pi3Cshapes::tube(vec3f(0, 0, 0.f), 0.5f, 1.f, 2.f), pos, currentColour); break;
-		case CT_CONE: createShape(Pi3Cshapes::cone(vec3f(0, 0, 0.f), 1.f, 2.f), pos, currentColour); break;
-		case CT_TCONE: createShape(Pi3Cshapes::tcone(vec3f(0, 0, 0.f), 1.f, 0.7f, 2.f), pos, currentColour); break;
-		case CT_SPHERE: createShape(Pi3Cshapes::sphere(vec3f(0, 0, 0.f), 1.f), pos, currentColour); break;
-		case CT_TORUS: createShape(Pi3Cshapes::torus(vec3f(0, 0, 0.f), 2.f, 1.f), pos, currentColour); break;
+		case CT_CUBOID: createShape(Pi3Cshapes::cuboid(vec3f(0, 0, 0.f), vec3f(1.f, 1.f, 1.f)), pos, currentColour); maxSteps = 2; break;
+		case CT_CYLINDER: createShape(Pi3Cshapes::cylinder(vec3f(0, 0, 0.f), 1.f, 2.f), pos, currentColour); maxSteps = 1; break;
+		case CT_TUBE: createShape(Pi3Cshapes::tube(vec3f(0, 0, 0.f), 0.5f, 1.f, 2.f), pos, currentColour); maxSteps = 2; break;
+		case CT_CONE: createShape(Pi3Cshapes::cone(vec3f(0, 0, 0.f), 1.f, 2.f), pos, currentColour); maxSteps = 1; break;
+		case CT_TCONE: createShape(Pi3Cshapes::tcone(vec3f(0, 0, 0.f), 1.f, 0.7f, 2.f), pos, currentColour); maxSteps = 2; break;
+		case CT_SPHERE: createShape(Pi3Cshapes::sphere(vec3f(0, 0, 0.f), 0.05f), pos, currentColour); maxSteps = 1; break;
+		case CT_TORUS: createShape(Pi3Cshapes::torus(vec3f(0, 0, 0.f), 2.f, 1.f), pos, currentColour); maxSteps = 2; break;
 		case CT_WEDGE: break;
-		case CT_EXTRUDE: break;
+		case CT_EXTRUDE: maxSteps = 0; break;
 		case CT_LATHE: break;
+		case CT_LINE: maxSteps = 0; break;
 		case CT_LANDSCAPE: createLandscape(pos, currentColour); break;
 		}
+
+		//createCount = 1;
 	}
+}
+
+void Modeller::creatingShape(bool nextStep)
+{
+	int shapeRef = scene.models.size() - 1;
+	vec3f pos = -currentPos;
+	Pi3Cmodel& model = scene.models[shapeRef];
+	Pi3Cmesh& mesh = resource->meshes[model.meshRef];
+	vertsPtr vp = resource->getMeshVerts(model.meshRef);
+
+	if (maxSteps == 0) {
+		switch (createTool) {
+		case CT_EXTRUDE:
+			line.push_back(pos);
+			break;
+		}
+	}
+	if (createCount == 1) {
+		switch (createTool) {
+		case CT_CUBOID:Pi3Cshapes::cube_verts(*vp.verts, vp.offset, (pos - createFirstPoint)/2.f, (pos - createFirstPoint), 1, 1, 1, currentColour); break;
+		case CT_CYLINDER:Pi3Cshapes::cylinder_verts(*vp.verts, vp.offset, vec3f(0, 0, 0), pos.x - createFirstPoint.x, pos.y - createFirstPoint.y); break;
+		case CT_SPHERE:Pi3Cshapes::sphere_verts(*vp.verts, vp.offset, vec3f(0, 0, 0), (pos - createFirstPoint).length()); break;
+		case CT_TORUS:Pi3Cshapes::torus_verts(*vp.verts, vp.offset, vec3f(0, 0, 0), (pos - createFirstPoint).length(), 0.7f); break;
+		case CT_CONE:Pi3Cshapes::cone_verts(*vp.verts, vp.offset, vec3f(0, 0, 0), pos.x - createFirstPoint.x, pos.y-createFirstPoint.y); break;
+		case CT_TCONE:Pi3Cshapes::tcone_verts(*vp.verts, vp.offset, vec3f(0, 0, 0), pos.x - createFirstPoint.x, (pos.x - createFirstPoint.x)*1.0f, pos.y - createFirstPoint.y); break;
+		case CT_TUBE:Pi3Cshapes::tube_verts(*vp.verts, vp.offset, vec3f(0, 0, 0), (pos.x - createFirstPoint.x)*0.9f, pos.x - createFirstPoint.x, pos.y - createFirstPoint.y); break;
+		}
+		oldPos = pos;
+	}
+	else if (createCount == 2) {
+		switch (createTool) {
+		case CT_CUBOID:
+		{
+			if (abs(oldPos.x - createFirstPoint.x) < 0.001f) {
+				pos.x = (pos.y - createFirstPoint.y); pos.y = oldPos.y; pos.z = oldPos.z;
+			}
+			if (abs(oldPos.y - createFirstPoint.y) < 0.001f) {
+				pos.y = (pos.z - createFirstPoint.z); pos.x = oldPos.x; pos.z = oldPos.z;
+			}
+			if (abs(oldPos.z - createFirstPoint.z) < 0.001f) {
+				pos.z = (pos.y - createFirstPoint.y); pos.y = oldPos.y; pos.x = oldPos.x;
+			}
+			Pi3Cshapes::cube_verts(*vp.verts, vp.offset, (pos - createFirstPoint) / 2.f, (pos - createFirstPoint), 1, 1, 1, currentColour);
+		}
+		break;
+		case CT_TORUS:Pi3Cshapes::torus_verts(*vp.verts, vp.offset, vec3f(0, 0, 0), (oldPos - createFirstPoint).length(), (pos - createFirstPoint).length()); break;
+		case CT_TCONE:Pi3Cshapes::tcone_verts(*vp.verts, vp.offset, vec3f(0, 0, 0), oldPos.x - createFirstPoint.x, (pos.x - createFirstPoint.x), pos.y - createFirstPoint.y); break;
+		case CT_TUBE:Pi3Cshapes::tube_verts(*vp.verts, vp.offset, vec3f(0, 0, 0), pos.x - createFirstPoint.x, oldPos.x - createFirstPoint.x, oldPos.y - createFirstPoint.y); break;
+		}
+	}
+	mesh.bbox.bboxFromVerts(*vp.verts, vp.offset, mesh.vc, mesh.stride);
+	resource->updateMesh(model.meshRef);
+
+	//if (nextStep) createCount++;
 }
 
 void Modeller::MouseButtonUp()
@@ -319,7 +378,13 @@ void Modeller::ClickLeftMouseButton(viewInfo& view)
 
 		switch (editMode) {
 		case ED_CREATE:
-			createShapes();
+			if (createCount == maxSteps) {
+				createCount = 0;
+			}
+			else {
+				if (createCount==0) createShapes();
+				createCount++;
+			}
 			window->mouse.up = false;
 			break;
 		case ED_SELECT:
@@ -351,6 +416,67 @@ void Modeller::ClickLeftMouseButton(viewInfo& view)
 			break;
 		}
 
+	}
+}
+
+void Modeller::ClickRightMouseButton(viewInfo& view)
+{
+	if (currentViewIsActive() && window->mouse.RightButton) {
+
+		setCurrentSelView(currentView);
+
+		switch (editMode) {
+		case ED_CREATE:
+			if (maxSteps == 0) {
+				finishLine();
+				createCount = 0;
+			}
+			window->mouse.up = false;
+			break;
+		case ED_SELECT:
+			touchScene();
+			if (touch.selmodel) {
+				scene.models[brushref].matrix.move(touch.intersection);
+				editUndo.selectModel(scene.models, &scene.models[touch.parent()], window->ctrlKey);
+				//scene.models[touch.groupRefs[0]].selected = touch.selmodel->selected;
+			}
+			else
+				clearSelections();
+			break;
+		case ED_MOVE:
+			touchScene();
+			if (touch.selmodel) {
+				editUndo.selectModel(scene.models, touch.selmodel, window->ctrlKey);
+				scene.models[touch.parent()].selected = true;
+			}
+			else clearSelections();
+			break;
+		case ED_DROPMAN:
+			touchScene();
+			break;
+		case ED_ROTATE:
+			break;
+		case ED_SCALE:
+			editUndo.setSelectionCentre(scene.models);
+			//scene.models[selboxRef].visible = false;
+			break;
+		}
+
+	}
+}
+
+void Modeller::finishLine()
+{
+	std::vector<std::vector<float>> contours;
+
+	switch (createTool) {
+	case CT_EXTRUDE:
+		createShape(Pi3Cshapes::extrude("Extrude",vec3f(0, 0, 0.f), contours, 1.f, 1), vec3f(0, 0, 0.f), currentColour);
+		break;
+	case CT_LATHE:
+		break;
+	case CT_LINE:
+		break;
 	}
 }
 
@@ -406,17 +532,23 @@ void Modeller::handleEvents(std::vector<uint32_t>& eventList)
 		switch (ev)
 		{
 		case SDL_MOUSEBUTTONDOWN:
-			ClickLeftMouseButton(view);
+			if (window->mouse.LeftButton) ClickLeftMouseButton(view);
+			if (window->mouse.RightButton) ClickRightMouseButton(view);
 			break;
 		case SDL_MOUSEBUTTONUP:
 			MouseButtonUp();
 			break;
 		case SDL_MOUSEMOTION:
-			if (window->mouse.anyButton() && currentViewIsActive() && sceneAction != SA_DRAGBAR) {
-				vec3f mouseXYZ = vec3f(window->mouse.deltaXY.x, -window->mouse.deltaXY.y, 0);
-				//float sc = -window->mouse.deltaXY.y * 0.1f;
-				if (window->mouse.MiddleButton) DragMiddleMouseButton(view, mouseXYZ);
-				if (window->mouse.LeftButton) DragLeftMouseButton(view, mouseXYZ);
+			if (currentViewIsActive() && sceneAction != SA_DRAGBAR) {
+				if (createCount > 0) {
+					creatingShape(window->mouse.LeftButton);
+				}
+				else if (window->mouse.anyButton()) {
+					vec3f mouseXYZ = vec3f(window->mouse.deltaXY.x, -window->mouse.deltaXY.y, 0);
+					//float sc = -window->mouse.deltaXY.y * 0.1f;
+					if (window->mouse.MiddleButton) DragMiddleMouseButton(view, mouseXYZ);
+					if (window->mouse.LeftButton) DragLeftMouseButton(view, mouseXYZ);
+				}
 			}
 			break;
 		case SDL_MOUSEWHEEL:
@@ -522,7 +654,7 @@ void Modeller::setSelectionBox()
 {
 	Pi3Cbbox3d bbox = scene.getSelectedBounds();
 	vertsPtr vp = resource->getMeshVerts(scene.models[selboxRef].meshRef);
-	Pi3Cgizmos::select_box_verts(*vp.verts, vp.ptr, bbox.min, bbox.size(), 0xffffff);
+	Pi3Cgizmos::select_box_verts(*vp.verts, vp.offset, bbox.min, bbox.size(), 0xffffff);
 	resource->updateMesh(scene.models[selboxRef].meshRef);
 }
 

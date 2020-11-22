@@ -45,6 +45,7 @@ namespace Pi3Cshapes {
 
 	Pi3Cmesh rect(const vec2f &pos, const vec2f &size, const vec2f &uvpos = vec2f(0.f, 0.f), const vec2f &uvsize = vec2f(1.f,1.f));
 	Pi3Cmesh rectLine(const vec2f &pos, const vec2f &size, const float thickness = 0, const vec2f &uvpos = vec2f(0.f, 0.f), const vec2f &uvsize = vec2f(1.f, 1.f));
+	Pi3Cmesh polyline(const std::vector<vec3f>& lines, const vec2f& uvpos, const vec2f& uvsize);
 	Pi3Cmesh quad(const vec3f &p1, const vec3f &p2, const vec3f &p3, const vec3f &p4, const vec2f &uvpos = vec2f(0.f, 0.f), const vec2f &uvsize = vec2f(1.f, 1.f));
 	Pi3Cmesh plane(const vec3f &pos, const vec2f &size, const uint32_t xdivs, const uint32_t ydivs, int direction, const vec2f &uvsize = vec2f(1.f, 1.f));
 	Pi3Cmesh grid(const vec2f &size = vec2f(100.f, 100.f), const float majorStep = 10.f, const float minorStep = 1.f, const uint32_t mincol = 0x606060, const uint32_t majcol = 0x404040);
@@ -52,7 +53,7 @@ namespace Pi3Cshapes {
 	Pi3Cmesh lathe(const std::string &name, const vec3f &pos, std::vector<vec2f> &path, const int edges= Pi3C_SIDES,
 		const float rise=0.0f, const float startAngle = 0.f, const float endAngle = 2.f*PI, const bool invert = false, const float creaseAngle = 60.0f, const vec2f &prevPoint = vec2f(0,0),
 		const vec2f &lastPoint = vec2f(0, 0), const uint32_t uvtype = UVMAP_CYLINDER);
-	Pi3Cmesh sphere(const vec3f &pos, const float radius, const float hemi=0.0f, const int slices= Pi3C_SIDES/2, const int sides = Pi3C_SIDES, const bool invert = false);
+	Pi3Cmesh sphere(const vec3f &pos, const float radius, const float hemi = 0.0f, const int slices = Pi3C_SIDES / 2, const int sides = Pi3C_SIDES, const bool invert = false);
 	Pi3Cmesh torus(const vec3f &pos, const float radius, const float ringradius, const int ringrots= Pi3C_SIDES, const int sides = Pi3C_SIDES);
 	Pi3Cmesh spring(const vec3f &pos, const float radius, const float height, const int coils, const float coilradius, const int ringrots=12, int sides = Pi3C_SIDES);
 	Pi3Cmesh cone(const vec3f &pos, const float radius, const float height, const int sides = Pi3C_SIDES);
@@ -66,7 +67,19 @@ namespace Pi3Cshapes {
 
 	//Pi3Cmesh capsule(vec3f pos, float radius, float midlength = 2.0f, int slices = Pi3C_SIDES, int sides = Pi3C_SIDES);
 
-	void texMap(std::vector<float> &vertBuffer, uint32_t vc, uint32_t stride, uint32_t uvoffset, uint8_t x, uint8_t y);
-
+	void polyline_verts(std::vector<float>& verts, uint32_t& vc, std::vector<vec3f>& lines, const vec2f& uvpos, const vec2f& uvsize, const uint32_t col);
+	void texMap(std::vector<float> &verts, uint32_t vc, uint32_t stride, uint32_t uvoffset, uint8_t x, uint8_t y);
+	void cube_verts(std::vector<float>& verts, uint32_t& vc, const vec3f& pos, const vec3f& size, const int divx, const int divy, const int divz, const uint32_t col);
+	void sphere_verts(std::vector<float>& verts, uint32_t& vc, const vec3f& pos, const float radius, const float hemi = 0.0f, const int slices = Pi3C_SIDES / 2, const int sides = Pi3C_SIDES, const bool invert = false);
+	void torus_verts(std::vector<float>& verts, uint32_t& vc, const vec3f &pos, const float radius, const float ringradius, const int ringrots = Pi3C_SIDES, const int sides = Pi3C_SIDES);
+	void spring_verts(std::vector<float>& verts, uint32_t& vc, const vec3f &pos, const float radius, const float length, const int coils, const float coilradius, const int ringrots = 12, const int sides = Pi3C_SIDES);
+	void cone_verts(std::vector<float>& verts, uint32_t& vc, const vec3f &pos, const float radius, const float height, const int sides = Pi3C_SIDES);
+	void tcone_verts(std::vector<float>& verts, uint32_t& vc, const vec3f &pos, const float botradius, const float topradius, const float height, const int sides = Pi3C_SIDES);
+	void cylinder_verts(std::vector<float>& verts, uint32_t& vc, const vec3f &pos, const float radius, const float height, const int sides = Pi3C_SIDES);
+	void tube_verts(std::vector<float>& verts, uint32_t& vc, const vec3f &pos, const float radius1, const float radius2, const float height, const int sides = Pi3C_SIDES);
+	void lathe_verts(std::vector<float>& verts, uint32_t& vc, const uint32_t stride, const vec3f& pos, std::vector<vec2f>& path, const int edges, const float rise, const float startAngle, const float endAngle, const bool invert, const float creaseAngle, const vec2f prevPoint, const vec2f lastPoint, const uint32_t uvtype, const uint32_t col);
+	void extrude_verts(std::vector<float> &verts, uint32_t &vc, const vec3f &pos, std::vector<std::vector<float>>& contours, const float depth, const uint16_t divs, const uint32_t col);
+	void grid_verts(std::vector<float>& verts, uint32_t& vc, const vec2f &size, const float majorStep, const float minorStep, const uint32_t mincol, const uint32_t majcol);
+	void elevationMap_verts(std::vector<float>& verts, uint32_t& vc, Pi3Ctexture &tex, const vec3f &pos, const vec3f &size, const uint32_t xdivs, const uint32_t ydivs, int direction, const vec2f &uvsize, const uint32_t col);
 }
 

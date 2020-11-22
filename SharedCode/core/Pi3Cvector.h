@@ -119,11 +119,25 @@ public:
 		return *this;
 	}
 
+	vec2f dot(vec2f p2)
+	{
+		float a = p2.x - x;
+		float b = y - p2.y;
+		float s = sqrtf(a * a + b * b);
+		if (s > 0.0f) return vec2f(b / s, a / s);
+		return vec2f(0.0f, 0.0f);
+	}
+
 	float length() const
 	{
 		return sqrtf(x*x + y*y);
 	}
 
+	float angleBetween(vec2f v2) const
+	{
+		float prod = x * v2.y - y * v2.x;
+		return fabs((prod < 0.f ? -1.0f : 1.0f) * acosf((x * v2.x + y * v2.y) / (length() * v2.length())));
+	}
 
 	static vec2f g_Zero;
 

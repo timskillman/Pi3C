@@ -15,8 +15,14 @@ void Pi3Cmesh::reset()
 	bbox.init();
 	materialRef = -1;
 	vc = 0;
+	stride = 9;
 }
-	
+
+void Pi3Cmesh::updateBounds()
+{
+	bbox.bboxFromVerts(verts, 0, vc, stride);
+}
+
 void Pi3Cmesh::addPackedVert(const vec3f &position, const vec3f &normal, const vec2f &uv, const uint32_t col)
 {
 	if (vc + stride > verts.size()) verts.resize(vc + 1000);

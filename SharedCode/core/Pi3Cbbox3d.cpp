@@ -58,13 +58,14 @@ void Pi3Cbbox3d::set(const Pi3Cbbox3d &box, const Pi3Cmatrix* mtx)
 	update(box, mtx);
 }
 
-void Pi3Cbbox3d::bboxFromVerts(const std::vector<float> &verts, const uint32_t start, const uint32_t vsize, const uint32_t stride)
+void Pi3Cbbox3d::bboxFromVerts(const std::vector<float> &verts, const uint32_t start, const uint32_t size, const uint32_t stride)
 {
-	min.x = verts[start]; max.x = min.x;
-	min.y = verts[start + 1]; max.y = min.y;
-	min.z = verts[start + 2]; max.z = min.z;
+	int st = start; // / stride;
+	min.x = verts[st]; max.x = min.x;
+	min.y = verts[st + 1]; max.y = min.y;
+	min.z = verts[st + 2]; max.z = min.z;
 
-	for (uint32_t i = 0; i < vsize; i += stride) {
+	for (uint32_t i = st; i < (st + size); i += stride) {
 		if (verts[i] < min.x) min.x = verts[i]; else if (verts[i] > max.x) max.x = verts[i];
 		if (verts[i + 1] < min.y) min.y = verts[i + 1]; else if (verts[i + 1] > max.y) max.y = verts[i + 1];
 		if (verts[i + 2] < min.z) min.z = verts[i + 2]; else if (verts[i + 2] > max.z) max.z = verts[i + 2];

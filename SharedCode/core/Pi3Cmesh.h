@@ -113,6 +113,7 @@ public:
 	uint32_t calcRectPtr(uint32_t ref) { return (vertOffset + ref * 6) * stride; }
 
 	void updateNormals(const uint32_t min, const uint32_t max);
+	void updateBounds();
 
 	bool hasColliderGrid = false;
 	float checkColliderGrid(const vec3f &p, const Pi3Cmatrix &mtx, float prevHeight);

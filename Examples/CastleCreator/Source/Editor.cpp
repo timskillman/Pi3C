@@ -138,7 +138,7 @@ void Editor::loadModels(const std::string &modelsLibraryFile)
 	for (auto &ln : modelLibrary) libnames.push_back(ln.first);
 
 	// Create a brush for touching objects ...
-	Pi3Cmodel brush = Pi3Cmodel(resource, Pi3Cshapes::sphere(vec3f(0, 0, 0), 2.0f, 0xffffff, 0.f, 10, 20), 0xffff00);
+	Pi3Cmodel brush = Pi3Cmodel(resource, Pi3Cshapes::sphere(vec3f(0, 0, 0), 2.0f, 0.f, 10, 20), 0xffff00);
 	brush.touchable = false;
 	brush.visible = false;
 	brush.material.alpha = 0.5f;

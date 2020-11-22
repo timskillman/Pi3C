@@ -5,6 +5,7 @@
 #include "Pi3Cmaterial.h"
 #include "Pi3Cshader.h"
 #include "Pi3CGL.h"
+#include "Pi3CvertsPtr.h"
 #include <vector>
 #include <string>
 #include <memory>
@@ -45,14 +46,6 @@
 
 #define DEFAULT_STRIDE 9
 
-struct vertsPtr {
-	uint32_t ptr;
-	std::vector<float> *verts;
-
-	vertsPtr() : ptr(0), verts(nullptr) {}
-	vertsPtr(uint32_t ptr, std::vector<float> *verts) : ptr(ptr), verts(verts) {}
-
-};
 
 class Pi3Cresource {
 public:

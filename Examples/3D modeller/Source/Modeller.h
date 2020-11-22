@@ -19,7 +19,7 @@ public:
 	~Modeller();
 
 	enum EditMode { ED_SELECT, ED_ROTATE, ED_MOVE, ED_SCALE, ED_CREATE, ED_CONTOUR, ED_ROTATESCENE, ED_DROPMAN };
-	enum CreateTool { CT_CUBOID, CT_SPHERE, CT_CYLINDER, CT_CONE, CT_TCONE, CT_TUBE, CT_TORUS, CT_WEDGE, CT_EXTRUDE, CT_LATHE, CT_TEXT, CT_LIBSHAPE, CT_LANDSCAPE, CT_NONE };
+	enum CreateTool { CT_CUBOID, CT_SPHERE, CT_CYLINDER, CT_CONE, CT_TCONE, CT_TUBE, CT_TORUS, CT_WEDGE, CT_EXTRUDE, CT_LATHE, CT_TEXT, CT_LIBSHAPE, CT_LANDSCAPE, CT_LINE, CT_NONE };
 	enum SceneAction { SA_NONE, SA_PANNING, SA_ZOOMING, SA_ROTATING, SA_DRAGBAR };
 
 	void setupGUI(loadOptions &opts);
@@ -85,6 +85,13 @@ public:
 	EditMode editMode = ED_SELECT;
 	CreateTool createTool = CT_CUBOID;
 	SceneAction sceneAction = SceneAction::SA_NONE;
+
+	int createCount = 0;
+	int maxSteps = 1;
+	Pi3Cmesh currentShape;
+	vec3f createFirstPoint;
+	vec3f oldPos;
+	std::vector<vec3f> line;
 
 	std::string libShape;				//Create tool library shape file
 
@@ -153,11 +160,14 @@ private:
 	void setCurrentSelView(int32_t selview);
 	void handleKeyPresses();
 	void createShapes();
+	void creatingShape(bool nextStep);
 	void ClickLeftMouseButton(viewInfo& view);
+	void ClickRightMouseButton(viewInfo& view);
 	void MouseButtonUp();
 	void DragLeftMouseButton(viewInfo& view, vec3f& mouseXYZ);
 	void DragMiddleMouseButton(viewInfo& view, vec3f& mouseXYZ);
 	void setTouchFlags(bool val);
 	void resetZoom();
 	void navikeys(SDL_Scancode key, SDL_Scancode keyA, SDL_Scancode KeyB);
+	void finishLine();
 };

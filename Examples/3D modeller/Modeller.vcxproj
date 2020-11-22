@@ -276,6 +276,7 @@
     <ClInclude Include="..\..\SharedCode\core\Pi3Ctexture.h" />
     <ClInclude Include="..\..\SharedCode\core\Pi3Ctouch.h" />
     <ClInclude Include="..\..\SharedCode\core\Pi3Cvector.h" />
+    <ClInclude Include="..\..\SharedCode\core\Pi3CvertsPtr.h" />
     <ClInclude Include="..\..\SharedCode\core\Pi3CviewInfo.h" />
     <ClInclude Include="..\..\SharedCode\core\Pi3Cwin.h" />
     <ClInclude Include="..\..\SharedCode\editing\Pi3Cediting.h" />

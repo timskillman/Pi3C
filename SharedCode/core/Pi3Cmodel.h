@@ -125,6 +125,16 @@ public:
 
 	std::string name;				//model name (used for search)
 	std::string desc;				//model description (long name)
+	std::string command;			//command string used to generate model (e.g. "Sphere(pos:[10.1,15.5,4.0],radius:[5.0],colour:[#FFFFFF]") )
+
+									// Sphere(pos:[x,y,z],radius:[r],hemi:[h],slices:[n],segments:[n],colour:[hexcolour])
+									// Cuboid(pos:[x,y,z],size:[x,y,z],divx:[n],divy:[n],divz:[n],colour:[hexcolour])
+									// Cone(pos:[x,y,z],radius:[r],height:[h],slices:[n],segments:[n],colour:[hexcolour])
+									// Cylinder(pos:[x,y,z],radius:[r],height:[h],slices:[n],segments:[n],colour:[hexcolour])
+									// Tube(pos:[x,y,z],radius1:[r],radius2:[r],height:[h],slices:[n],segments:[n],colour:[hexcolour])
+									// Lathe(pos:[x,y,z],path:[x1,y1, .... xn,yn],segments:[n],colour:[hexcolour])
+									// Extrude(pos:[x,y,z],path:[x1,y1, .... xn,yn],segments:[n],colour:[hexcolour])
+									// File(pos:[x,y,z],name:"filename.obj",size:[x,y,z]]
 
 	Pi3Cmatrix matrix;				//matrix used to transform mesh/group
 	Pi3Cmaterial material;			//used for rendering mesh - can be modified

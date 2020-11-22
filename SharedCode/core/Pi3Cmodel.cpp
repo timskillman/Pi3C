@@ -168,7 +168,7 @@ void Pi3Cmodel::updateMesh(Pi3Cresource* resource, const Pi3Cmesh &umesh)
 	if (umesh.verts.size() != (*vp.verts).size()) return;
 
 	for (uint32_t i = 0; i < umesh.verts.size(); i++) {
-		(*vp.verts)[vp.ptr++] = umesh.verts[i];
+		(*vp.verts)[vp.offset++] = umesh.verts[i];
 		//vp.ptr++;
 		//(*vp.verts)[vp.ptr + 1] = umesh.verts[i + 1]; 
 		//(*vp.verts)[vp.ptr + 2] = umesh.verts[i + 2]; 
@@ -510,7 +510,7 @@ void Pi3Cmodel::textModel(Pi3Cresource *resource, Pi3Cfont *font, const std::str
 }
 
 #define updateCoordsXYZ(x,y,z)											\
-	(*vp.verts)[vp.ptr] = x; (*vp.verts)[vp.ptr+1] = y; (*vp.verts)[vp.ptr+2] = z; vp.ptr+=stride;	\
+	(*vp.verts)[vp.offset] = x; (*vp.verts)[vp.offset+1] = y; (*vp.verts)[vp.offset+2] = z; vp.offset+=stride;	\
 
 void Pi3Cmodel::updateSpriteBillboard(Pi3Cresource *resource, const std::vector<vec3f> &pos, const std::vector<vec2f> &size, const vec3f &lookat)
 {
@@ -585,7 +585,7 @@ void Pi3Cmodel::updateLineQuad(Pi3Cresource *resource, const std::vector<vec3f> 
 }
 
 #define updateCoordsXY(x,y)							\
-		(*vp.verts)[vp.ptr] = x; (*vp.verts)[vp.ptr + 1] = y; vp.ptr+=stride; 	\
+		(*vp.verts)[vp.offset] = x; (*vp.verts)[vp.offset + 1] = y; vp.offset+=stride; 	\
 
 
 void Pi3Cmodel::updateSpriteVerts(vertsPtr &vp, const uint32_t stride, const vec3f& p1, const vec3f& p2, const vec3f& p3, const vec3f& p4)
