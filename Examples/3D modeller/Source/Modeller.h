@@ -171,5 +171,5 @@ private:
 	void resetZoom();
 	void navikeys(SDL_Scancode key, SDL_Scancode keyA, SDL_Scancode KeyB);
 	void finishLine();
-	vec3f Modeller::getShapeHeight(vec3f pos);
+	vec3f getShapeHeight(vec3f pos);
 };
