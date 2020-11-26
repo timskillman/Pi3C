@@ -201,6 +201,14 @@ Tr 0.999
 illum 2
 map_Kd maps/girder.png
 
+newmtl girder2
+Ka 0.200000 0.200000 0.200000
+Kd 1.000000 1.000000 1.000000
+Ks 1.000000 1.000000 1.000000
+Tr 0.999
+illum 2
+map_Kd maps/girder3.png
+
 newmtl walkplate
 Ka 0.200000 0.200000 0.200000
 Kd 1.000000 1.000000 1.000000
@@ -215,7 +223,17 @@ Kd 1.000000 1.000000 1.000000
 Ks 1.000000 1.000000 1.000000
 Tr 1.000
 illum 1
+animsheet 12 1 12
 map_Kd maps/radar.png
+
+newmtl blueLightning
+Ka 0.200000 0.200000 0.200000
+Kd 1.000000 1.000000 1.000000
+Ks 1.000000 1.000000 1.000000
+Tr 1.000
+illum 1
+animsheet 8 1 8
+map_Kd maps/lightningani.png
 
 newmtl ashcanopy
 Ka 0.200000 0.200000 0.200000
