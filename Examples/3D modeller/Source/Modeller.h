@@ -39,6 +39,7 @@ public:
 	void setDragBarH(bool on) { setDragBar(on, WECursor); };
 	void setDragBarV(bool on) { setDragBar(on, NSCursor); };
 	void dropMan();
+	void setFullScreen();
 	void setFullScene();
 	void setMousePosition(int x, int y) {
 		currentPos = views[currentView].calcMouseXYZ(x, y);
@@ -56,7 +57,7 @@ public:
 		std::string err; Pi3CfileOBJ::save(path, filename, &scene, selected, nullptr, err); 
 	}
 
-	bool currentViewIsActive() { return currentView != viewInfo::INACTIVE; }
+	bool currentViewIsActive() { return (currentView != viewInfo::INACTIVE) || fullscreen; }
 
 	void snapshot();
 	//vec3f getRelativeMove(const vec3f& pos);
@@ -109,14 +110,14 @@ public:
 	uint32_t currentColour = 0xffffff;
 	Pi3Cmaterial outlines;
 	bool keypress = false;
+	bool fullscreen = false;
 
 	Pi3Ctouch touch;
 
-	viewInfo views[5];
+	viewInfo views[6];
 	int32_t currentView = viewInfo::BOTTOMRIGHT;
 	int32_t currentSelView = currentView;
 	int32_t fullview = viewInfo::INACTIVE;
-
 
 	//scene model refs ..
 	int32_t brushref = -1;

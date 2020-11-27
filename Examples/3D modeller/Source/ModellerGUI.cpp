@@ -301,6 +301,7 @@ void MGui::doSceneToolbar(Modeller * md, Pi3Cimgui::rectStyle& iconstyle, bool m
 	//gui.setButtonStyle(iconstyle);
 
 	if (gui.BeginGroupHorizontal("rendl.png", iconstyle.halfWidth(), iconstyle.minHeight)) {
+		if (gui.ButtonImage("butFullscreen.png") && md->fullscreen==false && mb) md->setFullScreen();
 		if (gui.ButtonImage("butDropMan.png", md->editMode == Modeller::ED_DROPMAN) && mb) md->setEditMode(Modeller::ED_DROPMAN);
 		if (gui.ButtonImage("butBigwin.png") && mu) md->setFullScene();
 		if (gui.ButtonImage("butSceneRot.png", md->editMode == Modeller::ED_ROTATESCENE) && mu) md->setEditMode(Modeller::ED_ROTATESCENE);
@@ -362,11 +363,11 @@ void MGui::doIMGUI(Modeller * md)
 
 	gui.setPosition(wpos.x + leftbarWidth, wpos.y - topbarHeight);
 	doEditToolbar(md, bsIcons, mb);
-	
+
 	gui.sameLine();
 	doTransformToolbar(md, bsIcons, mb);
 
-	gui.setPosition(winWidth - rightbarWidth - 100, workHeight + topbarHeight + menuHeight + 3);
+	gui.setPosition(winWidth - rightbarWidth - 150, workHeight + topbarHeight + menuHeight + 3);
 	doSceneToolbar(md, bsIcons, mb, mu);
 
 	//Left side create shape buttons ...
@@ -387,7 +388,7 @@ void MGui::doIMGUI(Modeller * md)
 		gui.setButtonStyle(bsMenu);
 		//gui.setPosition(rect.x + 5, winHeight - rect.y - 26);
 		gui.setPosition(leftbarWidth + 320, workHeight + topbarHeight + menuHeight + 3);
-		std::string tpos = "X:" + ftostrdp(md->currentPos.x,2) + ", Y:" + ftostrdp(md->currentPos.y,2) + ", Z:" + ftostrdp(md->currentPos.z,2);
+		std::string tpos = "X:" + ftostrdp(md->currentPos.x, 2) + ", Y:" + ftostrdp(md->currentPos.y, 2) + ", Z:" + ftostrdp(md->currentPos.z, 2);
 		gui.Text(tpos, 0xffffffff);
 		//if (md->selectedName != "") {
 		//	gui.setPosition(leftbarWidth + 720, workHeight + topbarHeight + menuHeight + 3);

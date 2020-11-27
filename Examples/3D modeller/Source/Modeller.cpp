@@ -66,6 +66,7 @@ void Modeller::setupGUI(loadOptions &opts)
 	views[viewInfo::BOTTOMLEFT] = setupView(viewInfo::VIEW_TOP);
 	views[viewInfo::BOTTOMRIGHT] = setupView(viewInfo::VIEW_PERSPECTIVE);
 	views[viewInfo::FULL] = setupView(viewInfo::VIEW_PERSPECTIVE);
+	views[viewInfo::FULLSCREEN] = setupView(viewInfo::VIEW_PERSPECTIVE);
 }
 
 void Modeller::init()
@@ -214,6 +215,9 @@ void Modeller::handleKeyPresses()
 		case SDL_SCANCODE_R:
 		case SDL_SCANCODE_F:
 			navikeys(kp, SDL_SCANCODE_F, SDL_SCANCODE_R);
+			break;
+		case SDL_SCANCODE_ESCAPE:
+			if (fullscreen) setFullScreen();
 			break;
 		}
 	}
@@ -417,7 +421,8 @@ void Modeller::DragLeftMouseButton(viewInfo& view, vec3f& mouseXYZ)
 		}
 		break;
 	case ED_ROTATESCENE:
-		view.rot += vec3f(mouseXYZ.y, mouseXYZ.x, 0) * -0.01f;
+		view.addRot(vec3f(mouseXYZ.y, mouseXYZ.x, 0) * -0.01f);
+		//view.setRotMatrix(view.rot);
 		sceneAction = SA_ROTATING;
 		//rotating = true;
 		break;
@@ -426,7 +431,7 @@ void Modeller::DragLeftMouseButton(viewInfo& view, vec3f& mouseXYZ)
 
 void Modeller::ClickLeftMouseButton(viewInfo& view)
 {
-	if (currentViewIsActive() && window->mouse.LeftButton && sceneAction != SA_DRAGBAR) {
+	if ((currentViewIsActive() && window->mouse.LeftButton && sceneAction != SA_DRAGBAR)) {
 
 		setCurrentSelView(currentView);
 
@@ -538,7 +543,7 @@ void Modeller::touchScene()
 {
 	if (sceneAction != SA_NONE) return;
 
-	if (currentViewIsActive() && !mgui.somethingSelected()) {
+	if ((currentViewIsActive() && !mgui.somethingSelected()) || fullscreen) {
 
 		touchView(views[currentView]);
 
@@ -651,6 +656,26 @@ void Modeller::dropMan()
 	view.pos = vec3f(0, 0, 0);
 	view.zoom = 0.f;
 	view.pan = currentPos + vec3f(0,-2.f,0);
+}
+
+void Modeller::setFullScreen()
+{
+	if (fullscreen) {
+		SDL_SetWindowFullscreen(window->handle(), 0);
+		currentView = viewInfo::FULL;
+		setCurrentSelView(currentView);
+	}
+	else {
+		window->resizeWindow(1366, 768);
+		SDL_SetWindowFullscreen(window->handle(), SDL_WINDOW_FULLSCREEN);
+		currentView = viewInfo::FULLSCREEN;
+		views[currentView] = views[viewInfo::BOTTOMRIGHT];
+		editMode = ED_ROTATESCENE;
+		views[currentView].viewport = window->getRect();
+		setCurrentSelView(currentView);
+	}
+	fullscreen = !fullscreen;
+	window->mouse.up = false;
 }
 
 void Modeller::setFullScene()
@@ -785,42 +810,49 @@ void Modeller::render()
 
 	currentView = viewInfo::INACTIVE;
 
-	if (fullview >= 0) {
-		views[viewInfo::FULL].viewport = mgui.getRectFull();
-		currentView = viewInfo::FULL;
-		renderScene(views[viewInfo::FULL]);
+	if (fullscreen) {
+		currentView = viewInfo::FULLSCREEN;
+		renderScene(views[currentView]);
 	}
 	else {
-		//render perspective view (right lower)...
+
+		if (fullview >= 0) {
+			views[viewInfo::FULL].viewport = mgui.getRectFull();
+			currentView = viewInfo::FULL;
+			renderScene(views[viewInfo::FULL]);
+		}
+		else {
+			//render perspective view (right lower)...
 		
-		views[viewInfo::BOTTOMRIGHT].viewport = mgui.getRectBottomRight();
-		if (views[viewInfo::BOTTOMRIGHT].viewport.touch(mx, my)) currentView = viewInfo::BOTTOMRIGHT; 
-		renderScene(views[viewInfo::BOTTOMRIGHT]);
+			views[viewInfo::BOTTOMRIGHT].viewport = mgui.getRectBottomRight();
+			if (views[viewInfo::BOTTOMRIGHT].viewport.touch(mx, my)) currentView = viewInfo::BOTTOMRIGHT; 
+			renderScene(views[viewInfo::BOTTOMRIGHT]);
 
-		//render left lower ...
-		views[viewInfo::BOTTOMLEFT].viewport = mgui.getRectBottomLeft();
-		if (views[viewInfo::BOTTOMLEFT].viewport.touch(mx, my)) currentView = viewInfo::BOTTOMLEFT;
-		renderScene(views[viewInfo::BOTTOMLEFT]);
+			//render left lower ...
+			views[viewInfo::BOTTOMLEFT].viewport = mgui.getRectBottomLeft();
+			if (views[viewInfo::BOTTOMLEFT].viewport.touch(mx, my)) currentView = viewInfo::BOTTOMLEFT;
+			renderScene(views[viewInfo::BOTTOMLEFT]);
 
-		//render left top ...
-		views[viewInfo::TOPLEFT].viewport = mgui.getRectTopLeft();
-		if (views[viewInfo::TOPLEFT].viewport.touch(mx, my)) currentView = viewInfo::TOPLEFT;
-		renderScene(views[viewInfo::TOPLEFT]);
+			//render left top ...
+			views[viewInfo::TOPLEFT].viewport = mgui.getRectTopLeft();
+			if (views[viewInfo::TOPLEFT].viewport.touch(mx, my)) currentView = viewInfo::TOPLEFT;
+			renderScene(views[viewInfo::TOPLEFT]);
 
-		//render right top ...
-		views[viewInfo::TOPRIGHT].viewport = mgui.getRectTopRight();
-		if (views[viewInfo::TOPRIGHT].viewport.touch(mx, my)) currentView = viewInfo::TOPRIGHT;
-		renderScene(views[viewInfo::TOPRIGHT]);
+			//render right top ...
+			views[viewInfo::TOPRIGHT].viewport = mgui.getRectTopRight();
+			if (views[viewInfo::TOPRIGHT].viewport.touch(mx, my)) currentView = viewInfo::TOPRIGHT;
+			renderScene(views[viewInfo::TOPRIGHT]);
+		}
+
+	
+		//Render 2D
+		scene.setViewport(screenRect);
+		scene.setFixedLight(0xffffff, vec3f(0, 1000.f, 1000.f));
+		scene.setViewport2D(screenRect, 0.1f, 2000.f);
+		scene.render2D(window->getTicks());
+
+		handleIMGUI(); //must be in the rendering loop with 2D setup
 	}
-
-	//Render 2D
-	scene.setViewport(screenRect);
-	scene.setFixedLight(0xffffff, vec3f(0, 1000.f, 1000.f));
-	scene.setViewport2D(screenRect, 0.1f, 2000.f);
-	scene.render2D(window->getTicks());
-
-	handleIMGUI(); //must be in the rendering loop with 2D setup
-
 }
 
 void Modeller::snapshot() {

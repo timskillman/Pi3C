@@ -134,7 +134,7 @@ std::vector<uint32_t> Pi3Cwindow::event()
 				const uint8_t* keystate = getKeys();
 				shiftKey = keystate[SDL_SCANCODE_LSHIFT] || keystate[SDL_SCANCODE_RSHIFT];
 				ctrlKey = keystate[SDL_SCANCODE_LCTRL] || keystate[SDL_SCANCODE_RCTRL];
-				if (keystate[SDL_SCANCODE_ESCAPE]) quit = true;
+				//if (keystate[SDL_SCANCODE_ESCAPE]) quit = true;
 			}
 			break;
 		case SDL_KEYUP:
@@ -189,10 +189,7 @@ std::vector<uint32_t> Pi3Cwindow::event()
 			case SDL_WINDOWEVENT_RESIZED:
 			case SDL_WINDOWEVENT_SIZE_CHANGED:
 				//Get new dimensions and repaint on window size change
-				mWidth = ev.window.data1;
-				mHeight = ev.window.data2;
-				glViewport(0, 0, mWidth, mHeight);
-				resized = true;
+				resize(ev.window.data1, ev.window.data2);
 				break;
 
 			case SDL_WINDOWEVENT_ENTER:

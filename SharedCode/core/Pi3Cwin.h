@@ -7,6 +7,7 @@
 #include "Pi3Cvector.h"
 #include "SDL_ttf.h"
 #include "SDL_mixer.h"
+#include "Pi3Crect.h"
 
 // =======================================================================
 // Pi3C Raspberry Pi Graphics Library
@@ -99,7 +100,16 @@ public:
 	bool init(const char * title, const int width, const int height, const uint32_t flags, const uint8_t samples);
 	void setCaption(const std::string &caption);
 	void destroy();
-
+	void resizeWindow(int32_t newWidth, int32_t newHeight) {
+		SDL_SetWindowSize(mWindow, newWidth, newHeight);
+		resize(newWidth, newHeight);
+	}
+	void resize(int32_t newWidth, int32_t newHeight) {
+		mWidth = newWidth;
+		mHeight = newHeight;
+		glViewport(0, 0, mWidth, mHeight);
+		resized = true;
+	}
 	int getEvent() { return SDL_PollEvent(&ev); }
 	std::vector<uint32_t> event(); //return a list of event handles (if any)
 	void SwapBuffers();
@@ -111,6 +121,7 @@ public:
 	void setAlpha(bool v);
 	int getWidth();
 	int getHeight();
+	Pi3Crecti getRect() { return Pi3Crecti(0, 0, mWidth, mHeight); }
 	bool hasMouseFocus();
 	bool hasKeyboardFocus();
 	void forceMouseUp();

@@ -7,7 +7,7 @@ class viewInfo {
 public:
 
 	enum Projection { PERSPECTIVE, ORTHOGRAPHIC };
-	enum SceneLayout { INACTIVE = -1, TOPLEFT = 0, TOPRIGHT = 1, BOTTOMLEFT = 2, BOTTOMRIGHT = 3, FULL = 4 };
+	enum SceneLayout { INACTIVE = -1, TOPLEFT = 0, TOPRIGHT = 1, BOTTOMLEFT = 2, BOTTOMRIGHT = 3, FULL = 4, FULLSCREEN = 5 };
 	enum ViewProject { VIEW_LEFT, VIEW_RIGHT, VIEW_TOP, VIEW_BOTTOM, VIEW_FRONT, VIEW_BACK, VIEW_FREE, VIEW_PERSPECTIVE };
 
 	void setRotMatrix(const vec3f &rot) {
@@ -18,6 +18,12 @@ public:
 	void setRot(const vec3f &rot) {
 		setRotMatrix(rot);
 		this->rot = rot;
+	}
+
+	void addRot(const vec3f &dir)
+	{
+		rot += dir;
+		setRotMatrix(rot);
 	}
 
 	vec3f viewCoords(const vec3f& pos)
