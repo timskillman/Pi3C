@@ -666,8 +666,23 @@ void Modeller::setFullScreen()
 		setCurrentSelView(currentView);
 	}
 	else {
-		window->resizeWindow(1366, 768);
-		SDL_SetWindowFullscreen(window->handle(), SDL_WINDOW_FULLSCREEN);
+		
+		int r = SDL_SetWindowFullscreen(window->handle(), SDL_WINDOW_FULLSCREEN);
+		if (r<0) {
+			r = SDL_SetWindowFullscreen(window->handle(), SDL_WINDOW_FULLSCREEN_DESKTOP);
+			if (r<0) {
+				SDL_SetWindowFullscreen(window->handle(), 0);
+			} else {
+				SDL_DisplayMode dm;
+				SDL_GetCurrentDisplayMode(0, &dm);
+				window->resizeWindow(dm.w,dm.h);
+			}
+		}
+		else 
+		{
+			window->resizeWindow(800, 600);
+		}
+
 		currentView = viewInfo::FULLSCREEN;
 		views[currentView] = views[viewInfo::BOTTOMRIGHT];
 		editMode = ED_ROTATESCENE;
