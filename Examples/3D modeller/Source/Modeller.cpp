@@ -92,7 +92,7 @@ void Modeller::init()
 	player.init(avparams);
 
 	// Load Skybox ...
-	skybox = scene.loadModelOBJ(opts.asString("skyboxPath"), opts.asString("skybox"), vec3f(0,0,0), true, nullptr); // loadbarCallback);
+	skybox = scene.loadModelOBJ(opts.asString("skyboxPath"), opts.asString("skybox"), vec3f(0,0,0), true); // false, loadbarCallback);
 	scene.models[skybox].matrix.SetScale(opts.asFloat("skyboxScale"));
 	scene.models[skybox].touchable = false;
 
@@ -622,7 +622,7 @@ void Modeller::handleEvents(std::vector<uint32_t>& eventList)
 		case SDL_DROPFILE: 
 			std::string file = window->dropfile;
 			if (file.substr(file.size() - 4, 4) == ".obj") {
-				int32_t modelRef = scene.loadModelOBJ("", file, touch.touching ? touch.intersection : vec3f(0,0,0), true, nullptr);  // loadbarCallback);
+				int32_t modelRef = scene.loadModelOBJ("", file, touch.touching ? touch.intersection : vec3f(0,0,0), true);  // false, loadbarCallback);
 			}
 			break;
 		}
@@ -666,9 +666,9 @@ void Modeller::setFullScreen()
 	}
 	else {
 		
-		int r = SDL_SetWindowFullscreen(window->handle(), SDL_WINDOW_FULLSCREEN);
-		if (r<0) {
-			r = SDL_SetWindowFullscreen(window->handle(), SDL_WINDOW_FULLSCREEN_DESKTOP);
+		//int r = SDL_SetWindowFullscreen(window->handle(), SDL_WINDOW_FULLSCREEN);
+		//if (r<0) {
+			int r = SDL_SetWindowFullscreen(window->handle(), SDL_WINDOW_FULLSCREEN_DESKTOP);
 			if (r<0) {
 				SDL_SetWindowFullscreen(window->handle(), 0);
 			} else {
@@ -676,11 +676,11 @@ void Modeller::setFullScreen()
 				SDL_GetCurrentDisplayMode(0, &dm);
 				window->resizeWindow(dm.w,dm.h);
 			}
-		}
-		else 
-		{
-			window->resizeWindow(800, 600);
-		}
+		//}
+		//else 
+		//{
+		//	window->resizeWindow(800, 600);  //RPi can't seem to go fullscreen with a specified res - just drop it
+		//}
 
 		currentView = viewInfo::FULLSCREEN;
 		views[viewInfo::FULLSCREEN].pan = views[viewInfo::BOTTOMRIGHT].pan;
