@@ -228,7 +228,7 @@ void Modeller::navikeys(SDL_Scancode key, SDL_Scancode keyA, SDL_Scancode KeyB)
 {
 	if (currentViewIsActive()) {
 		viewInfo& view = views[currentView];
-		float speed = (window->shiftKey) ? 10.f : 1.f;
+		float speed = (window->shiftKey) ? 5.f : 0.5f;
 		float dirspd = (key == keyA) ? speed : -speed;
 		vec3f dir = (keyA == SDL_SCANCODE_F) ? vec3f(0, dirspd, 0) : (keyA == SDL_SCANCODE_A) ? vec3f(dirspd, 0, 0) : vec3f(0, 0, dirspd);
 		resetZoom();
@@ -656,14 +656,37 @@ void Modeller::setFullScreen()
 {
 	if (fullscreen) {
 		SDL_SetWindowFullscreen(window->handle(), 0);
+		views[viewInfo::BOTTOMRIGHT].pan = views[viewInfo::FULLSCREEN].pan;
+		views[viewInfo::BOTTOMRIGHT].rot = views[viewInfo::FULLSCREEN].rot;
+		views[viewInfo::BOTTOMRIGHT].pos = views[viewInfo::FULLSCREEN].pos;
+		views[viewInfo::BOTTOMRIGHT].zoom = views[viewInfo::FULLSCREEN].zoom;
 		currentView = viewInfo::FULL;
+		views[currentView] = views[viewInfo::BOTTOMRIGHT];
 		setCurrentSelView(currentView);
 	}
 	else {
-		window->resizeWindow(1366, 768);
-		SDL_SetWindowFullscreen(window->handle(), SDL_WINDOW_FULLSCREEN);
+		
+		int r = SDL_SetWindowFullscreen(window->handle(), SDL_WINDOW_FULLSCREEN);
+		if (r<0) {
+			r = SDL_SetWindowFullscreen(window->handle(), SDL_WINDOW_FULLSCREEN_DESKTOP);
+			if (r<0) {
+				SDL_SetWindowFullscreen(window->handle(), 0);
+			} else {
+				SDL_DisplayMode dm;
+				SDL_GetCurrentDisplayMode(0, &dm);
+				window->resizeWindow(dm.w,dm.h);
+			}
+		}
+		else 
+		{
+			window->resizeWindow(800, 600);
+		}
+
 		currentView = viewInfo::FULLSCREEN;
-		views[currentView] = views[viewInfo::BOTTOMRIGHT];
+		views[viewInfo::FULLSCREEN].pan = views[viewInfo::BOTTOMRIGHT].pan;
+		views[viewInfo::FULLSCREEN].rot = views[viewInfo::BOTTOMRIGHT].rot;
+		views[viewInfo::FULLSCREEN].pos = views[viewInfo::BOTTOMRIGHT].pos;
+		views[viewInfo::FULLSCREEN].zoom = views[viewInfo::BOTTOMRIGHT].zoom;
 		editMode = ED_ROTATESCENE;
 		views[currentView].viewport = window->getRect();
 		setCurrentSelView(currentView);
