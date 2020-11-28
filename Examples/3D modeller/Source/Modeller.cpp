@@ -341,14 +341,7 @@ void Modeller::creatingShape(bool nextStep)
 				if (pos.x < createFirstPoint.x) { v.x = -v.x; voff.x = -v.x; }
 				if (pos.y < createFirstPoint.y) { v.y = -v.y; voff.y = -v.y; }
 				if (pos.z < createFirstPoint.z) { v.z = -v.z; voff.z = -v.z; }
-				//float cx = (pos.x < createFirstPoint.x) ? createFirstPoint.x - pos.x : pos.x - createFirstPoint.x;
-				//float cy = (pos.y < createFirstPoint.y) ? createFirstPoint.y - pos.y : pos.y - createFirstPoint.y;
-				//float cz = (pos.z < createFirstPoint.z) ? createFirstPoint.z - pos.z : pos.z - createFirstPoint.z;
 				Pi3Cshapes::cube_verts(*vp.verts, vp.offset, v / 2.f + voff, v, 1, 1, 1, currentColour);
-				//if (pos.x < createFirstPoint.x) std::swap(pos.x, createFirstPoint.x);
-				//if (pos.y < createFirstPoint.y) std::swap(pos.y, createFirstPoint.y);
-				//if (pos.z < createFirstPoint.z) std::swap(pos.z, createFirstPoint.z);
-				//Pi3Cshapes::cube_verts(*vp.verts, vp.offset, (pos - createFirstPoint) / 2.f, (pos - createFirstPoint), 1, 1, 1, currentColour);
 			}
 			break;
 		case CT_CYLINDER:
@@ -386,6 +379,7 @@ void Modeller::creatingShape(bool nextStep)
 	}
 	vp = resource->getMeshVerts(model.meshRef);
 	mesh.updateBounds(&vp);
+	model.bbox = mesh.bbox;
 	//mesh.bbox.bboxFromVerts(*vp.verts, vp.offset, mesh.vc, mesh.stride);
 	resource->updateMesh(model.meshRef);
 

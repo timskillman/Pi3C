@@ -75,7 +75,7 @@ public:
 	//void update_sprite_billboards(const uint32_t spritesRef, const uint32_t spriteRef, const uint32_t count, const vec3f &lookat);
 
 	//Model functions
-	int32_t load_model(const std::string &path, const std::string &file, const vec3f &pos = vec3f(0, 0, 0));
+	int32_t load_model(const std::string &path, const std::string &file, const vec3f &pos = vec3f(0, 0, 0), const bool addColliderGrid = false);
 	int32_t load_model_and_collider(const std::string& path, const std::string& model, const std::string& collider, const vec3f& pos = vec3f(0, 0, 0));
 	int32_t add_model_to_scene2D(const Pi3Cmodel &model) { return scene.append2D(model, ""); }
 	int32_t add_model_to_scene3D(Pi3Cmodel &model) { return scene.append3D(model, ""); }
@@ -101,6 +101,8 @@ public:
 	int32_t create_plane(const vec3f& pos, const vec2f& size, const uint32_t xdivs, const uint32_t ydivs, int direction, const uint32_t colour, const std::string& texfile);
 	int32_t create_elevationMap(const vec3f &pos, const vec3f &size, Pi3Ctexture &tex, const uint32_t xdivs, const uint32_t ydivs, const uint32_t colour, const std::string& texfile);
 
+	void addColliderGridToModel(uint32_t modelRef);
+
 	//Render functions
 	void render3D() { scene.render3D(window.getTicks()); }
 	void render2D() { scene.render2D(window.getTicks()); }
@@ -108,6 +110,7 @@ public:
 	//Event handlers
 	std::vector<uint32_t> get_events() { return eventList; }
 	bool is_running(bool doEvents = true);
+	void quit();
 	bool do_events();
 	bool keyPress(char key);
 	inline uint32_t getMilliseconds() { return SDL_GetTicks(); }

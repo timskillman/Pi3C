@@ -254,11 +254,11 @@ Pi3Cmodel * Pi3Cmodel::appendLOD(Pi3Cresource *resource, Pi3Cmodel model, float 
 }
 
 
-void Pi3Cmodel::loadOBJfile(Pi3Cresource *resource, std::string path, std::string modelfile, std::function<void(float)> showProgressCB, bool asCollider)
+void Pi3Cmodel::loadOBJfile(Pi3Cresource *resource, std::string path, std::string modelfile, std::function<void(float)> showProgressCB, bool asCollider, bool addColliderGrid)
 {	
 	std::string error;
 	size_t meshStart = resource->meshes.size();
-	Pi3CfileOBJ::load(path, modelfile, resource, showProgressCB, asCollider, error);
+	Pi3CfileOBJ::load(path, modelfile, resource, showProgressCB, asCollider, addColliderGrid, error);
 	size_t meshEnd = resource->meshes.size();
 	//collider = asCollider;
 
@@ -276,6 +276,18 @@ void Pi3Cmodel::loadOBJfile(Pi3Cresource *resource, std::string path, std::strin
 	}
 }
 
+void Pi3Cmodel::addColliderGrid(Pi3Cresource *resource)
+{
+	if (meshRef >= 0) {
+		Pi3Cmesh& mesh = resource->meshes[meshRef];
+		mesh.hasColliderGrid = mesh.createColliderGrid();
+	}
+	else {
+		for (auto &g : group) {
+			g.addColliderGrid(resource);
+		}
+	}
+}
 /*
 bool Pi3Cmodel::collide(const Pi3Cresource *resource, const Pi3Cmatrix &pmat, const vec3f &pos, const vec3f &dir, const float radius) const
 {

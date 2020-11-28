@@ -91,7 +91,7 @@ public:
 	void renderBasic(Pi3Cresource *resource, Pi3Cshader * shader = nullptr, const Pi3Cmatrix *parent_matrix = nullptr, Pi3Cmaterial *materialOverride = nullptr);
 	void appendMesh(Pi3Cresource *resource, Pi3Cmesh mesh, bool asCollider);
 	void updateMesh(Pi3Cresource* resource, const Pi3Cmesh& umesh);
-	void loadOBJfile(Pi3Cresource *resource, std::string path, std::string modelfile, std::function<void(float)> showProgressCB, bool asCollider);
+	void loadOBJfile(Pi3Cresource *resource, std::string path, std::string modelfile, std::function<void(float)> showProgressCB, bool asCollider, bool addColliderGrid = false);
 	bool collide(const Pi3Cresource *resource, const Pi3Cmatrix *parent_matrix, const vec3f &pos, const vec3f &dir, const float radius) const;
 	float collideFloor(const Pi3Cresource *resource, const Pi3Cmatrix *parent_matrix, const vec3f &pos, float &prevHeight, const bool onehit = false) const;
 	void loadModelAndCollider(Pi3Cresource *resource, std::string path, std::string model, std::string collider, std::function<void(float)> showProgressCB);
@@ -101,6 +101,7 @@ public:
 	int32_t addPicture(Pi3Cresource *resource, const std::shared_ptr<Pi3Ctexture> &texture);
 	void createRect2D(Pi3Cresource *resource, const vec2f &pos = vec2f(0, -1.f), const vec2f &size = vec2f(1.f, 1.f), const uint32_t colour = 0xffffffff);
 	void textModel(Pi3Cresource *resource, Pi3Cfont *font, const std::string &text, const float wrapWidth, const Pi3Cfont::textReaderType textType = Pi3Cfont::RD_NONE);
+	void addColliderGrid(Pi3Cresource *resource);
 
 	Pi3Cmodel * append(Pi3Cresource *resource, Pi3Cmodel model, vec3f offset = vec3f(0, 0, 0), vec3f rotation = vec3f(0,0,0));
 	Pi3Cmodel * append(Pi3Cresource *resource, Pi3Cmodel model, Pi3Cmatrix matrix);

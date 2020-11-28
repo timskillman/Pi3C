@@ -153,6 +153,9 @@
     <ClCompile Include="Source\bullets.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\SharedCode\helpers\Pi3CfastRead.cpp">
+      <Filter>SharedCode\helpers</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\SharedCode\core\Pi3Cbbox3d.h">
@@ -295,6 +298,9 @@
     </ClInclude>
     <ClInclude Include="Source\bullets.h">
       <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\SharedCode\helpers\Pi3CfastRead.h">
+      <Filter>SharedCode\helpers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

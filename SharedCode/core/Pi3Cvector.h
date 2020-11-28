@@ -136,7 +136,8 @@ public:
 	float angleBetween(vec2f v2) const
 	{
 		float prod = x * v2.y - y * v2.x;
-		return fabs((prod < 0.f ? -1.0f : 1.0f) * acosf((x * v2.x + y * v2.y) / (length() * v2.length())));
+		float ab = (prod < 0.f ? -1.0f : 1.0f) * acosf((x * v2.x + y * v2.y) / (length() * v2.length()));
+		return fabs(ab);
 	}
 
 	static vec2f g_Zero;

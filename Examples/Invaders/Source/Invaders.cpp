@@ -54,7 +54,7 @@ int main(int argc, char *argv[])
 	winopts.title = opts.asString("title");
 	winopts.width = opts.asInt("screenWidth");
 	winopts.height = opts.asInt("screenHeight");
-	winopts.fullscreen = true; // opts.asBool("fullscreen");
+	winopts.fullscreen = false; // opts.asBool("fullscreen");
 	//winopts.majorVsn = 3;
 	//winopts.minorVsn = 0;
 	//winopts.antialiasLevel = opts.asInt("antiAlias");
@@ -76,8 +76,9 @@ int main(int argc, char *argv[])
 	avparams.fallSpeed = opts.asFloat("avatarFallSpeed");
 	player.init(avparams);
 
-	int landRef = pi3c.load_model(opts.asString("modelPath"), opts.asString("landscape"));
-	pi3c.scene.models[landRef].asCollider = true;  //use this model as a collider
+	int landRef = pi3c.load_model(opts.asString("modelPath"), opts.asString("landscape"),vec3f(0,0,0),true);
+	//pi3c.addColliderGridToModel(landRef); //calc collisions for landscape collider grid
+	//pi3c.scene.models[landRef].asCollider = true;  //use this model as a collider
 
 	//Scatter trees in round clusters ...
 	uint32_t maxTrees = opts.asInt("trees");		//Get max number of trees from options file
@@ -152,10 +153,10 @@ int main(int argc, char *argv[])
 	int mx = 100, my = 100;
 	Pi3Cimgui &gui = pi3c.gui;	//expose gui object from pi3c
 
-	if (winopts.fullscreen) {
+	//if (winopts.fullscreen) {
 		SDL_WarpMouseInWindow(pi3c.window.handle(), 100, 100);
 		SDL_ShowCursor(SDL_DISABLE);
-	}
+	//}
 
 	while (pi3c.is_running())
 	{
@@ -170,6 +171,7 @@ int main(int argc, char *argv[])
 		if (keystate[SDL_SCANCODE_F]) player.down();		//only when flying
 		if (keystate[SDL_SCANCODE_C]) { ship = cockpit; Mix_PlayChannel(1, sound_cockpit, -1); shipRot.x = 0; }
 		if (keystate[SDL_SCANCODE_V]) { ship = sship; Mix_PlayChannel(1, sound_engineRunning, -1); }
+		if (keystate[SDL_SCANCODE_ESCAPE]) pi3c.quit();
 		//if (keystate[SDL_SCANCODE_RETURN]) bolts.fireBolt(-player.getPosition(), player.getRotation());
 
 		if (takeoff != 0) {
@@ -228,7 +230,8 @@ int main(int argc, char *argv[])
 				break;
 			}
 		}
-		if (winopts.fullscreen) SDL_WarpMouseInWindow(pi3c.window.handle(), 100, 100);
+		//if (winopts.fullscreen) 
+			SDL_WarpMouseInWindow(pi3c.window.handle(), 100, 100);
 
 		shipRot.z *= 0.95f;			//dampened roll to 0
 		prot = prot * 0.96f;

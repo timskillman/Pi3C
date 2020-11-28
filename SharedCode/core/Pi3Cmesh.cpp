@@ -617,6 +617,7 @@ bool Pi3Cmesh::createColliderGrid()
 {
 	if (verts.size() < (5000*stride*3)) return false; //less than 1000 tris, then return
 
+	//Consolidates vertices into a x/z grid so that ground collisions can be tested considerably faster
 	float w = 9.999f / bbox.width();
 	float d = 9.999f / bbox.depth();
 	float mx = bbox.min.x;

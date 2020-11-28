@@ -83,6 +83,13 @@ Pi3Cmodel Pi3C::create_model_from_text(const std::string &text, const uint32_t w
 	return textModel;
 }
 
+void Pi3C::addColliderGridToModel(uint32_t modelRef)
+{
+	Pi3Cmodel& model = scene.models[modelRef];
+	model.addColliderGrid(&resource);
+	model.asCollider = true;
+}
+
 uint32_t Pi3C::add_background(const std::string &path, const std::string &file)
 {
 	Pi3Cmodel background;
@@ -144,9 +151,9 @@ void Pi3C::nextBackground() {
 //	}
 //}
 
-int32_t Pi3C::load_model(const std::string &path, const std::string &modelfile, const vec3f &pos)
+int32_t Pi3C::load_model(const std::string &path, const std::string &modelfile, const vec3f &pos, const bool addColliderGrid)
 {
-	return scene.loadModelOBJ(path, modelfile, pos, true, nullptr);  // loadbarCallback);
+	return scene.loadModelOBJ(path, modelfile, pos, true, addColliderGrid, nullptr);  // loadbarCallback);
 }
 
 int32_t Pi3C::load_model_and_collider(const std::string& path, const std::string& modelfile, const std::string& colliderfile, const vec3f& pos)
@@ -167,6 +174,11 @@ bool Pi3C::is_running(bool doEvents)
 	resource.calls = 0;
 	if (doEvents) do_events();
 	return !window.hasquit();
+}
+
+void Pi3C::quit()
+{
+	window.setquit(true);
 }
 
 float Pi3C::getAverageFPS()

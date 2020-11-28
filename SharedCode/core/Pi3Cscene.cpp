@@ -67,7 +67,7 @@ std::string Pi3Cscene::getPathFile(std::string &file) const
 	return path;
 }
 
-int32_t Pi3Cscene::loadModelOBJ(const std::string &path, const std::string &modelfile, const vec3f pos, const bool grouped, const std::function<void(float)> showProgressCB)
+int32_t Pi3Cscene::loadModelOBJ(const std::string &path, const std::string &modelfile, const vec3f pos, const bool grouped, bool addColliderGrid, const std::function<void(float)> showProgressCB)
 {
 	if (modelfile == "") return -1;
 	std::string newfile = modelfile;
@@ -76,14 +76,15 @@ int32_t Pi3Cscene::loadModelOBJ(const std::string &path, const std::string &mode
 	if (grouped) {
 		models.emplace_back();
 		Pi3Cmodel &model = models.back();
-		model.loadOBJfile(resource, newpath, newfile, showProgressCB, false);
+		model.loadOBJfile(resource, newpath, newfile, showProgressCB, false, addColliderGrid);
 		model.matrix.move(pos);
+		model.asCollider = addColliderGrid;
 	}
 	else
 	{
 		std::string error;
 		size_t meshStart = resource->meshes.size();
-		Pi3CfileOBJ::load(newpath, newfile, resource, showProgressCB, false, error);
+		Pi3CfileOBJ::load(newpath, newfile, resource, showProgressCB, false, addColliderGrid, error);
 		size_t meshEnd = resource->meshes.size();
 
 		if (meshEnd - meshStart > 0) {
@@ -93,6 +94,7 @@ int32_t Pi3Cscene::loadModelOBJ(const std::string &path, const std::string &mode
 				newModel.material = resource->materials[resource->meshes[i].materialRef]; 	//copy material into group model so it can change;
 				newModel.bbox = resource->meshes[i].bbox;
 				newModel.matrix.Translate(pos);
+				newModel.asCollider = addColliderGrid;
 				models.push_back(newModel);
 			}
 		}
@@ -102,7 +104,7 @@ int32_t Pi3Cscene::loadModelOBJ(const std::string &path, const std::string &mode
 
 int32_t Pi3Cscene::loadSkybox(const std::string &path, const std::string &file, const std::function<void(float)> showProgressCB, const float scale)
 {
-	int skybox = loadModelOBJ(path, file, vec3f(0,0,0), true, showProgressCB); // loadbarCallback);
+	int skybox = loadModelOBJ(path, file, vec3f(0,0,0), true, false, showProgressCB); // loadbarCallback);
 	models[skybox].matrix.SetScale(scale);
 	models[skybox].touchable = false;
 

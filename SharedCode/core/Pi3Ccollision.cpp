@@ -131,7 +131,8 @@ float Pi3Ccollision::collideFloor(const Pi3Cresource *resource, const uint32_t m
 	uint32_t size = mesh.vertSize * mesh.stride;
 
 	if (mesh.hasColliderGrid) {
-		return const_cast<Pi3Cmesh*>(&mesh)->checkColliderGrid(pos, mtx, prevHeight);	//Naughty! But necessary :-)
+		//Large map grid detection - much faster than testing all the trianges in a mesh!
+		return const_cast<Pi3Cmesh*>(&mesh)->checkColliderGrid(pos, mtx, prevHeight);
 	}
 
 	//if (mesh.verts.size() == 0) return prevHeight;
@@ -143,18 +144,18 @@ float Pi3Ccollision::collideFloor(const Pi3Cresource *resource, const uint32_t m
 	uint32_t stride = mesh.stride;
 
 	vec3f v1, v2, v3;
-	uint32_t x2 = stride; //uint32_t z2 = stride + 2;
-	uint32_t x3 = stride * 2; //uint32_t z3 = stride * 2 + 2;
+	uint32_t x2 = stride; uint32_t z2 = stride + 2;
+	uint32_t x3 = stride * 2; uint32_t z3 = stride * 2 + 2;
 
-	//float px = pos.x;
-	//float pz = pos.z;
+	float px = pos.x;
+	float pz = pos.z;
 
 	for (size_t sp = p; sp < p + size - stride * 3; sp += stride * 3) {
 
-		//if (verts[sp] > px && verts[sp + x2] > px && verts[sp + x3] > px) continue;
-		//if (verts[sp] < px && verts[sp + x2] < px && verts[sp + x3] < px) continue;
-		//if (verts[sp+2] > pz && verts[sp + z2] > pz && verts[sp + z3] > pz) continue;
-		//if (verts[sp+2] < pz && verts[sp + z2] < pz && verts[sp + z3] < pz) continue;
+		if (verts[sp] > px && verts[sp + x2] > px && verts[sp + x3] > px) continue;
+		if (verts[sp] < px && verts[sp + x2] < px && verts[sp + x3] < px) continue;
+		if (verts[sp+2] > pz && verts[sp + z2] > pz && verts[sp + z3] > pz) continue;
+		if (verts[sp+2] < pz && verts[sp + z2] < pz && verts[sp + z3] < pz) continue;
 
 		v1 = mtx.transformVec(&verts[sp]);
 		v2 = mtx.transformVec(&verts[sp + x2]);

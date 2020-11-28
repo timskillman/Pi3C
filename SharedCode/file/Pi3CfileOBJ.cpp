@@ -18,12 +18,13 @@ namespace Pi3CfileOBJ {
 
 	// OBJ load helpers ...
 
-	void addMesh(Pi3Cresource *resource, Pi3Cmesh &mesh)
+	void addMesh(Pi3Cresource *resource, Pi3Cmesh &mesh, const bool addColliderGrid)
 	{
 		//SDL_Log("Meshes %d,%d,%d,%d,%d",resource->meshes.size(),resource->materials.size(),resource->textures.size(),resource->vertBuffer.size(),resource->currentBuffer);
 		mesh.mode = GL_TRIANGLES;
 		mesh.bbox.bboxFromVerts(mesh.verts, 0, mesh.vc, mesh.stride);
-		//mesh.hasColliderGrid = mesh.createColliderGrid();
+		if (addColliderGrid) 
+			mesh.hasColliderGrid = mesh.createColliderGrid();
 		int meshref = resource->addMesh(&mesh);
 		resource->addMeshOutlines(meshref);
 
@@ -147,7 +148,7 @@ namespace Pi3CfileOBJ {
 
 	///// Load OBJ with Material support //////////////////////////////////////////////////////////////////
 
-	void load(const std::string &path, const std::string &filename, Pi3Cresource *resource, const std::function<void(float)> showProgressCB, const bool asCollider, std::string &error)
+	void load(const std::string &path, const std::string &filename, Pi3Cresource *resource, const std::function<void(float)> showProgressCB, const bool asCollider, const bool addColliderGrid, std::string &error)
 	{
 		int32_t v[64];
 		int32_t c;
@@ -381,7 +382,7 @@ namespace Pi3CfileOBJ {
 		//Add all models with no alpha materials
 		for (size_t i=0; i<meshModel.size(); i++) {
 			if (meshModel[i].verts.size()>0 && resource->materials[meshModel[i].materialRef].alpha >= 1.0f) {
-				addMesh(resource, meshModel[i]);
+				addMesh(resource, meshModel[i], addColliderGrid);
 			}
 		}
 		
@@ -389,7 +390,7 @@ namespace Pi3CfileOBJ {
 		//However, overlapping alpha's will obscure each other unless z-depth is turned off
 		for (size_t i=0; i<meshModel.size(); i++) {
 			if (meshModel[i].verts.size() > 0 && resource->materials[meshModel[i].materialRef].alpha < 1.0f) {
-				addMesh(resource, meshModel[i]);
+				addMesh(resource, meshModel[i], addColliderGrid);
 			}
 		}
 		
