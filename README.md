@@ -2,22 +2,25 @@
 
 
 # Pi3C
+*v0.0.2 Alpha*
 
-Pi3C is a C++ graphics engine and toolkit designed for the Raspberry Pi and works on other platforms such as Windows and Android.
+Pi3C is a fast, C++ graphics engine and toolkit tailored for all models of the Raspberry Pi and works on other platforms such as Windows and Android. It's small size and innovative techniques make it fast enough to run highly detailed 3D games; even on the Pi Zero ... 
 
-It is designed to encourage youngsters and anyone interested in programming by exploring the games and apps provided.
+![alt text](https://github.com/timskillman/Pi3C/blob/master/Resources/images/ShipRear.png "Complex 3D models even on the Pi Zero")
 
-These range from a few lines of simple, self explained code to more complex, real-world examples.
+It is designed to be simple to use and encourage youngsters (or anyone) new to programming by exploring the basic tutorials, games and apps provided.
 
-Pi3C tries to avoid the complexities of C++ by providing a top-level class called Pi3C. This class has simple commands to help you start your journey into the exciting world of programming.
+These range from a few lines of simple, self explained code to more complex, real-world and heavy-weight examples.
 
-Even though Pi3C is simple, is provides top class functions to render incredible graphics when you consider the low cost of a Raspberry Pi.
-In fact, I'm confident that you will be amazed at what can be achieved on the Raspberry with just a few lines of code using Pi3C.
+Pi3C tries to avoid the complexities of C++ by providing a top-level class called Pi3C. This class has simple commands to help you start your journey into the exciting world of C++ programming.  Pi3C's utilizes the 'Simple DirectMedia Layer' (SDL 2.0) cross-platform development library (https://www.libsdl.org/). 
 
-Pi3C also includes tools such as a 3D modeller and games editor with 1st person capabilites for testing scenes.  
-Other tools will include a Style editor (to help design a Graphics User Interface (GUI)) and a project kickstarter.
+Pi3C provides functions to render Open GLES 2.0 graphics using shaders. It also provides a high speed, Immediate Mode Graphics User Interface (IMGUI) with various buttons, text  and common widgets. Using these functions, complex Apps and games can be made with relative ease.
 
-I hope that you will enjoy your experience with Pi3C!
+Pi3C will also includes tools for 3D modelling and scene arrangemet with 1st person capabilites for testing scenes such as free flight, point and jump, and full screen renderng.  Other tools planned will include an IMGUI interface designer and C++ code generator that will jump-start your project.
+
+Pi3C is currently under heavy development and functions may/will change over time as new Apps, Games and Demos are developed.  These developments will continue to greatly improve, enhance and simplify the Pi3C graphics engine and speed up your coding.
+
+I hope that you will enjoy your experience with Pi3C as it develops!
 
 *Tim Skillman*
 
@@ -63,10 +66,17 @@ Or, you can write fast applications.
 <a name="examplegames">**Example Games**</a>
 
 The following examples can be explored in this repo ...
+- Invaders
 
 <a name="exampleapps">**Example Apps**</a>
 
 The following apps can be explored in this repo ...
+- 3D Modeller
+- Castle Creator
+
+<a name="demos">**Example Demo's**</a>
+- Snowflakes
+- Extruder
 
 <a name="whatisc++">**What is C++?**</a>
 
@@ -151,10 +161,11 @@ Now you should be setup and ready to play with Pi3C ... **Congratulations!**
 Pi3C folders are laid out in the following way;
 
 ~~~~
-Projects     (Examples here)
+Examples     (Example games, apps and demos in here)
 SharedCode   (Pi3C core and helper code)
 Resources    (Models, textures and sounds stored here)
 ThirdParty   (Windows only - not needed on the Pi, but keep if developing on a Windows machine as well)
+Projects     A place to put your projects and reference the Pi3C SharedCode
 ~~~~
 
 <a name="projects">**Projects Folder**</a>
