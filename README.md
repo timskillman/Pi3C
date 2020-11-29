@@ -4,7 +4,9 @@
 # Pi3C
 *v0.0.2 Alpha*
 
-Pi3C is a fast, C++ graphics engine and toolkit tailored for all models of the Raspberry Pi and works on other platforms such as Windows and Android. It's small size and innovative techniques make it fast enough to run highly detailed 3D games; even on the Pi Zero. 
+Pi3C is a fast, C++ graphics engine and toolkit tailored for all models of the Raspberry Pi and works on other platforms such as Windows and Android. It's small size and innovative techniques make it fast enough to run highly detailed 3D games; even on the Pi Zero ... 
+
+![alt text](https://github.com/timskillman/Pi3C/blob/master/Resources/images/ShipRear.png "Complex 3D models even on the Pi Zero")
 
 It is designed to be simple to use and encourage youngsters (or anyone) new to programming by exploring the basic tutorials, games and apps provided.
 
