@@ -31,6 +31,9 @@
     <Filter Include="Shared Code\core">
       <UniqueIdentifier>{56c8bfdf-a7a9-4bd3-b007-cdd71b5aa6fd}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Shared Code\glutess">
+      <UniqueIdentifier>{e2ada6ac-7155-46e3-8acf-8c56d063e30a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\MDviewer.cpp">
@@ -98,6 +101,48 @@
     </ClCompile>
     <ClCompile Include="..\..\SharedCode\ui\Pi3Cstring.cpp">
       <Filter>Shared Code\ui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\SharedCode\helpers\Pi3CfastRead.cpp">
+      <Filter>Shared Code\helpers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\SharedCode\helpers\Pi3Cutils.cpp">
+      <Filter>Shared Code\helpers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\SharedCode\helpers\Pi3Cshapes.cpp">
+      <Filter>Shared Code\helpers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\SharedCode\glutess\dict.c">
+      <Filter>Shared Code\glutess</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\SharedCode\glutess\geom.c">
+      <Filter>Shared Code\glutess</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\SharedCode\glutess\memalloc.c">
+      <Filter>Shared Code\glutess</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\SharedCode\glutess\mesh.c">
+      <Filter>Shared Code\glutess</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\SharedCode\glutess\normal.c">
+      <Filter>Shared Code\glutess</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\SharedCode\glutess\priorityq.c">
+      <Filter>Shared Code\glutess</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\SharedCode\glutess\render.c">
+      <Filter>Shared Code\glutess</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\SharedCode\glutess\sweep.c">
+      <Filter>Shared Code\glutess</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\SharedCode\glutess\tess.c">
+      <Filter>Shared Code\glutess</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\SharedCode\glutess\tessellate.cpp">
+      <Filter>Shared Code\glutess</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\SharedCode\glutess\tessmono.c">
+      <Filter>Shared Code\glutess</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -173,13 +218,72 @@
     <ClInclude Include="..\..\SharedCode\ui\Pi3Cstring.h">
       <Filter>Shared Code\ui</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\SharedCode\helpers\Pi3CfastRead.h">
+      <Filter>Shared Code\helpers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\SharedCode\helpers\Pi3Cutils.h">
+      <Filter>Shared Code\helpers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\SharedCode\helpers\Pi3Cshapes.h">
+      <Filter>Shared Code\helpers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\SharedCode\glutess\dict.h">
+      <Filter>Shared Code\glutess</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\SharedCode\glutess\dict-list.h">
+      <Filter>Shared Code\glutess</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\SharedCode\glutess\geom.h">
+      <Filter>Shared Code\glutess</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\SharedCode\glutess\gluos.h">
+      <Filter>Shared Code\glutess</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\SharedCode\glutess\glutess.h">
+      <Filter>Shared Code\glutess</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\SharedCode\glutess\memalloc.h">
+      <Filter>Shared Code\glutess</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\SharedCode\glutess\mesh.h">
+      <Filter>Shared Code\glutess</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\SharedCode\glutess\normal.h">
+      <Filter>Shared Code\glutess</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\SharedCode\glutess\priorityq.h">
+      <Filter>Shared Code\glutess</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\SharedCode\glutess\priorityq-heap.h">
+      <Filter>Shared Code\glutess</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\SharedCode\glutess\priorityq-sort.h">
+      <Filter>Shared Code\glutess</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\SharedCode\glutess\render.h">
+      <Filter>Shared Code\glutess</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\SharedCode\glutess\sweep.h">
+      <Filter>Shared Code\glutess</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\SharedCode\glutess\tess.h">
+      <Filter>Shared Code\glutess</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\SharedCode\glutess\tessellate.h">
+      <Filter>Shared Code\glutess</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\SharedCode\glutess\tessmono.h">
+      <Filter>Shared Code\glutess</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Shaders\fs1.glsl">
-      <Filter>assets</Filter>
+    <None Include="assets\shaders\fs1.glsl" />
+    <None Include="assets\shaders\vs1.glsl" />
+    <None Include="..\..\SharedCode\glutess\LICENSE">
+      <Filter>Shared Code\glutess</Filter>
     </None>
-    <None Include="Shaders\vs1.glsl">
-      <Filter>assets</Filter>
+    <None Include="..\..\SharedCode\glutess\README.md">
+      <Filter>Shared Code\glutess</Filter>
     </None>
   </ItemGroup>
 </Project>

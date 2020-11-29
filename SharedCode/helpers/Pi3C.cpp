@@ -345,7 +345,7 @@ int32_t Pi3C::create_extrude(vec3f& pos, std::vector<std::vector<float>>& floatP
 }
 
 int32_t Pi3C::create_lathe(const vec3f &pos, std::vector<vec2f> &path, const int edges, uint32_t colour, const std::string& texfile) {
-	Pi3Cmodel lathe(&resource, Pi3Cshapes::lathe("", pos, path, colour, edges), colour);
+	Pi3Cmodel lathe(&resource, Pi3Cshapes::lathe("", pos, path, edges), colour);
 	return scene.append3D(lathe, texfile);
 }
 

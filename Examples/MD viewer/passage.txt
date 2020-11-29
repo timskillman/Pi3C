@@ -1,4 +1,5 @@
-<p style="text-align: center;"><h1>John 3</h1> New International Version (NIV)</p>
+<p style="text-align: center;"><h1>John 3</h1>
+New International Version (NIV)</p>
 
 <h6>Jesus Teaches Nicodemus</h6>
 

@@ -115,6 +115,7 @@ public:
 	void SwapBuffers();
 	float getTicks() { return ticks; }
 	void setClearColour(const float red, const float green, const float blue);
+	void setClearColour(const uint8_t red, const uint8_t green, const uint8_t blue);
 	void setClearColour(const uint32_t clearColour);
 	uint32_t getClearColour();
 	void clear();

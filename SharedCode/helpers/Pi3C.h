@@ -125,7 +125,7 @@ public:
 	//Window functions
 	uint32_t width() { return winw; }
 	uint32_t height() { return winh; }
-	void clear_window(uint32_t clearColour = 0xff800000);
+	void clear_window(uint32_t clearColour = 0x000000);
 	void resize_window();
 	void swap_buffers();
 

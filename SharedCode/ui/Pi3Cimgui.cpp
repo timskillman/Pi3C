@@ -637,8 +637,8 @@ bool Pi3Cimgui::Text(const std::string &text, const int minwidth, const int minh
 	uint32_t col = (colour == 0) ? currentParams.textColour | 0xff000000 : colour;
 	pos = nextPos;
 	Pi3Crect textSize = resource->renderText(resource->lettersRef, currentFont, text, vec3f((float)nextPos.x, (float)nextPos.y, zpos), 8000.f, col);
-	size.x = ((uint32_t)textSize.width > minwidth) ? (uint32_t)textSize.width : minwidth;
-	size.y = ((uint32_t)textSize.height > minheight) ? (uint32_t)textSize.height : minheight;
+	size.x = ((int32_t)textSize.width > minwidth) ? (int32_t)textSize.width : minwidth;
+	size.y = ((int32_t)textSize.height > minheight) ? (int32_t)textSize.height : minheight;
 	NextPos();
 	return false;
 }
@@ -646,9 +646,9 @@ bool Pi3Cimgui::Text(const std::string &text, const int minwidth, const int minh
 bool Pi3Cimgui::TextArea(std::string &text, const int minwidth, const int minheight)
 {
 	pos = nextPos;
-	Pi3Crect textSize = resource->renderText(resource->lettersRef, currentFont, text, vec3f(pos.x, pos.y, zpos), minwidth);
-	size.x = ((uint32_t)textSize.width > minwidth) ? (uint32_t)textSize.width : minwidth;
-	size.y = ((uint32_t)textSize.height > minheight) ? (uint32_t)textSize.height : minheight;
+	Pi3Crect textSize = resource->renderText(resource->lettersRef, currentFont, text, vec3f((float)pos.x, (float)pos.y, zpos), (float)minwidth);
+	size.x = ((int32_t)textSize.width > minwidth) ? (int32_t)textSize.width : minwidth;
+	size.y = ((int32_t)textSize.height > minheight) ? (int32_t)textSize.height : minheight;
 	NextPos();
 	return false;
 }
@@ -747,7 +747,7 @@ void Pi3Cimgui::snapshot()
 	snaptex.reset(new Pi3Ctexture(window->getWidth(), window->getHeight(), snap, 4));
 
 	snapShotPic.deleteTexture(resource); //delete any previous snapshot texture
-	snapShotPic.createRect2D(resource, vec2f(0, 0), vec2f(window->getWidth(), window->getHeight()));
+	snapShotPic.createRect2D(resource, vec2f(0, 0), vec2f((float)window->getWidth(), (float)window->getHeight()));
 	snapShotPic.addPicture(resource, snaptex);
 
 	takeSnapshot = true;

@@ -49,7 +49,7 @@ int main(int argc, char *argv[])
 	while (pi3c.is_running())
 	{
 		pi3c.do_events();
-		pi3c.clear_window();
+		pi3c.clear_window(0x505050);
 
 		gui.Begin();
 

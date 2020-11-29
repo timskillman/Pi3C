@@ -334,14 +334,20 @@ void Pi3Cwindow::setAlpha(bool useAlpha)
 
 void Pi3Cwindow::setClearColour(const float red, const float green, const float blue)
 {
-	clearColour = (uint32_t)(red * 255.f) + ((uint32_t)(green * 255.f) << 8) + ((uint32_t)(green * 255.f) << 16);
+	clearColour = (uint32_t)(red * 255.f) + ((uint32_t)(green * 255.f) << 8) + ((uint32_t)(blue *255.f) << 16);
 	glClearColor(red, green, blue, 1.f);
+}
+
+void Pi3Cwindow::setClearColour(const uint8_t red, const uint8_t green, const uint8_t blue)
+{
+	clearColour = (uint32_t)(red) + (uint32_t)(green << 8) + (uint32_t)(blue << 16);
+	glClearColor(red / 255.f, green / 255.f, blue / 255.f, 1.f);
 }
 
 void Pi3Cwindow::setClearColour(const uint32_t clearColour)
 {
 	this->clearColour = clearColour;
-	setClearColour((clearColour & 255) / 255.f, ((clearColour >> 8) & 255) / 255.f, ((clearColour >> 16) & 255) / 255.f);
+	setClearColour((uint8_t)(clearColour & 255), (uint8_t)(clearColour >> 8) & 255 , (uint8_t)(clearColour >> 16) & 255 );
 }
 
 uint32_t Pi3Cwindow::getClearColour() {
