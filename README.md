@@ -8,7 +8,7 @@ Pi3C is a fast, C++ graphics engine and toolkit tailored for all models of the R
 
 ![alt text](https://github.com/timskillman/Pi3C/blob/master/Resources/images/ShipRear.png "Complex 3D models even on the Pi Zero")
 
-It is designed to be simple to use and encourage youngsters (or anyone) new to programming by exploring the basic tutorials, games and apps provided.
+Pi3C is designed to be simple to use and encourage youngsters (or anyone) new to programming by exploring the basic tutorials, games and apps provided.
 
 These range from a few lines of simple, self explained code to more complex, real-world and heavy-weight examples.
 
