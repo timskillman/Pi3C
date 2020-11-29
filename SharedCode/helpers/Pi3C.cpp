@@ -181,6 +181,13 @@ void Pi3C::quit()
 	window.setquit(true);
 }
 
+float Pi3C::getFloorHeight(const uint32_t modelRef, const vec3f pos)
+{
+	float ht = 1e8f;  //start from way up high!
+	ht = scene.models[modelRef].collideFloor(&resource, nullptr, pos, ht, true);
+	return ht;
+}
+
 float Pi3C::getAverageFPS()
 {
 	uint32_t ticks = SDL_GetTicks() - start_time;

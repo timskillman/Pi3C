@@ -102,6 +102,7 @@ public:
 	int32_t create_elevationMap(const vec3f &pos, const vec3f &size, Pi3Ctexture &tex, const uint32_t xdivs, const uint32_t ydivs, const uint32_t colour, const std::string& texfile);
 
 	void addColliderGridToModel(uint32_t modelRef);
+	float getFloorHeight(const uint32_t modelRef, const vec3f pos);
 
 	//Render functions
 	void render3D() { scene.render3D(window.getTicks()); }

@@ -54,7 +54,7 @@ int main(int argc, char *argv[])
 	winopts.title = opts.asString("title");
 	winopts.width = opts.asInt("screenWidth");
 	winopts.height = opts.asInt("screenHeight");
-	winopts.fullscreen = false; // opts.asBool("fullscreen");
+	winopts.fullscreen = true; // opts.asBool("fullscreen");
 	//winopts.majorVsn = 3;
 	//winopts.minorVsn = 0;
 	//winopts.antialiasLevel = opts.asInt("antiAlias");
@@ -76,9 +76,8 @@ int main(int argc, char *argv[])
 	avparams.fallSpeed = opts.asFloat("avatarFallSpeed");
 	player.init(avparams);
 
-	int landRef = pi3c.load_model(opts.asString("modelPath"), opts.asString("landscape"),vec3f(0,0,0),true);
-	//pi3c.addColliderGridToModel(landRef); //calc collisions for landscape collider grid
-	//pi3c.scene.models[landRef].asCollider = true;  //use this model as a collider
+	bool addColliderMesh = true;
+	int landRef = pi3c.load_model(opts.asString("modelPath"), opts.asString("landscape"),vec3f(0,0,0), addColliderMesh);
 
 	//Scatter trees in round clusters ...
 	uint32_t maxTrees = opts.asInt("trees");		//Get max number of trees from options file
@@ -149,6 +148,7 @@ int main(int argc, char *argv[])
 	player.flyspeed = 0;
 
 	vec3f prot{ 0,0,0 };
+	bool dead = false;
 
 	int mx = 100, my = 100;
 	Pi3Cimgui &gui = pi3c.gui;	//expose gui object from pi3c
@@ -181,11 +181,12 @@ int main(int argc, char *argv[])
 				takeoff = 0; player.flyspeed = 0;
 			}
 		}
+
 		float ticks = pi3c.window.getTicks()*30.f;
 
 		pi3c.model3D(sship)->visible = (ship==sship);
 		pi3c.model3D(cockpit)->visible = (ship==cockpit);
-		player.updateAndCollide(&pi3c.scene, pi3c.window.getTicks());
+		if (!dead) player.updateAndCollide(&pi3c.scene, pi3c.window.getTicks());
 
 		// Centre skybox and other 'infinite' geometry around player...
 		if (skybox >= 0) pi3c.model3D(skybox)->move(-player.getPosition());
@@ -235,8 +236,11 @@ int main(int argc, char *argv[])
 
 		shipRot.z *= 0.95f;			//dampened roll to 0
 		prot = prot * 0.96f;
-		pi3c.model3D(ship)->move(-player.getPosition()+offset);
-		pi3c.model3D(ship)->matrix.setRotate(shipRot);
+		if (!dead) {
+			//show ship in third person ahead of player view ...
+			pi3c.model3D(ship)->move(-player.getPosition() + offset);
+			pi3c.model3D(ship)->matrix.setRotate(shipRot);
+		}
 		//if (shipRot.z != 0) shipRot.z *= 0.95f;			//dampened roll to 0
 		//if (shipRot.x != 0 && ship == sship) shipRot.x *= 0.7f;			//dampened pitch to 0
 
@@ -257,8 +261,14 @@ int main(int argc, char *argv[])
 		//pi3c.model(altref)->resizeRect2D(&pi3c.resource, vec2f(20, 20), vec2f(20, player.altitude));
 		pi3c.render2D();
 
+
+		//ht = pi3c.scene.models[ship].collideFloor(resource, nullptr, -vec3f(pos.x, 10000.f, pos.z), ht, true);
+		//if (ht < 1e8f) alien.matrix.sety(10000.f - ht + 150.f);
+		float ht = pi3c.getFloorHeight(landRef, player.getPosition()-offset);
+		if (ht == 1e8f) dead = true;
+
 		gui.Begin();
-		std::string fps = "Altitude:" + std::to_string((int)player.altitude);
+		std::string fps = "Altitude:" + std::to_string((int)ht);
 		gui.Text(fps, 0xff0000ff);
 
 		pi3c.swap_buffers();
