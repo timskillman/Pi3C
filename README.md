@@ -16,6 +16,8 @@ Pi3C provides functions to render Open GLES 2.0 graphics using shaders. It also 
 
 Pi3C will also includes tools for 3D modelling and scene arrangemet with 1st person capabilites for testing scenes such as free flight, point and jump, and full screen renderng.  Other tools planned will include an IMGUI interface designer and C++ code generator that will jump-start your project.
 
+Pi3C is currently under heavy development and functions may/will change over time as new Apps, Games and Demos are developed.  These developments will continue to greatly improve, enhance and simplify the Pi3C graphics engine and speed up your coding.
+
 I hope that you will enjoy your experience with Pi3C as it develops!
 
 *Tim Skillman*
