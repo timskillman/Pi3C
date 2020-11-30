@@ -65,7 +65,7 @@ Or, you can write fast applications.
 
 <a name="examplegames">**Example Games**</a>
 
-The following examples can be explored in this repo ...
+The following games can be explored in this repo ...
 - Invaders
 
 <a name="exampleapps">**Example Apps**</a>
@@ -75,8 +75,13 @@ The following apps can be explored in this repo ...
 - Castle Creator
 
 <a name="demos">**Example Demo's**</a>
-- Snowflakes
+- HelloWorld
+- Snow
 - Extruder
+- PerlinMap
+- ShaderToy
+- MD viewer
+- NoahsArk
 
 <a name="whatisc++">**What is C++?**</a>
 
