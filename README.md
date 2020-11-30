@@ -96,7 +96,7 @@ C++ is one of the most popular, industry standard programming languages.
 
 **You will need the following parts**
 
- - Raspberry Pi Model 3 B+
+ - Raspberry Pi (preferably 3/4 for faster compiling)
  - 5 volt, 2.5 amp power supply with Micro-USB connector
  - Keyboard and Mouse
  - Monitor or TV with HMDI
