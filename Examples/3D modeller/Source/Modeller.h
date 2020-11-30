@@ -88,12 +88,13 @@ public:
 	SceneAction sceneAction = SceneAction::SA_NONE;
 
 	int createCount = 0;
+	int lastCreateCount = 0;
 	int maxSteps = 1;
 	Pi3Cmesh currentShape;
 	vec3f createFirstPoint;
 	vec3f oldPos;
 	vec3f oldPos2;
-	std::vector<vec3f> line;
+	std::vector<vec3f> lines;
 
 	std::string libShape;				//Create tool library shape file
 
@@ -126,6 +127,7 @@ public:
 	int32_t gridRef = -1;
 	int32_t selboxRef = -1;
 	int32_t moveGizmoRef = -1;
+	int32_t outlineRef = -1;
 	std::string selectedName;
 	uint32_t shapeCounts[50] {};
 
@@ -136,6 +138,7 @@ public:
 	float cx = 0;
 	float cy = 0;
 	vec3f currentPos;
+	int32_t lineCount = 0;
 	//bool ctrlKey = false;
 	//bool shiftKey = false;
 
@@ -171,6 +174,7 @@ private:
 	void setTouchFlags(bool val);
 	void resetZoom();
 	void navikeys(SDL_Scancode key, SDL_Scancode keyA, SDL_Scancode KeyB);
+	void addLinePoint(const vec3f point);
 	void finishLine();
 	vec3f getShapeHeight(vec3f pos);
 };

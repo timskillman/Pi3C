@@ -75,11 +75,11 @@ namespace Pi3Cgizmos {
 	Pi3Cmesh selectBoxGizmo(const vec3f &pos, const vec3f &size, const uint32_t col) 
 	{
 		Pi3Cmesh mesh("selectBox");
-		mesh.stride = 9;
 
 		select_box_verts(mesh.verts, mesh.vc, pos, size, col);
 
-		mesh.bbox.bboxFromVerts(mesh.verts, 0, mesh.vc, mesh.stride);
+		mesh.updateBounds();
+		//mesh.bbox.bboxFromVerts(mesh.verts, 0, mesh.vc, mesh.stride);
 		mesh.materialRef = 0;
 		mesh.mode = GL_LINE_STRIP;
 		return mesh;

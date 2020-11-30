@@ -114,6 +114,19 @@ void Modeller::init()
 	selboxModel.material.rendermode = GL_LINE_STRIP;
 	selboxRef = scene.append3D(selboxModel);
 
+	//Create outline shape
+	Pi3Cmesh lmesh;
+	for (uint32_t l = 0; l < 100000; l++) {
+		lmesh.addPackedVert(vec3f(0, 0, 0), vec3f(0, 0, 0), vec2f(0, 0), 0xffffff);
+	}
+	lmesh.updateBounds();
+	lmesh.materialRef = 0;
+	lmesh.mode = GL_LINE_STRIP;
+	Pi3Cmodel outlineModel = Pi3Cmodel(resource, lmesh, 0xffffff);
+	outlineModel.touchable = false;
+	outlineModel.material.rendermode = GL_LINE_STRIP;
+	outlineRef = scene.append3D(outlineModel);
+
 	// Create move gizmo
 	Pi3Cmodel moveGizmo = Pi3Cmodel(resource, Pi3Cgizmos::moveGizmo(vec3f(0, 0, 0), vec3f(0, 0, 0), 0xffffffff));
 	moveGizmo.touchable = false;
@@ -304,21 +317,43 @@ vec3f Modeller::getShapeHeight(vec3f pos)
 	return pos;
 }
 
-void Modeller::creatingShape(bool nextStep)
+void Modeller::addLinePoint(const vec3f point)
 {
-	int shapeRef = scene.models.size() - 1;
-	vec3f pos = -currentPos;
-	Pi3Cmodel& model = scene.models[shapeRef];
+	Pi3Cmodel& model = scene.models[outlineRef];
 	Pi3Cmesh& mesh = resource->meshes[model.meshRef];
 	vertsPtr vp = resource->getMeshVerts(model.meshRef);
+	if (lineCount == 0) lines.clear();
+	
+	vp.offset = lines.size() * mesh.stride;
+	mesh.vc = (lines.size()+1) * mesh.stride;
+	mesh.vertSize = lines.size()+1;
+
+	if (createCount != lastCreateCount) {
+		lines.push_back(point);
+		lineCount++;
+		lastCreateCount = createCount;
+	}
+	Pi3Cshapes::storeVNTC(*vp.verts, vp.offset, point, vec3f(0, 0, 0), vec2f(1.f, 1.f), 0xffffffff);
+	resource->updateMesh(model.meshRef);
+}
+
+void Modeller::creatingShape(bool nextStep)
+{
+	vec3f pos = -currentPos;
 
 	if (maxSteps == 0) {
 		switch (createTool) {
 		case CT_EXTRUDE:
-			line.push_back(pos);
-			break;
+			addLinePoint(pos);
+			return;
 		}
 	}
+
+	int shapeRef = scene.models.size() - 1;
+	Pi3Cmodel& model = scene.models[shapeRef];
+	Pi3Cmesh& mesh = resource->meshes[model.meshRef];
+	vertsPtr vp = resource->getMeshVerts(model.meshRef);
+
 	if (createCount == 1) {
 		switch (createTool) {
 		case CT_CUBOID:Pi3Cshapes::cube_verts(*vp.verts, vp.offset, (pos - createFirstPoint)/2.f, (pos - createFirstPoint), 1, 1, 1, currentColour); break;
@@ -483,6 +518,8 @@ void Modeller::ClickRightMouseButton(viewInfo& view)
 			if (maxSteps == 0) {
 				finishLine();
 				createCount = 0;
+				lineCount = 0;
+				maxSteps = 1;
 			}
 			window->mouse.up = false;
 			break;
@@ -524,7 +561,7 @@ void Modeller::finishLine()
 
 	switch (createTool) {
 	case CT_EXTRUDE:
-		createShape(Pi3Cshapes::extrude("Extrude",vec3f(0, 0, 0.f), contours, 1.f, 1), vec3f(0, 0, 0.f), currentColour);
+		//createShape(Pi3Cshapes::extrude("Extrude",vec3f(0, 0, 0.f), contours, 1.f, 1), vec3f(0, 0, 0.f), currentColour);
 		break;
 	case CT_LATHE:
 		break;

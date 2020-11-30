@@ -67,8 +67,9 @@ namespace Pi3Cshapes {
 
 	//Pi3Cmesh capsule(vec3f pos, float radius, float midlength = 2.0f, int slices = Pi3C_SIDES, int sides = Pi3C_SIDES);
 
-	void polyline_verts(std::vector<float>& verts, uint32_t& vc, std::vector<vec3f>& lines, const vec2f& uvpos, const vec2f& uvsize, const uint32_t col);
+	void storeVNTC(std::vector<float>& verts, uint32_t& vc, const vec3f& pos, const vec3f& norm, const vec2f& texcoords, const uint32_t col);
 	void texMap(std::vector<float> &verts, uint32_t vc, uint32_t stride, uint32_t uvoffset, uint8_t x, uint8_t y);
+	void polyline_verts(std::vector<float>& verts, uint32_t& vc, const std::vector<vec3f>& lines, const vec2f& uvpos, const vec2f& uvsize, const uint32_t col);
 	void cube_verts(std::vector<float>& verts, uint32_t& vc, const vec3f& pos, const vec3f& size, const int divx, const int divy, const int divz, const uint32_t col);
 	void sphere_verts(std::vector<float>& verts, uint32_t& vc, const vec3f& pos, const float radius, const float hemi = 0.0f, const int slices = Pi3C_SIDES / 2, const int sides = Pi3C_SIDES, const bool invert = false);
 	void torus_verts(std::vector<float>& verts, uint32_t& vc, const vec3f &pos, const float radius, const float ringradius, const int ringrots = Pi3C_SIDES, const int sides = Pi3C_SIDES);
