@@ -206,11 +206,11 @@ namespace std
 	//Map for vertex x,y,z coords ...
 
 	struct mapvert {
-		mapvert(const float x, const float y, const float z) : x((int32_t)(x*MAP_UPSCALE)), y((int32_t)(y*MAP_UPSCALE)), z((int32_t)(z*MAP_UPSCALE)) {}
+		mapvert(const float x, const float y, const float z) : x(x), y(y), z(z) {}
 		friend bool operator== (const mapvert &a, const mapvert &b);
 
 		uint32_t index;
-		int32_t x, y, z;
+		float x, y, z;
 	};
 
 	bool operator== (const mapvert &a, const mapvert &b) {
@@ -221,18 +221,18 @@ namespace std
 	struct hash<mapvert>
 	{
 		size_t operator()(const mapvert &v) const {
-			return hash<int32_t>()(v.x) ^ hash<int32_t>()(v.y) ^ hash<int32_t>()(v.z);
+			return hash<float>()(v.x) ^ hash<float>()(v.y) ^ hash<float>()(v.z);
 		}
 	};
 
 	//Map for texture u,v coords ...
 
 	struct mapuv {
-		mapuv(const float u, const float v) : u((int32_t)(u*MAP_UPSCALE)), v((int32_t)(v*MAP_UPSCALE)) {}
+		mapuv(const float u, const float v) : u(u), v(v) {}
 		friend bool operator== (const mapuv &a, const mapuv &b);
 
 		uint32_t index;
-		int32_t u, v;
+		float u, v;
 	};
 
 	bool operator== (const mapuv &a, const mapuv &b) {
@@ -243,7 +243,7 @@ namespace std
 	struct hash<mapuv>
 	{
 		size_t operator()(const mapuv &v) const {
-			return hash<int32_t>()(v.u) ^ hash<int32_t>()(v.v);
+			return hash<float>()(v.u) ^ hash<float>()(v.v);
 		}
 	};
 

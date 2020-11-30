@@ -153,6 +153,9 @@
     <ClCompile Include="Source\PerlinGUI.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\SharedCode\helpers\Pi3CfastRead.cpp">
+      <Filter>Shared Code\helpers</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\SharedCode\glutess\dict.h">
@@ -292,6 +295,9 @@
     </ClInclude>
     <ClInclude Include="Source\PerlinGUI.h">
       <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\SharedCode\helpers\Pi3CfastRead.h">
+      <Filter>Shared Code\helpers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -241,6 +241,7 @@
     <ClCompile Include="..\..\SharedCode\glutess\tessmono.c" />
     <ClCompile Include="..\..\SharedCode\helpers\Pi3C.cpp" />
     <ClCompile Include="..\..\SharedCode\helpers\Pi3Cavatar.cpp" />
+    <ClCompile Include="..\..\SharedCode\helpers\Pi3CfastRead.cpp" />
     <ClCompile Include="..\..\SharedCode\helpers\Pi3Chtml.cpp" />
     <ClCompile Include="..\..\SharedCode\helpers\Pi3CloadOptions.cpp" />
     <ClCompile Include="..\..\SharedCode\helpers\Pi3Cparticles.cpp" />
@@ -290,6 +291,7 @@
     <ClInclude Include="..\..\SharedCode\glutess\tessmono.h" />
     <ClInclude Include="..\..\SharedCode\helpers\Pi3C.h" />
     <ClInclude Include="..\..\SharedCode\helpers\Pi3Cavatar.h" />
+    <ClInclude Include="..\..\SharedCode\helpers\Pi3CfastRead.h" />
     <ClInclude Include="..\..\SharedCode\helpers\Pi3Chtml.h" />
     <ClInclude Include="..\..\SharedCode\helpers\Pi3CloadOptions.h" />
     <ClInclude Include="..\..\SharedCode\helpers\Pi3Cparticles.h" />
