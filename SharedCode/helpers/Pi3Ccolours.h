@@ -1,7 +1,7 @@
 #pragma once
 
 struct Pi3Ccolours {
-
+	//Based on HTML/CSS colour names - https://www.w3schools.com/colors/colors_names.asp
 	enum {
 		AliceBlue = 0xFFFFF8F0,
 		AntiqueWhite = 0xFFD7EBFA,

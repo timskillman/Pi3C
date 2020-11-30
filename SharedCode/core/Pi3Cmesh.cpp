@@ -14,7 +14,7 @@ void Pi3Cmesh::reset()
 	bbox.init();
 	materialRef = -1;
 	vc = 0;
-	stride = 9;
+	stride = defaultStride;
 }
 
 void Pi3Cmesh::updateBounds(const vertsPtr* vp)
@@ -149,7 +149,7 @@ int32_t Pi3Cmesh::touchPoint(Pi3Ctouch &touch, const Pi3Cmatrix &mtx, const std:
 		if (crossViewer == 7) continue;
 
 		if (crossViewer != 0) {
-			//Triangle needs clipping or splitting into two triangles...
+			//TODO: Triangle needs clipping or splitting into two triangles...
 			crossViewer = crossViewer;
 		}
 
@@ -200,14 +200,17 @@ int32_t Pi3Cmesh::touchPoint(Pi3Ctouch &touch, const Pi3Cmatrix &mtx, const std:
 
 namespace std
 {
+
+#define MAP_UPSCALE 1000000.f
+
 	//Map for vertex x,y,z coords ...
 
 	struct mapvert {
-		mapvert(const float x, const float y, const float z) : x(x), y(y), z(z) {}
+		mapvert(const float x, const float y, const float z) : x((int32_t)(x*MAP_UPSCALE)), y((int32_t)(y*MAP_UPSCALE)), z((int32_t)(z*MAP_UPSCALE)) {}
 		friend bool operator== (const mapvert &a, const mapvert &b);
 
 		uint32_t index;
-		float x, y, z;
+		int32_t x, y, z;
 	};
 
 	bool operator== (const mapvert &a, const mapvert &b) {
@@ -218,18 +221,18 @@ namespace std
 	struct hash<mapvert>
 	{
 		size_t operator()(const mapvert &v) const {
-			return hash<float>()(v.x) ^ hash<float>()(v.y) ^ hash<float>()(v.z);
+			return hash<int32_t>()(v.x) ^ hash<int32_t>()(v.y) ^ hash<int32_t>()(v.z);
 		}
 	};
 
 	//Map for texture u,v coords ...
 
 	struct mapuv {
-		mapuv(const float u, const float v) : u(u), v(v) {}
+		mapuv(const float u, const float v) : u((int32_t)(u*MAP_UPSCALE)), v((int32_t)(v*MAP_UPSCALE)) {}
 		friend bool operator== (const mapuv &a, const mapuv &b);
 
 		uint32_t index;
-		float u, v;
+		int32_t u, v;
 	};
 
 	bool operator== (const mapuv &a, const mapuv &b) {
@@ -240,18 +243,20 @@ namespace std
 	struct hash<mapuv>
 	{
 		size_t operator()(const mapuv &v) const {
-			return hash<float>()(v.u) ^ hash<float>()(v.v);
+			return hash<int32_t>()(v.u) ^ hash<int32_t>()(v.v);
 		}
 	};
 
 	//Map for triangle edge indices ...
 
 	struct mapedges {
-		mapedges(const float x1, const float y1, const float z1, const float x2, const float y2, const float z2) : x1(x1), y1(y1), z1(z1), x2(x2), y2(y2), z2(z2) {}
+		mapedges(const float x1, const float y1, const float z1, const float x2, const float y2, const float z2) : 
+			x1((int32_t)(x1*MAP_UPSCALE)), y1((int32_t)(y1*MAP_UPSCALE)), z1((int32_t)(z1*MAP_UPSCALE)), 
+			x2((int32_t)(x2*MAP_UPSCALE)), y2((int32_t)(y2*MAP_UPSCALE)), z2((int32_t)(z2*MAP_UPSCALE)) {}
 		friend bool operator== (const mapedges &a, const mapedges &b);
 
 		uint32_t index;
-		float x1, y1, z1, x2, y2, z2;
+		int32_t x1, y1, z1, x2, y2, z2;
 	};
 
 	bool operator== (const mapedges &a, const mapedges &b) { //check verts in both directions ...
@@ -263,7 +268,7 @@ namespace std
 	struct hash<mapedges>
 	{
 		size_t operator()(const mapedges &v) const {
-			return hash<float>()(v.x1) ^ hash<float>()(v.y1) ^ hash<float>()(v.z1) ^ hash<float>()(v.x2) ^ hash<float>()(v.y2) ^ hash<float>()(v.z2);
+			return hash<int32_t>()(v.x1) ^ hash<int32_t>()(v.y1) ^ hash<int32_t>()(v.z1) ^ hash<int32_t>()(v.x2) ^ hash<int32_t>()(v.y2) ^ hash<int32_t>()(v.z2);
 		}
 	};
 }
@@ -615,9 +620,12 @@ float Pi3Cmesh::checkColliderGrid(const vec3f &p, const Pi3Cmatrix &mtx, float p
 
 bool Pi3Cmesh::createColliderGrid()
 {
-	if (verts.size() < (5000*stride*3)) return false; //less than 1000 tris, then return
+	if (verts.size() < (5000*stride*3)) return false; //less than 5000 tris, then return
 
-	//Consolidates vertices into a x/z grid so that ground collisions can be tested considerably faster
+	//Consolidates vertices into a 10x10 x/z grid so that ground collisions can be tested considerably faster
+	//This is done by grouping triangles into grid sections so that x/z lookup will only check those triangles in the grid section
+	//and ignore all other triangles outside the grid section
+
 	float w = 9.999f / bbox.width();
 	float d = 9.999f / bbox.depth();
 	float mx = bbox.min.x;

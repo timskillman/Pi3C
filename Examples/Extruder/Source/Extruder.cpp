@@ -42,7 +42,6 @@ int main(int argc, char *argv[])
 	float thickness = 10.f;
 
 	pi3c.create_extrude(pathCenter, floatPath, thickness, Pi3Ccolours::White, "butterflies.png");
-	//pi3c.create_cuboid(vec3f(0, 80, 0), vec3f(50, 50, 50), Pi3Ccolours::Yellow);
 
 	pi3c.scene.setFixedLight(Pi3Ccolours::White, vec3f(150.f, 150.f, 150.f)); //transform sun position into scene
 
@@ -52,20 +51,11 @@ int main(int argc, char *argv[])
 	{
 		pi3c.clear_window();
 
-		//const uint8_t *keystate = pi3c.window.getKeys();
-		//if (keystate[SDL_SCANCODE_S]) {
-		//	SDL_RWops *fo = SDL_RWFromFile("thumb.png", "wb");
-		//	pi3c.scene.renderOffscreen(fo, 512, 512);
-		//	SDL_RWclose(fo);
-		//	glViewport(0, 0, screenWidth, screenHeight);
-		//	pi3c.scene.setPerspective3D(screenWidth, screenHeight, opts.asFloat("perspective"), opts.asFloat("nearz"), opts.asFloat("farz"));
-		//} 
 		pi3c.scene.setMatrix(vec3f(0, 0, 0), vec3f(0, 0, -300.f), vec3f(roty,roty,0));
 		roty += 0.003f;
 
 		pi3c.render3D();
 
-		
 		pi3c.render2D();
 		pi3c.showFPS();
 

@@ -146,6 +146,6 @@ private:
 
 	float triArea(const vec3f &v1, const vec3f &v2, const vec3f &v3, float &maxLength) const;
 
-	std::vector<float> xgrid[10][10]; //collider grid ... stores triangles grouped in a 10x10 area
+	std::vector<float> xgrid[10][10]; //collider grid ... stores triangles grouped in a 10x10 area - used for fast ground collision testing
 
 };
