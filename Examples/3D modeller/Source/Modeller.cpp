@@ -517,9 +517,7 @@ void Modeller::ClickRightMouseButton(viewInfo& view)
 		case ED_CREATE:
 			if (maxSteps == 0) {
 				finishLine();
-				createCount = 0;
-				lineCount = 0;
-				maxSteps = 1;
+
 			}
 			window->mouse.up = false;
 			break;
@@ -557,17 +555,33 @@ void Modeller::ClickRightMouseButton(viewInfo& view)
 
 void Modeller::finishLine()
 {
-	std::vector<std::vector<float>> contours;
+	//
 
-	switch (createTool) {
-	case CT_EXTRUDE:
-		//createShape(Pi3Cshapes::extrude("Extrude",vec3f(0, 0, 0.f), contours, 1.f, 1), vec3f(0, 0, 0.f), currentColour);
-		break;
-	case CT_LATHE:
-		break;
-	case CT_LINE:
-		break;
+	if (lines.size() > 2) {
+		vec3f facenormal = lines[0].trinormal(lines[1], lines[2]);
+		std::vector<float> contour;
+		for (auto& v : lines)
+		{
+			vec3f vr = views[currentView].rotInvertMatrix.transformRotateVec(v);
+			contour.push_back(vr.x);
+			contour.push_back(vr.y);
+		}
+		std::vector<std::vector<float>> contours;
+		contours.push_back(contour);
+
+		switch (createTool) {
+		case CT_EXTRUDE:	
+				createShape(Pi3Cshapes::extrude("Extrude",vec3f(0, 0, 0.f), contours, 1.f, 1), vec3f(0, 0, 0.f), currentColour);
+			break;
+		case CT_LATHE:
+			break;
+		case CT_LINE:
+			break;
+		}
 	}
+	createCount = 0;
+	lineCount = 0;
+	maxSteps = 1;
 }
 
 void Modeller::touchScene()

@@ -1,17 +1,25 @@
 3D modeller targets
 -------------------
 
-- 3 point modelling of shapes (Cuboid)
+*=Done
++=working on it
+
++ 2/3/4 point modelling of shapes
+  * All shapes now have multi-point creation
+  - Shape creation needs to rotate into view
 - OBJ grouping
 - Group / Ungroup selection
 - Rotate selection
-- Line/curve drawing to create Extrude & Lathe
++ Line/curve drawing to create Extrude & Lathe
 - Line fatten
 - Slices for shapes (Enter parameters)
 - Point editing
-- Flight mode WASDRF
+* Flight mode 
+  * WASDRF keys
+  * Fullscreen
 - Walk in scene
-- View points & navigation
++ View points & navigation 
+  * Jump to point
 - Flight path
 - Animate selection;
   - Rotate
@@ -23,3 +31,9 @@
 - Drop in scene with normal direction of face
 - Add behaviour to shape paths (e.g. pause or wait for interaction)
 - Merge lightmaps with texture UV's tool and shaders
+- Transparencies need to merge between file imports
+- LOD
+  - Appear from distance / hide other object(s)
+  - Appear only when inside / exclude outside objects (show visible triangle count)
+  - Appear only when arriving at specific volume(s)
+- Write generic file dialog window
