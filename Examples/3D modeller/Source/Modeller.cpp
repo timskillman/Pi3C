@@ -324,20 +324,58 @@ void Modeller::addLinePoint(const vec3f point)
 	vertsPtr vp = resource->getMeshVerts(model.meshRef);
 	if (lineCount == 0) lines.clear();
 	
+	vec3f newPoint = (lineCount > 1 && (point - createFirstPoint).length() < 0.5f) ? createFirstPoint : point;
+
 	vp.offset = lines.size() * mesh.stride;
 	mesh.vc = (lines.size()+1) * mesh.stride;
 	mesh.vertSize = lines.size()+1;
 
 	if (createCount != lastCreateCount) {
-		lines.push_back(point);
+		lines.push_back(newPoint);
+
+		if (lineCount > 1 && newPoint == createFirstPoint) {
+			finishLine();
+			return;
+		}
+
 		lineCount++;
 		lastCreateCount = createCount;
 	}
-	Pi3Cshapes::storeVNTC(*vp.verts, vp.offset, point, vec3f(0, 0, 0), vec2f(1.f, 1.f), 0xffffffff);
+	Pi3Cshapes::storeVNTC(*vp.verts, vp.offset, newPoint, vec3f(0, 0, 0), vec2f(1.f, 1.f), 0xffffffff);
 	resource->updateMesh(model.meshRef);
 }
 
-void Modeller::creatingShape(bool nextStep)
+void Modeller::finishLine()
+{
+
+	if (lines.size() > 2) {
+		vec3f facenormal = lines[0].trinormal(lines[1], lines[2]);
+		std::vector<float> contour;
+		for (auto& v : lines)
+		{
+			vec3f vr = views[currentView].rotInvertMatrix.transformRotateVec(v);
+			contour.push_back(vr.x);
+			contour.push_back(vr.y);
+		}
+		std::vector<std::vector<float>> contours;
+		contours.push_back(contour);
+
+		switch (createTool) {
+		case CT_EXTRUDE:
+			createShape(Pi3Cshapes::extrude("Extrude", vec3f(0, 0, 0.f), contours, 1.f, 1), vec3f(0, 0, 0.f), currentColour);
+			break;
+		case CT_LATHE:
+			break;
+		case CT_LINE:
+			break;
+		}
+	}
+	createCount = 0;
+	lineCount = 0;
+	maxSteps = 1;
+}
+
+void Modeller::creatingShape()
 {
 	vec3f pos = -currentPos;
 
@@ -472,6 +510,7 @@ void Modeller::ClickLeftMouseButton(viewInfo& view)
 			else {
 				if (createCount==0) createShapes();
 				createCount++;
+				creatingShape();
 			}
 			window->mouse.up = false;
 			break;
@@ -553,36 +592,7 @@ void Modeller::ClickRightMouseButton(viewInfo& view)
 	}
 }
 
-void Modeller::finishLine()
-{
-	//
 
-	if (lines.size() > 2) {
-		vec3f facenormal = lines[0].trinormal(lines[1], lines[2]);
-		std::vector<float> contour;
-		for (auto& v : lines)
-		{
-			vec3f vr = views[currentView].rotInvertMatrix.transformRotateVec(v);
-			contour.push_back(vr.x);
-			contour.push_back(vr.y);
-		}
-		std::vector<std::vector<float>> contours;
-		contours.push_back(contour);
-
-		switch (createTool) {
-		case CT_EXTRUDE:	
-				createShape(Pi3Cshapes::extrude("Extrude",vec3f(0, 0, 0.f), contours, 1.f, 1), vec3f(0, 0, 0.f), currentColour);
-			break;
-		case CT_LATHE:
-			break;
-		case CT_LINE:
-			break;
-		}
-	}
-	createCount = 0;
-	lineCount = 0;
-	maxSteps = 1;
-}
 
 void Modeller::touchScene()
 {
@@ -645,7 +655,7 @@ void Modeller::handleEvents(std::vector<uint32_t>& eventList)
 		case SDL_MOUSEMOTION:
 			if (currentViewIsActive() && sceneAction != SA_DRAGBAR) {
 				if (createCount > 0) {
-					creatingShape(window->mouse.LeftButton);
+					creatingShape();
 				}
 				else if (window->mouse.anyButton()) {
 					vec3f mouseXYZ = vec3f(window->mouse.deltaXY.x, -window->mouse.deltaXY.y, 0);

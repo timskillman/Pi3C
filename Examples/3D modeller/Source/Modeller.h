@@ -165,7 +165,7 @@ private:
 	void setCurrentSelView(int32_t selview);
 	void handleKeyPresses();
 	void createShapes();
-	void creatingShape(bool nextStep);
+	void creatingShape();
 	void ClickLeftMouseButton(viewInfo& view);
 	void ClickRightMouseButton(viewInfo& view);
 	void MouseButtonUp();
