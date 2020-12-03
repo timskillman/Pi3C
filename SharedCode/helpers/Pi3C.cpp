@@ -339,8 +339,8 @@ int32_t Pi3C::create_sphere(const vec3f& pos, const float radius, const uint32_t
 	return scene.append3D(sphere, texfile);
 }
 
-int32_t Pi3C::create_extrude(vec3f& pos, std::vector<std::vector<float>>& floatPath, float thickness, uint32_t colour, const std::string& texfile) {
-	Pi3Cmodel extrude(&resource, Pi3Cshapes::extrude("", pos, floatPath, thickness), colour);
+int32_t Pi3C::create_extrude(vec3f& pos, std::vector<std::vector<vec2f>>& paths, float thickness, uint32_t colour, const std::string& texfile) {
+	Pi3Cmodel extrude(&resource, Pi3Cshapes::extrude("", pos, paths, thickness), colour);
 	return scene.append3D(extrude, texfile);
 }
 

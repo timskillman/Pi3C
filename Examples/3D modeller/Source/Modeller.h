@@ -94,7 +94,8 @@ public:
 	vec3f createFirstPoint;
 	vec3f oldPos;
 	vec3f oldPos2;
-	std::vector<vec3f> lines;
+	std::vector<vec3f> lines; //used for creating lines/extrude and lathe
+	std::vector<std::vector<vec2f>> contours; //used for creating Extrude
 
 	std::string libShape;				//Create tool library shape file
 
@@ -139,6 +140,7 @@ public:
 	float cy = 0;
 	vec3f currentPos;
 	int32_t lineCount = 0;
+	int32_t lastMovePoint = 0;
 	//bool ctrlKey = false;
 	//bool shiftKey = false;
 
@@ -176,5 +178,6 @@ private:
 	void navikeys(SDL_Scancode key, SDL_Scancode keyA, SDL_Scancode KeyB);
 	void addLinePoint(const vec3f point);
 	void finishLine();
+	void transformLines(std::vector<vec3f>& lines, std::vector<vec2f>& contour, int32_t start = 0);
 	vec3f getShapeHeight(vec3f pos);
 };

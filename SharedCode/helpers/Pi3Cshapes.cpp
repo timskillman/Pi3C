@@ -441,9 +441,11 @@ namespace Pi3Cshapes {
 		return tube;
 	}
 
-	Pi3Cmesh extrude(const std::string &name, const vec3f &pos, std::vector<std::vector<float>> &contours, const float depth, const uint16_t divs)
+	Pi3Cmesh extrude(const std::string &name, const vec3f &pos, std::vector<std::vector<vec2f>> &paths, const float depth, const uint16_t divs)
 	{
 		Pi3Cmesh extrusion(name);
+		std::vector<std::vector<float>> contours;
+		convertPathToFloats(paths, contours);
 		extrude_verts(extrusion.verts, extrusion.vc, pos, contours, depth, divs, 0xffffffff);
 		extrusion.updateBounds();
 		texMap(extrusion.verts, extrusion.vc, extrusion.stride, 6, 0, 2);
@@ -671,73 +673,23 @@ namespace Pi3Cshapes {
 		return vec3f(x, y, z);
 	}
 
+	void convertPathToFloats(std::vector<std::vector<vec2f>>& paths, std::vector<std::vector<float>>& contours)
+	{
+		//convert vec2f path to vector float contour ...
+		for (auto& path : paths) {
+			contours.emplace_back();
+			std::vector<float>& contour = contours.back();
+			contour.resize(path.size() * 2);
+			memcpy(&contour[0], &path[0], path.size() * 2 * sizeof(float));
+		}
+	}
+
 	void extrude_verts(std::vector<float> &verts, uint32_t &vc, const vec3f &pos, std::vector<std::vector<float>>& contours, const float depth, const uint16_t divs, const uint32_t col) 
 	{
 
-		//convert vec2f path to vector float path ...
-		//std::vector<std::vector<float>> contours;
-		//for (size_t i = 0; i < path.size(); i++) {
-		//	contours.emplace_back();
-		//	std::vector<vec2f>& contourxy = path[i];
-		//	std::vector<float>& contour = contours.back();
-		//	contour.resize(path.size() * 2);
-		//	memcpy(&contour[0], &contourxy[0], contourxy.size() * 2 * sizeof(float));
-		//}
-		
 		std::vector<float> tris;
 		std::vector<std::vector<float>> edges;
 		int triCount = Pi3Cutils::tesselatePath(contours, tris, edges);
-
-/*		
-		std::vector<std::vector<float>> contours;
-		for (size_t i = 0; i < contoursxy.size(); i++) {
-			contours.emplace_back();
-			std::vector<vec2f>& contourxy = contoursxy[i];
-			std::vector<float>& contour = contours.back();
-			contour.resize(contourxy.size() * 2);
-			memcpy(&contour[0], &contourxy[0], contourxy.size() * 2 * sizeof(float));
-		}
-
-		//Find leftmost polygon (always an outside polygon)
-		float leftx = 1e20f;
-		int f = -1;
-		for (size_t c = 0; c < contours.size(); c++) {
-			std::vector<float>& contour = contours[c];
-			for (size_t p = 0; p < contour.size(); p += 2) {
-				if (contour[p] < leftx) {
-					leftx = contour[p];
-					f = c;
-				}
-			}
-		}
-
-		//Work out CW/CCW of leftmost polygon ...
-		std::vector<float>& contour = contours[f];
-		float a = 0.f; size_t p = contour.size() - 2;
-		for (size_t q = 0; q < contour.size() - 1; q += 2) {
-			a += contour[p] * contour[q + 1] - contour[q] * contour[p + 1];
-			p = q;
-		}
-
-		//reverse contours if inverted
-		if (a > 0)
-		{
-			for (size_t a = 0; a < contours.size(); a++) {
-				std::vector<float>& contour = contours[a];
-				uint32_t vs = contour.size();
-				for (size_t j = 0; j < (vs - 1) / 2; j += 2) {
-					std::swap(contour[j], contour[vs - j - 2]);
-					std::swap(contour[j + 1], contour[vs - j - 1]);
-				}
-			}
-		}
-
-		std::vector<float> tris;
-		std::vector<std::vector<float>> edges;
-		tessellate(&contours, NULL, &edges, true);	//Get outer edges
-		tessellate(&contours, &tris, NULL, false);	//Get triangles
-		int triCount = tris.size() / 9;
-*/
 
 		std::vector<float> tempVerts;
 		uint32_t tc = 0;

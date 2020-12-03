@@ -62,7 +62,7 @@ namespace Pi3Cshapes {
 	Pi3Cmesh tube(const vec3f &pos, const float innerradius, const float outerradius, const float height, int sides = Pi3C_SIDES);
 	Pi3Cmesh disk(const vec3f &pos, const float innerRad, const float outerRad, const int sides = Pi3C_SIDES);
 
-	Pi3Cmesh extrude(const std::string &name, const vec3f &pos, std::vector<std::vector<float>> &contours, const float depth, const uint16_t divs = 1);
+	Pi3Cmesh extrude(const std::string &name, const vec3f &pos, std::vector<std::vector<vec2f>> &contours, const float depth, const uint16_t divs = 1);
 	Pi3Cmesh elevationMap(Pi3Ctexture &tex, const vec3f &pos, const vec3f &size, const uint32_t xdivs, const uint32_t ydivs, const int direction, const vec2f &uvsize = vec2f(1.f, 1.f));
 
 	//Pi3Cmesh capsule(vec3f pos, float radius, float midlength = 2.0f, int slices = Pi3C_SIDES, int sides = Pi3C_SIDES);
@@ -82,5 +82,7 @@ namespace Pi3Cshapes {
 	void extrude_verts(std::vector<float> &verts, uint32_t &vc, const vec3f &pos, std::vector<std::vector<float>>& contours, const float depth, const uint16_t divs, const uint32_t col);
 	void grid_verts(std::vector<float>& verts, uint32_t& vc, const vec2f &size, const float majorStep, const float minorStep, const uint32_t mincol, const uint32_t majcol);
 	void elevationMap_verts(std::vector<float>& verts, uint32_t& vc, Pi3Ctexture &tex, const vec3f &pos, const vec3f &size, const uint32_t xdivs, const uint32_t ydivs, int direction, const vec2f &uvsize, const uint32_t col);
+
+	void convertPathToFloats(std::vector<std::vector<vec2f>>& paths, std::vector<std::vector<float>>& contours);
 }
 

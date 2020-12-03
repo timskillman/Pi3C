@@ -94,7 +94,7 @@ public:
 	int32_t create_tcone(const vec3f& pos, const float top_radius, const float bottom_radius, const float height, const uint32_t colour, const std::string& texfile = "");
 	int32_t create_sphere(const vec3f& pos, const float radius, const uint32_t colour, const std::string& texfile = "");
 	int32_t create_torus(const vec3f& pos, const float radius, const float ring_radius, const uint32_t colour, const std::string& texfile = "");
-	int32_t create_extrude(vec3f& pos, std::vector<std::vector<float>>& floatPath, float thickness, uint32_t colour, const std::string& texfile = "");
+	int32_t create_extrude(vec3f& pos, std::vector<std::vector<vec2f>>& paths, float thickness, uint32_t colour, const std::string& texfile = "");
 	int32_t create_lathe(const vec3f &pos, std::vector<vec2f> &path, const int edges, uint32_t colour, const std::string& texfile = "");
 	int32_t create_spring(const vec3f& pos, const float radius, const float length, const int coils, const float coilradius, const int ringrots, const uint32_t colour, const std::string& texfile = "");
 	int32_t create_disk(const vec3f& pos, const float inner_radius, const float outer_radius, const uint32_t colour, const std::string& texfile);
