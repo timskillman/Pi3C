@@ -745,16 +745,16 @@ namespace Pi3Cshapes {
 		vec3f n = vec3f(0.f, 1.f, 0.f);
 		for (int i = 0; i < triCount; i++) {  //Top faces
 			int t = i * 9;
-			storeVNTC(verts, vc, pos + vec3f(tris[t], depth, tris[t + 1]), n, vec2f(0, 0), col);
-			storeVNTC(verts, vc, pos + vec3f(tris[t + 3], depth, tris[t + 4]), n, vec2f(0, 0), col);
-			storeVNTC(verts, vc, pos + vec3f(tris[t + 6], depth, tris[t + 7]), n, vec2f(0, 0), col);
+			storeVNTC(verts, vc, pos + vec3f(tris[t], tris[t + 1], depth), n, vec2f(0, 0), col);
+			storeVNTC(verts, vc, pos + vec3f(tris[t + 3], tris[t + 4], depth), n, vec2f(0, 0), col);
+			storeVNTC(verts, vc, pos + vec3f(tris[t + 6], tris[t + 7], depth), n, vec2f(0, 0), col);
 		}
 		n = vec3f(0.f, -1.f, 0.f);
 		for (int i = 0; i < triCount; i++) {  //Bottom faces
 			int t = i * 9;
-			storeVNTC(verts, vc, pos + vec3f(tris[t], 0, tris[t + 1]), n, vec2f(0, 0), col);
-			storeVNTC(verts, vc, pos + vec3f(tris[t + 6], 0, tris[t + 7]), n, vec2f(0, 0), col);
-			storeVNTC(verts, vc, pos + vec3f(tris[t + 3], 0, tris[t + 4]), n, vec2f(0, 0), col);
+			storeVNTC(verts, vc, pos + vec3f(tris[t], tris[t + 1], 0), n, vec2f(0, 0), col);
+			storeVNTC(verts, vc, pos + vec3f(tris[t + 6], tris[t + 7], 0), n, vec2f(0, 0), col);
+			storeVNTC(verts, vc, pos + vec3f(tris[t + 3], tris[t + 4], 0), n, vec2f(0, 0), col);
 		}
 
 		for (size_t i = 0; i < edges.size(); i++) {
@@ -762,13 +762,13 @@ namespace Pi3Cshapes {
 			for (size_t j = 0; j < contour.size(); j += 2) {
 				size_t k = (j + 2) % contour.size();
 				vec2f norm = vec2f(contour[j], contour[j + 1]).dot(vec2f(contour[k], contour[k + 1]));
-				storeVNTC(verts, vc, pos + vec3f(contour[j], 0, contour[j + 1]), vec3f(norm.x, 0, norm.y), vec2f(0, 0), col);
-				storeVNTC(verts, vc, pos + vec3f(contour[k], 0, contour[k + 1]), vec3f(norm.x, 0, norm.y), vec2f(0, 0), col);
-				storeVNTC(verts, vc, pos + vec3f(contour[k], depth, contour[k + 1]), vec3f(norm.x, 0, norm.y), vec2f(0, 0), col);
+				storeVNTC(verts, vc, pos + vec3f(contour[j], contour[j + 1], 0), vec3f(norm.x, norm.y, 0), vec2f(0, 0), col);
+				storeVNTC(verts, vc, pos + vec3f(contour[k], contour[k + 1], 0), vec3f(norm.x, norm.y, 0), vec2f(0, 0), col);
+				storeVNTC(verts, vc, pos + vec3f(contour[k], contour[k + 1], depth), vec3f(norm.x, norm.y, 0), vec2f(0, 0), col);
 
-				storeVNTC(verts, vc, pos + vec3f(contour[k], depth, contour[k + 1]), vec3f(norm.x, 0, norm.y), vec2f(0, 0), col);
-				storeVNTC(verts, vc, pos + vec3f(contour[j], depth, contour[j + 1]), vec3f(norm.x, 0, norm.y), vec2f(0, 0), col);
-				storeVNTC(verts, vc, pos + vec3f(contour[j], 0, contour[j + 1]), vec3f(norm.x, 0, norm.y), vec2f(0, 0), col);
+				storeVNTC(verts, vc, pos + vec3f(contour[k], contour[k + 1], depth), vec3f(norm.x, norm.y, 0), vec2f(0, 0), col);
+				storeVNTC(verts, vc, pos + vec3f(contour[j], contour[j + 1], depth), vec3f(norm.x, norm.y, 0), vec2f(0, 0), col);
+				storeVNTC(verts, vc, pos + vec3f(contour[j], contour[j + 1], 0), vec3f(norm.x, norm.y, 0), vec2f(0, 0), col);
 			}
 		}
 

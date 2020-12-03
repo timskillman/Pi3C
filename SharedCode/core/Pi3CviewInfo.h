@@ -11,8 +11,8 @@ public:
 	enum ViewProject { VIEW_LEFT, VIEW_RIGHT, VIEW_TOP, VIEW_BOTTOM, VIEW_FRONT, VIEW_BACK, VIEW_FREE, VIEW_PERSPECTIVE };
 
 	void setRotMatrix(const vec3f &rot) {
-		rotInvertMatrix.setRotateXY(rot);
-		rotInvertMatrix = rotInvertMatrix.inverse();
+		rotMatrix.setRotateXY(rot);
+		rotInvertMatrix = rotMatrix.inverse();
 	}
 
 	void setRot(const vec3f &rot) {
@@ -47,6 +47,7 @@ public:
 	Projection projection = PERSPECTIVE;
 	Pi3Crecti viewport;
 	Pi3Cmatrix rotInvertMatrix;
+	Pi3Cmatrix rotMatrix;
 	vec3f pos{ 0,0,0 };
 	vec3f rot{ 0,0,0 };
 	vec3f pan{ 0,0,0 };

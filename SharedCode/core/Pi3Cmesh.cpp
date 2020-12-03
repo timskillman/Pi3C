@@ -76,6 +76,22 @@ void Pi3Cmesh::resize(const vec3f &pos, const vec3f &size, const std::vector<flo
 	}
 }
 
+void Pi3Cmesh::transform(std::vector<float>& verts, const uint32_t vo, const Pi3Cmatrix& mtx)
+{
+	uint32_t vsize = vertSize * stride;
+	uint32_t voff = vertOffset * stride;
+	uint32_t vp = vo;
+
+	for (size_t i = 0; i<vertSize; i++)
+	{
+		vec3f v = mtx.transformVec(vec3f(verts[vp], verts[vp + 1], verts[vp + 2]));
+		verts[vp] = v.x;
+		verts[vp + 1] = v.y;
+		verts[vp + 2] = v.z;
+		vp += stride;
+	}
+}
+
 Pi3Cmesh Pi3Cmesh::clone(const uint32_t from, const uint32_t size) const
 {
 	/* we only want to partially clone some of the vertices */

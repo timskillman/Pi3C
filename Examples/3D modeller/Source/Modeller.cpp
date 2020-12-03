@@ -353,7 +353,7 @@ void Modeller::finishLine()
 		std::vector<float> contour;
 		for (auto& v : lines)
 		{
-			vec3f vr = views[currentView].rotInvertMatrix.transformRotateVec(v);
+			vec3f vr = views[currentView].rotInvertMatrix.transformVec(v);
 			contour.push_back(vr.x);
 			contour.push_back(vr.y);
 		}
@@ -362,13 +362,21 @@ void Modeller::finishLine()
 
 		switch (createTool) {
 		case CT_EXTRUDE:
-			createShape(Pi3Cshapes::extrude("Extrude", vec3f(0, 0, 0.f), contours, 1.f, 1), vec3f(0, 0, 0.f), currentColour);
+			createShape(Pi3Cshapes::extrude("Extrude", vec3f(0, 0, 0.f), contours, -1.f, 1), vec3f(0, 0, 0.f), currentColour);
 			break;
 		case CT_LATHE:
 			break;
 		case CT_LINE:
 			break;
 		}
+
+		Pi3Cmodel& model = scene.models[scene.models.size() - 1];
+		Pi3Cmesh& mesh = resource->meshes[model.meshRef];
+		vertsPtr vp = resource->getMeshVerts(model.meshRef);
+		mesh.transform(*vp.verts, vp.offset, views[currentView].rotMatrix);
+		resource->updateMesh(model.meshRef);
+		//Pi3Cmatrix mir = views[currentView].rotInvertMatrix.inverse();
+		//model.matrix = views[currentView].rotInvertMatrix.inverse();
 	}
 	createCount = 0;
 	lineCount = 0;

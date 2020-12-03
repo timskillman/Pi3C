@@ -94,6 +94,7 @@ public:
 
 	void offset(const vec3f pos, std::vector<float> &verts, uint32_t start, const uint32_t size, const uint32_t stride = defaultStride);
 	void resize(const vec3f &pos, const vec3f &size, const std::vector<float> &mverts);
+	void transform(std::vector<float>& verts, const uint32_t vo, const Pi3Cmatrix& mtx);
 	void reset();
 
 	void render(const GLenum rendermode = GL_TRIANGLES);
