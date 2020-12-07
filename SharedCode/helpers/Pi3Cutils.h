@@ -2,7 +2,7 @@
 #include "Pi3Cvector.h"
 #include "Pi3Cwin.h"
 #include "Pi3Crect.h"
-#include <SDL_Image.h>
+#include <SDL_image.h>
 #include <vector>
 
 namespace Pi3Cutils
