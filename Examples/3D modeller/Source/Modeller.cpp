@@ -366,7 +366,7 @@ void Modeller::finishLine()
 				transformLines(lines, contour, views[currentView].rotInvertMatrix);
 			}
 			createShape(Pi3Cshapes::extrude("Extrude", vec3f(0, 0, 0.f), contours, -1.f, 1), vec3f(0, 0, 0.f), currentColour);
-			scene.lastModel().transformVerts(resource, views[currentView].rotMatrix);
+			scene.lastModel()->transformVerts(resource, views[currentView].rotMatrix);
 			break;
 		case CT_LATHE:
 			{
@@ -378,7 +378,7 @@ void Modeller::finishLine()
 					p.x -= fp.x;
 				}
 				createShape(Pi3Cshapes::lathe("Lathe", vec3f(fp.x, 0, 0.f), contour, true), vec3f(0, 0, 0.f), currentColour);
-				scene.lastModel().transformVerts(resource, views[currentView].rotMatrix);
+				scene.lastModel()->transformVerts(resource, views[currentView].rotMatrix);
 			}
 			break;
 		case CT_LINE:
@@ -427,8 +427,8 @@ void Modeller::creatingShape()
 		}
 	}
 
-	Pi3Cmodel& currentModel = scene.lastModel();
-	vertsPtr vp = currentModel.getMeshVerts(resource);
+	Pi3Cmodel* currentModel = scene.lastModel();
+	vertsPtr vp = currentModel->getMeshVerts(resource);
 	vec3f v1, v2;
 
 	if (createCount == 1) {
@@ -444,7 +444,7 @@ void Modeller::creatingShape()
 		}
 		oldPos = pos;
 		oldPos2 = pos;
-		if (createTool != CT_CUBOID) currentModel.transformVerts(resource, views[currentView].rotInvertMatrix);
+		if (createTool != CT_CUBOID) currentModel->transformVerts(resource, views[currentView].rotInvertMatrix);
 	}
 	else if (createCount == 2) {
 		float dist1 = (oldPos - createFirstPoint).length();
@@ -479,7 +479,7 @@ void Modeller::creatingShape()
 			}
 			break;
 		}
-		if (createTool != CT_CUBOID) currentModel.transformVerts(resource, views[currentView].rotInvertMatrix);
+		if (createTool != CT_CUBOID) currentModel->transformVerts(resource, views[currentView].rotInvertMatrix);
 		oldPos2 = pos;
 	}
 	else if (createCount == 3) {
@@ -500,9 +500,9 @@ void Modeller::creatingShape()
 			}
 			break;
 		}
-		currentModel.transformVerts(resource, views[currentView].rotInvertMatrix);
+		currentModel->transformVerts(resource, views[currentView].rotInvertMatrix);
 	}
-	currentModel.refreshMesh(resource);
+	currentModel->refreshMesh(resource);
 	//vp = resource->getMeshVerts(scene.lastModel().meshRef);
 	//mesh.updateBounds(&vp);
 	//model.bbox = mesh.bbox;
