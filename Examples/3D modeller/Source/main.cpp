@@ -3,7 +3,7 @@
 #include "Modeller.h"
 
 // ==========================================================================
-// Pi3C Graphics Library Example - Castle Creator (by Tim Skillman)
+// Pi3C Graphics Library Example - Pi3C Modeller (by Tim Skillman)
 // ==========================================================================
 //
 // The MIT License
@@ -41,6 +41,7 @@ int main(int argc, char *argv[])
 	winopts.fullscreen = opts.asBool("fullscreen");
 	winopts.width = opts.asInt("screenWidth");
 	winopts.height = opts.asInt("screenHeight");
+	winopts.antialiasLevel = opts.asInt("antiAliasLevel");
 	winopts.clearColour = 0xffffff;
 	static Pi3Cwindow window(winopts);
 
