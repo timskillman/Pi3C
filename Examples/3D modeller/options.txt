@@ -1,8 +1,9 @@
-title:RPi3C Modeller
+title:Pi3C Modeller
 screenWidth:800
 screenHeight:600
 perspective:800
 fullscreen:false
+antiAliasLevel:0
 fly:false
 lightpos:0.0 1.0 0.0
 startpos:10.0 -9.0 0.0
