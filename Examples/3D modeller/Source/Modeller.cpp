@@ -319,14 +319,14 @@ void Modeller::addLinePoint(const vec3f point)
 
 	//work out mesh offsets and vert sizes for line contours ...
 	vp.offset = lines.size() * mesh->stride;
-	switch (createTool) {
-	case CT_EXTRUDE:
+	//switch (createTool) {
+	//case CT_EXTRUDE:
 		mesh->vc = (lines.size() + 2) * mesh->stride;
-		break;
-	case CT_LATHE:
-		mesh->vc = (lines.size() + 2) * mesh->stride;
-		break;
-	}
+	//	break;
+	//case CT_LATHE:
+	//	mesh->vc = (lines.size() + 2) * mesh->stride;
+	//	break;
+	//}
 
 	if (createCount != lastCreateCount) {
 
@@ -385,13 +385,7 @@ void Modeller::addLinePoint(const vec3f point)
 	//	mesh->lineIndexes.push_back(sc + 1);
 	//}
 
-	
-
-	//mesh->mode = GL_LINES;
-	//model.material.rendermode = GL_LINES;
-
 	resource->updateMesh(model.meshRef);
-	//lastPoint = newPoint;
 
 }
 

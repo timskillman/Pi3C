@@ -516,31 +516,31 @@ void Pi3Cimgui::EndGroupHorizontal(const std::string& icon, const int icw, const
 
 void Pi3Cimgui::startGroupRect()
 {
-	groupSize.emplace_back();
-	Pi3Crecti& grect = groupSize.back();
-	grect.x = pos.x;
-	grect.y = pos.y;
+	//groupSize.emplace_back();
+	//Pi3Crecti& grect = groupSize.back();
+	//grect.x = pos.x;
+	//grect.y = pos.y;
 }
 
 void Pi3Cimgui::updateGroupSize(int32_t nx, int32_t ny)
 {
-	if (groupSize.size() == 0) return;
+	//if (groupSize.size() == 0) return;
 
-	Pi3Crecti& grect = groupSize.back();
-	int32_t w = nx - grect.x;
-	int32_t h = grect.y - ny;
-	if (w > grect.width) grect.width = w;
-	if (h > grect.height) grect.height = h;
+	//Pi3Crecti& grect = groupSize.back();
+	//int32_t w = nx - grect.x;
+	//int32_t h = grect.y - ny;
+	//if (w > grect.width) grect.width = w;
+	//if (h > grect.height) grect.height = h;
 }
 
 void Pi3Cimgui::endGroupRect()
 {
-	if (groupSize.size() == 0) return;
+	//if (groupSize.size() == 0) return;
 
-	Pi3Crecti& grect = groupSize.back();
+	//Pi3Crecti& grect = groupSize.back();
 
 
-	if (grect.width <= 0 || grect.height <= 0) return;
+	//if (grect.width <= 0 || grect.height <= 0) return;
 
 	//std::vector<uint8_t> data(grect.width * grect.height * 4);
 	//glReadPixels(0, 0, grect.width, grect.height, GL_RGBA, GL_UNSIGNED_BYTE, &data[0]);
