@@ -178,6 +178,6 @@ private:
 	void navikeys(SDL_Scancode key, SDL_Scancode keyA, SDL_Scancode KeyB);
 	void addLinePoint(const vec3f point);
 	void finishLine();
-	void transformLines(std::vector<vec3f>& lines, std::vector<vec2f>& contour, int32_t start = 0);
-	vec3f getShapeHeight(vec3f pos);
+	void transformLines(std::vector<vec3f>& lines, std::vector<vec2f>& contour, Pi3Cmatrix& matrix, int32_t start = 0);
+	void getShapeHeight(vec3f& pos, vec3f& v1, vec3f& v2);
 };

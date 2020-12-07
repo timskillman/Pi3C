@@ -88,6 +88,10 @@ void Pi3Cmesh::transform(std::vector<float>& verts, const uint32_t vo, const Pi3
 		verts[vp] = v.x;
 		verts[vp + 1] = v.y;
 		verts[vp + 2] = v.z;
+		vec3f n = mtx.transformRotateVec(vec3f(verts[vp + 3], verts[vp + 4], verts[vp + 5]));
+		verts[vp + 3] = n.x;
+		verts[vp + 4] = n.y;
+		verts[vp + 5] = n.z;
 		vp += stride;
 	}
 }

@@ -57,6 +57,26 @@ void Pi3Cmodel::loadModelAndCollider(Pi3Cresource *resource, std::string path, s
 	}
 }
 
+void Pi3Cmodel::transformVerts(Pi3Cresource* resource, Pi3Cmatrix& matrix)
+{
+	Pi3Cmesh* mesh = getMesh(resource);
+	if (!mesh) return;
+	vertsPtr vp = getMeshVerts(resource);
+	mesh->transform(*vp.verts, vp.offset, matrix);
+	resource->updateMesh(meshRef);
+}
+
+void Pi3Cmodel::refreshMesh(Pi3Cresource* resource)
+{
+	//Update mesh vertices and bounds, then upload to GPU
+	vertsPtr vp = getMeshVerts(resource);
+	Pi3Cmesh* mesh = getMesh(resource);
+	if (!mesh) return;
+	mesh->updateBounds(&vp);
+	bbox = mesh->bbox;
+	resource->updateMesh(meshRef);
+}
+
 void Pi3Cmodel::create(Pi3Cresource *resource, Pi3Cmesh *mesh, uint32_t diffuseColour)
 {	
 	meshRef = resource->addMesh(mesh);

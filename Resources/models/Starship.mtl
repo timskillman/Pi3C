@@ -51,12 +51,12 @@ Ks 1.000000 1.000000 1.000000
 Tr 1.000000
 illum 1
 
-newmtl red
+newmtl red2
 Ka 1.000000 0.000000 0.000000
 Kd 1.000000 0.000000 0.000000
 Ks 1.000000 1.000000 1.000000
 Tr 1.000000
-illum 2
+illum 1
 
 newmtl yellow
 Ka 1.000000 1.000000 0.000000
@@ -197,17 +197,17 @@ newmtl girder
 Ka 0.200000 0.200000 0.200000
 Kd 1.000000 1.000000 1.000000
 Ks 1.000000 1.000000 1.000000
-Tr 0.999
+Tr 1.00
 illum 2
 map_Kd maps/girder.png
 
 newmtl girder2
-Ka 0.200000 0.200000 0.200000
+Ka 0.100000 0.100000 0.100000
 Kd 1.000000 1.000000 1.000000
 Ks 1.000000 1.000000 1.000000
-Tr 0.999
+Tr 1.00
 illum 2
-map_Kd maps/girder3.png
+map_Kd maps/girder3blue.png
 
 newmtl walkplate
 Ka 0.200000 0.200000 0.200000
@@ -284,3 +284,80 @@ Kd 1.000000 1.000000 1.000000
 Ks 1.000000 1.000000 1.000000
 illum 1
 map_Kd maps/clouds2.jpg
+
+newmtl core
+Ka 0.000000 0.000000 0.000000
+Kd 1.000000 1.000000 1.000000
+Ks 1.000000 1.000000 1.000000
+illum 1
+map_Kd maps/EngineCoreBaked.png
+
+newmtl mounts
+Ka 0.000000 0.000000 0.000000
+Kd 1.000000 1.000000 1.000000
+Ks 1.000000 1.000000 1.000000
+illum 1
+map_Kd maps/EngineMountsBaked.png
+
+newmtl coils
+Ka 0.000000 0.000000 0.000000
+Kd 1.000000 1.000000 1.000000
+Ks 1.000000 1.000000 1.000000
+illum 1
+map_Kd maps/EngineCoilsBaked.png
+
+newmtl engineHousing
+Ka 0.000000 0.000000 0.000000
+Kd 1.000000 1.000000 1.000000
+Ks 1.000000 1.000000 1.000000
+illum 1
+map_Kd maps/EngineHousingBaked.png
+
+newmtl shock1
+Ka 0.000000 0.000000 0.000000
+Kd 1.000000 1.000000 1.000000
+Ks 1.000000 1.000000 1.000000
+illum 1
+map_Kd maps/EngineShockBaked.png
+
+newmtl shock1b
+Ka 0.000000 0.000000 0.000000
+Kd 1.000000 1.000000 1.000000
+Ks 1.000000 1.000000 1.000000
+illum 1
+map_Kd maps/EngineShock1bBaked.png
+
+newmtl supports
+Ka 0.000000 0.000000 0.000000
+Kd 1.000000 1.000000 1.000000
+Ks 1.000000 1.000000 1.000000
+illum 1
+map_Kd maps/EngineSupportsBaked.png
+
+newmtl pipes
+Ka 0.000000 0.000000 0.000000
+Kd 1.000000 1.000000 1.000000
+Ks 1.000000 1.000000 1.000000
+illum 1
+map_Kd maps/EnginePipesBaked.png
+
+newmtl floor
+Ka 0.000000 0.000000 0.000000
+Kd 1.000000 1.000000 1.000000
+Ks 1.000000 1.000000 1.000000
+illum 1
+map_Kd maps/EngineFloorBaked.png
+
+newmtl railings
+Ka 0.000000 0.000000 0.000000
+Kd 1.000000 1.000000 1.000000
+Ks 1.000000 1.000000 1.000000
+illum 1
+map_Kd maps/EngineRailingsBaked.png
+
+newmtl room
+Ka 0.000000 0.000000 0.000000
+Kd 1.000000 1.000000 1.000000
+Ks 1.000000 1.000000 1.000000
+illum 1
+map_Kd maps/EngineRoomBaked.png

@@ -33,6 +33,11 @@ namespace Pi3Cshapes {
 		verts[vc++] = (float)(col & 255) / 256.f + (float)((col >> 8) & 255) + (float)((col >> 16) & 255) * 256.f; //range 65536.255
 	}
 
+	void addPoint(vertsPtr& vp, const vec3f& pos)
+	{
+		Pi3Cshapes::storeVNTC(*vp.verts, vp.offset, pos, vec3f(0, 0, 0), vec2f(1.f, 1.f), 0xffffffff);
+	}
+
 	void rect_verts(std::vector<float>& verts, uint32_t& vc, const vec2f& pos, const vec2f& size, const vec2f& uvpos, const vec2f& uvsize, uint32_t col)
 	{
 		vec3f n(0, -1.f, 0);
@@ -453,7 +458,7 @@ namespace Pi3Cshapes {
 		return extrusion;
 	}
 
-	Pi3Cmesh lathe(const std::string &name, const vec3f &pos, std::vector<vec2f> &path,
+	Pi3Cmesh lathe(const std::string &name, const vec3f &pos, std::vector<vec2f> &path, bool sidePath,
 		const int edges, const float rise, const float startAngle,
 		const float endAngle, const bool invert, const float creaseAngle,
 		const vec2f &prevPoint, const vec2f &lastPoint, const uint32_t uvtype)
@@ -464,7 +469,7 @@ namespace Pi3Cshapes {
 		size_t sz = path.size();
 		if (sz < 2) return lathe;
 
-		lathe_verts(lathe.verts, lathe.vc, lathe.stride, pos, path, edges, rise, startAngle, endAngle, invert, creaseAngle, prevPoint, lastPoint, uvtype, col);
+		lathe_verts(lathe.verts, lathe.vc, lathe.stride, pos, path, sidePath, edges, rise, startAngle, endAngle, invert, creaseAngle, prevPoint, lastPoint, uvtype, col);
 		lathe.updateBounds();
 		return lathe;
 	}
@@ -493,7 +498,7 @@ namespace Pi3Cshapes {
 
 	//---------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-	void lathe_verts(std::vector<float>& verts, uint32_t& vc, const uint32_t stride, const vec3f& pos, std::vector<vec2f>& path, const int edges, const float rise, const float startAngle, const float endAngle, const bool invert, const float creaseAngle, const vec2f prevPoint, const vec2f lastPoint, const uint32_t uvtype, const uint32_t col)
+	void lathe_verts(std::vector<float>& verts, uint32_t& vc, const uint32_t stride, const vec3f& pos, std::vector<vec2f>& path, const bool sidePath, const int edges, const float rise, const float startAngle, const float endAngle, const bool invert, const float creaseAngle, const vec2f prevPoint, const vec2f lastPoint, const uint32_t uvtype, const uint32_t col)
 	{
 		float inv = (invert) ? -1.0f : 1.0f;
 		std::vector<vec2f> normals;
@@ -536,11 +541,20 @@ namespace Pi3Cshapes {
 				float ang = startAngle + (float)r * angStep;
 				float sinr = sin(ang);
 				float cosr = cos(ang);
-				storeVNTC(vertTemp, tc, pos + vec3f(path[p].x * sinr, risey, path[p].x * cosr), vec3f(sinr * normals[p].x, normals[p].y, cosr * normals[p].x), vec2f(tcx * r, tcy), col);
+				if (sidePath) {
+					storeVNTC(vertTemp, tc, pos + vec3f(path[p].x * sinr, risey, path[p].x * cosr), vec3f(sinr * normals[p].x, normals[p].y, cosr * normals[p].x), vec2f(tcx * r, tcy), col);
+				}
+				else {
+					storeVNTC(vertTemp, tc, pos + vec3f(path[p].x * sinr, path[p].x * cosr, risey), vec3f(sinr * normals[p].x, cosr * normals[p].x, normals[p].y), vec2f(tcx * r, tcy), col);
+				}
 				risey += rdiv;
 			}
-
-			storeVNTC(vertTemp, tc, pos + vec3f(0, path[p].y, path[p].x), vec3f(0, normals[p].y, normals[p].x), vec2f(0.9999f, tcy), col);
+			if (sidePath) {
+				storeVNTC(vertTemp, tc, pos + vec3f(0, path[p].y, path[p].x), vec3f(0, normals[p].y, normals[p].x), vec2f(0.9999f, tcy), col);
+			}
+			else {
+				storeVNTC(vertTemp, tc, pos + vec3f(0, path[p].x, path[p].y), vec3f(0, normals[p].x, normals[p].y), vec2f(0.9999f, tcy), col);
+			}
 		}
 
 		int pn = 0;
@@ -548,15 +562,29 @@ namespace Pi3Cshapes {
 		for (size_t p = 0; p < (sz - 1); p++) {
 			pn += (edges + 1);
 			if ((path[p + 1] != path[p]) || p == (sz - 2)) {
-				for (int32_t r = 0; r < edges; r++)
-				{
-					copyVerts(vertTemp, verts, stride, vc, pn + r);
-					copyVerts(vertTemp, verts, stride, vc, pp + r + 1);
-					copyVerts(vertTemp, verts, stride, vc, pp + r);
+				if (sidePath) {
+					for (int32_t r = 0; r < edges; r++)
+					{
+						copyVerts(vertTemp, verts, stride, vc, pn + r);
+						copyVerts(vertTemp, verts, stride, vc, pp + r + 1);
+						copyVerts(vertTemp, verts, stride, vc, pp + r);
 
-					copyVerts(vertTemp, verts, stride, vc, pn + r);
-					copyVerts(vertTemp, verts, stride, vc, pn + r + 1);
-					copyVerts(vertTemp, verts, stride, vc, pp + r + 1);
+						copyVerts(vertTemp, verts, stride, vc, pn + r);
+						copyVerts(vertTemp, verts, stride, vc, pn + r + 1);
+						copyVerts(vertTemp, verts, stride, vc, pp + r + 1);
+					}
+				}
+				else {
+					for (int32_t r = 0; r < edges; r++)
+					{
+						copyVerts(vertTemp, verts, stride, vc, pn + r);
+						copyVerts(vertTemp, verts, stride, vc, pp + r);
+						copyVerts(vertTemp, verts, stride, vc, pp + r + 1);
+
+						copyVerts(vertTemp, verts, stride, vc, pn + r);
+						copyVerts(vertTemp, verts, stride, vc, pp + r + 1);
+						copyVerts(vertTemp, verts, stride, vc, pn + r + 1);
+					}
 				}
 			}
 			pp += (edges + 1);
@@ -573,7 +601,7 @@ namespace Pi3Cshapes {
 			path.push_back(vec2f(radius*sin(static_cast<float>(r)*st + ho)*inv, radius*cos(static_cast<float>(r)*st + ho)));
 		}
 
-		lathe_verts(verts, vc, 9, pos, path, sides, 0, 0, 2.f*PI, false, 60.f, vec2f(1, path[0].y), vec2f(-1, path[path.size() - 1].y), UVMAP_SPHERE, 0xffffffff);
+		lathe_verts(verts, vc, 9, pos, path, false, sides, 0, 0, 2.f*PI, false, 60.f, vec2f(1, path[0].y), vec2f(-1, path[path.size() - 1].y), UVMAP_SPHERE, 0xffffffff);
 	}
 
 	void torus_verts(std::vector<float>& verts, uint32_t& vc, const vec3f &pos, const float radius, const float ringradius, const int ringrots, const int sides)
@@ -584,7 +612,7 @@ namespace Pi3Cshapes {
 			path.push_back(vec2f(radius + ringradius * sin(r*st), ringradius*cos(r*st)));
 		}
 
-		lathe_verts(verts, vc, 9, pos, path, sides, 0, 0, 2.f*PI, false, 60.f, vec2f(1, path[0].y), vec2f(-1, path[path.size() - 1].y), UVMAP_SPHERE, 0xffffffff);
+		lathe_verts(verts, vc, 9, pos, path, false, sides, 0, 0, 2.f*PI, false, 60.f, vec2f(1, path[0].y), vec2f(-1, path[path.size() - 1].y), UVMAP_SPHERE, 0xffffffff);
 	}
 
 	void spring_verts(std::vector<float>& verts, uint32_t& vc, const vec3f &pos, const float radius, const float length, const int coils, const float coilradius, const int ringrots, const int sides)
@@ -595,7 +623,7 @@ namespace Pi3Cshapes {
 		for (int r = 0; r < (ringrots + 1); r++) {
 			path.push_back(vec2f(radius + coilradius * sin(r*st), coilradius*cos(r*st)));
 		}
-		lathe_verts(verts, vc, 9, pos, path, sides, 0, 0, 2.f*PI*(float)coils, false, 60.f, vec2f(1, path[0].y), vec2f(-1, path[path.size() - 1].y), UVMAP_SPHERE, 0xffffffff);
+		lathe_verts(verts, vc, 9, pos, path, false, sides, 0, 0, 2.f*PI*(float)coils, false, 60.f, vec2f(1, path[0].y), vec2f(-1, path[path.size() - 1].y), UVMAP_SPHERE, 0xffffffff);
 	}
 
 	void cone_verts(std::vector<float>& verts, uint32_t& vc, const vec3f &pos, const float radius, const float height, const int sides)
@@ -604,7 +632,7 @@ namespace Pi3Cshapes {
 		path.push_back(vec2f(0, height));
 		path.push_back(vec2f(radius, 0));
 		path.push_back(vec2f(0, 0));
-		lathe_verts(verts, vc, 9, pos, path, sides, 0, 0, 2.f*PI, true, 60.f, vec2f(-radius, height * 2), vec2f(-radius, 0), UVMAP_SPHERE, 0xffffffff);
+		lathe_verts(verts, vc, 9, pos, path, false, sides, 0, 0, 2.f*PI, true, 60.f, vec2f(-radius, height * 2), vec2f(-radius, 0), UVMAP_SPHERE, 0xffffffff);
 	}
 
 	void tcone_verts(std::vector<float>& verts, uint32_t& vc, const vec3f &pos, const float botradius, const float topradius, const float height, const int sides)
@@ -614,7 +642,7 @@ namespace Pi3Cshapes {
 		path.push_back(vec2f(topradius, height));
 		path.push_back(vec2f(botradius, 0));
 		path.push_back(vec2f(0, 0));
-		lathe_verts(verts, vc, 9, pos, path, sides, 0, 0, 2.f*PI, true, 60.f, vec2f(-1.0f, height), vec2f(0, 0), UVMAP_SPHERE, 0xffffffff);
+		lathe_verts(verts, vc, 9, pos, path, false, sides, 0, 0, 2.f*PI, true, 60.f, vec2f(-1.0f, height), vec2f(0, 0), UVMAP_SPHERE, 0xffffffff);
 	}
 
 	void cylinder_verts(std::vector<float>& verts, uint32_t& vc, const vec3f &pos, const float radius, const float height, const int sides)
@@ -624,8 +652,7 @@ namespace Pi3Cshapes {
 		path.push_back(vec2f(radius, height));
 		path.push_back(vec2f(radius, 0));
 		path.push_back(vec2f(0, 0));
-		lathe_verts(verts, vc, 9, pos, path, sides, 0, 0, 2.f*PI, true, 60.f, vec2f(-1.0f, height), vec2f(0, 0), UVMAP_SPHERE, 0xffffffff);
-		//return lathe("Cylinder", pos, path, sides, 0.0f, 0.0f, 2.f*PI, true, 60.0f, vec2f(-1.0f, height));
+		lathe_verts(verts, vc, 9, pos, path, false, sides, 0, 0, 2.f*PI, true, 60.f, vec2f(-1.0f, height), vec2f(0, 0), UVMAP_SPHERE, 0xffffffff);
 	}
 	
 	void tube_verts(std::vector<float>& verts, uint32_t& vc, const vec3f &pos, const float radius1, const float radius2, const float height, const int sides)
@@ -636,8 +663,7 @@ namespace Pi3Cshapes {
 		path.push_back(vec2f(radius2, 0));
 		path.push_back(vec2f(radius1, 0));
 		path.push_back(vec2f(radius1, height));
-		lathe_verts(verts, vc, 9, pos, path, sides, 0, 0, 2.f*PI, true, 60.f, vec2f(0, 0), vec2f(0, 0), UVMAP_SPHERE, 0xffffffff);
-		//return lathe("Tube", pos, path, sides, 0.0f, 0.0f, 2.f*PI, true, 60.0f, vec2f(0, 0), vec2f(0, 0), UVMAP_SPHERE);
+		lathe_verts(verts, vc, 9, pos, path, false, sides, 0, 0, 2.f*PI, true, 60.f, vec2f(0, 0), vec2f(0, 0), UVMAP_SPHERE, 0xffffffff);
 	}
 
 	void texMap(std::vector<float> &vertBuffer, uint32_t vc, uint32_t stride, uint32_t uvoffset, uint8_t x, uint8_t y)
