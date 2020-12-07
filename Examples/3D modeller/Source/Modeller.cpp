@@ -121,10 +121,11 @@ void Modeller::init()
 	}
 	lmesh.updateBounds();
 	lmesh.materialRef = 0;
-	lmesh.mode = GL_LINE_STRIP;
+	lmesh.mode = GL_LINES;
+
 	Pi3Cmodel outlineModel = Pi3Cmodel(resource, lmesh, 0xffffff);
 	outlineModel.touchable = false;
-	outlineModel.material.rendermode = GL_LINE_STRIP;
+	outlineModel.material.rendermode = GL_LINES;
 	outlineRef = scene.append3D(outlineModel);
 
 	// Create move gizmo
@@ -136,7 +137,7 @@ void Modeller::init()
 	moveGizmoRef = scene.append3D(moveGizmo);
 
 	outlines = *resource->defaultMaterial();
-	outlines.rendermode = GL_LINES | GL_LINE_STRIP;
+	outlines.rendermode = GL_LINE_STRIP; 
 	outlines.illum = 1;
 
 	handCursor = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_HAND);
@@ -314,33 +315,84 @@ void Modeller::addLinePoint(const vec3f point)
 	Pi3Cmesh* mesh = model.getMesh(resource);
 	vertsPtr vp = model.getMeshVerts(resource);
 	
-	vec3f newPoint = (lineCount > (lastMovePoint + 1) && (point - createFirstPoint).length() < 0.5f) ? createFirstPoint : point;
+	vec3f newPoint = (lineCount > (lastMovePoint + 1) && (point - createFirstPoint).length() < 0.3f) ? createFirstPoint : point;
 
+	//work out mesh offsets and vert sizes for line contours ...
 	vp.offset = lines.size() * mesh->stride;
-	mesh->vc = (lines.size()+1) * mesh->stride;
-	mesh->vertSize = lines.size()+1;
+	switch (createTool) {
+	case CT_EXTRUDE:
+		mesh->vc = (lines.size() + 2) * mesh->stride;
+		break;
+	case CT_LATHE:
+		mesh->vc = (lines.size() + 2) * mesh->stride;
+		break;
+	}
 
 	if (createCount != lastCreateCount) {
 
-		if (lineCount == lastMovePoint) createFirstPoint = point;
+		//create new point (left mouse button) ...
+
+		if (lineCount == lastMovePoint) {
+			createFirstPoint = point;
+			model.visible = true;
+			//lastPoint = point;
+		}
 		lines.push_back(newPoint);
 
 		switch (createTool) {
 		case CT_EXTRUDE:
+			//Join points? 
 			if (lineCount > (lastMovePoint+1) && newPoint == createFirstPoint) {
 				contours.emplace_back();
 				std::vector<vec2f>& contour = contours.back();
-				transformLines(lines, contour, views[currentView].rotInvertMatrix, lastMovePoint);
+				transformLines(lines, contour, views[currentView].rotInvertMatrix, lastMovePoint+1);
 				lastMovePoint = lineCount+1;
 			}
+			break;
+		case CT_LATHE:
 			break;
 		}
 
 		lineCount++;
 		lastCreateCount = createCount;
 	}
+
 	Pi3Cshapes::addPoint(vp, newPoint);
+	Pi3Cshapes::addPoint(vp, newPoint);
+
+	//Create line indexes from contours and current path...
+	mesh->lineIndexes.clear();
+	int sc = 0;
+	for (auto& c : contours) {
+		for (int i = 0; i < c.size(); i++) {
+			mesh->lineIndexes.push_back(sc + i);
+			mesh->lineIndexes.push_back(sc + (i + 1) % c.size());
+		}
+		sc += c.size() + 1;
+	}
+
+	int c = lineCount - lastMovePoint;
+	for (int i = 0; i < c; i++) {
+		mesh->lineIndexes.push_back(sc + i);
+		mesh->lineIndexes.push_back(sc + i + 1);
+	}
+	//sc += c+1;
+
+	//if (createTool == CT_LATHE) {
+	//	Pi3Cshapes::addPoint(vp, createFirstPoint - vec3f(0, 100, 0));
+	//	Pi3Cshapes::addPoint(vp, createFirstPoint - vec3f(0, -200, 0));
+	//	mesh->lineIndexes.push_back(sc);
+	//	mesh->lineIndexes.push_back(sc + 1);
+	//}
+
+	
+
+	//mesh->mode = GL_LINES;
+	//model.material.rendermode = GL_LINES;
+
 	resource->updateMesh(model.meshRef);
+	//lastPoint = newPoint;
+
 }
 
 void Modeller::transformLines(std::vector<vec3f>& lines, std::vector<vec2f>& contour, Pi3Cmatrix& matrix, int32_t start)
@@ -360,10 +412,10 @@ void Modeller::finishLine()
 		switch (createTool) {
 		case CT_EXTRUDE:
 			if (lineCount > (lastMovePoint + 1)) {
-				lines.push_back(createFirstPoint);
+				lines.push_back(createFirstPoint); //close current contour
 				contours.emplace_back();
-				std::vector<vec2f>& contour = contours[contours.size() - 1];
-				transformLines(lines, contour, views[currentView].rotInvertMatrix);
+				std::vector<vec2f>& contour = contours.back();
+				transformLines(lines, contour, views[currentView].rotInvertMatrix, lastMovePoint + 1);
 			}
 			createShape(Pi3Cshapes::extrude("Extrude", vec3f(0, 0, 0.f), contours, -1.f, 1), vec3f(0, 0, 0.f), currentColour);
 			scene.lastModel()->transformVerts(resource, views[currentView].rotMatrix);
@@ -373,6 +425,7 @@ void Modeller::finishLine()
 				std::vector<vec2f> contour;
 				Pi3Cmatrix matrix;
 				transformLines(lines, contour, views[currentView].rotInvertMatrix);
+				//Rotate around first point ...
 				vec2f fp = contour[0];
 				for (auto& p : contour) {
 					p.x -= fp.x;
@@ -393,6 +446,7 @@ void Modeller::finishLine()
 	maxSteps = 1;
 	contours.clear();
 	lines.clear();
+	scene.models[outlineRef].visible = false;
 }
 
 void Modeller::getShapeHeight(vec3f& pos, vec3f& v1, vec3f& v2)

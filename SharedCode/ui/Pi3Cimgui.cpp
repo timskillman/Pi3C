@@ -182,6 +182,8 @@ bool Pi3Cimgui::renderButton(Pi3Cmodel *drawObj, const int minwidth, const int m
 	rect.renderBasic(resource);
 	image.renderBasic(resource);
 
+	updateGroupSize(pos.x + size.x, pos.y + size.y);
+
 	NextPos();
 
 	return mouseTouchRect;
@@ -252,6 +254,8 @@ bool Pi3Cimgui::renderButton2(Pi3Cmodel *drawObj, const int minwidth, const int 
 	image.renderBasic(resource);
 	text.renderBasic(resource);
 
+	updateGroupSize(pos.x + size.x, pos.y + size.y);
+
 	NextPos();
 
 	return mouseTouchRect;
@@ -287,6 +291,8 @@ void Pi3Cimgui::renderRectAt(const Pi3Cpointi& size, const Pi3Cpointi& pos, cons
 	if (colour != 0) rect.material.alpha = (float)((colour>>24) & 255)/255.f;
 	setColour(rect, (colour == 0) ? currentParams.buttonColour : colour);
 	rect.renderBasic(resource);
+
+	updateGroupSize(pos.x + size.x, pos.y + size.y);
 }
 
 Pi3Cpointi Pi3Cimgui::calcImageSize(int tw, int th, const int minwidth, const int minheight, bool squash)
@@ -316,6 +322,9 @@ bool Pi3Cimgui::renderIconImage(Pi3Cmodel *image, const int width, const int hei
 	bool mouseTouchRect = touched(size);
 	image->matrix.move(vec3f((float)pos.x, (float)(pos.y-wh.y - currentParams.top),zpos));
 	image->matrix.SetScales(vec3f((float)wh.x, (float)wh.y, 1.f));
+
+	updateGroupSize(pos.x + wh.x, pos.y + wh.y - height);
+
 	setColour(*image, colour);
 	image->renderBasic(resource);
 	NextPos();
@@ -493,24 +502,66 @@ bool Pi3Cimgui::SliderInt(const std::string &text, const int32_t from, const int
 
 bool Pi3Cimgui::BeginGroupHorizontal(const std::string &icon, const int icw, const int ich)
 {
+	startGroupRect();
 	if (icon!="") renderBackIcon(icon, icw, ich);
+	
 	return true;
+}
+
+void Pi3Cimgui::EndGroupHorizontal(const std::string& icon, const int icw, const int ich)
+{
+	if (icon != "") renderBackIcon(icon, icw, ich);
+	endGroupRect();
+}
+
+void Pi3Cimgui::startGroupRect()
+{
+	groupSize.emplace_back();
+	Pi3Crecti& grect = groupSize.back();
+	grect.x = pos.x;
+	grect.y = pos.y;
+}
+
+void Pi3Cimgui::updateGroupSize(int32_t nx, int32_t ny)
+{
+	if (groupSize.size() == 0) return;
+
+	Pi3Crecti& grect = groupSize.back();
+	int32_t w = nx - grect.x;
+	int32_t h = grect.y - ny;
+	if (w > grect.width) grect.width = w;
+	if (h > grect.height) grect.height = h;
+}
+
+void Pi3Cimgui::endGroupRect()
+{
+	if (groupSize.size() == 0) return;
+
+	Pi3Crecti& grect = groupSize.back();
+
+
+	if (grect.width <= 0 || grect.height <= 0) return;
+
+	//std::vector<uint8_t> data(grect.width * grect.height * 4);
+	//glReadPixels(0, 0, grect.width, grect.height, GL_RGBA, GL_UNSIGNED_BYTE, &data[0]);
+
+	//Pi3Cutils::saveBufferToPNG("iconGroup.png", data, grect.width, grect.height);
 }
 
 bool Pi3Cimgui::BeginGroupVertical(const std::string &icon, const int icw, const int ich)
 {
+	startGroupRect();
+
 	if (icon != "") renderBackIcon(icon, icw, ich);
 	return true;
 }
 
-void Pi3Cimgui::EndGroupHorizontal(const std::string &icon, const int icw, const int ich)
-{
-	if (icon != "") renderBackIcon(icon, icw, ich);
-}
+
 
 void Pi3Cimgui::EndGroupVertical(const std::string &icon, const int icw, const int ich)
 {
 	if (icon != "") renderBackIcon(icon, icw, ich);
+	endGroupRect();
 }
 
 bool Pi3Cimgui::InputText(const std::string &text, std::string &input, const int minWidth, const int minHeight, uint32_t colour)

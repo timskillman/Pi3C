@@ -60,6 +60,19 @@ namespace Pi3Cutils {
 		}
 	}
 
+	void saveBufferToPNG(const char* filename, std::vector<uint8_t>& snapShot, const int width, const int height)
+	{
+		std::vector<uint8_t> destimage;
+		destimage.resize(snapShot.size());
+		flipImage(snapShot, destimage, width, height);
+
+		SDL_Surface* ss = SDL_CreateRGBSurfaceFrom(&destimage[0], width, height, 32, width * 4, 0x000000ff, 0x0000ff00, 0x00ff0000, 0xff000000);
+		SDL_RWops* fo = SDL_RWFromFile(filename, "wb");
+		IMG_SavePNG_RW(ss, fo, 0);
+		SDL_RWclose(fo);
+		SDL_FreeSurface(ss);
+	}
+
 	bool snapShot(const Pi3Crecti &rect, std::vector<uint8_t> &snapShot)
 	{
 		try {
@@ -70,7 +83,7 @@ namespace Pi3Cutils {
 			destimage.resize(snapShot.size());
 			glReadPixels(rect.x, rect.y, rect.width, rect.height, GL_RGBA, GL_UNSIGNED_BYTE, &destimage[0]);
 			flipImage(destimage, snapShot, rect.width, rect.height);
-			//saveBufferToPNG("snapshot.png", snapShot, rect.width, rect.height);
+			saveBufferToPNG("snapshot.png", snapShot, rect.width, rect.height);
 			return true;
 		}
 		catch (const std::bad_alloc&) {

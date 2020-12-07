@@ -141,6 +141,7 @@ public:
 	vec3f currentPos;
 	int32_t lineCount = 0;
 	int32_t lastMovePoint = 0;
+	vec3f lastPoint;
 	//bool ctrlKey = false;
 	//bool shiftKey = false;
 

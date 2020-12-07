@@ -9,6 +9,7 @@
 #include "Pi3Crect.h"
 #include "Pi3Cutils.h"
 #include "Pi3Ccolours.h"
+#include "Pi3Cutils.h"
 #include <string>
 #include <vector>
 
@@ -127,6 +128,10 @@ public:
 	bool BeginGroupVertical(const std::string &icon = "", const int icw = 0, const int ich = 0);
 	void EndGroupHorizontal(const std::string &icon = "", const int icw = 0, const int ich = 0);
 	void EndGroupVertical(const std::string &icon = "", const int icw = 0, const int ich = 0);
+
+	void startGroupRect();
+	void updateGroupSize(int32_t x, int32_t y);
+	void endGroupRect();
 
 	//Menu bar widget ...
 	bool BeginMenuBar();

@@ -248,7 +248,7 @@ void Pi3Cresource::renderMesh(const int meshRef, const GLenum rendermode)
 	setRenderBuffer(mesh.bufRef, mesh.stride);
 
 
-	if (rendermode == GL_TRIANGLES || (mesh.mode & GL_LINE_STRIP)) mesh.render(rendermode);
+	if (rendermode == GL_TRIANGLES || mesh.mode== GL_LINE_STRIP) mesh.render(rendermode);
 
 	if (mesh.lineIndexes.size()>0 && (rendermode & GL_LINES))
 		mesh.renderIndexed(GL_LINES, mesh.lineIndexes.size(), &mesh.lineIndexes[0]);
