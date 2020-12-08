@@ -19,6 +19,10 @@ public:
 	Pi3Crecti getRectTopLeft();
 	Pi3Crecti getRectFull();
 	void resize() { gui.resize(); }
+	void drawViewBorders(Modeller* md); //, Pi3Cpointi& wpos
+
+	bool draggingBarX = false;
+	bool draggingBarY = false;
 
 private:
 
@@ -45,8 +49,7 @@ private:
 	float dragBarX = 0.5f;
 	float dragBarY = 0.5f;
 	float dragBarThickness = 8.f;
-	bool draggingBarX = false;
-	bool draggingBarY = false;
+
 	int dbh = (int)(dragBarThickness * 0.5f);
 
 	//Temp work vars ...
@@ -54,14 +57,15 @@ private:
 	int workHeight = 0;
 	float ibx = 1.f - dragBarX;
 	float iby = 1.f - dragBarY;
+	Pi3Cpointi viewPos;
 
 	void renderYellowBorder(uint32_t currentSelView);
-	void dragViewportBars(Modeller * md, Pi3Cpointi& wposm, int midht);
+	void dragViewportBars(Modeller * md, int midht);
 	void saveAll(Modeller * md);
 	std::string ftostrdp(float n, int decimalPlaces);
 	bool draggingBars();
 
-	void drawBorders(Modeller * md, Pi3Cpointi& wpos);
+
 	void doMenus(Modeller * md);
 	void doEditToolbar(Modeller * md, Pi3Cimgui::rectStyle& iconstyle, bool mb);
 	void doTransformToolbar(Modeller * md, Pi3Cimgui::rectStyle& iconstyle, bool mb);

@@ -3,6 +3,16 @@
 #include <cstring>
 #include "Pi3CfileOBJ.h"
 
+void Pi3Cscene::setup2Dprojection()
+{
+	resource->shaders[currentShader].setProjectionMatrix(projMatrix2D);
+}
+
+void Pi3Cscene::setup3Dprojection()
+{
+	resource->shaders[currentShader].setProjectionMatrix(projMatrix3D);
+}
+
 void Pi3Cscene::render(const float ticks, Pi3Cmatrix &projMatrix, Pi3Cmatrix &modelMatrix, std::vector<Pi3Cmodel> &mods, Pi3Cmaterial *materialOverride)
 {
 	resource->shaders[currentShader].ticks = ticks;

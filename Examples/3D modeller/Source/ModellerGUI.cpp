@@ -158,7 +158,7 @@ float dragLimit(float& dragPos, float pos)
 	return 1.f - dragPos;
 }
 
-void MGui::dragViewportBars(Modeller * md, Pi3Cpointi& wpos, int midht)
+void MGui::dragViewportBars(Modeller * md, int midht)
 {
 	bool mb = md->window->mouse.LeftButton;
 	int mx = md->window->mouse.x;
@@ -166,7 +166,7 @@ void MGui::dragViewportBars(Modeller * md, Pi3Cpointi& wpos, int midht)
 
 	if (md->fullview == viewInfo::INACTIVE) {
 		//Drag bar horizontal ...
-		gui.setPosition(leftbarWidth + (int)(dragBarX * (float)workWidth - dragBarThickness * 0.5f), wpos.y);
+		gui.setPosition(leftbarWidth + (int)(dragBarX * (float)workWidth - dragBarThickness * 0.5f), viewPos.y);
 
 		bool touchDragBarH = gui.renderRect((int)dragBarThickness, midht);
 		if (touchDragBarH || draggingBarX) md->setDragBarH(true);
@@ -203,19 +203,13 @@ void MGui::dragViewportBars(Modeller * md, Pi3Cpointi& wpos, int midht)
 	}
 }
 
-void MGui::drawBorders(Modeller * md, Pi3Cpointi& wpos)
+void MGui::drawViewBorders(Modeller* md) // , Pi3Cpointi& viewPos)
 {
-	int winWidth = md->window->getWidth();
 	int winHeight = md->window->getHeight();
+	int midht = winHeight - viewPos.y - botbarHeight;
 
-	int midht = winHeight - wpos.y - botbarHeight;
-	gui.renderRect(leftbarWidth, midht);
-	gui.movePosition(winWidth - rightbarWidth, 0);
-	gui.renderRect(rightbarWidth, midht);
-	gui.setPosition(0, wpos.y + midht);
-	gui.renderRect(winWidth, botbarHeight);
-
-	dragViewportBars(md, wpos, midht);
+	dragViewportBars(md, midht);
+	renderYellowBorder(md->currentSelView);
 }
 
 void MGui::doMenus(Modeller * md)
@@ -355,13 +349,21 @@ void MGui::doIMGUI(Modeller * md)
 	//Draw borders ...
 	gui.renderRect(winWidth, topbarHeight);
 	gui.nextLine(0);
-	Pi3Cpointi wpos = gui.getPosition();
-	drawBorders(md, wpos);
+	viewPos = gui.getPosition(); //top, left corner of views
+
+	int midht = winHeight - viewPos.y - botbarHeight;
+	gui.renderRect(leftbarWidth, midht);
+	gui.movePosition(winWidth - rightbarWidth, 0);
+	gui.renderRect(rightbarWidth, midht);
+	gui.setPosition(0, viewPos.y + midht);
+	gui.renderRect(winWidth, botbarHeight);
+
+	//drawViewBorders(md);
 
 	//Top menu bar icons ...
 	gui.setButtonStyle(bsIcons);
 
-	gui.setPosition(wpos.x + leftbarWidth, wpos.y - topbarHeight);
+	gui.setPosition(viewPos.x + leftbarWidth, viewPos.y - topbarHeight);
 	doEditToolbar(md, bsIcons, mb);
 
 	gui.sameLine();
@@ -371,7 +373,7 @@ void MGui::doIMGUI(Modeller * md)
 	doSceneToolbar(md, bsIcons, mb, mu);
 
 	//Left side create shape buttons ...
-	gui.setPosition(wpos.x + (leftbarWidth - bsButtons.minWidth) / 2, wpos.y);
+	gui.setPosition(viewPos.x + (leftbarWidth - bsButtons.minWidth) / 2, viewPos.y);
 	bsButtons.sameLine = false;
 	gui.setButtonStyle(bsButtons);
 	doShapesToolbar(md, bsButtons, mb, mu);
@@ -381,7 +383,7 @@ void MGui::doIMGUI(Modeller * md)
 	static double v = 5;
 	gui.SliderH("Scroll", 0, 10, v, 300, 24);
 
-	renderYellowBorder(md->currentSelView);
+	
 
 	if (md->currentView != viewInfo::INACTIVE) {
 		Pi3Crecti &rect = md->views[md->currentView].viewport;

@@ -119,6 +119,7 @@ public:
 	void setClearColour(const uint32_t clearColour);
 	uint32_t getClearColour();
 	void clear();
+	void clearRect(const Pi3Crecti& viewRect);
 	void setAlpha(bool v);
 	int getWidth();
 	int getHeight();

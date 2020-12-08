@@ -321,6 +321,14 @@ void Pi3Cwindow::clear()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
+void Pi3Cwindow::clearRect(const Pi3Crecti& viewRect)
+{
+	glEnable(GL_SCISSOR_TEST);
+	glScissor(viewRect.x, viewRect.y, viewRect.width, viewRect.height);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glDisable(GL_SCISSOR_TEST);
+}
+
 void Pi3Cwindow::setAlpha(bool useAlpha)
 {
 	if (useAlpha) {

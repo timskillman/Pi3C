@@ -63,14 +63,14 @@ namespace Pi3CfileOBJ {
 	{
 		static char vs1[128], vs2[128], vs3[128];
 		sscanf(vals.c_str(), "%s %s %s", vs1, vs2, vs3);
-		return vec3f(mystrtof(vs1),mystrtof(vs2),mystrtof(vs3));
+		return vec3f((float)mystrtof(vs1), (float)mystrtof(vs2), (float)mystrtof(vs3));
 	}
 	
 	vec2f readVec2f(std::string& vals)
 	{
 		static char vs1[128], vs2[128];
 		sscanf(vals.c_str(), "%s %s", vs1, vs2);
-		return vec2f(mystrtof(vs1),mystrtof(vs2));
+		return vec2f((float)mystrtof(vs1), (float)mystrtof(vs2));
 	}
 	
 	void getMatLib(const std::string &path, const std::string &name, Pi3Cresource* resource)

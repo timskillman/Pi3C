@@ -130,7 +130,7 @@ public:
 	void EndGroupVertical(const std::string &icon = "", const int icw = 0, const int ich = 0);
 
 	void startGroupRect();
-	void updateGroupSize(int32_t x, int32_t y);
+	void updateGroupSize(const Pi3Cpointi& pos, const Pi3Cpointi& size);
 	void endGroupRect();
 
 	//Menu bar widget ...

@@ -68,7 +68,7 @@ namespace Pi3Cshapes {
 	{
 		if (lines.size() < 3) return;
 		vec3f n = lines[0].trinormal(lines[1], lines[2]);
-		for (int v=0; v<lines.size(); v++) {
+		for (uint32_t v=0; v<lines.size(); v++) {
 			storeVNTC(verts, vc, lines[v], n, uvpos, col);
 		}
 	}

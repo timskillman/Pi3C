@@ -182,7 +182,7 @@ bool Pi3Cimgui::renderButton(Pi3Cmodel *drawObj, const int minwidth, const int m
 	rect.renderBasic(resource);
 	image.renderBasic(resource);
 
-	updateGroupSize(pos.x + size.x, pos.y + size.y);
+	updateGroupSize(pos, size);
 
 	NextPos();
 
@@ -254,7 +254,7 @@ bool Pi3Cimgui::renderButton2(Pi3Cmodel *drawObj, const int minwidth, const int 
 	image.renderBasic(resource);
 	text.renderBasic(resource);
 
-	updateGroupSize(pos.x + size.x, pos.y + size.y);
+	updateGroupSize(pos, size);
 
 	NextPos();
 
@@ -292,7 +292,7 @@ void Pi3Cimgui::renderRectAt(const Pi3Cpointi& size, const Pi3Cpointi& pos, cons
 	setColour(rect, (colour == 0) ? currentParams.buttonColour : colour);
 	rect.renderBasic(resource);
 
-	updateGroupSize(pos.x + size.x, pos.y + size.y);
+	updateGroupSize(pos, size);
 }
 
 Pi3Cpointi Pi3Cimgui::calcImageSize(int tw, int th, const int minwidth, const int minheight, bool squash)
@@ -323,7 +323,7 @@ bool Pi3Cimgui::renderIconImage(Pi3Cmodel *image, const int width, const int hei
 	image->matrix.move(vec3f((float)pos.x, (float)(pos.y-wh.y - currentParams.top),zpos));
 	image->matrix.SetScales(vec3f((float)wh.x, (float)wh.y, 1.f));
 
-	updateGroupSize(pos.x + wh.x, pos.y + wh.y - height);
+	updateGroupSize(pos, Pi3Cpointi(wh.x, wh.y - height));
 
 	setColour(*image, colour);
 	image->renderBasic(resource);
@@ -516,34 +516,36 @@ void Pi3Cimgui::EndGroupHorizontal(const std::string& icon, const int icw, const
 
 void Pi3Cimgui::startGroupRect()
 {
-	//groupSize.emplace_back();
-	//Pi3Crecti& grect = groupSize.back();
-	//grect.x = pos.x;
-	//grect.y = pos.y;
+	groupSize.emplace_back();
+	Pi3Crecti& grect = groupSize.back();
+	grect.x = pos.x;
+	grect.y = pos.y;
 }
 
-void Pi3Cimgui::updateGroupSize(int32_t nx, int32_t ny)
+void Pi3Cimgui::updateGroupSize(const Pi3Cpointi& pos, const Pi3Cpointi& size)
 {
-	//if (groupSize.size() == 0) return;
+	if (groupSize.size() == 0 || size.x<=0 || size.y<=0) return;
 
-	//Pi3Crecti& grect = groupSize.back();
-	//int32_t w = nx - grect.x;
-	//int32_t h = grect.y - ny;
-	//if (w > grect.width) grect.width = w;
-	//if (h > grect.height) grect.height = h;
+	Pi3Crecti& grect = groupSize.back();
+	if (((pos.x + size.x) - grect.x) > grect.width) grect.width = (pos.x + size.x) - grect.x;
+	if (fabs((pos.y - size.y) - grect.y) > grect.height)
+		grect.height = (int32_t)fabs((pos.y - size.y) - grect.y);
+	if ((pos.y - size.y) < grect.y) grect.y = pos.y - size.y;
+	//if (pos.x < grect.x) grect.x = pos.x;
+	//if (pos.y < grect.y) grect.y = pos.y;`
 }
 
 void Pi3Cimgui::endGroupRect()
 {
-	//if (groupSize.size() == 0) return;
+	if (groupSize.size() == 0) return;
 
-	//Pi3Crecti& grect = groupSize.back();
+	Pi3Crecti& grect = groupSize.back();
 
 
-	//if (grect.width <= 0 || grect.height <= 0) return;
+	if (grect.width <= 0 || grect.height <= 0) return;
 
 	//std::vector<uint8_t> data(grect.width * grect.height * 4);
-	//glReadPixels(0, 0, grect.width, grect.height, GL_RGBA, GL_UNSIGNED_BYTE, &data[0]);
+	//glReadPixels(grect.x, grect.y, grect.width, grect.height, GL_RGBA, GL_UNSIGNED_BYTE, &data[0]);
 
 	//Pi3Cutils::saveBufferToPNG("iconGroup.png", data, grect.width, grect.height);
 }

@@ -57,8 +57,9 @@ public:
 		std::string err; Pi3CfileOBJ::save(path, filename, &scene, selected, nullptr, err); 
 	}
 
-	bool currentViewIsActive() { return (currentView != viewInfo::INACTIVE) || fullscreen; }
+	bool currentViewIsActive() { return (currentView != viewInfo::INACTIVE && !mgui.somethingSelected()) || fullscreen; }
 
+	void renderView(const viewInfo::SceneLayout projection, const Pi3Crecti& rect, int32_t mx, int32_t my);
 	void snapshot();
 	//vec3f getRelativeMove(const vec3f& pos);
 
@@ -86,6 +87,8 @@ public:
 	EditMode editMode = ED_SELECT;
 	CreateTool createTool = CT_CUBOID;
 	SceneAction sceneAction = SceneAction::SA_NONE;
+
+	int refresh = 2;
 
 	int createCount = 0;
 	int lastCreateCount = 0;
@@ -181,4 +184,9 @@ private:
 	void finishLine();
 	void transformLines(std::vector<vec3f>& lines, std::vector<vec2f>& contour, Pi3Cmatrix& matrix, int32_t start = 0);
 	void getShapeHeight(vec3f& pos, vec3f& v1, vec3f& v2);
+
+	void updateRefresh() { if (refresh > 0) refresh--; }
+	void refreshWindow() { refresh = 2; }
+	bool notRefreshed() { return refresh > 0; }
+	bool refreshed() { return refresh == 0; }
 };

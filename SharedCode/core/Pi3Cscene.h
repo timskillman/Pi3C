@@ -106,6 +106,8 @@ public:
 	void setViewport(const Pi3Crecti &rect);
 	void setOrthographic3D(const Pi3Crecti &rect, const float zoom, const float znear, const float zfar);
 	void setViewport2D(const Pi3Crecti &rect, const float znear, const float zfar);
+	void setup2Dprojection();
+	void setup3Dprojection();
 	void resize(const Pi3Crecti &rect);
 
 	bool collide(const vec3f &pos, const vec3f &dir, const float radius) const;

@@ -592,6 +592,7 @@ void Modeller::DragLeftMouseButton(viewInfo& view, vec3f& mouseXYZ)
 		if (view.projection == viewInfo::PERSPECTIVE) {
 			view.addRot(vec3f(mouseXYZ.y, mouseXYZ.x, 0) * -0.01f);
 			//view.setRotMatrix(view.rot);
+
 			sceneAction = SA_ROTATING;
 			//rotating = true;
 		}
@@ -699,7 +700,7 @@ void Modeller::touchScene()
 {
 	if (sceneAction != SA_NONE) return;
 
-	if ((currentViewIsActive() && !mgui.somethingSelected()) || fullscreen) {
+	if (currentViewIsActive() && !mgui.somethingSelected()) {
 
 		touchView(views[currentView]);
 
@@ -775,6 +776,7 @@ void Modeller::handleEvents(std::vector<uint32_t>& eventList)
 			break;
 		case SDL_WINDOWEVENT:
 			if (window->resized) {
+				refreshWindow();
 				mgui.resize();
 			}
 			break;
@@ -785,6 +787,7 @@ void Modeller::handleEvents(std::vector<uint32_t>& eventList)
 			std::string file = window->dropfile;
 			if (file.substr(file.size() - 4, 4) == ".obj") {
 				int32_t modelRef = scene.loadModelOBJ("", file, touch.touching ? touch.intersection : vec3f(0,0,0), true);  // false, loadbarCallback);
+				refreshWindow();
 			}
 			break;
 		}
@@ -841,7 +844,7 @@ void Modeller::setFullScreen()
 		}
 		else 
 		{
-			window->resizeWindow(1440, 900);  //RPi can't seem to go fullscreen with a specified res - just drop it
+			window->resizeWindow(1440, 900);
 		}
 
 		currentView = viewInfo::FULLSCREEN;
@@ -868,6 +871,7 @@ void Modeller::setFullScene()
 		setCurrentSelView(fullview);
 		fullview = viewInfo::INACTIVE;
 	}
+	refreshWindow();
 	window->mouse.up = false;
 }
 
@@ -980,59 +984,68 @@ void Modeller::renderScene(viewInfo &view)
 	scene.renderView(view, &outlines);
 }
 
+void Modeller::renderView(const viewInfo::SceneLayout projection, const Pi3Crecti& rect, int32_t mx, int32_t my)
+{
+	if (refreshed() && (mx<rect.x || mx>(rect.x + rect.width) || my<rect.y || my>(rect.y + rect.height))) return;
+
+	window->clearRect(rect);
+	views[projection].viewport = rect;
+	if (views[projection].viewport.touch(mx, my)) currentView = projection;
+	renderScene(views[projection]);
+}
+
 void Modeller::render()
 {
 	resource->calls = 0;
 
-	Pi3Crecti screenRect(0, 0, window->getWidth(), window->getHeight());
+	if (fullscreen) { 
+		renderScene(views[currentView]); 
+		return; 
+	}
+
 	int mx = window->mouse.x;
 	int my = window->getHeight() - window->mouse.y;
 
-	currentView = viewInfo::INACTIVE;
+	//Render 2D
+	Pi3Crecti screenRect(0, 0, window->getWidth(), window->getHeight());
+	scene.setViewport(screenRect);
+	scene.setFixedLight(0xffffff, vec3f(0, 1000.f, 1000.f));
+	scene.setViewport2D(screenRect, 0.1f, 2000.f);
+	scene.render2D(window->getTicks());
 
-	if (fullscreen) {
-		currentView = viewInfo::FULLSCREEN;
-		renderScene(views[currentView]);
+	mgui.doIMGUI(this);
+	//handleIMGUI(); //must be in the rendering loop with 2D setup
+
+
+	currentView = viewInfo::INACTIVE;
+	Pi3Crecti viewRect = mgui.getRectFull();
+	
+	//window->clearRect(viewRect);
+
+	if (fullview >= 0) {
+		views[viewInfo::FULL].viewport = viewRect;
+		currentView = viewInfo::FULL;
+		renderScene(views[viewInfo::FULL]);
 	}
 	else {
-
-		if (fullview >= 0) {
-			views[viewInfo::FULL].viewport = mgui.getRectFull();
-			currentView = viewInfo::FULL;
-			renderScene(views[viewInfo::FULL]);
-		}
-		else {
-			//render perspective view (right lower)...
-		
-			views[viewInfo::BOTTOMRIGHT].viewport = mgui.getRectBottomRight();
-			if (views[viewInfo::BOTTOMRIGHT].viewport.touch(mx, my)) currentView = viewInfo::BOTTOMRIGHT; 
-			renderScene(views[viewInfo::BOTTOMRIGHT]);
-
-			//render left lower ...
-			views[viewInfo::BOTTOMLEFT].viewport = mgui.getRectBottomLeft();
-			if (views[viewInfo::BOTTOMLEFT].viewport.touch(mx, my)) currentView = viewInfo::BOTTOMLEFT;
-			renderScene(views[viewInfo::BOTTOMLEFT]);
-
-			//render left top ...
-			views[viewInfo::TOPLEFT].viewport = mgui.getRectTopLeft();
-			if (views[viewInfo::TOPLEFT].viewport.touch(mx, my)) currentView = viewInfo::TOPLEFT;
-			renderScene(views[viewInfo::TOPLEFT]);
-
-			//render right top ...
-			views[viewInfo::TOPRIGHT].viewport = mgui.getRectTopRight();
-			if (views[viewInfo::TOPRIGHT].viewport.touch(mx, my)) currentView = viewInfo::TOPRIGHT;
-			renderScene(views[viewInfo::TOPRIGHT]);
-		}
-
-	
-		//Render 2D
-		scene.setViewport(screenRect);
-		scene.setFixedLight(0xffffff, vec3f(0, 1000.f, 1000.f));
-		scene.setViewport2D(screenRect, 0.1f, 2000.f);
-		scene.render2D(window->getTicks());
-
-		handleIMGUI(); //must be in the rendering loop with 2D setup
+		renderView(viewInfo::BOTTOMRIGHT, mgui.getRectBottomRight(), mx, my); //render perspective view
+		renderView(viewInfo::BOTTOMLEFT, mgui.getRectBottomLeft(), mx, my);
+		renderView(viewInfo::TOPLEFT, mgui.getRectTopLeft(), mx, my);
+		renderView(viewInfo::TOPRIGHT, mgui.getRectTopRight(), mx, my);
 	}
+
+	//Render 2D
+	scene.setViewport(screenRect);
+	//scene.setFixedLight(0xffffff, vec3f(0, 1000.f, 1000.f));
+	scene.setViewport2D(screenRect, 0.1f, 2000.f);
+	scene.setup2Dprojection();
+	//scene.render2D(window->getTicks());
+
+	mgui.drawViewBorders(this);
+
+	updateRefresh();
+
+	if (mgui.draggingBarX || mgui.draggingBarY) refreshWindow();
 }
 
 void Modeller::snapshot() {
