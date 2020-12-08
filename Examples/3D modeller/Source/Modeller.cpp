@@ -640,6 +640,8 @@ void Modeller::ClickLeftMouseButton(viewInfo& view)
 			touchScene();
 			break;
 		case ED_ROTATE:
+		case ED_ROTATESCENE:
+			setCursor(handCursor);
 			break;
 		case ED_SCALE:
 			editUndo.setSelectionCentre(scene.models);
@@ -699,7 +701,7 @@ void Modeller::touchScene()
 {
 	if (sceneAction != SA_NONE) return;
 
-	if ((currentViewIsActive() && !mgui.somethingSelected()) || fullscreen) {
+	if (currentViewIsActive()) {
 
 		touchView(views[currentView]);
 
@@ -718,11 +720,22 @@ void Modeller::touchScene()
 			touch.selmodel->selected = true;
 
 			switch (editMode) {
-			case ED_SELECT: touchObject(*touch.selmodel); break;
-			case ED_MOVE: setCursor(moveCursor); break;
-			case ED_ROTATE: setCursor(handCursor); break;
-			case ED_SCALE: setCursor(handCursor); break;
-			case ED_DROPMAN: dropMan(); break;
+			case ED_SELECT: 
+				touchObject(*touch.selmodel);
+				setCursor(arrowCursor);
+				break;
+			case ED_MOVE: 
+				setCursor(moveCursor); 
+				break;
+			case ED_ROTATE: 
+				setCursor(handCursor); 
+				break;
+			case ED_SCALE: 
+				setCursor(handCursor); 
+				break;
+			case ED_DROPMAN: 
+				dropMan(); 
+				break;
 			}
 
 		}
@@ -980,9 +993,25 @@ void Modeller::renderScene(viewInfo &view)
 	scene.renderView(view, &outlines);
 }
 
+void Modeller::renderView(const viewInfo::SceneLayout projection, const Pi3Crecti& rect, int32_t mx, int32_t my)
+{
+	//if (refreshed() && (mx<rect.x || mx>(rect.x + rect.width) || my<rect.y || my>(rect.y + rect.height))) return;
+	//window->clearRect(rect);
+
+	views[projection].viewport = rect;
+	if (views[projection].viewport.touch(mx, my)) currentView = projection;
+	renderScene(views[projection]);
+}
+
 void Modeller::render()
 {
 	resource->calls = 0;
+
+	if (fullscreen) {
+		currentView = viewInfo::FULLSCREEN;
+		renderScene(views[currentView]);
+		return;
+	}
 
 	Pi3Crecti screenRect(0, 0, window->getWidth(), window->getHeight());
 	int mx = window->mouse.x;
@@ -990,49 +1019,25 @@ void Modeller::render()
 
 	currentView = viewInfo::INACTIVE;
 
-	if (fullscreen) {
-		currentView = viewInfo::FULLSCREEN;
-		renderScene(views[currentView]);
+	if (fullview >= 0) {
+		views[viewInfo::FULL].viewport = mgui.getRectFull();
+		currentView = viewInfo::FULL;
+		renderScene(views[viewInfo::FULL]);
 	}
 	else {
-
-		if (fullview >= 0) {
-			views[viewInfo::FULL].viewport = mgui.getRectFull();
-			currentView = viewInfo::FULL;
-			renderScene(views[viewInfo::FULL]);
-		}
-		else {
-			//render perspective view (right lower)...
-		
-			views[viewInfo::BOTTOMRIGHT].viewport = mgui.getRectBottomRight();
-			if (views[viewInfo::BOTTOMRIGHT].viewport.touch(mx, my)) currentView = viewInfo::BOTTOMRIGHT; 
-			renderScene(views[viewInfo::BOTTOMRIGHT]);
-
-			//render left lower ...
-			views[viewInfo::BOTTOMLEFT].viewport = mgui.getRectBottomLeft();
-			if (views[viewInfo::BOTTOMLEFT].viewport.touch(mx, my)) currentView = viewInfo::BOTTOMLEFT;
-			renderScene(views[viewInfo::BOTTOMLEFT]);
-
-			//render left top ...
-			views[viewInfo::TOPLEFT].viewport = mgui.getRectTopLeft();
-			if (views[viewInfo::TOPLEFT].viewport.touch(mx, my)) currentView = viewInfo::TOPLEFT;
-			renderScene(views[viewInfo::TOPLEFT]);
-
-			//render right top ...
-			views[viewInfo::TOPRIGHT].viewport = mgui.getRectTopRight();
-			if (views[viewInfo::TOPRIGHT].viewport.touch(mx, my)) currentView = viewInfo::TOPRIGHT;
-			renderScene(views[viewInfo::TOPRIGHT]);
-		}
-
-	
-		//Render 2D
-		scene.setViewport(screenRect);
-		scene.setFixedLight(0xffffff, vec3f(0, 1000.f, 1000.f));
-		scene.setViewport2D(screenRect, 0.1f, 2000.f);
-		scene.render2D(window->getTicks());
-
-		handleIMGUI(); //must be in the rendering loop with 2D setup
+		renderView(viewInfo::BOTTOMRIGHT, mgui.getRectBottomRight(), mx, my); //render perspective view
+		renderView(viewInfo::BOTTOMLEFT, mgui.getRectBottomLeft(), mx, my);
+		renderView(viewInfo::TOPLEFT, mgui.getRectTopLeft(), mx, my);
+		renderView(viewInfo::TOPRIGHT, mgui.getRectTopRight(), mx, my);
 	}
+
+	//Render 2D
+	scene.setViewport(screenRect);
+	scene.setFixedLight(0xffffff, vec3f(0, 1000.f, 1000.f));
+	scene.setViewport2D(screenRect, 0.1f, 2000.f);
+	scene.render2D(window->getTicks());
+
+	handleIMGUI(); //must be in the rendering loop with 2D setup
 }
 
 void Modeller::snapshot() {

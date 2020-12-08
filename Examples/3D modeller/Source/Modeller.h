@@ -57,7 +57,7 @@ public:
 		std::string err; Pi3CfileOBJ::save(path, filename, &scene, selected, nullptr, err); 
 	}
 
-	bool currentViewIsActive() { return (currentView != viewInfo::INACTIVE) || fullscreen; }
+	bool currentViewIsActive() { return (currentView != viewInfo::INACTIVE && !mgui.somethingSelected()) || fullscreen; }
 
 	void snapshot();
 	//vec3f getRelativeMove(const vec3f& pos);
@@ -181,4 +181,5 @@ private:
 	void finishLine();
 	void transformLines(std::vector<vec3f>& lines, std::vector<vec2f>& contour, Pi3Cmatrix& matrix, int32_t start = 0);
 	void getShapeHeight(vec3f& pos, vec3f& v1, vec3f& v2);
+	void renderView(const viewInfo::SceneLayout projection, const Pi3Crecti& rect, int32_t mx, int32_t my);
 };
