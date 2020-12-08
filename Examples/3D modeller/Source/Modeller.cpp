@@ -770,6 +770,8 @@ void Modeller::handleEvents(std::vector<uint32_t>& eventList)
 			if (currentViewIsActive() && sceneAction != SA_DRAGBAR) {
 				if (createCount > 0) {
 					creatingShape();
+					window->mouse.up = false;
+					return;
 				}
 				else if (window->mouse.anyButton()) {
 					vec3f mouseXYZ = vec3f(window->mouse.deltaXY.x, -window->mouse.deltaXY.y, 0);
