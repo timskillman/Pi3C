@@ -95,6 +95,7 @@ public:
 	vec3f oldPos;
 	vec3f oldPos2;
 	std::vector<vec3f> lines; //used for creating lines/extrude and lathe
+	std::vector<std::vector<vec3f>> linePaths;
 	std::vector<std::vector<vec2f>> contours; //used for creating Extrude
 
 	std::string libShape;				//Create tool library shape file

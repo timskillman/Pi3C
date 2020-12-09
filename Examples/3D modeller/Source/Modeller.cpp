@@ -335,7 +335,6 @@ void Modeller::addLinePoint(const vec3f point)
 		if (lineCount == lastMovePoint) {
 			createFirstPoint = point;
 			model.visible = true;
-			//lastPoint = point;
 		}
 		lines.push_back(newPoint);
 
@@ -343,9 +342,11 @@ void Modeller::addLinePoint(const vec3f point)
 		case CT_EXTRUDE:
 			//Join points? 
 			if (lineCount > (lastMovePoint+1) && newPoint == createFirstPoint) {
-				contours.emplace_back();
-				std::vector<vec2f>& contour = contours.back();
-				transformLines(lines, contour, views[currentView].rotInvertMatrix, lastMovePoint+1);
+				linePaths.emplace_back();
+				std::vector<vec3f>& pline = linePaths.back();
+				for (int32_t i = lastMovePoint + 1; i < lines.size(); i++) {
+					pline.push_back(lines[i]);
+				}
 				lastMovePoint = lineCount+1;
 			}
 			break;
@@ -363,7 +364,7 @@ void Modeller::addLinePoint(const vec3f point)
 	//Create line indexes from contours and current path...
 	mesh->lineIndexes.clear();
 	int sc = 0;
-	for (auto& c : contours) {
+	for (auto& c : linePaths) {
 		for (int i = 0; i < c.size(); i++) {
 			mesh->lineIndexes.push_back(sc + i);
 			mesh->lineIndexes.push_back(sc + (i + 1) % c.size());
@@ -407,10 +408,20 @@ void Modeller::finishLine()
 		case CT_EXTRUDE:
 			if (lineCount > (lastMovePoint + 1)) {
 				lines.push_back(createFirstPoint); //close current contour
+				linePaths.push_back(lines);
+				//contours.emplace_back();
+				//std::vector<vec2f>& contour = contours.back();
+				//transformLines(lines, contour, views[currentView].rotInvertMatrix, lastMovePoint + 1);
+			}
+
+			//int lm = 0;
+			for (auto& lp : linePaths) {
 				contours.emplace_back();
 				std::vector<vec2f>& contour = contours.back();
-				transformLines(lines, contour, views[currentView].rotInvertMatrix, lastMovePoint + 1);
+				transformLines(lp, contour, views[currentView].rotInvertMatrix, 0);
+				//lm = lp.size();
 			}
+
 			createShape(Pi3Cshapes::extrude("Extrude", vec3f(0, 0, 0.f), contours, -1.f, 1), vec3f(0, 0, 0.f), currentColour);
 			scene.lastModel()->transformVerts(resource, views[currentView].rotMatrix);
 			break;
@@ -440,6 +451,7 @@ void Modeller::finishLine()
 	maxSteps = 1;
 	contours.clear();
 	lines.clear();
+	linePaths.clear();
 	scene.models[outlineRef].visible = false;
 }
 
