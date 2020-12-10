@@ -337,6 +337,8 @@ void MGui::doShapesToolbar(Modeller * md, Pi3Cimgui::rectStyle& iconstyle, bool 
 void MGui::doIMGUI(Modeller * md)
 {
 
+	//uint32_t ticks = SDL_GetTicks();
+	
 	gui.Begin();
 
 	doMenus(md);
@@ -350,7 +352,7 @@ void MGui::doIMGUI(Modeller * md)
 	int my = md->window->mouse.y;
 	bool mouseOverToolbars = mx<leftbarWidth || mx>(winWidth - rightbarWidth) || my<(topbarHeight + menuHeight) || my>winHeight - botbarHeight;
 	bool mb = md->window->mouse.LeftButton && mouseOverToolbars;
-	bool mu = md->window->mouse.up;
+	bool mu = md->window->mouse.up && mouseOverToolbars;
 	md->setMousePosition(mx, winHeight - my);
 
 	//Draw borders ...
@@ -397,7 +399,9 @@ void MGui::doIMGUI(Modeller * md)
 		//}
 	}
 
+	//SDL_Log("Ticks:%d",SDL_GetTicks()-ticks);
 	gui.End();
+	
 }
 
 std::string MGui::ftostrdp(float n, int decimalPlaces)

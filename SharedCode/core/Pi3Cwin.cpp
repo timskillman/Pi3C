@@ -154,6 +154,7 @@ std::vector<uint32_t> Pi3Cwindow::event()
 				mouse.drag = false;
 				//mouse.up = false;
 				mouse.wasDragging = false;
+				//SDL_Log("Window Mouse down");
 			}
 			switch (ev.button.button) {
 			case SDL_BUTTON_LEFT:

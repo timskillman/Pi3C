@@ -587,6 +587,16 @@ void Modeller::DragMiddleMouseButton(viewInfo& view, vec3f& mouseXYZ)
 void Modeller::DragLeftMouseButton(viewInfo& view, vec3f& mouseXYZ)
 {
 	switch (editMode) {
+	case ED_CREATE:
+		if (createCount == maxSteps) {
+			createCount = 0;
+		}
+		else {
+			if (createCount==0) createShapes();
+			createCount++;
+			creatingShape();
+		}
+		break;
 	case ED_MOVE:
 		moveSelections(view.viewCoords(mouseXYZ));
 		setSelectionBox();
@@ -627,7 +637,8 @@ void Modeller::ClickLeftMouseButton(viewInfo& view)
 				createCount++;
 				creatingShape();
 			}
-			window->mouse.up = false;
+			
+			//window->mouse.up = false;
 			break;
 		case ED_SELECT:
 			if (!window->ctrlKey) clearSelections();
@@ -767,29 +778,31 @@ void Modeller::handleEvents(std::vector<uint32_t>& eventList)
 
 	// process window events ...
 	viewInfo& view = views[currentView];
-
+	
 	for (auto& ev : eventList) {
 		switch (ev)
 		{
 		case SDL_MOUSEBUTTONDOWN:
+			//SDL_Log("MouseDown");
 			if (window->mouse.LeftButton) ClickLeftMouseButton(view);
 			if (window->mouse.RightButton) ClickRightMouseButton(view);
 			break;
 		case SDL_MOUSEBUTTONUP:
+			//SDL_Log("MouseUp");
 			MouseButtonUp();
 			break;
 		case SDL_MOUSEMOTION:
+			//SDL_Log("MouseMove");
 			if (currentViewIsActive() && sceneAction != SA_DRAGBAR) {
-				if (createCount > 0) {
-					creatingShape();
-					window->mouse.up = false;
-					return;
-				}
-				else if (window->mouse.anyButton()) {
+				if (window->mouse.anyButton()) {
 					vec3f mouseXYZ = vec3f(window->mouse.deltaXY.x, -window->mouse.deltaXY.y, 0);
 					//float sc = -window->mouse.deltaXY.y * 0.1f;
 					if (window->mouse.MiddleButton) DragMiddleMouseButton(view, mouseXYZ);
 					if (window->mouse.LeftButton) DragLeftMouseButton(view, mouseXYZ);
+				} else if (createCount > 0) {
+					creatingShape();
+					window->mouse.up = false;
+					return;
 				}
 			}
 			break;
@@ -1051,7 +1064,9 @@ void Modeller::render()
 	scene.setViewport2D(screenRect, 0.1f, 2000.f);
 	scene.render2D(window->getTicks());
 
+	
 	handleIMGUI(); //must be in the rendering loop with 2D setup
+	
 }
 
 void Modeller::snapshot() {

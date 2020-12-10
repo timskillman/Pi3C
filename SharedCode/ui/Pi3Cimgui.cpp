@@ -735,7 +735,7 @@ void Pi3Cimgui::Begin() {
 
 void Pi3Cimgui::End()
 {
-	if (!takeSnapshot) snapshot();
+	//if (!takeSnapshot) snapshot(); //SLOW!
 }
 
 bool Pi3Cimgui::BeginMenuBar()
