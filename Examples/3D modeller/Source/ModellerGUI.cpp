@@ -348,7 +348,8 @@ void MGui::doIMGUI(Modeller * md)
 
 	int mx = md->window->mouse.x;
 	int my = md->window->mouse.y;
-	bool mb = md->window->mouse.LeftButton;
+	bool mouseOverToolbars = mx<leftbarWidth || mx>(winWidth - rightbarWidth) || my<(topbarHeight + menuHeight) || my>winHeight - botbarHeight;
+	bool mb = md->window->mouse.LeftButton && mouseOverToolbars;
 	bool mu = md->window->mouse.up;
 	md->setMousePosition(mx, winHeight - my);
 
