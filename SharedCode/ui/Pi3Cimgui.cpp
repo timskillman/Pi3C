@@ -834,6 +834,8 @@ void Pi3Cimgui::takeSnapshot()
 {
 	if (takenSnapshot != 1) return;
 
+	//SDL_Log("Snapshot");
+
 	std::vector<uint8_t> snap;
 	Pi3Cutils::snapShot(Pi3Crecti(0, 0, window->getWidth(), window->getHeight()), snap);
 
@@ -844,6 +846,7 @@ void Pi3Cimgui::takeSnapshot()
 	snapShotPic.createRect2D(resource, vec2f(0, 0), vec2f((float)window->getWidth(), (float)window->getHeight()));
 	snapShotPic.addPicture(resource, snaptex);
 	snapShotPic.matrix.setz(-30.f);
+	snapShotPic.material.SetColAmbient(0);
 
 	takenSnapshot = 2;
 }

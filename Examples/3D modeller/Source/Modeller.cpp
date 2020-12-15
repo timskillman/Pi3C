@@ -637,7 +637,7 @@ void Modeller::ClickLeftMouseButton(viewInfo& view)
 				creatingShape();
 			}
 			
-			//window->mouse.up = false;
+			window->mouse.up = false;
 			break;
 		case ED_SELECT:
 			if (!window->ctrlKey) clearSelections();
@@ -815,6 +815,7 @@ void Modeller::handleEvents(std::vector<uint32_t>& eventList)
 		case SDL_WINDOWEVENT:
 			if (window->resized) {
 				mgui.resize();
+				window->resized = false;
 			}
 			break;
 		case SDL_KEYDOWN:

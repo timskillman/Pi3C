@@ -243,9 +243,6 @@ void MGui::doMenus(Modeller * md)
 		if (gui.BeginMenu("Object")) {
 			if (gui.MenuItem("Create", "Ctrl+C")) {}
 			if (gui.MenuItem("Array tool", "Ctrl+V")) {}
-			if (gui.MenuItem("Delete", "Del")) {}
-			if (gui.MenuItem("Undo", "Ctrl+X")) {}
-			if (gui.MenuItem("Redo", "Ctrl+Y")) {}
 			gui.EndMenu();
 		}
 		gui.EndMenuBar("MenuBar");
@@ -360,7 +357,7 @@ void MGui::doIMGUI(Modeller * md)
 
 	bool mb = md->window->mouse.LeftButton && mouseOverToolbars;
 	bool mu = md->window->mouse.up && mouseOverToolbars;
-	md->setMousePosition(mx, winHeight - my);
+	//md->setMousePosition(mx, winHeight - my);
 
 	//Draw borders ...
 	gui.renderRect(winWidth, topbarHeight);

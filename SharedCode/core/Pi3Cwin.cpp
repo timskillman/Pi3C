@@ -226,7 +226,6 @@ std::vector<uint32_t> Pi3Cwindow::event()
 			case SDL_WINDOWEVENT_RESTORED:
 				mMinimized = false;
 				break;
-
 			}
 			break;
 		case SDL_DROPFILE:
