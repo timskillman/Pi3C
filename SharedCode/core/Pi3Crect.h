@@ -21,7 +21,9 @@ public:
 
 	Pi3Cpointi & operator - (Pi3Cpointi const &rhs)
 	{
-		return Pi3Cpointi(x - rhs.x, y - rhs.y);
+		x -= rhs.x;
+		y -= rhs.y;
+		return *this;
 	}
 
 	int32_t x;
