@@ -4,7 +4,7 @@
 # Pi3C
 *v0.0.2 Alpha*
 
-Pi3C is a fast, C++ graphics engine and toolkit tailored for all models of the Raspberry Pi and works on other platforms such as Windows and Android. It's small size and innovative techniques make it fast enough to run highly detailed 3D games; even on the Pi Zero ... 
+Pi3C is a fast, C++ graphics engine and toolkit tailored for all models of the Raspberry Pi and works on other platforms such as Windows. It's small size and innovative techniques make it fast enough to run highly detailed 3D games; even on the Pi Zero ... 
 
 ![alt text](https://github.com/timskillman/Pi3C/blob/master/Resources/images/ShipRear.png "Complex 3D models even on the Pi Zero")
 
@@ -103,12 +103,13 @@ C++ is one of the most popular, industry standard programming languages.
  - HDMI cable
  - 16GB or 32GB Micro-SD card
 
-**Setting up the SD card**
+<a name="settingup">**Setting up Pi3C**</a>
 
- - Download the latest Raspbian Stretch image from [https://www.raspberrypi.org/downloads/](https://www.raspberrypi.org/downloads/)
- - Flash the Raspbian Stretch image to your SD card using [balenaEtcher](https://www.balena.io/etcher/)
- - Insert the SD card into your Raspberry Pi, [setup the Pi](https://projects.raspberrypi.org/en/projects/raspberry-pi-setting-up) and start it up.  You will need WiFi setup as well.
- - Open a terminal window enter;
+Pi3C requires SDL 2.0 and the fastest implementation of hardware Open GL.
+
+1) Ensure the fastest Open GL driver is running
+
+- Open a terminal window enter;
  
  ~~~~
   sudo raspi-config
@@ -117,14 +118,14 @@ C++ is one of the most popular, industry standard programming languages.
  Select 'Advanced Options' and configure;
  
   - Full KMS, Open GL driver
-  - 128 megabytes of GPU memory(memory split option)
+  - 64 megabytes of GPU memory(memory split option)
   - Restart your Pi and setup SDL 2.0 (next section)
   
-<a name="settingup">**Setting Up SDL 2.0 on your Raspberry Pi**</a>
+2) **Setting Up SDL 2.0 on your Raspberry Pi**
 
-Even though Raspbian Stretch comes with a version of SDL2, you need to download the latest SDL2 development libraries and SDL2's associated libraries for sound, images, network and font support.
+Even though Raspbian OS comes with a version of SDL2, you need to download the latest SDL2 development libraries and SDL2's associated libraries for sound, images, network and font support.
 
-Open a terminal window, make sure you're connected to the internet and enter (You will be prompted to enter 'Y' before installing each library);
+Open a terminal window, make sure you're connected to the internet and enter (You will be prompted to enter 'Y' before installing each of the following libraries);
 
 ~~~~
  sudo apt-get install libsdl2-dev
@@ -135,11 +136,11 @@ Open a terminal window, make sure you're connected to the internet and enter (Yo
 ~~~~
 
 
-<a name="downloadpi3c">**Downloading Pi3C**</a>
+3) <a name="downloadpi3c">**Downloading Pi3C**</a>
 
-One of the easiest ways to download and modify Pi3C for your own use it use Git [(try this link if you want to know more)](https://projects.raspberrypi.org/en/projects/getting-started-with-git)
+The easiest ways to download and modify Pi3C for your own use it use [Git](https://projects.raspberrypi.org/en/projects/getting-started-with-git)
 
-If Git is not already installed on your Pi, start by downloading Git; open a terminal window and type;
+Git is usually installed with the Raspberry Pi OS, but if not, download Git with;
 
 ~~~~
  sudo apt install git
