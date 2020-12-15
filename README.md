@@ -103,12 +103,13 @@ C++ is one of the most popular, industry standard programming languages.
  - HDMI cable
  - 16GB or 32GB Micro-SD card
 
-**Setting up Pi3C**
+<a name="settingup">**Setting up Pi3C**</a>
 
 Pi3C requires SDL 2.0 and the fastest implementation of hardware Open GL.
 
-1) 
- - Open a terminal window enter;
+1) Ensure the fastest Open GL driver is running
+
+- Open a terminal window enter;
  
  ~~~~
   sudo raspi-config
@@ -120,7 +121,7 @@ Pi3C requires SDL 2.0 and the fastest implementation of hardware Open GL.
   - 64 megabytes of GPU memory(memory split option)
   - Restart your Pi and setup SDL 2.0 (next section)
   
-<a name="settingup">**Setting Up SDL 2.0 on your Raspberry Pi**</a>
+2) **Setting Up SDL 2.0 on your Raspberry Pi**
 
 Even though Raspbian OS comes with a version of SDL2, you need to download the latest SDL2 development libraries and SDL2's associated libraries for sound, images, network and font support.
 
@@ -135,7 +136,7 @@ Open a terminal window, make sure you're connected to the internet and enter (Yo
 ~~~~
 
 
-<a name="downloadpi3c">**Downloading Pi3C**</a>
+3) <a name="downloadpi3c">**Downloading Pi3C**</a>
 
 The easiest ways to download and modify Pi3C for your own use it use [Git](https://projects.raspberrypi.org/en/projects/getting-started-with-git)
 
