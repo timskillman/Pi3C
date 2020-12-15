@@ -18,6 +18,11 @@ void Pi3Cscene::render3D(const float ticks, Pi3Cmaterial *materialOverride)
 	render(ticks, projMatrix3D, modelMatrix3D, models, materialOverride);
 }
 
+void Pi3Cscene::setup2D()
+{
+	resource->shaders[currentShader].setProjectionMatrix(projMatrix2D);
+}
+
 void Pi3Cscene::render2D(const float ticks)
 {
 	//glClear(GL_DEPTH_BUFFER_BIT);

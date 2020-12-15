@@ -83,7 +83,7 @@ namespace Pi3Cutils {
 			destimage.resize(snapShot.size());
 			glReadPixels(rect.x, rect.y, rect.width, rect.height, GL_RGBA, GL_UNSIGNED_BYTE, &destimage[0]);
 			flipImage(destimage, snapShot, rect.width, rect.height);
-			saveBufferToPNG("snapshot.png", snapShot, rect.width, rect.height);
+			//saveBufferToPNG("snapshot.png", snapShot, rect.width, rect.height);
 			return true;
 		}
 		catch (const std::bad_alloc&) {

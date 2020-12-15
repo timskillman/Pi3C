@@ -19,6 +19,11 @@ public:
 		return *this;
 	}
 
+	Pi3Cpointi & operator - (Pi3Cpointi rhs)
+	{
+		return Pi3Cpointi(x - rhs.x, y - rhs.y);
+	}
+
 	int32_t x;
 	int32_t y;
 };

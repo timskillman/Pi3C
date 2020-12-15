@@ -77,6 +77,7 @@ public:
 	void setMatrix(vec3f const &firstpos, vec3f const &thirdpos, vec3f const &rot);
 	void render3D(const float ticks = 1.f, Pi3Cmaterial *materialOverride = nullptr);
 	void render2D(const float ticks = 1.f);
+	void setup2D();
 	void renderSkybox(const vec3f &pos, const int32_t skyboxref = 0, float ticks = 1.f);
 	void renderOffscreen(const viewInfo& viewinfo, Pi3Cmaterial* outlines, int width = 0, int height = 0); //, const Pi3Cshader &shader
 	void renderView(const viewInfo& view, Pi3Cmaterial* outlines = nullptr);

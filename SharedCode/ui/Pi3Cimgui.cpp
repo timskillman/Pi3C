@@ -735,11 +735,31 @@ void Pi3Cimgui::Begin() {
 
 void Pi3Cimgui::End()
 {
-	//if (!takeSnapshot) snapshot(); //SLOW!
+	if (takenSnapshot>0) takeSnapshot();
 }
 
-bool Pi3Cimgui::BeginMenuBar()
+void Pi3Cimgui::startContainer(const std::string& name)
 {
+	auto cit = containers.find(name);
+	if (cit == containers.end()) {
+		containerStruct c;
+		c.pos = pos;
+		containers.insert({name,c});
+	}
+	else {
+		containerStruct& c = cit->second;
+		if (c.initialised) {
+			size = c.size;
+		}
+	}
+}
+
+bool Pi3Cimgui::BeginMenuBar(const std::string& name)
+{
+	Pi3Crecti rect;
+
+	startContainer(name);
+
 	currentParams.selectable = false;
 	menuNextItemPos = Pi3Cpointi(pos.x + currentParams.horizGap, pos.y);
 	bool touch = ButtonText(" ", false, 4000);
@@ -750,8 +770,24 @@ bool Pi3Cimgui::BeginMenuBar()
 	return true;
 }
 
-void Pi3Cimgui::EndMenuBar()
+void Pi3Cimgui::EndMenuBar(const std::string& name)
 {
+	auto cit = containers.find(name);
+	if (cit == containers.end()) {
+		//Error! Can't find Container!
+	}
+	else {
+		containerStruct& c = cit->second;
+		if (!c.initialised) {
+			c.endPos = menuEndPos;
+			c.size = menuNextItemPos - menuEndPos;
+			c.initialised = true;
+		}
+		else {
+			menuEndPos = c.endPos;
+		}
+	}
+
 	nextPos = menuEndPos;
 	leftpos = menuEndPos.x;
 	zpos = -10.f;
@@ -789,8 +825,15 @@ bool Pi3Cimgui::MenuItem(const std::string &menuItem, const std::string &itemHot
 	return clicked;
 }
 
-void Pi3Cimgui::snapshot()
+void Pi3Cimgui::resize() {
+	for (auto& c : containers) c.second.initialised = false;
+	if (takenSnapshot==2) takenSnapshot = 1;
+}
+
+void Pi3Cimgui::takeSnapshot()
 {
+	if (takenSnapshot != 1) return;
+
 	std::vector<uint8_t> snap;
 	Pi3Cutils::snapShot(Pi3Crecti(0, 0, window->getWidth(), window->getHeight()), snap);
 
@@ -800,8 +843,14 @@ void Pi3Cimgui::snapshot()
 	snapShotPic.deleteTexture(resource); //delete any previous snapshot texture
 	snapShotPic.createRect2D(resource, vec2f(0, 0), vec2f((float)window->getWidth(), (float)window->getHeight()));
 	snapShotPic.addPicture(resource, snaptex);
+	snapShotPic.matrix.setz(-30.f);
 
-	takeSnapshot = true;
+	takenSnapshot = 2;
+}
+
+void Pi3Cimgui::drawSnapshot()
+{
+	snapShotPic.renderBasic(resource);
 }
 
 std::string Pi3Cimgui::OpenFileDialog(const rectStyle * style)
@@ -811,7 +860,7 @@ std::string Pi3Cimgui::OpenFileDialog(const rectStyle * style)
 
 	std::string inptext = "";
 	bool finished = false;
-	snapShotPic.matrix.setz(-30.f);
+	//snapShotPic.matrix.setz(-30.f);
 	setGaps(3, 3);
 	currentParams.textColour = Pi3Ccolours::Black;
 	
@@ -820,7 +869,7 @@ std::string Pi3Cimgui::OpenFileDialog(const rectStyle * style)
 		window->clear();
 		std::vector<uint32_t> events = window->event();
 
-		snapShotPic.renderBasic(resource);
+		drawSnapshot();
 
 		Begin();
 		renderRect(window->getWidth(), window->getHeight(), Pi3Ccolours::TransparentBlack);

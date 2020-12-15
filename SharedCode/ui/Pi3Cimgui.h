@@ -28,6 +28,7 @@ public:
 		Pi3Cpointi pos;
 		Pi3Cpointi size;
 		Pi3Cpointi scroll;
+		Pi3Cpointi endPos;
 	};
 
 	struct rectStyle {
@@ -133,9 +134,16 @@ public:
 	void updateGroupSize(int32_t x, int32_t y);
 	void endGroupRect();
 
+	void startContainer(const std::string& name);
+
+	void startSnapshot() { takenSnapshot = 1; }
+	void stopSnapshot() { takenSnapshot = 0; }
+	void takeSnapshot();
+	void drawSnapshot();
+
 	//Menu bar widget ...
-	bool BeginMenuBar();
-	void EndMenuBar();
+	bool BeginMenuBar(const std::string& name);
+	void EndMenuBar(const std::string& name);
 	bool BeginMenu(const std::string &menuHeading);
 	bool MenuItem(const std::string &menuItem, const std::string &itemHotkey, const int minWidth = 200.f, const int minheight = 24.f);
 	void EndMenu();
@@ -145,11 +153,12 @@ public:
 	bool renderIcon(const std::string &str, const int minwidth = 0, const int minheight = 0);
 	bool renderText(const std::string &str, const int minwidth = 0, const int minheight = 0, uint32_t colour = 0);
 	bool renderBackIcon(const std::string &str, const int minwidth = 0, const int minheight = 0);
+	void resize();
 
 	bool somethingSelected = false;
+	int takenSnapshot = 0;
 
 	Pi3Cresource * resource = nullptr;
-	void resize() { takeSnapshot = false; }
 
 private:
 
@@ -160,7 +169,8 @@ private:
 	void NextPos();
 	Pi3Cpointi calcImageSize(int tw, int th, const int minwidth, const int minheight, bool squash = false);
 	void setButtonBackground(Pi3Cmodel &rect, const bool mouseTouchRect);
-	void snapshot();
+
+
 	Pi3Cmodel * findCreateImage(const std::string &str, const ButtonType type);
 	Pi3Cmodel * findCreateImage2(const std::string &str, const ButtonType type);
 	Pi3Cmodel * createImage(const std::string &text, const std::shared_ptr<Pi3Ctexture> &ttex);
@@ -196,7 +206,7 @@ private:
 	int32_t thisTextField = -1;
 	
 	Pi3Cmodel snapShotPic;
-	bool takeSnapshot = false;
+	
 
 	//std::vector<containerStruct> containers;
 	std::map<std::string, containerStruct> containers;

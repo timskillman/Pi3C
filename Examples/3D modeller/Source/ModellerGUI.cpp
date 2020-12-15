@@ -222,7 +222,7 @@ void MGui::doMenus(Modeller * md)
 {
 	//Menubar ...
 	gui.setButtonStyle(bsMenu);
-	if (gui.BeginMenuBar()) {
+	if (gui.BeginMenuBar("MenuBar")) {
 		if (gui.BeginMenu("File")) {
 			if (gui.MenuItem("New", "Ctrl+N")) md->clearScene();
 			if (gui.MenuItem("Open", "Ctrl+O")) {} // open();
@@ -248,7 +248,7 @@ void MGui::doMenus(Modeller * md)
 			if (gui.MenuItem("Redo", "Ctrl+Y")) {}
 			gui.EndMenu();
 		}
-		gui.EndMenuBar();
+		gui.EndMenuBar("MenuBar");
 	}
 }
 
@@ -338,19 +338,26 @@ void MGui::doIMGUI(Modeller * md)
 {
 
 	//uint32_t ticks = SDL_GetTicks();
-	
+	int winWidth = md->window->getWidth();
+	int winHeight = md->window->getHeight();
+	int mx = md->window->mouse.x;
+	int my = md->window->mouse.y;
+	md->setMousePosition(mx, winHeight - my);
+	bool mouseOverToolbars = mx<leftbarWidth || mx>(winWidth - rightbarWidth) || my<(topbarHeight + menuHeight) || my>winHeight - botbarHeight;
+
 	gui.Begin();
+
+	if (!mouseOverToolbars && gui.takenSnapshot == 2) {
+		gui.drawSnapshot();
+		glClear(GL_DEPTH_BUFFER_BIT);
+		return;
+	}
 
 	doMenus(md);
 
-	int winWidth = md->window->getWidth();
-	int winHeight = md->window->getHeight();
 	workWidth = winWidth - leftbarWidth - rightbarWidth;
 	workHeight = winHeight - menuHeight - topbarHeight - botbarHeight;
 
-	int mx = md->window->mouse.x;
-	int my = md->window->mouse.y;
-	bool mouseOverToolbars = mx<leftbarWidth || mx>(winWidth - rightbarWidth) || my<(topbarHeight + menuHeight) || my>winHeight - botbarHeight;
 	bool mb = md->window->mouse.LeftButton && mouseOverToolbars;
 	bool mu = md->window->mouse.up && mouseOverToolbars;
 	md->setMousePosition(mx, winHeight - my);
@@ -360,6 +367,8 @@ void MGui::doIMGUI(Modeller * md)
 	gui.nextLine(0);
 	Pi3Cpointi wpos = gui.getPosition();
 	drawBorders(md, wpos);
+
+
 
 	//Top menu bar icons ...
 	gui.setButtonStyle(bsIcons);
@@ -386,6 +395,7 @@ void MGui::doIMGUI(Modeller * md)
 
 	renderYellowBorder(md->currentSelView);
 
+	//Draw xyz values
 	if (md->currentView != viewInfo::INACTIVE) {
 		Pi3Crecti &rect = md->views[md->currentView].viewport;
 		gui.setButtonStyle(bsMenu);
@@ -413,6 +423,7 @@ std::string MGui::ftostrdp(float n, int decimalPlaces)
 
 void MGui::saveAll(Modeller * md)
 {
+	gui.takeSnapshot();
 	std::string savefile = gui.OpenFileDialog(&bsDialog);
 	if (savefile!="") md->saveFile("../", savefile);
 }

@@ -12,6 +12,8 @@ public:
 	void init(loadOptions &opts, Pi3Cresource * resource, Pi3Cwindow *window);
 	void doIMGUI(Modeller * md);
 	bool somethingSelected() { return gui.somethingSelected; }
+	void startSnapshot() { gui.startSnapshot(); }
+	void stopSnapshot() { gui.stopSnapshot(); }
 
 	Pi3Crecti getRectBottomRight();
 	Pi3Crecti getRectBottomLeft();
@@ -48,6 +50,8 @@ private:
 	bool draggingBarX = false;
 	bool draggingBarY = false;
 	int dbh = (int)(dragBarThickness * 0.5f);
+
+	bool fastRender = false; // fast draw into 3D views - no GUI rendering
 
 	//Temp work vars ...
 	int workWidth = 0;

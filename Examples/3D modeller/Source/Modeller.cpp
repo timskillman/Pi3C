@@ -442,7 +442,6 @@ void Modeller::finishLine()
 		case CT_LINE:
 			break;
 		}
-
 		
 	}
 	createCount = 0;
@@ -588,14 +587,14 @@ void Modeller::DragLeftMouseButton(viewInfo& view, vec3f& mouseXYZ)
 {
 	switch (editMode) {
 	case ED_CREATE:
-		if (createCount == maxSteps) {
-			createCount = 0;
-		}
-		else {
-			if (createCount==0) createShapes();
-			createCount++;
-			creatingShape();
-		}
+		//if (createCount == maxSteps) {
+		//	createCount = 0;
+		//}
+		//else {
+		//	if (createCount==0) createShapes();
+		//	createCount++;
+		//	creatingShape();
+		//}
 		break;
 	case ED_MOVE:
 		moveSelections(view.viewCoords(mouseXYZ));
@@ -1000,6 +999,7 @@ void Modeller::setCreateTool(const CreateTool tool)
 {
 	createTool = tool;
 	editMode = ED_CREATE;
+	mgui.startSnapshot();
 	setCursor(crossCursor);
 }
 
@@ -1044,6 +1044,14 @@ void Modeller::render()
 	int mx = window->mouse.x;
 	int my = window->getHeight() - window->mouse.y;
 
+	//Render 2D
+	scene.setViewport(screenRect);
+	scene.setFixedLight(0xffffff, vec3f(0, 1000.f, 1000.f));
+	scene.setViewport2D(screenRect, 0.1f, 2000.f);
+	scene.render2D(window->getTicks());
+
+	handleIMGUI(); //must be in the rendering loop with 2D setup
+
 	currentView = viewInfo::INACTIVE;
 
 	if (fullview >= 0) {
@@ -1058,14 +1066,7 @@ void Modeller::render()
 		renderView(viewInfo::TOPRIGHT, mgui.getRectTopRight(), mx, my);
 	}
 
-	//Render 2D
-	scene.setViewport(screenRect);
-	scene.setFixedLight(0xffffff, vec3f(0, 1000.f, 1000.f));
-	scene.setViewport2D(screenRect, 0.1f, 2000.f);
-	scene.render2D(window->getTicks());
 
-	
-	handleIMGUI(); //must be in the rendering loop with 2D setup
 	
 }
 
