@@ -95,6 +95,7 @@ public:
 	vec3f createFirstPoint;
 	vec3f oldPos;
 	vec3f oldPos2;
+	float oldht;
 	std::vector<vec3f> lines; //used for creating lines/extrude and lathe
 	std::vector<std::vector<vec3f>> linePaths;
 	std::vector<std::vector<vec2f>> contours; //used for creating Extrude
@@ -160,6 +161,8 @@ private:
 	MGui mgui;
 	//Pi3Cbbox3d selbbox;
 
+	std::string info;
+
 	void touchView(viewInfo &vi);
 	void touchPerspectiveView(viewInfo &vi);
 	void touchOrthoView(viewInfo &vi);
@@ -182,6 +185,6 @@ private:
 	void addLinePoint(const vec3f point);
 	void finishLine();
 	void transformLines(std::vector<vec3f>& lines, std::vector<vec2f>& contour, Pi3Cmatrix& matrix, int32_t start = 0);
-	void getShapeHeight(vec3f& pos, vec3f& v1, vec3f& v2);
+	float getShapeHeight(vec3f& pos, vec3f& v1, vec3f& v2);
 	void renderView(const viewInfo::SceneLayout projection, const Pi3Crecti& rect, int32_t mx, int32_t my);
 };

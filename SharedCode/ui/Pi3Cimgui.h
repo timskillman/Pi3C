@@ -105,7 +105,6 @@ public:
 	bool Container(const std::string &name, const int minwidth = 0, const int minheight = 0);
 	bool ContainerEnd(const std::string &name);
 	bool Label(const std::string &text, const int minwidth = 0, const int minheight = 0);										/* Render static label (doesn't change)*/
-	bool Text(const std::string& text, const uint32_t colour = 0);
 	bool Text(const std::string &text, const int minwidth = 0, const int minheight = 0, const uint32_t colour = 0);		/* Render dynamic text */
 	bool TextArea(std::string &text, const int minwidth, const int minheight);
 	bool ButtonText(const std::string &text, const bool selected = false, const int minwidth = 0, const int minheight = 0);
@@ -157,7 +156,7 @@ public:
 	void resize();
 
 	bool somethingSelected = false;
-	int takenSnapshot = 0;
+	int takenSnapshot = 1;   //Force a snapshot at beginning
 
 	Pi3Cresource * resource = nullptr;
 
@@ -171,9 +170,9 @@ private:
 	Pi3Cpointi calcImageSize(int tw, int th, const int minwidth, const int minheight, bool squash = false);
 	void setButtonBackground(Pi3Cmodel &rect, const bool mouseTouchRect);
 
-
+	void loadImage(std::shared_ptr<Pi3Ctexture>& ttex, const std::string& str, const ButtonType type);
+	Pi3Cmodel * findCreateImageRect(const std::string &str, const ButtonType type, bool asRect = true);
 	Pi3Cmodel * findCreateImage(const std::string &str, const ButtonType type);
-	Pi3Cmodel * findCreateImage2(const std::string &str, const ButtonType type);
 	Pi3Cmodel * createImage(const std::string &text, const std::shared_ptr<Pi3Ctexture> &ttex);
 	Pi3Cmodel * createImageRect(const std::string &text, const std::shared_ptr<Pi3Ctexture> &ttex);
 	Pi3Cmodel * create2ImageRect(const std::string &text, const std::shared_ptr<Pi3Ctexture> &ttex1, const std::shared_ptr<Pi3Ctexture> &ttex2 = nullptr);

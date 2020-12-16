@@ -77,50 +77,32 @@ void Pi3Cimgui::loadImages(const std::string &path, const std::vector<std::strin
 {
 	texturePath = path + "/";
 	for (const auto &filename : filenames) {
-		findCreateImage2(filename, IMAGE);
+		findCreateImage(filename, IMAGE);
 	}
+}
+
+Pi3Cmodel * Pi3Cimgui::findCreateImageRect(const std::string &str, const ButtonType type, bool asRect)
+{
+	auto findString = imageRect.find(str);
+	if (findString != imageRect.end()) return &findString->second;
+	std::shared_ptr<Pi3Ctexture> ttex;
+	ttex.reset(new Pi3Ctexture);
+
+	if (type == TEXT) {
+		if (!currentFont) return nullptr;
+		ttex.reset(currentFont->textSurface(str));
+	}
+	else {
+		ttex.reset(new Pi3Ctexture((texturePath + str).c_str(), true));
+	}
+	ttex->doNotDelete = true;
+	if (asRect) return createImageRect(str, ttex);
+	return createImage(str, ttex);
 }
 
 Pi3Cmodel * Pi3Cimgui::findCreateImage(const std::string &str, const ButtonType type)
 {
-	auto findString = imageRect.find(str);
-	if (findString != imageRect.end()) return &findString->second;
-	std::shared_ptr<Pi3Ctexture> ttex;
-	ttex.reset(new Pi3Ctexture);
-
-	if (type == TEXT) {
-		if (!currentFont) return nullptr;
-		ttex.reset(currentFont->textSurface(str));
-		//ttex.get()->fromTextSurface(ts);
-		//SDL_FreeSurface(ts);
-		//ttex = currentFont->asTexture(str, currentParams.textColour);
-	}
-	else {
-		//ttex->loadFromFile((texturePath + str).c_str());
-		ttex.reset(new Pi3Ctexture((texturePath + str).c_str(), true));
-	}
-	return createImageRect(str, ttex);
-}
-
-Pi3Cmodel * Pi3Cimgui::findCreateImage2(const std::string &str, const ButtonType type)
-{
-	auto findString = imageRect.find(str);
-	if (findString != imageRect.end()) return &findString->second;
-	std::shared_ptr<Pi3Ctexture> ttex;
-	ttex.reset(new Pi3Ctexture);
-
-	if (type == TEXT) {
-		if (!currentFont) return nullptr;
-		//SDL_Surface *ts = currentFont->textSurface(str);
-		//ttex.get()->fromTextSurface(ts);
-		//SDL_FreeSurface(ts);
-		ttex.reset(currentFont->textSurface(str));
-		//ttex = currentFont->asTexture(str, currentParams.textColour);
-	}
-	else {
-		ttex.reset(new Pi3Ctexture((texturePath + str).c_str(), true));
-	}
-	return createImage(str, ttex);
+	return findCreateImageRect(str, type, false);
 }
 
 void Pi3Cimgui::NextPos()
@@ -333,17 +315,17 @@ bool Pi3Cimgui::renderIconImage(Pi3Cmodel *image, const int width, const int hei
 
 bool Pi3Cimgui::renderIcon(const std::string &str, const int minwidth, const int minheight)
 {
-	return renderIconImage(findCreateImage2(str, IMAGE), minwidth, minheight, true, currentParams.textColour);
+	return renderIconImage(findCreateImage(str, IMAGE), minwidth, minheight, true, currentParams.textColour);
 }
 
 bool Pi3Cimgui::renderText(const std::string &str, const int minwidth, const int minheight, uint32_t colour)
 {
-	return renderIconImage(findCreateImage2(str, TEXT), minwidth, minheight, false, (colour==0) ? currentParams.textColour : colour);
+	return renderIconImage(findCreateImage(str, TEXT), minwidth, minheight, false, (colour==0) ? currentParams.textColour : colour);
 }
 
 bool Pi3Cimgui::renderBackIcon(const std::string &str, const int minwidth, const int minheight)
 {
-	return renderIconImage(findCreateImage2(str, IMAGE), minwidth, minheight, true, currentParams.buttonColour);
+	return renderIconImage(findCreateImage(str, IMAGE), minwidth, minheight, true, currentParams.buttonColour);
 }
 
 bool Pi3Cimgui::touched(const Pi3Cpointi &size)
@@ -422,7 +404,7 @@ bool Pi3Cimgui::ContainerEnd(const std::string &name)
 bool Pi3Cimgui::ButtonText(const std::string &str, const bool selected, const int minWidth, const int minHeight)
 {
 	currentParams.selected = selected;
-	bool touched = renderButton(findCreateImage(str, TEXT), minWidth, minHeight);
+	bool touched = renderButton(findCreateImageRect(str, TEXT), minWidth, minHeight);
 	bool clicked = touched && window->mouse.LeftButton;
 	currentParams.selected = false;
 	if (touched) somethingSelected = true;
@@ -432,7 +414,7 @@ bool Pi3Cimgui::ButtonText(const std::string &str, const bool selected, const in
 bool Pi3Cimgui::ButtonImage(const std::string &img, const bool selected, const int minWidth, const int minHeight)
 {
 	currentParams.selected = selected;
-	bool touched = renderButton(findCreateImage(img, IMAGE), minWidth, minHeight);
+	bool touched = renderButton(findCreateImageRect(img, IMAGE), minWidth, minHeight);
 	bool clicked = touched && window->mouse.LeftButton;
 	currentParams.selected = false;
 	if (touched) somethingSelected = true;
@@ -622,7 +604,7 @@ bool Pi3Cimgui::InputText(const std::string &text, std::string &input, const int
 
 	//uint32_t col = (colour == 0) ? currentParams.textColour | 0xff000000 : colour;
 	if (input != "") {
-		resource->renderText(resource->lettersRef, currentFont, input, vec3f((float)pos.x, (float)pos.y, zpos), 8000.f, (colour==0) ? currentParams.textColour : colour); //(float)mWidth
+		resource->renderText(resource->lettersRef, currentFont, input, vec3f((float)pos.x, (float)pos.y, zpos), 8000.f, (colour == 0) ? currentParams.textColour : colour); //(float)mWidth
 	}
 	textID++;
 
@@ -680,11 +662,6 @@ bool Pi3Cimgui::ListBox(const std::string &text, uint32_t &currentItem, const st
 bool Pi3Cimgui::Label(const std::string &text, const int minwidth, const int minheight)
 {
 	return renderText(text, minwidth, minheight);
-}
-
-bool Pi3Cimgui::Text(const std::string& text, const uint32_t colour)
-{
-	return Text(text, 0, 0, colour);
 }
 
 bool Pi3Cimgui::Text(const std::string &text, const int minwidth, const int minheight, const uint32_t colour)

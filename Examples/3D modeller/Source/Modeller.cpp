@@ -455,16 +455,20 @@ void Modeller::finishLine()
 	scene.models[outlineRef].visible = false;
 }
 
-void Modeller::getShapeHeight(vec3f& pos, vec3f& v1, vec3f& v2)
+float Modeller::getShapeHeight(vec3f& pos, vec3f& v1, vec3f& v2)
 {
+	float ht = 0;
 	if (abs(oldPos.x - createFirstPoint.x) < 0.001f) {
-		pos.x = -(pos.y - oldPos.y); pos.y = oldPos.y; pos.z = oldPos.z;
+		ht = -(pos.y - oldPos.y);
+		pos.x = ht; pos.y = oldPos.y; pos.z = oldPos.z;
 	}
 	if (abs(oldPos.y - createFirstPoint.y) < 0.001f) {
-		pos.y = -(pos.z - oldPos.z); pos.x = oldPos.x; pos.z = oldPos.z;
+		ht = -(pos.z - oldPos.z);
+		pos.y = ht; pos.x = oldPos.x; pos.z = oldPos.z;
 	}
 	if (abs(oldPos.z - createFirstPoint.z) < 0.001f) {
-		pos.z = -(pos.y - oldPos.y); pos.y = oldPos.y; pos.x = oldPos.x;
+		ht = -(pos.y - oldPos.y);
+		pos.z = ht; pos.y = oldPos.y; pos.x = oldPos.x;
 	}
 
 	v1 = pos - createFirstPoint;
@@ -472,6 +476,8 @@ void Modeller::getShapeHeight(vec3f& pos, vec3f& v1, vec3f& v2)
 	if (pos.x < createFirstPoint.x) { v2.x = v1.x; v1.x = -v1.x; }
 	if (pos.y < createFirstPoint.y) { v2.y = v1.y; v1.y = -v1.y; }
 	if (pos.z < createFirstPoint.z) { v2.z = v1.z; v1.z = -v1.z; }
+
+	return ht;
 }
 
 void Modeller::creatingShape()
@@ -489,18 +495,40 @@ void Modeller::creatingShape()
 
 	Pi3Cmodel* currentModel = scene.lastModel();
 	vertsPtr vp = currentModel->getMeshVerts(resource);
-	vec3f v1, v2;
+	vec3f v1, v2, csize;
 
 	if (createCount == 1) {
 		float dist = (pos - createFirstPoint).length();
 		switch (createTool) {
-		case CT_CUBOID:Pi3Cshapes::cube_verts(*vp.verts, vp.offset, (pos - createFirstPoint)/2.f, pos - createFirstPoint, 1, 1, 1, currentColour); break;
-		case CT_CYLINDER:Pi3Cshapes::cylinder_verts(*vp.verts, vp.offset, vec3f(0, 0, 0), dist, 0.1f); break;
-		case CT_SPHERE:Pi3Cshapes::sphere_verts(*vp.verts, vp.offset, vec3f(0, 0, 0), dist); break;
-		case CT_TORUS:Pi3Cshapes::torus_verts(*vp.verts, vp.offset, vec3f(0, 0, 0), dist, 0.01f); break;
-		case CT_CONE:Pi3Cshapes::cone_verts(*vp.verts, vp.offset, vec3f(0, 0, 0), dist, 0.01f); break;
-		case CT_TCONE:Pi3Cshapes::tcone_verts(*vp.verts, vp.offset, vec3f(0, 0, 0), dist, dist, 0.01f); break;
-		case CT_TUBE:Pi3Cshapes::tube_verts(*vp.verts, vp.offset, vec3f(0, 0, 0), dist, dist *1.01f, 0.01f); break;
+		case CT_CUBOID:
+			csize = pos - createFirstPoint;
+			info = "Cuboid x:" + Pi3Cutils::ftostrdp(csize.x, 2) + " y:" + Pi3Cutils::ftostrdp(csize.y, 2) + " z:" + Pi3Cutils::ftostrdp(csize.z, 2);
+			Pi3Cshapes::cube_verts(*vp.verts, vp.offset, (pos - createFirstPoint) / 2.f, csize, 1, 1, 1, currentColour);
+			break;
+		case CT_CYLINDER:
+			info = "Cylinder radius:" + Pi3Cutils::ftostrdp(dist, 2);
+			Pi3Cshapes::cylinder_verts(*vp.verts, vp.offset, vec3f(0, 0, 0), dist, 0.1f); 
+			break;
+		case CT_SPHERE:
+			info = "Sphere radius:" + Pi3Cutils::ftostrdp(dist, 2);
+			Pi3Cshapes::sphere_verts(*vp.verts, vp.offset, vec3f(0, 0, 0), dist); 
+			break;
+		case CT_TORUS:
+			info = "Torus radius:" + Pi3Cutils::ftostrdp(dist, 2);
+			Pi3Cshapes::torus_verts(*vp.verts, vp.offset, vec3f(0, 0, 0), dist, 0.01f); 
+			break;
+		case CT_CONE:
+			info = "Cone radius:" + Pi3Cutils::ftostrdp(dist, 2);
+			Pi3Cshapes::cone_verts(*vp.verts, vp.offset, vec3f(0, 0, 0), dist, 0.01f); 
+			break;
+		case CT_TCONE:
+			info = "Truncated cone bottom radius:" + Pi3Cutils::ftostrdp(dist, 2);
+			Pi3Cshapes::tcone_verts(*vp.verts, vp.offset, vec3f(0, 0, 0), dist, dist, 0.01f); 
+			break;
+		case CT_TUBE:
+			info = "Tube inner radius:" + Pi3Cutils::ftostrdp(dist, 2);
+			Pi3Cshapes::tube_verts(*vp.verts, vp.offset, vec3f(0, 0, 0), dist, dist *1.01f, 0.01f); 
+			break;
 		}
 		oldPos = pos;
 		oldPos2 = pos;
@@ -509,54 +537,66 @@ void Modeller::creatingShape()
 	else if (createCount == 2) {
 		float dist1 = (oldPos - createFirstPoint).length();
 		float dist2 = views[currentView].rotInvertMatrix.transformVec(pos - oldPos).y;
+		float ht = getShapeHeight(pos, v1, v2);
 		switch (createTool) {
 		case CT_CUBOID:
 			{
-				getShapeHeight(pos, v1, v2);
+				info = "Cuboid height:" + Pi3Cutils::ftostrdp(ht, 2);
 				Pi3Cshapes::cube_verts(*vp.verts, vp.offset, v1 / 2.f + v2, v1, 1, 1, 1, currentColour);
 			}
 			break;
 		case CT_CYLINDER:
 			{
-				//getShapeHeight(pos, v1, v2);
-				Pi3Cshapes::cylinder_verts(*vp.verts, vp.offset, vec3f(0, 0, 0), dist1, dist2); break;
+				info = "Cylinder height:" + Pi3Cutils::ftostrdp(ht, 2);
+				Pi3Cshapes::cylinder_verts(*vp.verts, vp.offset, vec3f(0, 0, 0), dist1, ht); break;
 			}
 			break;
 		case CT_CONE:
 			{
-				//getShapeHeight(pos, v1, v2);
-				Pi3Cshapes::cone_verts(*vp.verts, vp.offset, vec3f(0, 0, 0), dist1, dist2); break;
+				info = "Cone height:" + Pi3Cutils::ftostrdp(ht, 2);
+				Pi3Cshapes::cone_verts(*vp.verts, vp.offset, vec3f(0, 0, 0), dist1, ht); break;
 			}
 			break;
-		case CT_TORUS:Pi3Cshapes::torus_verts(*vp.verts, vp.offset, vec3f(0, 0, 0), dist1, dist2); break;
-		case CT_TCONE:Pi3Cshapes::tcone_verts(*vp.verts, vp.offset, vec3f(0, 0, 0), dist1, (oldPos2 - createFirstPoint).length(), .1f); break;
+		case CT_TORUS:
+			info = "Torus thickness:" + Pi3Cutils::ftostrdp(dist2*2.f, 2);
+			Pi3Cshapes::torus_verts(*vp.verts, vp.offset, vec3f(0, 0, 0), dist1, dist2); 
+			break;
+		case CT_TCONE:
+			info = "Truncated cone top radius:" + Pi3Cutils::ftostrdp(ht, 2);
+			Pi3Cshapes::tcone_verts(*vp.verts, vp.offset, vec3f(0, 0, 0), dist1, dist1, ht); // (oldPos2 - createFirstPoint).length(), .1f);
+			break;
 		case CT_TUBE:
 			{
 				float r1 = dist1;
-				float r2 = (oldPos2 - createFirstPoint).length();
-				if (r1 > r2) std::swap(r1, r2);
+				float r2 = dist1+ht; // (oldPos2 - createFirstPoint).length();
+				//if (r1 > r2) std::swap(r1, r2);
+				info = "Tube outer radius:" + Pi3Cutils::ftostrdp(r2, 2);
 				Pi3Cshapes::tube_verts(*vp.verts, vp.offset, vec3f(0, 0, 0), r1, r2, .1f);
 			}
 			break;
 		}
 		if (createTool != CT_CUBOID) currentModel->transformVerts(resource, views[currentView].rotInvertMatrix);
 		oldPos2 = pos;
+		oldht = ht;
 	}
 	else if (createCount == 3) {
 		float dist1 = (oldPos - createFirstPoint).length();
 		float dist2 = (oldPos2 - createFirstPoint).length();
-		float ht = (pos - oldPos2).length();
+		//float ht = (pos - oldPos2).length();
+		float ht = getShapeHeight(pos, v1, v2);
 
 		switch (createTool) {
 		case CT_TCONE:
 			{
-				Pi3Cshapes::tcone_verts(*vp.verts, vp.offset, vec3f(0, 0, 0), dist1, dist2, ht);
+				info = "Truncated cone height:" + Pi3Cutils::ftostrdp(ht, 2);
+				Pi3Cshapes::tcone_verts(*vp.verts, vp.offset, vec3f(0, 0, 0), dist1, dist1 + ht-oldht, oldht);
 			}
 			break;
 		case CT_TUBE:
 			{
-				if (dist1 > dist2) std::swap(dist1, dist2);
-				Pi3Cshapes::tube_verts(*vp.verts, vp.offset, vec3f(0, 0, 0), dist1, dist2, ht);
+				//if (dist1 > dist2) std::swap(dist1, dist2);
+				info = "Tube height:" + Pi3Cutils::ftostrdp(ht, 2);
+				Pi3Cshapes::tube_verts(*vp.verts, vp.offset, vec3f(0, 0, 0), dist1, dist1 + oldht, ht - oldht);
 			}
 			break;
 		}
@@ -630,6 +670,7 @@ void Modeller::ClickLeftMouseButton(viewInfo& view)
 		switch (editMode) {
 		case ED_CREATE:
 			if (createCount == maxSteps) {
+				info = "";
 				createCount = 0;
 			}
 			else {
@@ -1009,6 +1050,7 @@ void Modeller::setEditMode(const EditMode mode)
 {
 	createTool = CT_NONE;
 	editMode = mode;
+	mgui.startSnapshot();
 }
 
 void Modeller::handleIMGUI()
@@ -1082,9 +1124,12 @@ void Modeller::render()
 	scene.setViewport(screenRect);
 	scene.setup2D();
 	mgui.dragBars(this);
-	std::string text = "X:" + Pi3Cutils::ftostrdp(currentPos.x, 2) + ", Y:" + Pi3Cutils::ftostrdp(currentPos.y, 2) + ", Z:" + Pi3Cutils::ftostrdp(currentPos.z, 2);
-	Pi3Crecti prect = viewRect((viewInfo::SceneLayout)currentSelView);
-	mgui.printText(this, text, prect.x + 8, window->getHeight() - prect.y - 30, 0xffffffff);
+
+	if (currentView != viewInfo::INACTIVE) {
+		std::string text = "X:" + Pi3Cutils::ftostrdp(currentPos.x, 2) + ", Y:" + Pi3Cutils::ftostrdp(currentPos.y, 2) + ", Z:" + Pi3Cutils::ftostrdp(currentPos.z, 2)+"    "+info;
+		Pi3Crecti prect = viewRect((viewInfo::SceneLayout)currentSelView);
+		mgui.printText(this, text, prect.x + 8, window->getHeight() - prect.y - 30, 0xffffffff);
+	}
 }
 
 void Modeller::snapshot() {

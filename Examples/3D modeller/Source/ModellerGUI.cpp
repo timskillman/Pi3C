@@ -421,12 +421,13 @@ void MGui::printText(Modeller* md, std::string text, int x, int y, uint32_t col)
 {
 	gui.setButtonStyle(bsMenu);
 	gui.setPosition(x, y);
-	gui.Text(text, col);
+	gui.Text(text, 0,0,Pi3Ccolours::White);
 }
 
 void MGui::saveAll(Modeller * md)
 {
-	gui.takeSnapshot();
+	//startSnapshot();
+	//gui.takeSnapshot();
 	std::string savefile = gui.OpenFileDialog(&bsDialog);
 	if (savefile!="") md->saveFile("../", savefile);
 }

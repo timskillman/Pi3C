@@ -236,7 +236,8 @@ Pi3Crect Pi3Cresource::renderText(const int meshRef, Pi3Cfont *font, const std::
 	//matrix.SetScales(vec3f((float)wh.x, (float)wh.y, 1.f));
 	shaders[0].SetModelMatrix(matrix);
 	shaders[0].setMaterial(&font->fontsheet.sheetMaterial);
-	shaders[0].setColDiffuse(colour);
+	shaders[0].setColAmbient(colour);
+	//shaders[0].setColDiffuse(0xffffffff);
 
 	renderMesh(meshRef, GL_TRIANGLES);
 	return size;

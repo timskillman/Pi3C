@@ -69,7 +69,8 @@ public:
 	inline uint32_t  GetPitch() const { return pitch; }
 	inline bool isValid() { return (pixels != nullptr); }
 	GLuint textureID = 0;	//GL ID returned from upload (uint only)
-	
+	bool doNotDelete = false;
+
 private:
 	void init();
 	
@@ -81,4 +82,5 @@ private:
 	uint32_t pitch = 0;
 	size_t size = 0;
 	bool uploaded = false;
+
 };

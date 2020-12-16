@@ -108,7 +108,7 @@ void Pi3Cfont::createFontSheet(const uint32_t sheetWidth, const uint32_t sheetHe
 	fontsheet.sheetMaterial.texID = fontsheet.sheet->textureID;
 	fontsheet.sheetMaterial.texRef = 0; //need to validate rendering texture
 	fontsheet.sheetMaterial.SetColDiffuse(0xffffffff);
-	fontsheet.sheetMaterial.SetColAmbient(0xffffffff);
+	//fontsheet.sheetMaterial.SetColAmbient(0xffffffff);
 	fontsheet.sheetMaterial.alpha = 0.99f;
 	fontsheet.sheetMaterial.illum = 1; //non shaded illuminat
 
