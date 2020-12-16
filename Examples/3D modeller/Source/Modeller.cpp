@@ -315,7 +315,8 @@ void Modeller::addLinePoint(const vec3f point)
 	Pi3Cmesh* mesh = model.getMesh(resource);
 	vertsPtr vp = model.getMeshVerts(resource);
 	
-	vec3f newPoint = (lineCount > (lastMovePoint + 1) && (point - createFirstPoint).length() < 0.3f) ? createFirstPoint : point;
+	float snapDistance = 3.f / views[currentView].zoomFactor();
+	vec3f newPoint = (lineCount > (lastMovePoint + 1) && (point - createFirstPoint).length() < snapDistance) ? createFirstPoint : point;
 
 	//work out mesh offsets and vert sizes for line contours ...
 	vp.offset = lines.size() * mesh->stride;
@@ -1021,6 +1022,17 @@ void Modeller::renderScene(viewInfo &view)
 	scene.renderView(view, &outlines);
 }
 
+Pi3Crecti Modeller::viewRect(const viewInfo::SceneLayout projection)
+{
+	switch (projection) {
+		case viewInfo::FULL: return mgui.getRectFull();
+		case viewInfo::BOTTOMRIGHT: return mgui.getRectBottomRight();
+		case viewInfo::BOTTOMLEFT: return mgui.getRectBottomLeft();
+		case viewInfo::TOPLEFT: return mgui.getRectTopLeft();
+		case viewInfo::TOPRIGHT: return mgui.getRectTopRight();
+	}
+}
+
 void Modeller::renderView(const viewInfo::SceneLayout projection, const Pi3Crecti& rect, int32_t mx, int32_t my)
 {
 	//if (refreshed() && (mx<rect.x || mx>(rect.x + rect.width) || my<rect.y || my>(rect.y + rect.height))) return;
@@ -1067,8 +1079,12 @@ void Modeller::render()
 		renderView(viewInfo::TOPRIGHT, mgui.getRectTopRight(), mx, my);
 	}
 
-
-	
+	scene.setViewport(screenRect);
+	scene.setup2D();
+	mgui.dragBars(this);
+	std::string text = "X:" + Pi3Cutils::ftostrdp(currentPos.x, 2) + ", Y:" + Pi3Cutils::ftostrdp(currentPos.y, 2) + ", Z:" + Pi3Cutils::ftostrdp(currentPos.z, 2);
+	Pi3Crecti prect = viewRect((viewInfo::SceneLayout)currentSelView);
+	mgui.printText(this, text, prect.x + 8, window->getHeight() - prect.y - 30, 0xffffffff);
 }
 
 void Modeller::snapshot() {

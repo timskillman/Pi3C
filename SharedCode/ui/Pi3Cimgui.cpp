@@ -682,6 +682,11 @@ bool Pi3Cimgui::Label(const std::string &text, const int minwidth, const int min
 	return renderText(text, minwidth, minheight);
 }
 
+bool Pi3Cimgui::Text(const std::string& text, const uint32_t colour)
+{
+	return Text(text, 0, 0, colour);
+}
+
 bool Pi3Cimgui::Text(const std::string &text, const int minwidth, const int minheight, const uint32_t colour)
 {
 	if (text == "") return false;

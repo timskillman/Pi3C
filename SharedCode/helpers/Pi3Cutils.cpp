@@ -1,6 +1,8 @@
 #include "Pi3Cutils.h"
 #include "tessellate.h"
 #include <cstring>
+#include <sstream>
+#include <iomanip>
 
 namespace Pi3Cutils {
 
@@ -91,4 +93,10 @@ namespace Pi3Cutils {
 		}
 	}
 
+	std::string ftostrdp(float n, int decimalPlaces)
+	{
+		std::stringstream stream;
+		stream << std::fixed << std::setprecision(decimalPlaces) << n;
+		return stream.str();
+	}
 }

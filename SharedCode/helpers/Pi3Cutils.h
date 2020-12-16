@@ -11,4 +11,5 @@ namespace Pi3Cutils
 	void flipImage(std::vector<uint8_t> &src, std::vector<uint8_t> &dest, uint32_t w, uint32_t h);
 	bool snapShot(const Pi3Crecti &rect, std::vector<uint8_t> &snapShot);
 	void saveBufferToPNG(const char* filename, std::vector<uint8_t>& snapShot, const int width, const int height);
+	std::string ftostrdp(float n, int decimalPlaces);
 }

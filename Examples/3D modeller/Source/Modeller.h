@@ -56,6 +56,7 @@ public:
 	void saveFile(const std::string& path, const std::string& filename, bool selected = false) { 
 		std::string err; Pi3CfileOBJ::save(path, filename, &scene, selected, nullptr, err); 
 	}
+	Pi3Crecti viewRect(const viewInfo::SceneLayout projection);
 
 	bool currentViewIsActive() { return (currentView != viewInfo::INACTIVE && !mgui.somethingSelected()) || fullscreen; }
 

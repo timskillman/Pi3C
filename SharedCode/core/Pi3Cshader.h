@@ -114,6 +114,8 @@ public:
 	void setupShader();
 	void setMaterial(Pi3Cmaterial *mat);
 	void setColDiffuse(uint32_t colour);
+	void setColAmbient(uint32_t colour);
+	void setColEmissive(uint32_t colour);
 	void setProjectionMatrix(const Pi3Cmatrix &matrix) { SetMatrix4f(perspectiveMatrixRef, matrix); }
 	void SetModelMatrix(const Pi3Cmatrix &matrix) { SetMatrix4f(modelMatrixRef, matrix); }
 	

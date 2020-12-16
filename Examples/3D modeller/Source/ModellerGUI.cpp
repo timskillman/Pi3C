@@ -1,7 +1,6 @@
 #include "ModellerGUI.h"
 #include "Modeller.h"
-#include <sstream>
-#include <iomanip>
+#include "Pi3Cutils.h"
 
 void MGui::init(loadOptions &opts, Pi3Cresource * resource, Pi3Cwindow *window)
 {
@@ -105,23 +104,23 @@ void MGui::renderYellowBorder(uint32_t currentSelView)
 
 	if (rec.width > 0) {
 		Pi3Cmodel rect;
-		float rw = 3.f;
+		float rw = 4.f;
 		uint32_t col = 0xff00ffff;
 		rect.matrix.setz(-1.f);
-		rect.createRect2D(gui.resource, vec2f((float)rec.x, (float)rec.y), vec2f((float)rec.width, rw), col);
+		rect.createRect2D(gui.resource, vec2f((float)rec.x, (float)rec.y), vec2f((float)(rec.width+1), rw), col);
 		rect.renderBasic(gui.resource);
-		rect.createRect2D(gui.resource, vec2f((float)rec.x, (float)(rec.y + rec.height) - rw), vec2f((float)rec.width, rw), col);
+		rect.createRect2D(gui.resource, vec2f((float)rec.x, (float)(rec.y + rec.height) - rw), vec2f((float)(rec.width + 1), rw), col);
 		rect.renderBasic(gui.resource);
 		rect.createRect2D(gui.resource, vec2f((float)rec.x, (float)rec.y), vec2f(rw, (float)rec.height), col);
 		rect.renderBasic(gui.resource);
-		rect.createRect2D(gui.resource, vec2f((float)(rec.x + rec.width) - rw, (float)rec.y), vec2f(rw, (float)rec.height), col);
+		rect.createRect2D(gui.resource, vec2f((float)(rec.x + rec.width + 1) - rw, (float)rec.y), vec2f(rw, (float)rec.height), col);
 		rect.renderBasic(gui.resource);
 	}
 }
 
 Pi3Crecti MGui::getRectBottomRight()
 {
-	return Pi3Crecti(leftbarWidth + (int)((float)workWidth * dragBarX) + dbh, botbarHeight, (int)((float)workWidth * ibx), (int)((float)workHeight * iby));
+	return Pi3Crecti(leftbarWidth + (int)((float)workWidth * dragBarX) + dbh, botbarHeight, (int)((float)workWidth * ibx)-dbh, (int)((float)workHeight * iby));
 }
 
 Pi3Crecti MGui::getRectBottomLeft()
@@ -131,19 +130,23 @@ Pi3Crecti MGui::getRectBottomLeft()
 
 Pi3Crecti MGui::getRectTopRight()
 {
-	return Pi3Crecti(leftbarWidth + (int)((float)workWidth * dragBarX) + dbh, botbarHeight + (int)((float)workHeight * iby) + dbh, (int)((float)workWidth * ibx), (int)((float)workHeight * dragBarY) - dbh * 3);
+	return Pi3Crecti(leftbarWidth + (int)((float)workWidth * dragBarX) + dbh, botbarHeight + (int)((float)workHeight * iby) + dbh, (int)((float)workWidth * ibx)-dbh, (int)((float)workHeight * dragBarY) - dbh * 4);
 }
 
 Pi3Crecti MGui::getRectTopLeft()
 {
-	return Pi3Crecti(leftbarWidth, botbarHeight + (int)((float)workHeight * iby) + dbh, (int)((float)workWidth * dragBarX) - dbh, (int)((float)workHeight * dragBarY) - dbh * 3);
+	return Pi3Crecti(leftbarWidth, botbarHeight + (int)((float)workHeight * iby) + dbh, (int)((float)workWidth * dragBarX) - dbh, (int)((float)workHeight * dragBarY) - dbh * 4);
 }
 
 Pi3Crecti MGui::getRectFull()
 {
-	return Pi3Crecti(leftbarWidth, botbarHeight, workWidth, workHeight - dbh * 3);
+	return Pi3Crecti(leftbarWidth, botbarHeight, workWidth, workHeight - dbh * 4);
 }
 
+Pi3Cpointi MGui::getTopLeft()
+{
+	return Pi3Cpointi(leftbarWidth + dbh, topbarHeight + menuHeight + dbh*2);
+}
 
 bool MGui::draggingBars()
 {
@@ -168,7 +171,7 @@ void MGui::dragViewportBars(Modeller * md, Pi3Cpointi& wpos, int midht)
 		//Drag bar horizontal ...
 		gui.setPosition(leftbarWidth + (int)(dragBarX * (float)workWidth - dragBarThickness * 0.5f), wpos.y);
 
-		bool touchDragBarH = gui.renderRect((int)dragBarThickness, midht);
+		bool touchDragBarH = gui.renderRect((int)dragBarThickness, midht, 0xffffffff);
 		if (touchDragBarH || draggingBarX) md->setDragBarH(true);
 
 		if (touchDragBarH && mb && !draggingBars()) {
@@ -184,7 +187,7 @@ void MGui::dragViewportBars(Modeller * md, Pi3Cpointi& wpos, int midht)
 		//Drag bar vertical ...
 		gui.setPosition(leftbarWidth, topbarHeight + menuHeight + (int)((float)workHeight*dragBarY - dragBarThickness * 0.5f));
 
-		bool touchDragBarV = gui.renderRect(workWidth, (int)dragBarThickness);
+		bool touchDragBarV = gui.renderRect(workWidth, (int)dragBarThickness, 0xffffffff);
 		if (touchDragBarV || draggingBarY) md->setDragBarV(true);
 
 		if (touchDragBarV && mb && !draggingBars()) {
@@ -203,19 +206,14 @@ void MGui::dragViewportBars(Modeller * md, Pi3Cpointi& wpos, int midht)
 	}
 }
 
-void MGui::drawBorders(Modeller * md, Pi3Cpointi& wpos)
+void MGui::dragBars(Modeller * md)
 {
-	int winWidth = md->window->getWidth();
-	int winHeight = md->window->getHeight();
-
-	int midht = winHeight - wpos.y - botbarHeight;
-	gui.renderRect(leftbarWidth, midht);
-	gui.movePosition(winWidth - rightbarWidth, 0);
-	gui.renderRect(rightbarWidth, midht);
-	gui.setPosition(0, wpos.y + midht);
-	gui.renderRect(winWidth, botbarHeight);
-
+	Pi3Cpointi wpos = getTopLeft();
+	workWidth = md->window->getWidth() - leftbarWidth - rightbarWidth;
+	workHeight = md->window->getHeight() - menuHeight - topbarHeight - botbarHeight;
+	int midht = md->window->getHeight() - wpos.y - botbarHeight;
 	dragViewportBars(md, wpos, midht);
+	renderYellowBorder(md->currentSelView);
 }
 
 void MGui::doMenus(Modeller * md)
@@ -363,7 +361,15 @@ void MGui::doIMGUI(Modeller * md)
 	gui.renderRect(winWidth, topbarHeight);
 	gui.nextLine(0);
 	Pi3Cpointi wpos = gui.getPosition();
-	drawBorders(md, wpos);
+
+	int midht = winHeight - wpos.y - botbarHeight;
+	gui.renderRect(leftbarWidth, midht);
+	gui.movePosition(winWidth - rightbarWidth, 0);
+	gui.renderRect(rightbarWidth, midht);
+	gui.setPosition(0, wpos.y + midht);
+	gui.renderRect(winWidth, botbarHeight);
+
+	//dragBars(md, wpos);
 
 
 
@@ -390,16 +396,16 @@ void MGui::doIMGUI(Modeller * md)
 	static double v = 5;
 	gui.SliderH("Scroll", 0, 10, v, 300, 24);
 
-	renderYellowBorder(md->currentSelView);
-
 	//Draw xyz values
 	if (md->currentView != viewInfo::INACTIVE) {
-		Pi3Crecti &rect = md->views[md->currentView].viewport;
-		gui.setButtonStyle(bsMenu);
+	
+		//Pi3Crecti &rect = md->views[md->currentView].viewport;
+		//gui.setButtonStyle(bsMenu);
 		//gui.setPosition(rect.x + 5, winHeight - rect.y - 26);
-		gui.setPosition(leftbarWidth + 320, workHeight + topbarHeight + menuHeight + 3);
-		std::string tpos = "X:" + ftostrdp(md->currentPos.x, 2) + ", Y:" + ftostrdp(md->currentPos.y, 2) + ", Z:" + ftostrdp(md->currentPos.z, 2);
-		gui.Text(tpos, 0xffffffff);
+		//gui.setPosition(leftbarWidth + 320, workHeight + topbarHeight + menuHeight + 3);
+		//std::string text = "X:" + Pi3Cutils::ftostrdp(md->currentPos.x, 2) + ", Y:" + Pi3Cutils::ftostrdp(md->currentPos.y, 2) + ", Z:" + Pi3Cutils::ftostrdp(md->currentPos.z, 2);
+		//printText(md, text, leftbarWidth + 320, workHeight + topbarHeight + menuHeight + 3);
+		//gui.Text(tpos, 0xffffffff);
 		//if (md->selectedName != "") {
 		//	gui.setPosition(leftbarWidth + 720, workHeight + topbarHeight + menuHeight + 3);
 		//	gui.Text(md->selectedName, 0xffffffff);
@@ -411,11 +417,11 @@ void MGui::doIMGUI(Modeller * md)
 	
 }
 
-std::string MGui::ftostrdp(float n, int decimalPlaces)
+void MGui::printText(Modeller* md, std::string text, int x, int y, uint32_t col)
 {
-	std::stringstream stream;
-	stream << std::fixed << std::setprecision(decimalPlaces) << n;
-	return stream.str();
+	gui.setButtonStyle(bsMenu);
+	gui.setPosition(x, y);
+	gui.Text(text, col);
 }
 
 void MGui::saveAll(Modeller * md)

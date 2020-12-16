@@ -202,8 +202,17 @@ void Pi3Cshader::setupShader()
 
 void Pi3Cshader::setColDiffuse(uint32_t colour)
 {
-	//vec4f colDiffuse = vec4f((GLfloat)(colour & 255) / 255.f, (GLfloat)((colour >> 8) & 255) / 255.f, (GLfloat)((colour >> 16) & 255) / 255.f, (GLfloat)((colour >> 24) & 255) / 255.f);
 	Set4f(diffuseRef, RGB_VEC4(colour));
+}
+
+void Pi3Cshader::setColAmbient(uint32_t colour)
+{
+	Set4f(ambientRef, RGB_VEC4(colour));
+}
+
+void Pi3Cshader::setColEmissive(uint32_t colour)
+{
+	Set4f(emissiveRef, RGB_VEC4(colour));
 }
 
 void Pi3Cshader::setMaterial(Pi3Cmaterial *mat)

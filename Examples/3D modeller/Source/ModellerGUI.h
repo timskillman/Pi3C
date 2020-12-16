@@ -14,12 +14,16 @@ public:
 	bool somethingSelected() { return gui.somethingSelected; }
 	void startSnapshot() { gui.startSnapshot(); }
 	void stopSnapshot() { gui.stopSnapshot(); }
+	void dragBars(Modeller* md);
+	void printText(Modeller* md, std::string text, int x, int y, uint32_t col = 0);
 
 	Pi3Crecti getRectBottomRight();
 	Pi3Crecti getRectBottomLeft();
 	Pi3Crecti getRectTopRight();
 	Pi3Crecti getRectTopLeft();
 	Pi3Crecti getRectFull();
+	Pi3Cpointi getTopLeft();
+
 	void resize() { gui.resize(); }
 
 private:
@@ -62,10 +66,9 @@ private:
 	void renderYellowBorder(uint32_t currentSelView);
 	void dragViewportBars(Modeller * md, Pi3Cpointi& wposm, int midht);
 	void saveAll(Modeller * md);
-	std::string ftostrdp(float n, int decimalPlaces);
 	bool draggingBars();
 
-	void drawBorders(Modeller * md, Pi3Cpointi& wpos);
+
 	void doMenus(Modeller * md);
 	void doEditToolbar(Modeller * md, Pi3Cimgui::rectStyle& iconstyle, bool mb);
 	void doTransformToolbar(Modeller * md, Pi3Cimgui::rectStyle& iconstyle, bool mb);

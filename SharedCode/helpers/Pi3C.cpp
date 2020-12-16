@@ -210,7 +210,7 @@ void Pi3C::showFPS()
 {
 	gui.Begin();
 	const std::string fps = "FPS:" + std::to_string((int)getCurrentFPS());
-	gui.Text(fps);
+	gui.Text(fps, 0xffffffff);
 }
 
 void Pi3C::resize_window()
