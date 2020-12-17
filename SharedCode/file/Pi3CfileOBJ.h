@@ -34,7 +34,7 @@
 
 namespace Pi3CfileOBJ 
 {
-	void load(const std::string &path, const std::string &name, Pi3Cresource *resource, const std::function<void(float)> showProgressCB, const bool asCollider, const bool addColliderGrid, std::string &error);
+	void load(const std::string &path, const std::string &name, Pi3Cresource *resource, const std::function<void(float)> showProgressCB, const bool asCollider, const bool addColliderGrid, const int32_t groupId, std::string &error);
 	void save(const std::string &path, const std::string &name, Pi3Cscene *scene, const bool selected, std::function<void(float)> showProgressCB, std::string &error);
 	//void getMatLib(std::string path, std::string name, Pi3Cresource* resource);
 }

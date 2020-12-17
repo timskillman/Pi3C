@@ -73,10 +73,11 @@ namespace Pi3CfileOBJ {
 		return vec2f(mystrtof(vs1),mystrtof(vs2));
 	}
 	
-	void getMatLib(const std::string &path, const std::string &name, Pi3Cresource* resource)
+	void getMatLib(const std::string &path, const std::string &name, Pi3Cresource* resource, const uint32_t groupId)
 	{
 		std::string line;
 		Pi3Cmaterial objmat;
+		objmat.groupID = groupId; //used to separate groups of materials - e.g. system, models, skyboxes etc..
 		//SDL_Log("Loading material '%s'", (path + name).c_str());
 		std::ifstream matfile(path + name, std::ifstream::in);
 		if (!matfile.is_open()) {
@@ -148,7 +149,7 @@ namespace Pi3CfileOBJ {
 
 	///// Load OBJ with Material support //////////////////////////////////////////////////////////////////
 
-	void load(const std::string &path, const std::string &filename, Pi3Cresource *resource, const std::function<void(float)> showProgressCB, const bool asCollider, const bool addColliderGrid, std::string &error)
+	void load(const std::string &path, const std::string &filename, Pi3Cresource *resource, const std::function<void(float)> showProgressCB, const bool asCollider, const bool addColliderGrid, const int32_t groupId, std::string &error)
 	{
 		int32_t v[64];
 		int32_t c;
@@ -340,7 +341,7 @@ namespace Pi3CfileOBJ {
 				case 'm': //get material library
 					if (com == "mtllib") {
 						matlibname = vals;
-						getMatLib(gpath, matlibname, resource);
+						getMatLib(gpath, matlibname, resource, groupId);
 						meshModel.resize(resource->materials.size());
 					}
 					break;

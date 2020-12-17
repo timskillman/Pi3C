@@ -63,6 +63,9 @@ public:
 	Pi3Cmesh createRect(const vec3f& pos, const vec2f& size, const uint32_t col, const vec2f& uvpos = vec2f(0,0), const vec2f& uvsize = vec2f(1.f,1.f));
 	int32_t createDefaultTexture(int32_t &texID);
 	Pi3Cmaterial * defaultMaterial() { return &materials[0]; }
+	void deleteMaterialTexturesByID(int32_t groupId);
+	void deleteMaterialsByID(int32_t groupId);
+	void cleanTextures();	//removes empty textures
 
 	Pi3Ctexture* getTexture(int32_t ref) {
 		return (ref >= 0 && ref <= (int32_t)textures.size()) ? textures[ref].get() : nullptr;
@@ -117,6 +120,7 @@ public:
 	std::vector<Pi3Cmesh> meshes;
 	std::vector<std::vector<float>> vertBuffer;			//vertex buffers for modify and uploading to GPU
 	std::vector<uint32_t> vertBufferPtr;				//vertex buffer pointer for each vertex buffer (used for calculating free space in each buffer)
+
 	std::vector<Pi3Cmaterial> materials;
 	std::vector<std::shared_ptr<Pi3Ctexture>> textures;
 	std::vector<Pi3Cshader> shaders;

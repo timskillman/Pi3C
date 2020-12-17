@@ -72,7 +72,7 @@ std::string Pi3Cscene::getPathFile(std::string &file) const
 	return path;
 }
 
-int32_t Pi3Cscene::loadModelOBJ(const std::string &path, const std::string &modelfile, const vec3f pos, const bool grouped, bool addColliderGrid, const std::function<void(float)> showProgressCB)
+int32_t Pi3Cscene::loadModelOBJ(const std::string &path, const std::string &modelfile, const vec3f pos, const bool grouped, const int32_t groupId, bool addColliderGrid, const std::function<void(float)> showProgressCB)
 {
 	if (modelfile == "") return -1;
 	std::string newfile = modelfile;
@@ -81,7 +81,7 @@ int32_t Pi3Cscene::loadModelOBJ(const std::string &path, const std::string &mode
 	if (grouped) {
 		models.emplace_back();
 		Pi3Cmodel &model = models.back();
-		model.loadOBJfile(resource, newpath, newfile, showProgressCB, false, addColliderGrid);
+		model.loadOBJfile(resource, newpath, newfile, groupId, showProgressCB, false, addColliderGrid);
 		model.matrix.move(pos);
 		model.asCollider = addColliderGrid;
 	}
@@ -89,7 +89,7 @@ int32_t Pi3Cscene::loadModelOBJ(const std::string &path, const std::string &mode
 	{
 		std::string error;
 		size_t meshStart = resource->meshes.size();
-		Pi3CfileOBJ::load(newpath, newfile, resource, showProgressCB, false, addColliderGrid, error);
+		Pi3CfileOBJ::load(newpath, newfile, resource, showProgressCB, false, addColliderGrid, groupId, error);
 		size_t meshEnd = resource->meshes.size();
 
 		if (meshEnd - meshStart > 0) {
@@ -109,7 +109,7 @@ int32_t Pi3Cscene::loadModelOBJ(const std::string &path, const std::string &mode
 
 int32_t Pi3Cscene::loadSkybox(const std::string &path, const std::string &file, const std::function<void(float)> showProgressCB, const float scale)
 {
-	int skybox = loadModelOBJ(path, file, vec3f(0,0,0), true, false, showProgressCB); // loadbarCallback);
+	int skybox = loadModelOBJ(path, file, vec3f(0,0,0), true, 0, false, showProgressCB); // loadbarCallback);
 	models[skybox].matrix.SetScale(scale);
 	models[skybox].touchable = false;
 
@@ -137,7 +137,7 @@ Pi3Cbbox3d Pi3Cscene::getSelectedBounds()
 {
 	Pi3Cbbox3d bbox;
 	for (auto &model : models) {
-		if (model.selected) {
+		if (model.selected && model.visible && !model.deleted) {
 			bbox.update(model.bbox.bboxFromTVerts(&model.matrix));
 		}
 	}

@@ -14,25 +14,20 @@ void MGui::init(loadOptions &opts, Pi3Cresource * resource, Pi3Cwindow *window)
 
 	gui.setImagePath("assets/icons");
 
-	uint32_t backColour = 0xcccccc;
-	uint32_t white = 0xffffff;
-	uint32_t highlight = 0xeeeeee;
-	uint32_t selectColour = 0x00ffff;
-
 	// Setup GUI button styles ...
 	bsMenu.font = smallFont;
 	bsMenu.textColour = 0x0;
 	bsMenu.buttonAlpha = 1.f;
-	bsMenu.buttonColour = white;
+	bsMenu.buttonColour = iconColour;
 	bsMenu.minHeight = 32;
 	bsMenu.minWidth = 70;
 	bsMenu.vertGap = 0;
 	bsMenu.left = 5;
-	bsMenu.highlightColour = 0xc0c0c0;
+	bsMenu.highlightColour = Pi3Ccolours::LightGray;
 
 	bsHeading.font = largeFont;
-	bsHeading.textColour = white;
-	bsHeading.highlightColour = 0x00ffff;
+	bsHeading.textColour = iconColour;
+	bsHeading.highlightColour = highlight;
 	bsHeading.buttonColour = backColour;
 	bsHeading.top = 0;
 	bsHeading.bottom = 0;
@@ -40,7 +35,7 @@ void MGui::init(loadOptions &opts, Pi3Cresource * resource, Pi3Cwindow *window)
 	bsHeading.right = 0;
 
 	bsIcons.font = largeFont;
-	bsIcons.textColour = white;
+	bsIcons.textColour = iconColour;
 	bsIcons.buttonColour = backColour;
 	bsIcons.highlightColour = highlight;
 	bsIcons.minWidth = 32;
@@ -54,7 +49,7 @@ void MGui::init(loadOptions &opts, Pi3Cresource * resource, Pi3Cwindow *window)
 	bsIcons.selectColour = selectColour;
 
 	bsButtons.font = largeFont;
-	bsButtons.textColour = white;
+	bsButtons.textColour = iconColour;
 	bsButtons.buttonColour = backColour;
 	bsButtons.highlightColour = highlight;
 	bsButtons.justify = Pi3Cimgui::CENTRE;
@@ -71,7 +66,7 @@ void MGui::init(loadOptions &opts, Pi3Cresource * resource, Pi3Cwindow *window)
 
 	bsItems.font = smallFont;
 	bsItems.buttonAlpha = 0.8f;
-	bsItems.buttonColour = white;
+	bsItems.buttonColour = iconColour;
 	bsItems.textColour = 0x404040;
 	bsItems.minWidth = 140;
 	bsItems.minHeight = 40;
@@ -91,7 +86,7 @@ void MGui::init(loadOptions &opts, Pi3Cresource * resource, Pi3Cwindow *window)
 	bsDialog.highlightColour = Pi3Ccolours::Yellow;
 }
 
-void MGui::renderYellowBorder(uint32_t currentSelView)
+void MGui::renderBorder(uint32_t currentSelView)
 {
 	Pi3Crecti rec;
 	switch (currentSelView) {
@@ -105,8 +100,8 @@ void MGui::renderYellowBorder(uint32_t currentSelView)
 	if (rec.width > 0) {
 		Pi3Cmodel rect;
 		float rw = 4.f;
-		uint32_t col = 0xff00ffff;
-		rect.matrix.setz(-1.f);
+		uint32_t col = borderColour;
+		rect.matrix.setz(-10.f);
 		rect.createRect2D(gui.resource, vec2f((float)rec.x, (float)rec.y), vec2f((float)(rec.width+1), rw), col);
 		rect.renderBasic(gui.resource);
 		rect.createRect2D(gui.resource, vec2f((float)rec.x, (float)(rec.y + rec.height) - rw), vec2f((float)(rec.width + 1), rw), col);
@@ -213,7 +208,7 @@ void MGui::dragBars(Modeller * md)
 	workHeight = md->window->getHeight() - menuHeight - topbarHeight - botbarHeight;
 	int midht = md->window->getHeight() - wpos.y - botbarHeight;
 	dragViewportBars(md, wpos, midht);
-	renderYellowBorder(md->currentSelView);
+	renderBorder(md->currentSelView);
 }
 
 void MGui::doMenus(Modeller * md)
@@ -338,7 +333,9 @@ void MGui::doIMGUI(Modeller * md)
 	int mx = md->window->mouse.x;
 	int my = md->window->mouse.y;
 	md->setMousePosition(mx, winHeight - my);
-	bool mouseOverToolbars = mx<leftbarWidth || mx>(winWidth - rightbarWidth) || my<(topbarHeight + menuHeight) || my>winHeight - botbarHeight;
+	bool mouseOverToolbars = gui.menuOpen || mx<leftbarWidth || mx>(winWidth - rightbarWidth) || my<(topbarHeight + menuHeight) || my>winHeight - botbarHeight;
+
+	//SDL_Log("Menus %s", gui.menuTouch);
 
 	gui.Begin();
 
@@ -391,10 +388,10 @@ void MGui::doIMGUI(Modeller * md)
 	gui.setButtonStyle(bsButtons);
 	doShapesToolbar(md, bsButtons, mb, mu);
 
-	gui.setPosition(leftbarWidth, workHeight + topbarHeight + menuHeight + 3);
-	gui.setButtonStyle(bsHeading);
-	static double v = 5;
-	gui.SliderH("Scroll", 0, 10, v, 300, 24);
+	//gui.setPosition(leftbarWidth, workHeight + topbarHeight + menuHeight + 3);
+	//gui.setButtonStyle(bsHeading);
+	//static double v = 5;
+	//gui.SliderH("Scroll", 0, 10, v, 300, 24);
 
 	//Draw xyz values
 	if (md->currentView != viewInfo::INACTIVE) {

@@ -38,13 +38,19 @@ private:
 	Pi3Cimgui::rectStyle bsItems;
 	Pi3Cimgui::rectStyle bsDialog;
 
+	uint32_t backColour = Pi3Ccolours::Raspberry; // 0xcccccc;
+	uint32_t iconColour = Pi3Ccolours::Linen;
+	uint32_t selectColour = Pi3Ccolours::LightCoral; // 0x00ffff;
+	uint32_t highlight = Pi3Ccolours::Salmon;
+	uint32_t borderColour = Pi3Ccolours::Red;
+
 	std::string smallFont;
 	std::string largeFont;
 	std::string mediumFont;
 
 	int menuHeight = 20;
 	int topbarHeight = 36;
-	int botbarHeight = 40;
+	int botbarHeight = 60;
 	int leftbarWidth = 50;
 	int rightbarWidth = 40;
 
@@ -63,7 +69,7 @@ private:
 	float ibx = 1.f - dragBarX;
 	float iby = 1.f - dragBarY;
 
-	void renderYellowBorder(uint32_t currentSelView);
+	void renderBorder(uint32_t currentSelView);
 	void dragViewportBars(Modeller * md, Pi3Cpointi& wposm, int midht);
 	void saveAll(Modeller * md);
 	bool draggingBars();

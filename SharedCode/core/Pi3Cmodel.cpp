@@ -35,24 +35,24 @@ Pi3Cmodel::Pi3Cmodel(Pi3Cresource *resource, const std::string &name, Pi3Cmesh m
 	create(resource, &mesh, diffuseColour);
 }
 
-Pi3Cmodel::Pi3Cmodel(Pi3Cresource *resource, const std::string &path, const std::string &modelfile, const bool asCollider, std::function<void(float)> showProgressCB)
+Pi3Cmodel::Pi3Cmodel(Pi3Cresource *resource, const std::string &path, const std::string &modelfile, int32_t groupId, const bool asCollider, std::function<void(float)> showProgressCB)
 {
 	init();
-	loadOBJfile(resource, path, modelfile, showProgressCB, asCollider);
+	loadOBJfile(resource, path, modelfile, groupId, showProgressCB, asCollider);
 }
 
-Pi3Cmodel::Pi3Cmodel(Pi3Cresource *resource, const std::string &modelname, const std::string &path, const std::string &modelfile, const std::string &collider, std::function<void(float)> showProgressCB)
+Pi3Cmodel::Pi3Cmodel(Pi3Cresource *resource, const std::string &modelname, const std::string &path, const std::string &modelfile, int32_t groupId, const std::string &collider, std::function<void(float)> showProgressCB)
 {
 	init();
-	loadModelAndCollider(resource, path, modelfile, collider, showProgressCB);
+	loadModelAndCollider(resource, path, modelfile, groupId, collider, showProgressCB);
 	name = modelname;
 }
 
-void Pi3Cmodel::loadModelAndCollider(Pi3Cresource *resource, std::string path, std::string modelfile, std::string collider, std::function<void(float)> showProgressCB)
+void Pi3Cmodel::loadModelAndCollider(Pi3Cresource *resource, std::string path, std::string modelfile, int32_t groupId, std::string collider, std::function<void(float)> showProgressCB)
 {
-	if (modelfile != "") loadOBJfile(resource, path, modelfile, showProgressCB, false);
+	if (modelfile != "") loadOBJfile(resource, path, modelfile, groupId, showProgressCB, false);
 	if (collider != "") {
-		Pi3Cmodel c1(resource, path, collider, true, showProgressCB);
+		Pi3Cmodel c1(resource, path, collider, groupId, true, showProgressCB);
 		this->appendCollider(resource, c1);
 	}
 }
@@ -274,11 +274,11 @@ Pi3Cmodel * Pi3Cmodel::appendLOD(Pi3Cresource *resource, Pi3Cmodel model, float 
 }
 
 
-void Pi3Cmodel::loadOBJfile(Pi3Cresource *resource, std::string path, std::string modelfile, std::function<void(float)> showProgressCB, bool asCollider, bool addColliderGrid)
+void Pi3Cmodel::loadOBJfile(Pi3Cresource *resource, std::string path, std::string modelfile, int32_t groupId,std::function<void(float)> showProgressCB, bool asCollider, bool addColliderGrid)
 {	
 	std::string error;
 	size_t meshStart = resource->meshes.size();
-	Pi3CfileOBJ::load(path, modelfile, resource, showProgressCB, asCollider, addColliderGrid, error);
+	Pi3CfileOBJ::load(path, modelfile, resource, showProgressCB, asCollider, addColliderGrid, groupId, error);
 	size_t meshEnd = resource->meshes.size();
 	//collider = asCollider;
 

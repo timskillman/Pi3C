@@ -33,7 +33,6 @@ void Pi3Ctexture::init()
 
 void Pi3Ctexture::Delete()
 {
-	if (doNotDelete) return;
 	if (uploaded) glDeleteTextures(1, &textureID);
 	if (pixels) delete pixels;
 	init();

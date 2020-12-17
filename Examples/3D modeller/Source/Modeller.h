@@ -101,6 +101,7 @@ public:
 	std::vector<std::vector<vec2f>> contours; //used for creating Extrude
 
 	std::string libShape;				//Create tool library shape file
+	int32_t modelGroupId = 1;			// used for identifying model materials
 
 	//bool modeChange = true;
 	//float edTransition = 0;

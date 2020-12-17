@@ -153,12 +153,12 @@ void Pi3C::nextBackground() {
 
 int32_t Pi3C::load_model(const std::string &path, const std::string &modelfile, const vec3f &pos, const bool addColliderGrid)
 {
-	return scene.loadModelOBJ(path, modelfile, pos, true, addColliderGrid, nullptr);  // loadbarCallback);
+	return scene.loadModelOBJ(path, modelfile, pos, true, 1, addColliderGrid, nullptr);  // loadbarCallback);
 }
 
 int32_t Pi3C::load_model_and_collider(const std::string& path, const std::string& modelfile, const std::string& colliderfile, const vec3f& pos)
 {
-	Pi3Cmodel model; model.loadModelAndCollider(&resource, path, modelfile, colliderfile, nullptr);  // loadbarCallback);
+	Pi3Cmodel model; model.loadModelAndCollider(&resource, path, modelfile, 1, colliderfile, nullptr);  // loadbarCallback);
 	uint32_t modelRef = scene.append3D(model);
 	if (!pos.isZero()) scene.models[modelRef].move(pos);
 	return modelRef;

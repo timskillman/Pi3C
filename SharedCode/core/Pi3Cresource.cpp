@@ -56,7 +56,42 @@ void Pi3Cresource::createDefaultMaterial(const std::string &name)
 	defmaterial.texName = name;
 	defmaterial.texWidth = 1;
 	defmaterial.texHeight = 1;
+	defmaterial.groupID = -1; //system type group
 	materials.push_back(defmaterial);
+}
+
+void Pi3Cresource::deleteMaterialTexturesByID(int32_t groupId)
+{
+	for (auto& m: materials)
+	{
+		if (m.groupID == groupId) {
+			if (m.texRef >= 0 && m.texRef!= materials[0].texRef && textures[m.texRef]!=nullptr) {
+				textures[m.texRef]->Delete();
+				textures[m.texRef].reset();
+				m.texRef = -1;
+			}
+		}
+	}
+	//cleanTextures();
+}
+
+void Pi3Cresource::cleanTextures()
+{
+	for (auto& t: textures) {
+		if (t->isValid()==false) t.reset();
+	}
+}
+
+void Pi3Cresource::deleteMaterialsByID(int32_t groupId)
+{
+	size_t msz = materials.size();
+	for (size_t i = msz - 1; i > 0; i--)
+	{
+		Pi3Cmaterial& m = materials[i];
+		if (m.groupID == groupId) {
+			materials.erase(materials.begin() + i);
+		}
+	}
 }
 
 int32_t Pi3Cresource::createDefaultTexture(int32_t &texRef)

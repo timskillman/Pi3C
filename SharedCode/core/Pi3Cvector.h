@@ -275,8 +275,6 @@ public:
 		return ((x == 0.f) && (y == 0.f) && (z == 0.f));
 	}
 
-	//static vec3f g_Zero;
-
 	float x;
 	float y;
 	float z;

@@ -138,6 +138,61 @@ void Pi3Cmesh::renderIndexed(const GLenum rendermode, uint32_t indexCo, uint32_t
 //	return vec2f(vec.x*zd, vec.y*zd);
 //}
 
+void Pi3Cmesh::insideRect(Pi3Cbbox2d& bbox, std::vector<uint32_t>& pointIndexes, std::vector<uint32_t>& edgeIndexes, std::vector<uint32_t>& faceIndexes, const float perspective, const Pi3Cmatrix& mtx, const std::vector<float>& mverts)
+{
+	uint32_t vsize = vertSize * stride;
+	uint32_t voff = vertOffset * stride;
+
+	for (size_t i = voff; i < (voff + vsize); i += stride * 3)
+	{
+		uint32_t i2 = i + stride;
+		uint32_t i3 = i + stride + stride;
+
+		float x1 = mtx.transformX(&mverts[i]);
+		float x2 = mtx.transformX(&mverts[i2]);
+		float x3 = mtx.transformX(&mverts[i3]);
+
+		float y1 = mtx.transformY(&mverts[i]);
+		float y2 = mtx.transformY(&mverts[i2]);
+		float y3 = mtx.transformY(&mverts[i3]);
+
+		// Calc Z's and discard any triangle that is behind the viewer ...
+		if (perspective != 0) {
+			int crossViewer = 0;
+			float z1 = mtx.transformZ(&mverts[i]); if (z1 > 0) crossViewer = crossViewer | 1;
+			float z2 = mtx.transformZ(&mverts[i2]); if (z2 > 0) crossViewer = crossViewer | 2;
+			float z3 = mtx.transformZ(&mverts[i3]); if (z3 > 0) crossViewer = crossViewer | 4;
+			if (crossViewer == 7) continue; //behind
+
+			if (crossViewer != 0) {
+				//TODO: Triangle needs clipping or splitting into two triangles...
+				crossViewer = crossViewer;
+			}
+
+			float w1 = perspective / z1; 
+			float w2 = perspective / z2; 
+			float w3 = perspective / z3;
+			x1 *= w1; y1 *= w1;
+			x2 *= w2; y2 *= w2;
+			x3 *= w3; y3 *= w3;
+		}
+
+		int edges = 0;
+		if (bbox.pointInside(vec2f(x1, y1))) { pointIndexes.push_back(i); edges = 1; }
+		if (bbox.pointInside(vec2f(x2, y2))) { pointIndexes.push_back(i2); edges = edges | 2; }
+		if (bbox.pointInside(vec2f(x3, y3))) { pointIndexes.push_back(i3); edges = edges | 4; }
+
+		switch (edges) {
+		case 3:edgeIndexes.push_back(i); break; //edge 1-2
+		case 6:edgeIndexes.push_back(i2); break; //edge 2-3
+		case 5:edgeIndexes.push_back(i3); break; //edge 3-1
+		case 7:faceIndexes.push_back(i); break; //tri face
+		}
+
+	}
+
+}
+
 int32_t Pi3Cmesh::touchPoint(Pi3Ctouch &touch, const Pi3Cmatrix &mtx, const std::vector<float> &mverts) const
 {
 	/* Screen x,y touch is acheived by transforming each mesh triangle into 2D screen space,

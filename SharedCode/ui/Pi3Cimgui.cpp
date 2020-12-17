@@ -95,7 +95,6 @@ Pi3Cmodel * Pi3Cimgui::findCreateImageRect(const std::string &str, const ButtonT
 	else {
 		ttex.reset(new Pi3Ctexture((texturePath + str).c_str(), true));
 	}
-	ttex->doNotDelete = true;
 	if (asRect) return createImageRect(str, ttex);
 	return createImage(str, ttex);
 }
@@ -712,6 +711,7 @@ void Pi3Cimgui::Begin() {
 	setPosition(0, 0);
 	groupCo = 0;
 	textID = 0;
+	if (menuOpen && menuTouch == "") menuOpen = false;
 	if (!window->mouse.LeftButton) somethingSelected = false;
 }
 
@@ -782,8 +782,11 @@ bool Pi3Cimgui::BeginMenu(const std::string &menuHeading)
 	leftpos = menuNextItemPos.x;
 	bool touch = ButtonText(menuHeading, false, currentParams.minWidth, currentParams.minHeight);
 	menuNextItemPos = Pi3Cpointi(pos.x + size.x + currentParams.horizGap, pos.y);
-	if (touch) menuTouch = menuHeading;
-	return (menuTouch== menuHeading || (touch && window->mouse.LeftButton));
+	if (touch) {
+		menuTouch = menuHeading; 
+		menuOpen = true;
+	}
+	return (menuTouch == menuHeading || (touch && window->mouse.LeftButton));
 }
 
 void Pi3Cimgui::EndMenu()
@@ -803,7 +806,7 @@ bool Pi3Cimgui::MenuItem(const std::string &menuItem, const std::string &itemHot
 	//bool touch2 = Button(itemHotkey, TEXT, 70.f);
 	nextLine(0);
 	bool clicked = (touch && window->mouse.LeftButton);
-	if (clicked) { menuTouch = ""; somethingSelected = true; }
+	if (clicked) { menuTouch = ""; somethingSelected = true; menuOpen = false; }
 	return clicked;
 }
 

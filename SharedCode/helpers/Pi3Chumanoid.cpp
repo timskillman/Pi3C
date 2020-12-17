@@ -6,7 +6,7 @@ Pi3Cmesh Pi3Chumanoid::loadMesh(const std::string &file, Pi3Cresource *resource,
 {
 	std::string error;
 	size_t meshStart = resource->meshes.size();
-	Pi3CfileOBJ::load("", file, resource, 0, false, false, error);
+	Pi3CfileOBJ::load("", file, resource, 0, false, false, 0, error);
 	size_t meshEnd = resource->meshes.size();
 
 	//just use first mesh in file (should really merge meshes first) ...

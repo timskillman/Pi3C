@@ -23,4 +23,5 @@ UI work
 3D Editing work
 - Isolate/select independant mesh (i.e. no adjoining vertices)
 - Edited mesh selections (move/rotate/delete/detach)
-- 
+- Point/Line/Facet editing
+- Create from Line / facet - push out from normal

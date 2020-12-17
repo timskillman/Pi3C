@@ -101,6 +101,7 @@ public:
 	bool cullface = true;
 	GLenum rendermode;
 	bool changed = true;
+	int32_t groupID = 0;	//used for separating groups of materials - e.g. system, models, skyboxes etc..
 
 };
 

@@ -156,7 +156,10 @@ public:
 	void resize();
 
 	bool somethingSelected = false;
+	bool menuOpen = false;
 	int takenSnapshot = 1;   //Force a snapshot at beginning
+	std::string menuTouch;		//Currently touch menu heading (for drawing correct menuItem groups)
+
 
 	Pi3Cresource * resource = nullptr;
 
@@ -196,7 +199,6 @@ private:
 	//size, positions of menus ...
 	Pi3Cpointi menuEndPos;			//Menu item next position
 	Pi3Cpointi menuNextItemPos;		//Menubar heading next position
-	std::string menuTouch;		//Currently touch menu heading (for drawing correct menuItem groups)
 	bool selectingMenu = false;	//Ignore other hovers/selections while menu is open with this
 
 	bool textEditing = false;

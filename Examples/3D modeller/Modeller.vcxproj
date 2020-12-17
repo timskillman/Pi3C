@@ -302,6 +302,7 @@
     <ClInclude Include="..\..\SharedCode\glutess\tessmono.h" />
     <ClInclude Include="..\..\SharedCode\helpers\Pi3C.h" />
     <ClInclude Include="..\..\SharedCode\helpers\Pi3Cavatar.h" />
+    <ClInclude Include="..\..\SharedCode\helpers\Pi3Ccolours.h" />
     <ClInclude Include="..\..\SharedCode\helpers\Pi3Ccontour.h" />
     <ClInclude Include="..\..\SharedCode\helpers\Pi3CfastRead.h" />
     <ClInclude Include="..\..\SharedCode\helpers\Pi3Chtml.h" />

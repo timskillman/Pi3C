@@ -22,7 +22,7 @@ Modeller::Modeller(Pi3Cresource *resource, Pi3Cwindow *window)
 	scene.init(resource);
 	scene.selectShader(basicShaderRef);
 	scene.setViewport2D(Pi3Crecti(0, 0, window->getWidth(), window->getHeight()),-200.f, 2000.f);
-	window->setClearColour(0xff804040);
+	window->setClearColour(Pi3Ccolours::DimGray);
 	
 	//scene.renderOffscreen(1200,800,resource->shaders[0]);
 	
@@ -44,6 +44,8 @@ void Modeller::clearScene()
 	for (auto &model : scene.models) {
 		if (model.touchable) model.deleted = true;
 	}
+	resource->deleteMaterialTexturesByID(modelGroupId);
+	resource->deleteMaterialsByID(modelGroupId);
 	clearGizmos();
 }
 
@@ -92,24 +94,24 @@ void Modeller::init()
 	//player.init(avparams);
 
 	// Load Skybox ...
-	skybox = scene.loadModelOBJ(opts.asString("skyboxPath"), opts.asString("skybox"), vec3f(0,0,0), true); // false, loadbarCallback);
+	skybox = scene.loadModelOBJ(opts.asString("skyboxPath"), opts.asString("skybox"), vec3f(), true); // false, loadbarCallback);
 	scene.models[skybox].matrix.SetScale(opts.asFloat("skyboxScale"));
 	scene.models[skybox].touchable = false;
 
 	// Create a brush for touching objects ...
-	Pi3Cmodel brush = Pi3Cmodel(resource, Pi3Cshapes::sphere(vec3f(0, 0, 0.f), 0.5f, 0.f, 10, 10), 0xff00ffff);
+	Pi3Cmodel brush = Pi3Cmodel(resource, Pi3Cshapes::sphere(vec3f(), 0.5f, 0.f, 10, 10), 0xff00ffff);
 	brush.touchable = false;
 	brush.visible = false;
 	brushref = scene.append3D(brush);
 
 	// Create grid
-	Pi3Cmodel gridModel = Pi3Cmodel(resource, Pi3Cshapes::grid(vec2f(100.f, 100.f), 10.f, 1.f, 0x606060, 0x303030));
+	Pi3Cmodel gridModel = Pi3Cmodel(resource, Pi3Cshapes::grid(vec2f(100.f, 100.f), 10.f, 1.f, Pi3Ccolours::Graphite, Pi3Ccolours::Black));
 	gridModel.touchable = false;
 	gridModel.material.rendermode = GL_LINE_STRIP;
 	gridRef = scene.append3D(gridModel);
 
 	// Create selection box
-	Pi3Cmodel selboxModel = Pi3Cmodel(resource, Pi3Cgizmos::selectBoxGizmo(vec3f(0, 0, 0), vec3f(0, 0, 0), 0xffffff));
+	Pi3Cmodel selboxModel = Pi3Cmodel(resource, Pi3Cgizmos::selectBoxGizmo(vec3f(), vec3f(), 0xffffff));
 	selboxModel.touchable = false;
 	selboxModel.material.rendermode = GL_LINE_STRIP;
 	selboxRef = scene.append3D(selboxModel);
@@ -117,7 +119,7 @@ void Modeller::init()
 	//Create outline shape
 	Pi3Cmesh lmesh;
 	for (uint32_t l = 0; l < 100000; l++) {
-		lmesh.addPackedVert(vec3f(0, 0, 0), vec3f(0, 0, 0), vec2f(0, 0), 0xffffff);
+		lmesh.addPackedVert(vec3f(), vec3f(), vec2f(), 0xffffff);
 	}
 	lmesh.updateBounds();
 	lmesh.materialRef = 0;
@@ -129,7 +131,7 @@ void Modeller::init()
 	outlineRef = scene.append3D(outlineModel);
 
 	// Create move gizmo
-	Pi3Cmodel moveGizmo = Pi3Cmodel(resource, Pi3Cgizmos::moveGizmo(vec3f(0, 0, 0), vec3f(0, 0, 0), 0xffffffff));
+	Pi3Cmodel moveGizmo = Pi3Cmodel(resource, Pi3Cgizmos::moveGizmo(vec3f(), vec3f(), 0xffffffff));
 	moveGizmo.touchable = false;
 	moveGizmo.visible = false;
 	moveGizmo.material.rendermode = GL_LINES;
@@ -170,7 +172,7 @@ void Modeller::handleKeys()
 void Modeller::resetZoom()
 {
 	viewInfo& view = views[currentView];
-	view.pos = vec3f(0, 0, 0);
+	view.pos = vec3f();
 	if (view.zoom != 0) {
 		view.pan += view.rotInvertMatrix.transformRotateVec(vec3f(0, 0, -view.zoom));
 		view.zoom = 0;
@@ -293,13 +295,13 @@ void Modeller::createShapes()
 		createFirstPoint = pos;
 
 		switch (createTool) {
-		case CT_CUBOID: createShape(Pi3Cshapes::cuboid(vec3f(0, 0, 0.f), vec3f(.01f, .01f, .01f)), pos, currentColour); maxSteps = 2; break;
-		case CT_CYLINDER: createShape(Pi3Cshapes::cylinder(vec3f(0, 0, 0.f), .01f, .01f), pos, currentColour); maxSteps = 2; break;
-		case CT_TUBE: createShape(Pi3Cshapes::tube(vec3f(0, 0, 0.f), 0.005f, .01f, .01f), pos, currentColour); maxSteps = 3; break;
-		case CT_CONE: createShape(Pi3Cshapes::cone(vec3f(0, 0, 0.f), .01f, .01f), pos, currentColour); maxSteps = 2; break;
-		case CT_TCONE: createShape(Pi3Cshapes::tcone(vec3f(0, 0, 0.f), .01f, .01f, .01f), pos, currentColour); maxSteps = 3; break;
-		case CT_SPHERE: createShape(Pi3Cshapes::sphere(vec3f(0, 0, 0.f), 0.05f), pos, currentColour); maxSteps = 1; break;
-		case CT_TORUS: createShape(Pi3Cshapes::torus(vec3f(0, 0, 0.f), .01f, .01f), pos, currentColour); maxSteps = 2; break;
+		case CT_CUBOID: createShape(Pi3Cshapes::cuboid(vec3f(), vec3f(.01f, .01f, .01f)), pos, currentColour); maxSteps = 2; break;
+		case CT_CYLINDER: createShape(Pi3Cshapes::cylinder(vec3f(), .01f, .01f), pos, currentColour); maxSteps = 2; break;
+		case CT_TUBE: createShape(Pi3Cshapes::tube(vec3f(), 0.005f, .01f, .01f), pos, currentColour); maxSteps = 3; break;
+		case CT_CONE: createShape(Pi3Cshapes::cone(vec3f(), .01f, .01f), pos, currentColour); maxSteps = 2; break;
+		case CT_TCONE: createShape(Pi3Cshapes::tcone(vec3f(), .01f, .01f, .01f), pos, currentColour); maxSteps = 3; break;
+		case CT_SPHERE: createShape(Pi3Cshapes::sphere(vec3f(), 0.05f), pos, currentColour); maxSteps = 1; break;
+		case CT_TORUS: createShape(Pi3Cshapes::torus(vec3f(), .01f, .01f), pos, currentColour); maxSteps = 2; break;
 		case CT_WEDGE: break;
 		case CT_EXTRUDE: maxSteps = 0; break;
 		case CT_LATHE: maxSteps = 0; break;
@@ -581,7 +583,7 @@ void Modeller::creatingShape()
 	}
 	else if (createCount == 3) {
 		float dist1 = (oldPos - createFirstPoint).length();
-		float dist2 = (oldPos2 - createFirstPoint).length();
+		//float dist2 = (oldPos2 - createFirstPoint).length();
 		//float ht = (pos - oldPos2).length();
 		float ht = getShapeHeight(pos, v1, v2);
 
@@ -628,14 +630,6 @@ void Modeller::DragLeftMouseButton(viewInfo& view, vec3f& mouseXYZ)
 {
 	switch (editMode) {
 	case ED_CREATE:
-		//if (createCount == maxSteps) {
-		//	createCount = 0;
-		//}
-		//else {
-		//	if (createCount==0) createShapes();
-		//	createCount++;
-		//	creatingShape();
-		//}
 		break;
 	case ED_MOVE:
 		moveSelections(view.viewCoords(mouseXYZ));
@@ -782,9 +776,11 @@ void Modeller::touchScene()
 			//scene.models[brushref].matrix.move(touch.intersection);
 			setTouchFlags(true);
 			touch.selmodel->selected = true;
+			scene.models[brushref].visible = false;
 
 			switch (editMode) {
 			case ED_SELECT: 
+				scene.models[brushref].visible = true;
 				touchObject(*touch.selmodel);
 				setCursor(arrowCursor);
 				break;
@@ -866,7 +862,7 @@ void Modeller::handleEvents(std::vector<uint32_t>& eventList)
 		case SDL_DROPFILE: 
 			std::string file = window->dropfile;
 			if (file.substr(file.size() - 4, 4) == ".obj") {
-				int32_t modelRef = scene.loadModelOBJ("", file, touch.touching ? touch.intersection : vec3f(0,0,0), true);  // false, loadbarCallback);
+				int32_t modelRef = scene.loadModelOBJ("", file, touch.touching ? touch.intersection : vec3f(0,0,0), true, modelGroupId);  // false, loadbarCallback);
 			}
 			break;
 		}
@@ -1016,7 +1012,7 @@ void Modeller::touchView(viewInfo &vi)
 
 void Modeller::setTouchFlags(bool val)
 {
-	scene.models[brushref].visible = val;
+	//scene.models[brushref].visible = val;
 	scene.models[selboxRef].visible = val;
 	scene.models[moveGizmoRef].visible = val;
 }

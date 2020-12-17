@@ -4,6 +4,7 @@
 #include "Pi3Cvector.h"
 #include "Pi3Cmatrix.h"
 #include "Pi3Cbbox3d.h"
+#include "Pi3Cbbox2d.h"
 #include "Pi3Ctouch.h"
 #include "Pi3CvertsPtr.h"
 #include <string>
@@ -104,6 +105,7 @@ public:
 
 	Pi3Cmesh clone(const uint32_t from, const uint32_t size) const;
 
+	void insideRect(Pi3Cbbox2d& bbox, std::vector<uint32_t>& pointIndexes, std::vector<uint32_t>& edgeIndexes, std::vector<uint32_t>& faceIndexes, const float perspective, const Pi3Cmatrix& mtx, const std::vector<float>& mverts);
 
 	void addRect(const vec3f &pos, const vec2f &size, const vec2f &uv = vec2f(0, 0), const vec2f &us = vec2f(1.f, 1.f));
 	void addXshape(const vec3f& pos, const vec2f& size, const vec2f& uv = vec2f(0, 0), const vec2f& us = vec2f(1.f, 1.f));
