@@ -79,7 +79,7 @@ public:
 	int32_t load_model_and_collider(const std::string& path, const std::string& model, const std::string& collider, const vec3f& pos = vec3f(0, 0, 0));
 	int32_t add_model_to_scene2D(const Pi3Cmodel &model) { return scene.append2D(model, ""); }
 	int32_t add_model_to_scene3D(Pi3Cmodel &model) { return scene.append3D(model, ""); }
-	std::vector<float> * getMeshVerts(const uint32_t meshRef) { return &resource.vertBuffer[resource.meshes[meshRef].bufRef]; }
+	std::vector<float> * getMeshVerts(const uint32_t meshRef) { return &resource.vertBuffer[resource.meshes[meshRef].bufRef].verts; }
 	Pi3Cmodel* model3D(const uint32_t modelRef) { return &scene.models[modelRef]; }
 	Pi3Cmodel* model2D(const uint32_t modelRef) { return &scene.models2D[modelRef]; }
 	uint32_t getMeshVertPtr(const uint32_t meshRef) { return resource.meshes[meshRef].vertOffset*resource.meshes[meshRef].stride; }

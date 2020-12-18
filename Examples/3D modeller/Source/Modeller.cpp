@@ -46,6 +46,7 @@ void Modeller::clearScene()
 	}
 	resource->deleteMaterialTexturesByID(modelGroupId);
 	resource->deleteMaterialsByID(modelGroupId);
+	resource->deleteVertsBuffer(modelGroupId);
 	clearGizmos();
 }
 
@@ -99,19 +100,19 @@ void Modeller::init()
 	scene.models[skybox].touchable = false;
 
 	// Create a brush for touching objects ...
-	Pi3Cmodel brush = Pi3Cmodel(resource, Pi3Cshapes::sphere(vec3f(), 0.5f, 0.f, 10, 10), 0xff00ffff);
+	Pi3Cmodel brush = Pi3Cmodel(resource, Pi3Cshapes::sphere(vec3f(), 0.5f, 0.f, 10, 10),-1, 0xff00ffff);
 	brush.touchable = false;
 	brush.visible = false;
 	brushref = scene.append3D(brush);
 
 	// Create grid
-	Pi3Cmodel gridModel = Pi3Cmodel(resource, Pi3Cshapes::grid(vec2f(100.f, 100.f), 10.f, 1.f, Pi3Ccolours::Graphite, Pi3Ccolours::Black));
+	Pi3Cmodel gridModel = Pi3Cmodel(resource, Pi3Cshapes::grid(vec2f(100.f, 100.f), 10.f, 1.f, Pi3Ccolours::Graphite, Pi3Ccolours::Black),-1);
 	gridModel.touchable = false;
 	gridModel.material.rendermode = GL_LINE_STRIP;
 	gridRef = scene.append3D(gridModel);
 
 	// Create selection box
-	Pi3Cmodel selboxModel = Pi3Cmodel(resource, Pi3Cgizmos::selectBoxGizmo(vec3f(), vec3f(), 0xffffff));
+	Pi3Cmodel selboxModel = Pi3Cmodel(resource, Pi3Cgizmos::selectBoxGizmo(vec3f(), vec3f(), 0xffffff),-1);
 	selboxModel.touchable = false;
 	selboxModel.material.rendermode = GL_LINE_STRIP;
 	selboxRef = scene.append3D(selboxModel);
@@ -131,7 +132,7 @@ void Modeller::init()
 	outlineRef = scene.append3D(outlineModel);
 
 	// Create move gizmo
-	Pi3Cmodel moveGizmo = Pi3Cmodel(resource, Pi3Cgizmos::moveGizmo(vec3f(), vec3f(), 0xffffffff));
+	Pi3Cmodel moveGizmo = Pi3Cmodel(resource, Pi3Cgizmos::moveGizmo(vec3f(), vec3f(), 0xffffffff),-1);
 	moveGizmo.touchable = false;
 	moveGizmo.visible = false;
 	moveGizmo.material.rendermode = GL_LINES;
@@ -256,12 +257,12 @@ void Modeller::navikeys(SDL_Scancode key, SDL_Scancode keyA, SDL_Scancode KeyB)
 void Modeller::createLandscape(const vec3f pos, const uint32_t colour)
 {
 	Pi3Ctexture maptex = Pi3Ctexture("assets/maps/mountainsHgt2.png", false);
-	createShape(Pi3Cshapes::elevationMap(maptex, vec3f(0, -200.f, 0), vec3f(3000.f, 400.f, 3000.f), 128, 128, 0), pos, colour);
+	createShape(Pi3Cshapes::elevationMap(maptex, vec3f(0, -200.f, 0), vec3f(3000.f, 400.f, 3000.f), 128, 128, 0), pos, modelGroupId, colour);
 }
 
-void Modeller::createShape(const Pi3Cmesh& mesh, const vec3f& pos, const uint32_t colour)
+void Modeller::createShape(const Pi3Cmesh& mesh, const vec3f& pos, int32_t groupId, const uint32_t colour)
 {
-	Pi3Cmodel shape = Pi3Cmodel(resource, mesh, colour);
+	Pi3Cmodel shape = Pi3Cmodel(resource, mesh, groupId, colour);
 	if (shape.meshRef >= 0) {
 		clearSelections();
 		//Give unique name for each shape ...
@@ -295,13 +296,13 @@ void Modeller::createShapes()
 		createFirstPoint = pos;
 
 		switch (createTool) {
-		case CT_CUBOID: createShape(Pi3Cshapes::cuboid(vec3f(), vec3f(.01f, .01f, .01f)), pos, currentColour); maxSteps = 2; break;
-		case CT_CYLINDER: createShape(Pi3Cshapes::cylinder(vec3f(), .01f, .01f), pos, currentColour); maxSteps = 2; break;
-		case CT_TUBE: createShape(Pi3Cshapes::tube(vec3f(), 0.005f, .01f, .01f), pos, currentColour); maxSteps = 3; break;
-		case CT_CONE: createShape(Pi3Cshapes::cone(vec3f(), .01f, .01f), pos, currentColour); maxSteps = 2; break;
-		case CT_TCONE: createShape(Pi3Cshapes::tcone(vec3f(), .01f, .01f, .01f), pos, currentColour); maxSteps = 3; break;
-		case CT_SPHERE: createShape(Pi3Cshapes::sphere(vec3f(), 0.05f), pos, currentColour); maxSteps = 1; break;
-		case CT_TORUS: createShape(Pi3Cshapes::torus(vec3f(), .01f, .01f), pos, currentColour); maxSteps = 2; break;
+		case CT_CUBOID: createShape(Pi3Cshapes::cuboid(vec3f(), vec3f(.01f, .01f, .01f)), pos, modelGroupId, currentColour); maxSteps = 2; break;
+		case CT_CYLINDER: createShape(Pi3Cshapes::cylinder(vec3f(), .01f, .01f), pos, modelGroupId, currentColour); maxSteps = 2; break;
+		case CT_TUBE: createShape(Pi3Cshapes::tube(vec3f(), 0.005f, .01f, .01f), pos, modelGroupId, currentColour); maxSteps = 3; break;
+		case CT_CONE: createShape(Pi3Cshapes::cone(vec3f(), .01f, .01f), pos, modelGroupId, currentColour); maxSteps = 2; break;
+		case CT_TCONE: createShape(Pi3Cshapes::tcone(vec3f(), .01f, .01f, .01f), pos, modelGroupId, currentColour); maxSteps = 3; break;
+		case CT_SPHERE: createShape(Pi3Cshapes::sphere(vec3f(), 0.05f), pos, modelGroupId, currentColour); maxSteps = 1; break;
+		case CT_TORUS: createShape(Pi3Cshapes::torus(vec3f(), .01f, .01f), pos, modelGroupId, currentColour); maxSteps = 2; break;
 		case CT_WEDGE: break;
 		case CT_EXTRUDE: maxSteps = 0; break;
 		case CT_LATHE: maxSteps = 0; break;
@@ -425,7 +426,7 @@ void Modeller::finishLine()
 				//lm = lp.size();
 			}
 
-			createShape(Pi3Cshapes::extrude("Extrude", vec3f(0, 0, 0.f), contours, -1.f, 1), vec3f(0, 0, 0.f), currentColour);
+			createShape(Pi3Cshapes::extrude("Extrude", vec3f(0, 0, 0.f), contours, -1.f, 1), vec3f(0, 0, 0.f), modelGroupId, currentColour);
 			scene.lastModel()->transformVerts(resource, views[currentView].rotMatrix);
 			break;
 		case CT_LATHE:
@@ -438,7 +439,7 @@ void Modeller::finishLine()
 				for (auto& p : contour) {
 					p.x -= fp.x;
 				}
-				createShape(Pi3Cshapes::lathe("Lathe", vec3f(fp.x, 0, 0.f), contour, true), vec3f(0, 0, 0.f), currentColour);
+				createShape(Pi3Cshapes::lathe("Lathe", vec3f(fp.x, 0, 0.f), contour, true), vec3f(0, 0, 0.f), modelGroupId, currentColour);
 				scene.lastModel()->transformVerts(resource, views[currentView].rotMatrix);
 			}
 			break;

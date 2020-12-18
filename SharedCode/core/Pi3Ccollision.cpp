@@ -94,7 +94,7 @@ bool Pi3Ccollision::collideVector(const Pi3Cresource *resource, const uint32_t m
 	//if (mesh.verts.size() == 0) return false;
 	const Pi3Cmesh &mesh = resource->meshes[meshRef];
 	uint32_t p = mesh.vertOffset * mesh.stride;
-	const std::vector<float> &verts = resource->vertBuffer[mesh.bufRef];
+	const std::vector<float> &verts = resource->vertBuffer[mesh.bufRef].verts;
 	uint32_t size = mesh.vertSize * mesh.stride;
 
 	uint32_t stride = mesh.stride;
@@ -127,7 +127,7 @@ float Pi3Ccollision::collideFloor(const Pi3Cresource *resource, const uint32_t m
 {
 	const Pi3Cmesh &mesh = resource->meshes[meshRef];
 	uint32_t p = mesh.vertOffset * mesh.stride;
-	const std::vector<float> &verts = resource->vertBuffer[mesh.bufRef];
+	const std::vector<float> &verts = resource->vertBuffer[mesh.bufRef].verts;
 	uint32_t size = mesh.vertSize * mesh.stride;
 
 	if (mesh.hasColliderGrid) {

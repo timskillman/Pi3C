@@ -51,7 +51,7 @@ public:
 	viewInfo setupView(const viewInfo::ViewProject view);
 	bool isPerspective() { return views[currentView].projection == viewInfo::PERSPECTIVE;  }
 	bool initialised() { return (resource != nullptr); }
-	void createShape(const Pi3Cmesh& mesh, const vec3f& pos, const uint32_t colour = 0xffffffff);
+	void createShape(const Pi3Cmesh& mesh, const vec3f& pos, int32_t groupId, const uint32_t colour = 0xffffffff);
 	void createLandscape(const vec3f pos, const uint32_t colour);
 	void saveFile(const std::string& path, const std::string& filename, bool selected = false) { 
 		std::string err; Pi3CfileOBJ::save(path, filename, &scene, selected, nullptr, err); 

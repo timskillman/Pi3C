@@ -23,16 +23,16 @@
 //	}
 //}
 
-Pi3Cmodel::Pi3Cmodel(Pi3Cresource *resource, Pi3Cmesh mesh, uint32_t diffuseColour)
+Pi3Cmodel::Pi3Cmodel(Pi3Cresource *resource, Pi3Cmesh mesh, int32_t groupId, uint32_t diffuseColour)
 {
 	init();
-	create(resource, &mesh, diffuseColour);
+	create(resource, &mesh, groupId, diffuseColour);
 }
 
-Pi3Cmodel::Pi3Cmodel(Pi3Cresource *resource, const std::string &name, Pi3Cmesh mesh, uint32_t diffuseColour)
+Pi3Cmodel::Pi3Cmodel(Pi3Cresource *resource, const std::string &name, Pi3Cmesh mesh, int32_t groupId, uint32_t diffuseColour)
 {
 	init(); this->name = name;
-	create(resource, &mesh, diffuseColour);
+	create(resource, &mesh, groupId, diffuseColour);
 }
 
 Pi3Cmodel::Pi3Cmodel(Pi3Cresource *resource, const std::string &path, const std::string &modelfile, int32_t groupId, const bool asCollider, std::function<void(float)> showProgressCB)
@@ -77,9 +77,9 @@ void Pi3Cmodel::refreshMesh(Pi3Cresource* resource)
 	resource->updateMesh(meshRef);
 }
 
-void Pi3Cmodel::create(Pi3Cresource *resource, Pi3Cmesh *mesh, uint32_t diffuseColour)
+void Pi3Cmodel::create(Pi3Cresource *resource, Pi3Cmesh *mesh, int32_t groupId, uint32_t diffuseColour)
 {	
-	meshRef = resource->addMesh(mesh);
+	meshRef = resource->addMesh(mesh, groupId);
 	if (mesh->mode==GL_TRIANGLES) resource->addMeshOutlines(meshRef);
 	material = *resource->defaultMaterial();
 	material.SetColDiffuse(diffuseColour);
@@ -154,10 +154,10 @@ void Pi3Cmodel::render(Pi3Cresource *resource, Pi3Cshader &shader, const Pi3Cmat
 	}
 }
 
-void Pi3Cmodel::appendMesh(Pi3Cresource *resource, Pi3Cmesh mesh, bool asCollider)
+void Pi3Cmodel::appendMesh(Pi3Cresource *resource, Pi3Cmesh mesh, int32_t groupId, bool asCollider)
 {
 	//int32_t i = resource->addMesh(mesh);
-	int32_t i = resource->addMesh(&mesh);
+	int32_t i = resource->addMesh(&mesh, groupId);
 	if (group.size() == 0 && meshRef<0) {
 		meshRef = i;
 		bbox = resource->meshes[i].bbox;

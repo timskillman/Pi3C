@@ -12,16 +12,16 @@ void Pi3Cresource::init(const uint32_t stride)
 	Pi3Cmesh lets;
 	lets.vc = 10000 * 6 * stride;
 	lets.verts.resize(lets.vc); // 10000 letters - reserve MUST be multiple of consistent stride (since glDrawArrays requires a vertex index not a byte index)
-	letterSheetRef = addMesh(&lets); //create a dynamic buffer for the lettersheet (page size)
+	letterSheetRef = addMesh(&lets,-1); //create a dynamic buffer for the lettersheet (page size)
 
 	//Reserve for small text entry fields ...
 	lets.vc = 1000 * 6 * stride;
 	lets.verts.resize(lets.vc);
-	lettersRef = addMesh(&lets); //create a dynamic buffer for small temp lettersheet
+	lettersRef = addMesh(&lets,-1); //create a dynamic buffer for small temp lettersheet
 
 	//Create a default 2D rectangle as a helper for 2D GUI rendering 
 	Pi3Cmesh rect = createRect(vec3f(0, 0, -10.f), vec2f(1.f, 1.f), 0xffffffff, vec2f(0,0), vec2f(1.f,1.f));
-	rectRef = addMesh(&rect); //buffer used for creating models etc..
+	rectRef = addMesh(&rect,-1); //buffer used for creating models etc..
 
 	if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0) {
 		SDL_Log("couldn't initialize mix, error: %s\n", Mix_GetError());
@@ -120,7 +120,7 @@ void Pi3Cresource::updateMesh(const uint32_t meshRef, uint32_t vertCount, const 
 		mesh.vertSize = vertCount / mesh.stride;
 		mesh.vertOffset = vertOffset;
 	}
-	updateGPUverts(mesh.bufRef, mesh.vertOffset*mesh.stride, mesh.vc, vertBuffer[mesh.bufRef]);
+	updateGPUverts(mesh.bufRef, mesh.vertOffset*mesh.stride, mesh.vc, vertBuffer[mesh.bufRef].verts);
 }
 
 int32_t Pi3Cresource::addTexture(const std::shared_ptr<Pi3Ctexture> &Texture, int32_t &texRef)
@@ -164,10 +164,10 @@ int32_t Pi3Cresource::loadTexture(const std::string &path, const std::string &te
 void Pi3Cresource::addMeshOutlines(uint32_t meshref)
 {
 	Pi3Cmesh &mesh = meshes[meshref];
-	mesh.createTriangleEdges(vertBuffer[mesh.bufRef]);
+	mesh.createTriangleEdges(vertBuffer[mesh.bufRef].verts);
 }
 
-int32_t Pi3Cresource::addMesh(Pi3Cmesh * mesh, uint32_t maxsize)
+int32_t Pi3Cresource::addMesh(Pi3Cmesh * mesh, int32_t groupId, uint32_t maxsize)
 {
 	//Are we requesting too much?  Then attempt it ...
 	uint32_t mvsize = (mesh) ? mesh->verts.size() : 0;
@@ -177,8 +177,8 @@ int32_t Pi3Cresource::addMesh(Pi3Cmesh * mesh, uint32_t maxsize)
 	int32_t cbuf = currentBuffer;
 	if (cbuf > 0 && mvsize > 0) {
 		for (size_t b = 0; b < vertBuffer.size(); b++) {
-			uint32_t spareBuffer = vertBuffer[b].size() - vertBufferPtr[b];
-			if (spareBuffer > mvsize) {
+			uint32_t spareBuffer = vertBuffer[b].free();
+			if (spareBuffer > mvsize && groupId==vertBuffer[b].groupId) {
 				cbuf = b; break;
 			}
 		}
@@ -186,24 +186,30 @@ int32_t Pi3Cresource::addMesh(Pi3Cmesh * mesh, uint32_t maxsize)
 
 	//No buffers created yet or, request is larger than current buffer?, then create new buffer ...
 	bool vertsMoved = false;
-	if (cbuf < 0 || (mvsize + vertBufferPtr[cbuf]) > vertBuffer[cbuf].size()) {
-		if (cbuf>=0) SDL_Log("cbuf:%d, mvsize:%d + vertBufferPtr:%d, size=%d, maxsize = %d", cbuf, mvsize , vertBufferPtr[cbuf], vertBuffer[cbuf].size(), maxsize);
+	if (cbuf < 0 || (mvsize + vertBuffer[cbuf].freePtr) > vertBuffer[cbuf].verts.size()) {
+		if (cbuf>=0) SDL_Log("cbuf:%d, mvsize:%d + vertBufferPtr:%d, size=%d, maxsize=%d, groupId=%d", cbuf, mvsize , vertBuffer[cbuf].freePtr, vertBuffer[cbuf].verts.size(), maxsize, groupId);
 		mesh->verts.resize(maxsize);
-		vertBuffer.push_back(std::move(mesh->verts));
+		vertBuffer.emplace_back();
+		Pi3CvertsBuffer& vb = vertBuffer.back();
+		vb.verts = std::move(mesh->verts); // mesh->verts;
+		vb.freePtr = 0;
+		vb.groupId = groupId;
+		//vb.verts.push_back(std::move(mesh->verts));
 		vertsMoved = true;
-		vertBufferPtr.push_back(0);
+		//vertBufferPtr.push_back(0);
 		currentBuffer++; cbuf = currentBuffer;
 
 		//Create and reserve buffer in GPU ...
 		glGenBuffers(1, &VBOid[currentBuffer]);
 		SDL_Log("VBO:%d, Uploading floats = %d, mvsize=%d", VBOid[currentBuffer], maxsize, mvsize);
 		glBindBuffer(GL_ARRAY_BUFFER, VBOid[currentBuffer]);
-		glBufferData(GL_ARRAY_BUFFER, maxsize * sizeof(float), &vertBuffer[currentBuffer].front(), GL_DYNAMIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, maxsize * sizeof(float), &vertBuffer[currentBuffer].verts.front(), GL_DYNAMIC_DRAW);
+		vertBuffer[currentBuffer].bufferRef = VBOid[currentBuffer];
 	}
 
 	if (mesh) {
-		std::vector<float> &mverts = vertBuffer[cbuf];		//Get current buffer
-		uint32_t &bufferPtr = vertBufferPtr[cbuf];
+		std::vector<float> &mverts = vertBuffer[cbuf].verts;		//Get current buffer
+		uint32_t &bufferPtr = vertBuffer[cbuf].freePtr;
 
 		//Upload mesh verts into GPU ...
 		if (mvsize > 0) {
@@ -228,6 +234,42 @@ int32_t Pi3Cresource::addMesh(Pi3Cmesh * mesh, uint32_t maxsize)
 	}
 
 	return 0;
+}
+
+void Pi3Cresource::deleteVertsBuffer(int32_t groupId)
+{
+	//Delete all meshes that use a vertex buffer with specific groupId
+	size_t msz = meshes.size();
+	for (size_t i = msz - 1; i > 0; i--)
+	{
+		auto& vb = vertBuffer[meshes[i].bufRef];
+		if (vb.groupId == groupId) {
+			meshes.erase(meshes.begin() + i);
+		}
+	}
+
+	//Now delete all vertBuffer data with specific groupId
+	for (size_t b = 0; b < vertBuffer.size(); b++) {
+		auto& vb = vertBuffer[b];
+		if (vb.groupId == groupId) {
+			glDeleteBuffers(1, &VBOid[b]);
+			vb.verts.resize(0);
+			vb.freePtr = 0;
+			vb.groupId = -2; //mark for deletion
+			VBOid[b] = 0;
+		}
+	}
+
+	//Delete vertBuffers marked for deletion
+	msz = vertBuffer.size();
+	for (size_t i = msz - 1; i > 0; i--)
+	{
+		auto& vb = vertBuffer[i];
+		if (vb.groupId==-2) {
+			vertBuffer.erase(vertBuffer.begin() + i);
+			currentBuffer--;
+		}
+	}
 }
 
 void Pi3Cresource::setRenderBuffer(const int bufRef, const uint32_t stride) 
@@ -263,7 +305,7 @@ Pi3Crect Pi3Cresource::renderText(const int meshRef, Pi3Cfont *font, const std::
 	//Text meshref's can only be used once per frame (otherwise using the same meshRef will simply overwrite the previous text)
 	Pi3Crect size;
 	Pi3Cmesh &mesh = meshes[meshRef];
-	uint32_t vertCount = font->textureRects(text, vertBuffer[mesh.bufRef], size, wrapWidth, mesh.stride, Pi3Cfont::RD_NONE);	//generate verts from text	
+	uint32_t vertCount = font->textureRects(text, vertBuffer[mesh.bufRef].verts, size, wrapWidth, mesh.stride, Pi3Cfont::RD_NONE);	//generate verts from text	
 	updateMesh(meshRef, vertCount);											//upload updated verts to GPU
 
 	Pi3Cmatrix matrix;
@@ -295,7 +337,7 @@ void Pi3Cresource::renderMesh(const int meshRef, const GLenum rendermode)
 int32_t Pi3Cresource::touchMesh(const int meshRef, Pi3Ctouch &touch, const Pi3Cmatrix &tmat) const
 {
 	const Pi3Cmesh &mesh = meshes[meshRef];
-	return mesh.touchPoint(touch, tmat, vertBuffer[mesh.bufRef]);
+	return mesh.touchPoint(touch, tmat, vertBuffer[mesh.bufRef].verts);
 }
 
 void Pi3Cresource::updateGPUverts(const int bufref, const int vfrom, const int vsize, const std::vector<float> &verts)
@@ -357,7 +399,7 @@ void Pi3Cresource::clearAll()
 	textures.clear();
 	shaders.clear();
 	vertBuffer.resize(0);
-	vertBufferPtr.resize(0);
+	//vertBufferPtr.resize(0);
 	vertCount = 0;
 	currentBuffer = -1;
 	lastVBO = -1;

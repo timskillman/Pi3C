@@ -46,6 +46,14 @@
 
 #define DEFAULT_STRIDE 9
 
+struct Pi3CvertsBuffer {
+	std::vector<float> verts;	//verts buffer
+	uint32_t freePtr = 0;		//ptr to first free vert in verts buffer
+	int32_t groupId = -1;		//set to system type
+	int32_t bufferRef = -1;		//uploaded buffer reference
+
+	int32_t free() { return verts.size() - freePtr; }
+};
 
 class Pi3Cresource {
 public:
@@ -65,6 +73,7 @@ public:
 	Pi3Cmaterial * defaultMaterial() { return &materials[0]; }
 	void deleteMaterialTexturesByID(int32_t groupId);
 	void deleteMaterialsByID(int32_t groupId);
+	void deleteVertsBuffer(int32_t groupId);
 	void cleanTextures();	//removes empty textures
 
 	Pi3Ctexture* getTexture(int32_t ref) {
@@ -72,12 +81,12 @@ public:
 	}
 
 	//int32_t addMesh(Pi3Cmesh &mesh, const bool deleteVerts = true, const bool dynamicBuffer = false, const uint32_t vertSize = 2000000);		//returns mesh reference (or -1 if failed)
-	int32_t addMesh(Pi3Cmesh * mesh, uint32_t maxsize = 500000);
+	int32_t addMesh(Pi3Cmesh * mesh, int32_t groupId, uint32_t maxsize = 500000);
 
 	void addMeshOutlines(uint32_t meshref);
 
 	vertsPtr getMeshVerts(uint32_t meshRef) {
-		return vertsPtr(meshes[meshRef].vertOffset * meshes[meshRef].stride, &vertBuffer[meshes[meshRef].bufRef]);
+		return vertsPtr(meshes[meshRef].vertOffset * meshes[meshRef].stride, &vertBuffer[meshes[meshRef].bufRef].verts);
 	}
 
 	//std::vector<float> * getMeshVerts(uint32_t meshRef, uint32_t &p) { 
@@ -88,7 +97,7 @@ public:
 	std::vector<float>* getMeshBuffer(const uint32_t meshRef)
 	{
 		if (meshRef < 0) return nullptr;
-		return &vertBuffer[meshes[meshRef].bufRef];
+		return &vertBuffer[meshes[meshRef].bufRef].verts;
 	}
 
 	//void uploadMeshesToGPU();
@@ -115,11 +124,14 @@ public:
 
 	std::string error() { return errorStr; }
 
-	inline size_t vertexBufferSize(uint32_t id) { return vertBuffer[id].size(); }
+	inline size_t vertexBufferSize(uint32_t id) { return vertBuffer[id].verts.size(); }
 	
 	std::vector<Pi3Cmesh> meshes;
-	std::vector<std::vector<float>> vertBuffer;			//vertex buffers for modify and uploading to GPU
-	std::vector<uint32_t> vertBufferPtr;				//vertex buffer pointer for each vertex buffer (used for calculating free space in each buffer)
+
+	std::vector<Pi3CvertsBuffer> vertBuffer;
+
+	//std::vector<std::vector<float>> vertBuffer;			//vertex buffers for modify and uploading to GPU
+	//std::vector<uint32_t> vertBufferPtr;				//vertex buffer pointer for each vertex buffer (used for calculating free space in each buffer)
 
 	std::vector<Pi3Cmaterial> materials;
 	std::vector<std::shared_ptr<Pi3Ctexture>> textures;

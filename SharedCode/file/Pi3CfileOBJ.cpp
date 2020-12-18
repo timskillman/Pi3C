@@ -18,14 +18,14 @@ namespace Pi3CfileOBJ {
 
 	// OBJ load helpers ...
 
-	void addMesh(Pi3Cresource *resource, Pi3Cmesh &mesh, const bool addColliderGrid)
+	void addMesh(Pi3Cresource *resource, Pi3Cmesh &mesh, int32_t groupId, const bool addColliderGrid)
 	{
 		//SDL_Log("Meshes %d,%d,%d,%d,%d",resource->meshes.size(),resource->materials.size(),resource->textures.size(),resource->vertBuffer.size(),resource->currentBuffer);
 		mesh.mode = GL_TRIANGLES;
 		mesh.bbox.bboxFromVerts(mesh.verts, 0, mesh.vc, mesh.stride);
 		if (addColliderGrid) 
 			mesh.hasColliderGrid = mesh.createColliderGrid();
-		int meshref = resource->addMesh(&mesh);
+		int meshref = resource->addMesh(&mesh, groupId);
 		resource->addMeshOutlines(meshref);
 
 	}
@@ -383,7 +383,7 @@ namespace Pi3CfileOBJ {
 		//Add all models with no alpha materials
 		for (size_t i=0; i<meshModel.size(); i++) {
 			if (meshModel[i].verts.size()>0 && resource->materials[meshModel[i].materialRef].alpha >= 1.0f) {
-				addMesh(resource, meshModel[i], addColliderGrid);
+				addMesh(resource, meshModel[i], groupId, addColliderGrid);
 			}
 		}
 		
@@ -391,7 +391,7 @@ namespace Pi3CfileOBJ {
 		//However, overlapping alpha's will obscure each other unless z-depth is turned off
 		for (size_t i=0; i<meshModel.size(); i++) {
 			if (meshModel[i].verts.size() > 0 && resource->materials[meshModel[i].materialRef].alpha < 1.0f) {
-				addMesh(resource, meshModel[i], addColliderGrid);
+				addMesh(resource, meshModel[i], groupId, addColliderGrid);
 			}
 		}
 		
@@ -437,7 +437,7 @@ namespace Pi3CfileOBJ {
 				saveMaterial(matstr, model.material, "", counter);
 
 				Pi3Cmesh &mesh = resource->meshes[model.meshRef];
-				std::vector<float> &verts = resource->vertBuffer[mesh.bufRef];
+				std::vector<float> &verts = resource->vertBuffer[mesh.bufRef].verts;
 
 				if (saveTriangles) {
 					

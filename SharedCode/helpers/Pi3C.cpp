@@ -97,7 +97,7 @@ uint32_t Pi3C::add_background(const std::string &path, const std::string &file)
 	Pi3Cmesh rect;
 	rect.addRect(vec3f(0, (float)winh, -20.f), vec2f((float)winw, (float)winh));
 	//background.meshRef = resource.addMesh(rect);
-	background.meshRef = resource.addMesh(&rect);
+	background.meshRef = resource.addMesh(&rect, 1);
 
 	background.addTexture(&resource, (file!="" && path!="") ? path+"/"+file : path);
 	background.material.illum = 1;

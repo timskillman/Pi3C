@@ -59,7 +59,7 @@ public:
 	Pi3Cmodel* rightLowerLeg;
 	Pi3Cmodel* rightThigh;
 
-	Pi3Cmodel create(Pi3Cresource *resource, humanoidParams &params);
+	Pi3Cmodel create(Pi3Cresource *resource, humanoidParams &params, int32_t groupId);
 
 	void walk(vec3f dir, float speed);
 	void attachModel(Pi3Cmodel &body);
