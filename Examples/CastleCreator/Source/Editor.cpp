@@ -138,13 +138,13 @@ void Editor::loadModels(const std::string &modelsLibraryFile)
 	for (auto &ln : modelLibrary) libnames.push_back(ln.first);
 
 	// Create a brush for touching objects ...
-	Pi3Cmodel brush = Pi3Cmodel(resource, Pi3Cshapes::sphere(vec3f(0, 0, 0), 2.0f, 0.f, 10, 20), 0xffff00);
+	Pi3Cmodel brush = Pi3Cmodel(resource, Pi3Cshapes::sphere(vec3f(0, 0, 0), 2.0f, 0.f, 10, 20), -1, 0xffff00);
 	brush.touchable = false;
 	brush.visible = false;
 	brush.material.alpha = 0.5f;
 	ballbrushref = scene.append3D(brush);
 
-	Pi3Cmodel gridbrush = Pi3Cmodel(resource, Pi3Cshapes::cuboid(vec3f(0, 0, 0), vec3f(grid.x,1.f, grid.z), 1,1,1), 0xffff00);
+	Pi3Cmodel gridbrush = Pi3Cmodel(resource, Pi3Cshapes::cuboid(vec3f(0, 0, 0), vec3f(grid.x,1.f, grid.z), 1,1,1), -1, 0xffff00);
 	gridbrush.touchable = false;
 	gridbrush.visible = true;
 	gridbrush.material.alpha = 0.5f;
@@ -240,6 +240,7 @@ void Editor::handleEvents(std::vector<uint32_t>& eventList)
 			if (window->resized) {
 				scene.setPerspective3D(window->getWidth(), window->getHeight(), 800.f, nearzfarz.x, nearzfarz.y);
 				scene.setViewport2D(Pi3Crecti(0, 0, (int32_t)window->getWidth(), (int32_t)window->getHeight()), 0.1f, 2000.f);
+				gui.resize();
 				window->resized = false;
 			}
 			break;
@@ -377,7 +378,7 @@ void Editor::handleIMGui()
 
 	//Menubar ...
 	gui.setButtonStyle(bsMenu);
-	if (gui.BeginMenuBar()) {
+	if (gui.BeginMenuBar("MainMenu")) {
 		if (gui.BeginMenu("File")) {
 			if (gui.MenuItem("New", "Ctrl+N")) newScene(sceneModelRef);
 			if (gui.MenuItem("Open", "Ctrl+O")) open();
@@ -395,7 +396,7 @@ void Editor::handleIMGui()
 			if (gui.MenuItem("Birds eye view", "")) {}
 			if (gui.MenuItem("Fullscreen", "Ctrl+F")) {}
 		}
-		gui.EndMenuBar();
+		gui.EndMenuBar("MainMenu");
 	}
 
 	gui.movePosition(10, 3);
@@ -541,7 +542,7 @@ void Editor::loadModelLibraryJSON(const std::string &file)
 				for (size_t j = 0; j < LODmodels.size(); j++) {
 					std::string colliderFile = (j == 0) ? collider : "";
 					std::string modelName = LODmodels[j];
-					Pi3Cmodel modelLOD(resource, modelName, modelPath + "/" + category, modelName, colliderFile);
+					Pi3Cmodel modelLOD(resource, modelName, modelPath + "/" + category, modelName, 1, colliderFile);
 					float lodToo = LODdists[j];
 					model.appendLOD(resource, modelLOD, lodfrom, lodToo);
 					lodfrom = lodToo;

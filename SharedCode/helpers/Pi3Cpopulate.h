@@ -32,7 +32,7 @@ public:
 	};
 
 
-	Pi3Cmodel Populate(Pi3Cresource *resource, const uint32_t maxShapes, Pi3Cmodel& model, const std::string& texturePath, const uint32_t maxTextures, const float radius);
+	Pi3Cmodel Populate(Pi3Cresource *resource, const uint32_t maxShapes, Pi3Cmodel& model, const std::string& texturePath, const uint32_t maxTextures, const float radius, int32_t groupId);
 
 private:
 	

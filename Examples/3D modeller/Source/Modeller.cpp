@@ -95,9 +95,9 @@ void Modeller::init()
 	//player.init(avparams);
 
 	// Load Skybox ...
-	skybox = scene.loadModelOBJ(opts.asString("skyboxPath"), opts.asString("skybox"), vec3f(), true); // false, loadbarCallback);
-	scene.models[skybox].matrix.SetScale(opts.asFloat("skyboxScale"));
-	scene.models[skybox].touchable = false;
+	//skybox = scene.loadModelOBJ(opts.asString("skyboxPath"), opts.asString("skybox"), vec3f(), true); // false, loadbarCallback);
+	//scene.models[skybox].matrix.SetScale(opts.asFloat("skyboxScale"));
+	//scene.models[skybox].touchable = false;
 
 	// Create a brush for touching objects ...
 	Pi3Cmodel brush = Pi3Cmodel(resource, Pi3Cshapes::sphere(vec3f(), 0.5f, 0.f, 10, 10),-1, 0xff00ffff);
@@ -411,7 +411,7 @@ void Modeller::finishLine()
 		switch (createTool) {
 		case CT_EXTRUDE:
 			if (lineCount > (lastMovePoint + 1)) {
-				lines.push_back(createFirstPoint); //close current contour
+				//lines.push_back(createFirstPoint); //close current contour
 				linePaths.push_back(lines);
 				//contours.emplace_back();
 				//std::vector<vec2f>& contour = contours.back();
@@ -426,7 +426,7 @@ void Modeller::finishLine()
 				//lm = lp.size();
 			}
 
-			createShape(Pi3Cshapes::extrude("Extrude", vec3f(0, 0, 0.f), contours, -1.f, 1), vec3f(0, 0, 0.f), modelGroupId, currentColour);
+			createShape(Pi3Cshapes::extrude("Extrude", vec3f(), contours, 1.f, 1), vec3f(), modelGroupId, currentColour);
 			scene.lastModel()->transformVerts(resource, views[currentView].rotMatrix);
 			break;
 		case CT_LATHE:
@@ -863,7 +863,7 @@ void Modeller::handleEvents(std::vector<uint32_t>& eventList)
 		case SDL_DROPFILE: 
 			std::string file = window->dropfile;
 			if (file.substr(file.size() - 4, 4) == ".obj") {
-				int32_t modelRef = scene.loadModelOBJ("", file, touch.touching ? touch.intersection : vec3f(0,0,0), true, modelGroupId);  // false, loadbarCallback);
+				int32_t modelRef = scene.loadModelOBJ("", file, touch.touching ? touch.intersection : vec3f(), true, modelGroupId);  // false, loadbarCallback);
 			}
 			break;
 		}

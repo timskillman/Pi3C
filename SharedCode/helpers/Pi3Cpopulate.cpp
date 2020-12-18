@@ -2,7 +2,7 @@
 
 
 
-Pi3Cmodel Pi3Cpopulate::Populate(Pi3Cresource* resource, const uint32_t maxShapes, Pi3Cmodel& model, const std::string& texturePath, uint32_t maxTextures, const float radius)
+Pi3Cmodel Pi3Cpopulate::Populate(Pi3Cresource* resource, const uint32_t maxShapes, Pi3Cmodel& model, const std::string& texturePath, uint32_t maxTextures, const float radius, int32_t groupId)
 {
 	shapes.init(maxTextures);
 
@@ -46,7 +46,7 @@ Pi3Cmodel Pi3Cpopulate::Populate(Pi3Cresource* resource, const uint32_t maxShape
 	}
 
 	Pi3Cmodel popmodel;
-	popmodel.meshRef = resource->addMesh(shapes.mesh.get());
+	popmodel.meshRef = resource->addMesh(shapes.mesh.get(), groupId);
 	popmodel.addTexture(resource, texturePath);
 	popmodel.material.illum = 0;
 	popmodel.material.alpha = 1.f;

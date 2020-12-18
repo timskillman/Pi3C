@@ -30,10 +30,10 @@ void Pi3CmlinPath::drawToTexture(std::shared_ptr<Pi3Ctexture> tex, float sc)
 		vec2f fp = lp;
 		for (size_t i = 0; i < lcont.points.size(); i++) {
 			vec2f p = lcont.points[i] * sc;
-			Pi3CimageTools::drawLine(pix, lp.x, lp.y, p.x, p.y, 0xffffffff, width); //draw path in image
+			Pi3CimageTools::drawLine(pix, (int32_t)lp.x, (int32_t)lp.y, (int32_t)p.x, (int32_t)p.y, 0xffffffff, width); //draw path in image
 			lp = p;
 		}
-		Pi3CimageTools::drawLine(pix, lp.x, lp.y, fp.x, fp.y, 0xffffffff, width); //close path
+		Pi3CimageTools::drawLine(pix, (int32_t)lp.x, (int32_t)lp.y, (int32_t)fp.x, (int32_t)fp.y, 0xffffffff, width); //close path
 	}
 }
 

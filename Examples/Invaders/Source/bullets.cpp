@@ -7,7 +7,7 @@ void Bullets::init(Pi3Cresource* resource, Pi3Cscene* scene, const uint32_t _max
 	bulletLife = _bulletLife;
 	Pi3Cmesh bulletmesh = Pi3Cshapes::cuboid(vec3f(0, 0, -50), vec3f(2, 2, 150));
 	Pi3Cmodel bulletmodel;
-	bulletmodel.create(resource, &bulletmesh, 0xff00ffff);
+	bulletmodel.create(resource, &bulletmesh, 1, 0xff00ffff);
 	bulletmodel.name = "bullet";
 	bulletmodel.material.illum = 0;
 	bulletmodel.visible = false;

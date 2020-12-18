@@ -13,7 +13,7 @@ namespace Pi3Cutils {
 		float leftx = 1e20f;
 		int f = -1;
 		for (size_t c = 0; c < contours.size(); c++) {
-			std::vector<float>& contour = contours[c];
+			auto& contour = contours[c];
 			for (size_t p = 0; p < contour.size(); p += 2) {
 				if (contour[p] < leftx) {
 					leftx = contour[p];
@@ -22,19 +22,18 @@ namespace Pi3Cutils {
 			}
 		}
 
-		//Work out CW/CCW of leftmost polygon ...
+		//Work out CW/CCW of leftmost polygon by working out area of polygon ...
 		std::vector<float>& contour = contours[f];
-		float a = 0.f; size_t p = contour.size() - 2;
-		for (size_t q = 0; q < contour.size() - 1; q += 2) {
-			a += contour[p] * contour[q + 1] - contour[q] * contour[p + 1];
-			p = q;
+		float a = 0.f; size_t b = contour.size() - 2;
+		for (size_t c = 0; c < contour.size() - 1; c += 2) {
+			a += contour[b] * contour[c + 1] - contour[c] * contour[b + 1];
+			b = c;
 		}
 
 		//reverse contours if inverted
-		if (a > 0)
+		if (a < 0)
 		{
-			for (size_t a = 0; a < contours.size(); a++) {
-				std::vector<float>& contour = contours[a];
+			for (auto& contour: contours) {
 				uint32_t vs = contour.size();
 				for (size_t j = 0; j < (vs - 1) / 2; j += 2) {
 					std::swap(contour[j], contour[vs - j - 2]);

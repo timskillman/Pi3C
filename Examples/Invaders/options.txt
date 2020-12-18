@@ -6,7 +6,7 @@ screenHeight:900
 trees:50000
 fly:true
 lightpos:0.0 1.0 0.0
-startpos:0.0 -30 0.0
+startpos:0.0 0.0 0.0
 rotate:0.0 0.0 0.0
 perspective:500.0
 nearz:0.1

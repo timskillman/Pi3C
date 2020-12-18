@@ -6,7 +6,7 @@ Particles should eventally emit from a spherical area and move in a given direct
 
 */
 
-void Pi3Cparticles::create(Pi3Cresource* resources, const uint32_t count, const vec3f& pos, const ixyz& area, const uint32_t minsize, const uint32_t maxsize, Pi3CspriteSheetInfo& spriteInfo)
+void Pi3Cparticles::create(Pi3Cresource* resources, const uint32_t count, const vec3f& pos, const ixyz& area, const uint32_t minsize, const uint32_t maxsize, Pi3CspriteSheetInfo& spriteInfo, int32_t groupId)
 {
 	resource = resources;
 	mesh.reset(new Pi3Cmesh);
@@ -21,7 +21,7 @@ void Pi3Cparticles::create(Pi3Cresource* resources, const uint32_t count, const 
 		createParticle(pos, fsize, tileRef, spriteInfo, Pi3Cparticles::ixyz(1000, 0, 0));
 	}
 
-	model.meshRef = resource->addMesh(mesh.get());
+	model.meshRef = resource->addMesh(mesh.get(),groupId);
 	model.addTexture(resource, spriteInfo.filename);
 	model.material.illum = 1;
 	model.material.alpha = .99f;

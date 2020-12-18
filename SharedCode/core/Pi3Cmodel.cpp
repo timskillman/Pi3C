@@ -274,7 +274,7 @@ Pi3Cmodel * Pi3Cmodel::appendLOD(Pi3Cresource *resource, Pi3Cmodel model, float 
 }
 
 
-void Pi3Cmodel::loadOBJfile(Pi3Cresource *resource, std::string path, std::string modelfile, int32_t groupId,std::function<void(float)> showProgressCB, bool asCollider, bool addColliderGrid)
+void Pi3Cmodel::loadOBJfile(Pi3Cresource *resource, std::string path, std::string modelfile, int32_t groupId, std::function<void(float)> showProgressCB, bool asCollider, bool addColliderGrid)
 {	
 	std::string error;
 	size_t meshStart = resource->meshes.size();

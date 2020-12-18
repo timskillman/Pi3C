@@ -446,16 +446,21 @@ namespace Pi3Cshapes {
 		return tube;
 	}
 
-	Pi3Cmesh extrude(const std::string &name, const vec3f &pos, std::vector<std::vector<vec2f>> &paths, const float depth, const uint16_t divs)
+	Pi3Cmesh extrude(const std::string& name, const vec3f& pos, std::vector<std::vector<float>>& contours, const float depth, const uint16_t divs)
 	{
 		Pi3Cmesh extrusion(name);
-		std::vector<std::vector<float>> contours;
-		convertPathToFloats(paths, contours);
 		extrude_verts(extrusion.verts, extrusion.vc, pos, contours, depth, divs, 0xffffffff);
 		extrusion.updateBounds();
-		texMap(extrusion.verts, extrusion.vc, extrusion.stride, 6, 0, 2);
+		texMap(extrusion.verts, extrusion.vc, extrusion.stride, 6, 0, 1);
 		extrusion.materialRef = 0;
 		return extrusion;
+	}
+
+	Pi3Cmesh extrude(const std::string &name, const vec3f &pos, std::vector<std::vector<vec2f>> &paths, const float depth, const uint16_t divs)
+	{
+		std::vector<std::vector<float>> contours;
+		convertPathToFloats(paths, contours);
+		return extrude(name, pos, contours, depth, divs);
 	}
 
 	Pi3Cmesh lathe(const std::string &name, const vec3f &pos, std::vector<vec2f> &path, bool sidePath,

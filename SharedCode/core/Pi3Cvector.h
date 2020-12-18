@@ -137,7 +137,7 @@ public:
 	{
 		float prod = x * v2.y - y * v2.x;
 		float ab = (prod < 0.f ? -1.0f : 1.0f) * acosf((x * v2.x + y * v2.y) / (length() * v2.length()));
-		return fabs(ab);
+		return (ab<0) ? -ab : ab;
 	}
 
 	static vec2f g_Zero;

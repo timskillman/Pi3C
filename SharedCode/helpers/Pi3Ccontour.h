@@ -13,6 +13,9 @@ public:
 	void addPoint(const vec2f& point);
 	void addPoint(const float x, const float y) { addPoint(vec2f(x, y)); }
 	void calcCurve(vec2f& p0, vec2f& p1, vec2f& p2, vec2f& c0, vec2f& c1);
+	bool pointInside(vec2f& pt);
+	void reverse();
+	float area();
 
 	std::vector<vec2f> points;
 	Pi3Cbbox2d bbox;

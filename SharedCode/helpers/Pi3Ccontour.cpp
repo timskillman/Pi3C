@@ -24,6 +24,40 @@ void Pi3ClinContour::calcCurve(vec2f& p0, vec2f& p1, vec2f& p2, vec2f& c0, vec2f
 	c1 = vec2f(v2 * L.x, v2 * L.y);
 }
 
+bool Pi3ClinContour::pointInside(vec2f& point)
+{
+	//check point inside using right ray casting
+	size_t i, j, vs = points.size();
+	bool inside = false;
+
+	for (i = 0, j = vs - 1; i < vs; j = i++) {
+		if ( ((points[i].y >= point.y) != (points[j].y >= point.y)) &&
+			(point.x <= (points[j].x - points[i].x) * (point.y - points[i].y) / (points[j].y - points[i].y) + points[i].x))
+			inside = !inside;
+	}
+
+	return inside;
+}
+
+void Pi3ClinContour::reverse()
+{
+	uint32_t vs = points.size();
+	for (size_t i = 0; i < (vs / 2); i++) {
+		std::swap(points[i], points[vs - i - 1]);
+	}
+}
+
+float Pi3ClinContour::area()
+{
+	float a = 0.f;
+	uint32_t vs = points.size();
+	size_t b = vs - 1;
+	for (size_t c = 0; c < vs; c++) {
+		a += points[b].x * points[c].y - points[c].x * points[b].y;
+		b = c;
+	}
+	return a;
+}
 
 void Pi3ClinPath::append(const Pi3ClinContour& lcont)
 {

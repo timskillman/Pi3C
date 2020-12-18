@@ -85,7 +85,7 @@ int main(int argc, char *argv[])
 
 	//Setup our tree array ...
 	Pi3Cpopulate trees;
-	Pi3Cmodel treesModel = trees.Populate(&pi3c.resource, maxTrees, pi3c.scene.models[landRef], "../../Resources/models/maps/redwoods.png", maxTreeTypes, 500.f);
+	Pi3Cmodel treesModel = trees.Populate(&pi3c.resource, maxTrees, pi3c.scene.models[landRef], "../../Resources/models/maps/redwoods.png", maxTreeTypes, 500.f, 1);
 	int treesModelRef = pi3c.add_model_to_scene3D(treesModel);
 
 	//Pi3Cmodel altimeter;
@@ -100,7 +100,7 @@ int main(int argc, char *argv[])
 	Aliens aliens;
 	aliens.init(&pi3c.resource, &pi3c.scene, landRef, aship, 40);
 
-	int skybox = pi3c.scene.loadSkybox(opts.asString("skyboxPath"), opts.asString("skybox"), 0, opts.asFloat("skyboxScale")); // loadbarCallback);
+	int skybox = pi3c.scene.loadSkybox(opts.asString("skyboxPath"), opts.asString("skybox"), nullptr, opts.asFloat("skyboxScale")); // loadbarCallback);
 	int airport = pi3c.load_model(opts.asString("modelPath"), "airport.obj", vec3f(-500, 0, 0));
 
 	int sship = pi3c.load_model(opts.asString("modelPath"), "sship4.obj"); //sship3 //EagleTransporter // NMSship
@@ -202,7 +202,7 @@ int main(int argc, char *argv[])
 
 		// process window events ...
 		Pi3Cmatrix rmat; rmat.rotate(-player.getRotation());
-		vec3f offset = (ship == cockpit) ? vec3f(0, 0, 0) : -rmat.transformRotateVec(vec3f(0, shipbox.height()*1.5f, shipbox.depth()*1.5f));
+		vec3f offset = (ship == cockpit) ? vec3f() : -rmat.transformRotateVec(vec3f(0, shipbox.height()*1.5f, shipbox.depth()*1.5f));
 		bool moving = false;
 
 		std::vector<uint32_t> eventList = pi3c.get_events();
@@ -265,7 +265,7 @@ int main(int argc, char *argv[])
 		//ht = pi3c.scene.models[ship].collideFloor(resource, nullptr, -vec3f(pos.x, 10000.f, pos.z), ht, true);
 		//if (ht < 1e8f) alien.matrix.sety(10000.f - ht + 150.f);
 		float ht = pi3c.getFloorHeight(landRef, player.getPosition()-offset);
-		if (ht == 1e8f) dead = true;
+		//if (ht == 1e8f) dead = true; //getting stuck!! ... TODO: need to fix poly intersections for floor collision
 
 		gui.Begin();
 		std::string fps = "Altitude:" + std::to_string((int)ht);

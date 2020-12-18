@@ -21,7 +21,7 @@ public:
 
 	}
 
-	void create(Pi3Cresource* resource, const uint32_t count, const vec3f& pos, const ixyz& area, const uint32_t minsize, const uint32_t maxsize, Pi3CspriteSheetInfo &spriteAni);
+	void create(Pi3Cresource* resource, const uint32_t count, const vec3f& pos, const ixyz& area, const uint32_t minsize, const uint32_t maxsize, Pi3CspriteSheetInfo &spriteAni, int32_t groupId);
 	void update(const size_t ref, const vec2f size, const uint32_t type);
 	void createParticle(const vec3f& pos, const vec2f size, const uint32_t tileRef, Pi3CspriteSheetInfo& spriteAni, const ixyz& wandr);
 	void animate(const float d);

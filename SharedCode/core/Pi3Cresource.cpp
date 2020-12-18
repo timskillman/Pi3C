@@ -254,7 +254,6 @@ void Pi3Cresource::deleteVertsBuffer(int32_t groupId)
 		if (vb.groupId == groupId) {
 			glDeleteBuffers(1, &VBOid[b]);
 			vb.verts.resize(0);
-			vb.freePtr = 0;
 			vb.groupId = -2; //mark for deletion
 			VBOid[b] = 0;
 		}
