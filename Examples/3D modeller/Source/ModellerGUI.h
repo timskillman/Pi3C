@@ -50,7 +50,7 @@ private:
 
 	int menuHeight = 20;
 	int topbarHeight = 36;
-	int botbarHeight = 60;
+	int botbarHeight = 42;
 	int leftbarWidth = 50;
 	int rightbarWidth = 40;
 

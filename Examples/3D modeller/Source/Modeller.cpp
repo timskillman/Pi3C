@@ -95,9 +95,12 @@ void Modeller::init()
 	//player.init(avparams);
 
 	// Load Skybox ...
-	//skybox = scene.loadModelOBJ(opts.asString("skyboxPath"), opts.asString("skybox"), vec3f(), true); // false, loadbarCallback);
-	//scene.models[skybox].matrix.SetScale(opts.asFloat("skyboxScale"));
-	//scene.models[skybox].touchable = false;
+	std::string skyboxfile = opts.asString("skybox");
+	if (skyboxfile != "") {
+		skybox = scene.loadModelOBJ(opts.asString("skyboxPath"), , vec3f(), true); // false, loadbarCallback);
+		scene.models[skybox].matrix.SetScale(opts.asFloat("skyboxScale"));
+		scene.models[skybox].touchable = false;
+	}
 
 	// Create a brush for touching objects ...
 	Pi3Cmodel brush = Pi3Cmodel(resource, Pi3Cshapes::sphere(vec3f(), 0.5f, 0.f, 10, 10),-1, 0xff00ffff);
