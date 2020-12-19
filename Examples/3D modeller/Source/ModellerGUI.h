@@ -69,6 +69,8 @@ private:
 	float ibx = 1.f - dragBarX;
 	float iby = 1.f - dragBarY;
 
+	void updateWorkArea(Modeller* md);
+
 	void renderBorder(uint32_t currentSelView);
 	void dragViewportBars(Modeller * md, Pi3Cpointi& wposm, int midht);
 	void saveAll(Modeller * md);

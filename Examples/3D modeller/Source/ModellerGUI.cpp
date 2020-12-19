@@ -135,7 +135,7 @@ Pi3Crecti MGui::getRectTopLeft()
 
 Pi3Crecti MGui::getRectFull()
 {
-	return Pi3Crecti(leftbarWidth, botbarHeight, workWidth, workHeight - dbh * 4);
+	return Pi3Crecti(leftbarWidth, botbarHeight, workWidth, workHeight-dbh * 3);
 }
 
 Pi3Cpointi MGui::getTopLeft()
@@ -156,11 +156,17 @@ float dragLimit(float& dragPos, float pos)
 	return 1.f - dragPos;
 }
 
+void MGui::updateWorkArea(Modeller* md) {
+	workWidth = md->window->getWidth() - leftbarWidth - rightbarWidth;
+	workHeight = md->window->getHeight() - menuHeight - topbarHeight - botbarHeight;
+}
+
 void MGui::dragViewportBars(Modeller * md, Pi3Cpointi& wpos, int midht)
 {
 	bool mb = md->window->mouse.LeftButton;
 	int mx = md->window->mouse.x;
 	int my = md->window->mouse.y;
+	updateWorkArea(md);
 
 	if (md->fullview == viewInfo::INACTIVE) {
 		//Drag bar horizontal ...
@@ -204,8 +210,6 @@ void MGui::dragViewportBars(Modeller * md, Pi3Cpointi& wpos, int midht)
 void MGui::dragBars(Modeller * md)
 {
 	Pi3Cpointi wpos = getTopLeft();
-	workWidth = md->window->getWidth() - leftbarWidth - rightbarWidth;
-	workHeight = md->window->getHeight() - menuHeight - topbarHeight - botbarHeight;
 	int midht = md->window->getHeight() - wpos.y - botbarHeight;
 	dragViewportBars(md, wpos, midht);
 	renderBorder(md->currentSelView);
@@ -346,9 +350,7 @@ void MGui::doIMGUI(Modeller * md)
 	}
 
 	doMenus(md);
-
-	workWidth = winWidth - leftbarWidth - rightbarWidth;
-	workHeight = winHeight - menuHeight - topbarHeight - botbarHeight;
+	updateWorkArea(md);
 
 	bool mb = md->window->mouse.LeftButton && mouseOverToolbars;
 	bool mu = md->window->mouse.up && mouseOverToolbars;
