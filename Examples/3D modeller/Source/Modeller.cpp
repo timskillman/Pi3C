@@ -97,7 +97,7 @@ void Modeller::init()
 	// Load Skybox ...
 	std::string skyboxfile = opts.asString("skybox");
 	if (skyboxfile != "") {
-		skybox = scene.loadModelOBJ(opts.asString("skyboxPath"), , vec3f(), true); // false, loadbarCallback);
+		skybox = scene.loadModelOBJ(opts.asString("skyboxPath"),skyboxfile , vec3f(), true); // false, loadbarCallback);
 		scene.models[skybox].matrix.SetScale(opts.asFloat("skyboxScale"));
 		scene.models[skybox].touchable = false;
 	}
