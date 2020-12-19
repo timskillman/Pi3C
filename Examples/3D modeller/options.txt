@@ -19,7 +19,7 @@ fogNear:100.0
 modelPath:../../Resources/models/
 logo:maps/logo.png
 skyboxPath:../../Resources/models/skyboxes
-skybox:earth.obj
+skybox:sunnyday.obj
 skyboxScale:15.0
 fontsPath:../../Resources/fonts/
 font1:NotoSans-Regular.ttf
