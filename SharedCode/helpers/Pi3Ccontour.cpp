@@ -12,6 +12,16 @@ void Pi3ClinContour::addPoint(const vec2f& point)
 	bbox.update(point);
 }
 
+vec2f calcBezierPoint(const vec2f& v1, const vec2f& v2, const vec2f& v3, const vec2f& v4, float p)
+{
+	float ip = 1.f - p;
+	float a0 = ip * ip * ip;
+	float a1 = 3.f * p * ip * ip;
+	float a2 = 3.f * p * p * ip;
+	float a3 = p * p * p;
+	return vec2f(a0 * v1.x + a1 * v2.x + a2 * v3.x + a3 * v4.x, a0 * v1.y + a1 * v2.y + a2 * v3.y + a3 * v4.y);
+}
+
 void Pi3ClinContour::calcCurve(vec2f& p0, vec2f& p1, vec2f& p2, vec2f& c0, vec2f& c1)
 {
 	//Magic number from https://www.tinaja.com/glib/ellipse4.pdf
@@ -22,6 +32,24 @@ void Pi3ClinContour::calcCurve(vec2f& p0, vec2f& p1, vec2f& p2, vec2f& c0, vec2f
 	float v2 = 0.55228475f * b / (b + a);
 	c0 = vec2f(v1 * L.x, v1 * L.y);
 	c1 = vec2f(v2 * L.x, v2 * L.y);
+}
+
+float calcBezierAutoStep(const vec2f& v1, const vec2f& v2, const vec2f& v3, const vec2f& v4)
+{
+	vec2f p21 = v2 - v1;
+	vec2f p32 = v3 - v2;
+	vec2f p43 = v4 - v3;
+	float astep = (float)sqrtf(p21.x * p21.x + p21.y * p21.y + p32.x * p32.x + p32.y * p32.y + p43.x * p43.x + p43.y * p43.y) * .5f;
+	if (astep < 4) astep = 4; else if (astep > 24) astep = 24;
+	return 1.f / astep;
+}
+
+void Pi3ClinContour::createBezier(const vec2f& v1, const vec2f& v2, const vec2f& v3, const vec2f& v4, std::vector<vec2f>& points)
+{
+	float autoStep = calcBezierAutoStep(v1, v2, v3, v4);
+	for (float i = autoStep; i < 0.99999f; i += autoStep) {
+		points.push_back(calcBezierPoint(v1, v2, v3, v4, i));
+	}
 }
 
 bool Pi3ClinContour::pointInside(vec2f& point)

@@ -13,6 +13,7 @@ public:
 	void addPoint(const vec2f& point);
 	void addPoint(const float x, const float y) { addPoint(vec2f(x, y)); }
 	void calcCurve(vec2f& p0, vec2f& p1, vec2f& p2, vec2f& c0, vec2f& c1);
+	void createBezier(const vec2f& v1, const vec2f& v2, const vec2f& v3, const vec2f& v4, std::vector<vec2f>& points);
 	bool pointInside(vec2f& pt);
 	void reverse();
 	float area();

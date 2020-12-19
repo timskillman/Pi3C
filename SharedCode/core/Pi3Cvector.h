@@ -73,6 +73,11 @@ public:
 		return vec2f(x - rhs.x, y - rhs.y);
 	}
 
+	vec2f operator - (const vec2f rhs) const
+	{
+		return vec2f(x - rhs.x, y - rhs.y);
+	}
+
 	vec2f operator + (const vec2f &rhs) const
 	{
 		return vec2f(x + rhs.x, y + rhs.y);
