@@ -174,6 +174,12 @@
     <ClCompile Include="..\..\SharedCode\helpers\Pi3Cparticles.cpp">
       <Filter>Shared Code\helpers</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\SharedCode\helpers\Pi3Cpopulate.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\SharedCode\helpers\Pi3Cblocks.cpp">
+      <Filter>Shared Code\helpers</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\SharedCode\glutess\dict.h">
@@ -339,6 +345,18 @@
       <Filter>Shared Code\helpers</Filter>
     </ClInclude>
     <ClInclude Include="..\..\SharedCode\helpers\Pi3Cparticles.h">
+      <Filter>Shared Code\helpers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\SharedCode\helpers\Pi3Cpopulate.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\LineEdit.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\SharedCode\helpers\Pi3Cblocks.h">
+      <Filter>Shared Code\helpers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\SharedCode\helpers\FastNoiseLite.h">
       <Filter>Shared Code\helpers</Filter>
     </ClInclude>
   </ItemGroup>

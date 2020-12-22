@@ -3,6 +3,25 @@
 #include "Pi3Cvector.h"
 #include "Pi3Cmodel.h"
 
+class Blocks {
+public:
+	Blocks() {
+		createTexPackUV();
+	}
+
+	Pi3Cmesh createTestMap(int w, int h, int d);
+	void createTexPackUV();
+	void createMapMeshChunk(std::vector<uint8_t>& map, uint32_t mapWidth, uint32_t mapHeight, uint32_t mapDepth, Pi3Cmesh& mesh, int32_t x, int32_t y, int32_t w, int32_t h);
+
+private:
+	void addQuadTopBottom(Pi3Cmesh& mesh, int x, int h, int y, uint8_t mapval, uint8_t faceVal, int tb);
+	void addQuadLeftRight(Pi3Cmesh& mesh, int x, int h, int y, uint8_t mapval, uint8_t faceVal, int lr);
+	void addQuadFrontBack(Pi3Cmesh& mesh, int x, int h, int y, uint8_t mapval, uint8_t faceVal, int fb);
+
+	std::vector<std::vector<vec2f>> texPackUV; //uvs for pixel (cube) sides (top, left, right, front, back, bottom)
+
+};
+
 class ivec
 {
 public:
@@ -24,26 +43,6 @@ public:
 	xblock(float _x, float _y, float _z, uint32_t  _b, bool _doorTop) { x = _x; y = _y; z = _z; b = _b; doorTop = _doorTop; }
 };
 
-class blockInfo {
-public:
-	uint8_t  topx;		//texture top/bottom
-	uint8_t  topy;
-	uint8_t  sidesx;	//texture X side
-	uint8_t  sidesy;
-	uint8_t  frontx;	//texture Z front
-	uint8_t  fronty;
-	uint8_t  backx;		//texture Z back
-	uint8_t  backy;
-	uint32_t  colSides;
-	uint32_t  col;		//Colour (RRGGBB)
-	uint8_t  g;			//Geometry ref
-	uint8_t  h;			//hard material (i.e. stackable)
-
-	blockInfo(uint8_t  _topx, uint8_t  _topy, uint8_t  _sidesx, uint8_t  _sidesy, uint8_t  _frontx, uint8_t  _fronty, uint8_t  _backx, uint8_t  _backy, uint32_t  _colSides, uint32_t  _col, uint8_t  _g, uint8_t  _h)
-	{
-		topx = _topx; topy = _topy; sidesx = _sidesx; sidesy = _sidesy; frontx = _frontx; fronty = _fronty; backx = _backx; backy = _backy; colSides = _colSides;  col = _col;  g = _g;  h = _h;
-	}
-};
 
 static const vec2f uiconRefs[30] = {
 	vec2f(0, 0), 			//Add block
@@ -122,6 +121,27 @@ static const uint32_t  paintCols2[16] = {
 	0xffffff, 0xffffaa, 0xffaaff, 0xffaaaa, 0xaaffff, 0xaaffaa, 0xaaaaff, 0xaaaaaa,
 	0x777777, 0x888800, 0x880088, 0x880000, 0x008888, 0x008800, 0x000088, 0x222222
 }; //Another set of colours for blocks!
+
+class blockInfo {
+public:
+	uint8_t  topx;		//texture top/bottom
+	uint8_t  topy;
+	uint8_t  sidesx;	//texture X side
+	uint8_t  sidesy;
+	uint8_t  frontx;	//texture Z front
+	uint8_t  fronty;
+	uint8_t  backx;		//texture Z back
+	uint8_t  backy;
+	uint32_t  colSides;
+	uint32_t  col;		//Colour (RRGGBB)
+	uint8_t  g;			//Geometry ref
+	uint8_t  h;			//hard material (i.e. stackable)
+
+	blockInfo(uint8_t  _topx, uint8_t  _topy, uint8_t  _sidesx, uint8_t  _sidesy, uint8_t  _frontx, uint8_t  _fronty, uint8_t  _backx, uint8_t  _backy, uint32_t  _colSides, uint32_t  _col, uint8_t  _g, uint8_t  _h)
+	{
+		topx = _topx; topy = _topy; sidesx = _sidesx; sidesy = _sidesy; frontx = _frontx; fronty = _fronty; backx = _backx; backy = _backy; colSides = _colSides;  col = _col;  g = _g;  h = _h;
+	}
+};
 
 static const blockInfo typToTex[256] = {
 	//TOP TEXTURES (x,y,block_flag)...

@@ -10,7 +10,7 @@ void Pi3Cresource::init(const uint32_t stride)
 
 	//Create a dummy mesh to reserve GPU memory dynamic creation of letters ...
 	Pi3Cmesh lets;
-	lets.vc = 10000 * 6 * stride;
+	lets.vc = 1000 * 6 * stride;
 	lets.verts.resize(lets.vc); // 10000 letters - reserve MUST be multiple of consistent stride (since glDrawArrays requires a vertex index not a byte index)
 	letterSheetRef = addMesh(&lets,-1); //create a dynamic buffer for the lettersheet (page size)
 
@@ -186,7 +186,7 @@ int32_t Pi3Cresource::addMesh(Pi3Cmesh * mesh, int32_t groupId, uint32_t maxsize
 
 	//No buffers created yet or, request is larger than current buffer?, then create new buffer ...
 	bool vertsMoved = false;
-	if (cbuf < 0 || (mvsize + vertBuffer[cbuf].freePtr) > vertBuffer[cbuf].verts.size()) {
+	if (cbuf < 0 || groupId != vertBuffer[cbuf].groupId || (mvsize + vertBuffer[cbuf].freePtr) > vertBuffer[cbuf].verts.size()) {
 		if (cbuf>=0) SDL_Log("cbuf:%d, mvsize:%d + vertBufferPtr:%d, size=%d, maxsize=%d, groupId=%d", cbuf, mvsize , vertBuffer[cbuf].freePtr, vertBuffer[cbuf].verts.size(), maxsize, groupId);
 		mesh->verts.resize(maxsize);
 		vertBuffer.emplace_back();
@@ -323,7 +323,6 @@ void Pi3Cresource::renderMesh(const int meshRef, const GLenum rendermode)
 {
 	Pi3Cmesh &mesh = meshes[meshRef];
 	setRenderBuffer(mesh.bufRef, mesh.stride);
-
 
 	if (rendermode == GL_TRIANGLES || mesh.mode== GL_LINE_STRIP) mesh.render(rendermode);
 

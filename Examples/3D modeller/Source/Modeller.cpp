@@ -1,5 +1,6 @@
 #include "Modeller.h"
 #include "Pi3Cshapes.h"
+#include "Pi3Cblocks.h"
 #include "Pi3Cdirectory.h"
 #include <fstream>
 #include <sstream>
@@ -111,14 +112,17 @@ void Modeller::init()
 	// Create grid
 	Pi3Cmodel gridModel = Pi3Cmodel(resource, Pi3Cshapes::grid(vec2f(100.f, 100.f), 10.f, 1.f, Pi3Ccolours::Graphite, Pi3Ccolours::Black),-1);
 	gridModel.touchable = false;
-	gridModel.material.rendermode = GL_LINE_STRIP;
 	gridRef = scene.append3D(gridModel);
 
 	// Create selection box
 	Pi3Cmodel selboxModel = Pi3Cmodel(resource, Pi3Cgizmos::selectBoxGizmo(vec3f(), vec3f(), 0xffffff),-1);
 	selboxModel.touchable = false;
-	selboxModel.material.rendermode = GL_LINE_STRIP;
 	selboxRef = scene.append3D(selboxModel);
+
+	Pi3Cmodel selRectModel = Pi3Cmodel(resource, Pi3Cshapes::rectLine(vec2f(0, 0), vec2f(50, 50)), 3);
+	selRectModel.touchable = false;
+	selRectModel.material.SetColAmbient(0xffffffff);
+	selRectRef = scene.append2D(selRectModel);
 
 	//Create outline shape
 	Pi3Cmesh lmesh;
@@ -209,8 +213,13 @@ void Modeller::handleKeyPresses()
 	else {
 		switch (kp) {
 		case SDL_SCANCODE_DELETE:
-			editUndo.deleteSelection(scene.models);
-			clearGizmos();
+			if (editMode == ED_CREATE && maxSteps == 0) {
+				delLinePoint();
+			}
+			if (editMode == ED_SELECT) {
+				editUndo.deleteSelection(scene.models);
+				clearGizmos();
+			}
 			break;
 		case SDL_SCANCODE_G:
 			scene.models[gridRef].visible = !scene.models[gridRef].visible;
@@ -237,7 +246,10 @@ void Modeller::handleKeyPresses()
 			navikeys(kp, SDL_SCANCODE_F, SDL_SCANCODE_R);
 			break;
 		case SDL_SCANCODE_ESCAPE:
-			if (fullscreen) setFullScreen();
+			if (fullscreen) 
+				setFullScreen(); 
+			else
+				if (editMode == ED_CREATE && maxSteps == 0) resetLineDrawing();
 			break;
 		}
 	}
@@ -257,13 +269,26 @@ void Modeller::navikeys(SDL_Scancode key, SDL_Scancode keyA, SDL_Scancode KeyB)
 	}
 }
 
+void Modeller::createBlocks(const vec3f pos)
+{
+	Blocks block;
+	Pi3Cmesh blockmesh = block.createTestMap(128, 128, 256);
+	blockmesh.updateBounds();
+	blockmesh.materialRef = 0;
+	createShape(blockmesh, pos, modelGroupId, 0xffffffff, "assets/maps/SurvivalCraft512x512.png");
+	Pi3Cmodel& model = scene.models.back();
+	model.material.alpha = 0.999f;
+	//model.material = *resource->defaultMaterial();
+	//model.addTexture(resource, );
+}
+
 void Modeller::createLandscape(const vec3f pos, const uint32_t colour)
 {
 	Pi3Ctexture maptex = Pi3Ctexture("assets/maps/mountainsHgt2.png", false);
 	createShape(Pi3Cshapes::elevationMap(maptex, vec3f(0, -200.f, 0), vec3f(3000.f, 400.f, 3000.f), 128, 128, 0), pos, modelGroupId, colour);
 }
 
-void Modeller::createShape(const Pi3Cmesh& mesh, const vec3f& pos, int32_t groupId, const uint32_t colour)
+void Modeller::createShape(const Pi3Cmesh& mesh, const vec3f& pos, int32_t groupId, const uint32_t colour, const std::string txfile)
 {
 	Pi3Cmodel shape = Pi3Cmodel(resource, mesh, groupId, colour);
 	if (shape.meshRef >= 0) {
@@ -276,7 +301,7 @@ void Modeller::createShape(const Pi3Cmesh& mesh, const vec3f& pos, int32_t group
 		shape.name = mesh->name + std::to_string(shapeCounts[createTool]);
 		shape.move(pos);
 		shape.selected = true;
-		int32_t modelRef = scene.append3D(shape);
+		int32_t modelRef = scene.append3D(shape, txfile);
 		if (modelRef >= 0) editUndo.create(scene.models);
 	}
 }
@@ -297,6 +322,7 @@ void Modeller::createShapes()
 
 		vec3f pos = -currentPos;
 		createFirstPoint = pos;
+		maxSteps = 0;
 
 		switch (createTool) {
 		case CT_CUBOID: createShape(Pi3Cshapes::cuboid(vec3f(), vec3f(.01f, .01f, .01f)), pos, modelGroupId, currentColour); maxSteps = 2; break;
@@ -310,9 +336,26 @@ void Modeller::createShapes()
 		case CT_EXTRUDE: maxSteps = 0; break;
 		case CT_LATHE: maxSteps = 0; break;
 		case CT_LINE: maxSteps = 0; break;
+		case CT_BLOCKS: createBlocks(pos); break;
 		case CT_LANDSCAPE: createLandscape(pos, currentColour); break;
 		}
 	}
+}
+
+void Modeller::delLinePoint()
+{
+	if (lineCount <= lastMovePoint) return;
+
+	Pi3Cmodel& model = scene.models[outlineRef];
+	Pi3Cmesh* mesh = model.getMesh(resource);
+	vertsPtr vp = model.getMeshVerts(resource);
+
+	lines.pop_back();
+	vp.offset = lines.size() * mesh->stride;
+	mesh->vc = (lines.size() + 2) * mesh->stride;
+	lineCount--;
+
+	updateLineIndexes();
 }
 
 void Modeller::addLinePoint(const vec3f point)
@@ -326,13 +369,11 @@ void Modeller::addLinePoint(const vec3f point)
 
 	//work out mesh offsets and vert sizes for line contours ...
 	vp.offset = lines.size() * mesh->stride;
-	//switch (createTool) {
-	//case CT_EXTRUDE:
-		mesh->vc = (lines.size() + 2) * mesh->stride;
-	//	break;
-	//case CT_LATHE:
-	//	mesh->vc = (lines.size() + 2) * mesh->stride;
-	//	break;
+	mesh->vc = (lines.size() + 2) * mesh->stride;
+
+	//vec3f cp;
+	//if (lines.size() > 1) {
+	//	cp = (lines[lineCount - 1] ^ lines[(lineCount) % lines.size()]); // .unit() * 10.f;
 	//}
 
 	if (createCount != lastCreateCount) {
@@ -368,33 +409,31 @@ void Modeller::addLinePoint(const vec3f point)
 	Pi3Cshapes::addPoint(vp, newPoint);
 	Pi3Cshapes::addPoint(vp, newPoint);
 
-	//Create line indexes from contours and current path...
-	mesh->lineIndexes.clear();
+	updateLineIndexes();
+}
+
+void Modeller::updateLineIndexes()
+{
+	Pi3Cmodel& model = scene.models[outlineRef];
+	Pi3Cmesh& mesh = *(model.getMesh(resource));
+
+	mesh.lineIndexes.clear();
 	int sc = 0;
 	for (auto& c : linePaths) {
 		for (int i = 0; i < c.size(); i++) {
-			mesh->lineIndexes.push_back(sc + i);
-			mesh->lineIndexes.push_back(sc + (i + 1) % c.size());
+			mesh.lineIndexes.push_back(sc + i);
+			mesh.lineIndexes.push_back(sc + (i + 1) % c.size());
 		}
 		sc += c.size() + 1;
 	}
 
 	int c = lineCount - lastMovePoint;
 	for (int i = 0; i < c; i++) {
-		mesh->lineIndexes.push_back(sc + i);
-		mesh->lineIndexes.push_back(sc + i + 1);
+		mesh.lineIndexes.push_back(sc + i);
+		mesh.lineIndexes.push_back(sc + i + 1);
 	}
-	//sc += c+1;
-
-	//if (createTool == CT_LATHE) {
-	//	Pi3Cshapes::addPoint(vp, createFirstPoint - vec3f(0, 100, 0));
-	//	Pi3Cshapes::addPoint(vp, createFirstPoint - vec3f(0, -200, 0));
-	//	mesh->lineIndexes.push_back(sc);
-	//	mesh->lineIndexes.push_back(sc + 1);
-	//}
 
 	resource->updateMesh(model.meshRef);
-
 }
 
 void Modeller::transformLines(std::vector<vec3f>& lines, std::vector<vec2f>& contour, Pi3Cmatrix& matrix, int32_t start)
@@ -451,6 +490,11 @@ void Modeller::finishLine()
 		}
 		
 	}
+	resetLineDrawing();
+}
+
+void Modeller::resetLineDrawing()
+{
 	createCount = 0;
 	lineCount = 0;
 	lastMovePoint = 0;
@@ -490,11 +534,22 @@ void Modeller::creatingShape()
 {
 	vec3f pos = -currentPos;
 
+	//if (selectRect) {
+	//	selRect.width = window->mouse.x - selRect.x;
+	//	selRect.height = (window->getHeight()-window->mouse.y) - selRect.y;
+	//	setSelectionRect();
+	//	SDL_Log("Sel rect: %d,%d,%d,%d", selRect.x, selRect.y, selRect.width, selRect.height);
+	//	return;
+	//}
+
 	if (maxSteps == 0) {
 		switch (createTool) {
 		case CT_EXTRUDE:
 		case CT_LATHE:
+		case CT_LINE:
 			addLinePoint(pos);
+			return;
+		default:
 			return;
 		}
 	}
@@ -633,6 +688,15 @@ void Modeller::DragMiddleMouseButton(viewInfo& view, vec3f& mouseXYZ)
 void Modeller::DragLeftMouseButton(viewInfo& view, vec3f& mouseXYZ)
 {
 	switch (editMode) {
+	case ED_SELECT:
+		if (selectRect) {
+			selRect.width = window->mouse.x - selRect.x;
+			selRect.height = (window->getHeight() - window->mouse.y) - selRect.y;
+			setSelectionRect();
+			if (selRect.width != 0 || selRect.height != 0) scene.models2D[selRectRef].visible = true;
+			SDL_Log("Sel rect: %d,%d,%d,%d", selRect.x, selRect.y, selRect.width, selRect.height);
+		}
+		break;
 	case ED_CREATE:
 		break;
 	case ED_MOVE:
@@ -683,12 +747,18 @@ void Modeller::ClickLeftMouseButton(viewInfo& view)
 			if (!window->ctrlKey) clearSelections();
 			touchScene();
 			if (touch.selmodel) {
-				scene.models[brushref].matrix.move(touch.intersection);
+				brush()->matrix.move(touch.intersection);
 				editUndo.selectModel(scene.models, &scene.models[touch.parent()], window->ctrlKey);
 				//scene.models[touch.groupRefs[0]].selected = touch.selmodel->selected;
 			}
 			else
-				clearSelections();
+			{
+				selectRect = true;
+				brush()->visible = false;
+				selRect.x = window->mouse.x;
+				selRect.y = window->getHeight() - window->mouse.y;
+			}
+				//clearSelections();
 			break;
 		case ED_MOVE:
 			touchScene();
@@ -730,7 +800,7 @@ void Modeller::ClickRightMouseButton(viewInfo& view)
 		case ED_SELECT:
 			touchScene();
 			if (touch.selmodel) {
-				scene.models[brushref].matrix.move(touch.intersection);
+				brush()->matrix.move(touch.intersection);
 				editUndo.selectModel(scene.models, &scene.models[touch.parent()], window->ctrlKey);
 				//scene.models[touch.groupRefs[0]].selected = touch.selmodel->selected;
 			}
@@ -777,14 +847,14 @@ void Modeller::touchScene()
 			//move 3D pointer (sphere) to touch intersetion point ...
 			currentPos = -touch.intersection;
 
-			//scene.models[brushref].matrix.move(touch.intersection);
+			//brush()->matrix.move(touch.intersection);
 			setTouchFlags(true);
 			touch.selmodel->selected = true;
-			scene.models[brushref].visible = false;
+			brush()->visible = false;
 
 			switch (editMode) {
 			case ED_SELECT: 
-				scene.models[brushref].visible = true;
+				brush()->visible = true;
 				touchObject(*touch.selmodel);
 				setCursor(arrowCursor);
 				break;
@@ -830,6 +900,11 @@ void Modeller::handleEvents(std::vector<uint32_t>& eventList)
 			break;
 		case SDL_MOUSEBUTTONUP:
 			//SDL_Log("MouseUp");
+			if (selectRect) {
+				scene.touchRect(selRect);
+				selRectangle()->visible = false;
+				selectRect = false;
+			}
 			MouseButtonUp();
 			break;
 		case SDL_MOUSEMOTION:
@@ -963,13 +1038,15 @@ void Modeller::setCursor(SDL_Cursor *newCursor)
 
 void Modeller::setDragBar(bool on, SDL_Cursor *newCursor)
 {
-	if (on && sceneAction != SA_DRAGBAR) {
-		sceneAction = SA_DRAGBAR;
-		SDL_SetCursor(newCursor);
-	}
-	else if (!on && sceneAction == SA_DRAGBAR) {
-		sceneAction = SA_NONE;
-		SDL_SetCursor(currentCursor);
+	if (!selectRect) {
+		if (on && sceneAction != SA_DRAGBAR) {
+			sceneAction = SA_DRAGBAR;
+			SDL_SetCursor(newCursor);
+		}
+		else if (!on && sceneAction == SA_DRAGBAR) {
+			sceneAction = SA_NONE;
+			SDL_SetCursor(currentCursor);
+		}
 	}
 }
 
@@ -997,6 +1074,14 @@ void Modeller::setSelectionBox()
 	vertsPtr vp = selBox.getMeshVerts(resource);
 	Pi3Cgizmos::select_box_verts(*vp.verts, vp.offset, bbox.min, bbox.size(), 0xffffff);
 	resource->updateMesh(selBox.meshRef);
+}
+
+void Modeller::setSelectionRect()
+{
+	Pi3Cmodel& srm = scene.models2D[selRectRef];
+	vertsPtr vp = srm.getMeshVerts(resource);
+	Pi3Cshapes::rectLine_verts(*vp.verts, vp.offset, vec2f((float)selRect.x, (float)selRect.y), vec2f((float)selRect.width, (float)selRect.height), vec2f(), vec2f(), 0xffffff);
+	resource->updateMesh(srm.meshRef);
 }
 
 void Modeller::touchObject(Pi3Cmodel& selmodel)
@@ -1103,8 +1188,8 @@ void Modeller::render()
 	scene.setViewport(screenRect);
 	scene.setFixedLight(0xffffff, vec3f(0, 1000.f, 1000.f));
 	scene.setViewport2D(screenRect, 0.1f, 2000.f);
-	scene.render2D(window->getTicks());
-
+	//scene.render2D(window->getTicks());
+	scene.setup2D();
 	handleIMGUI(); //must be in the rendering loop with 2D setup
 
 	currentView = viewInfo::INACTIVE;
@@ -1122,7 +1207,8 @@ void Modeller::render()
 	}
 
 	scene.setViewport(screenRect);
-	scene.setup2D();
+	//scene.setup2D();
+	scene.render2D(window->getTicks());
 	mgui.dragBars(this);
 
 	if (currentView != viewInfo::INACTIVE) {

@@ -246,6 +246,7 @@
     <ClCompile Include="..\..\SharedCode\glutess\tessmono.c" />
     <ClCompile Include="..\..\SharedCode\helpers\Pi3C.cpp" />
     <ClCompile Include="..\..\SharedCode\helpers\Pi3Cavatar.cpp" />
+    <ClCompile Include="..\..\SharedCode\helpers\Pi3Cblocks.cpp" />
     <ClCompile Include="..\..\SharedCode\helpers\Pi3Ccontour.cpp" />
     <ClCompile Include="..\..\SharedCode\helpers\Pi3CfastRead.cpp" />
     <ClCompile Include="..\..\SharedCode\helpers\Pi3Chtml.cpp" />
@@ -302,8 +303,10 @@
     <ClInclude Include="..\..\SharedCode\glutess\tess.h" />
     <ClInclude Include="..\..\SharedCode\glutess\tessellate.h" />
     <ClInclude Include="..\..\SharedCode\glutess\tessmono.h" />
+    <ClInclude Include="..\..\SharedCode\helpers\FastNoiseLite.h" />
     <ClInclude Include="..\..\SharedCode\helpers\Pi3C.h" />
     <ClInclude Include="..\..\SharedCode\helpers\Pi3Cavatar.h" />
+    <ClInclude Include="..\..\SharedCode\helpers\Pi3Cblocks.h" />
     <ClInclude Include="..\..\SharedCode\helpers\Pi3Ccolours.h" />
     <ClInclude Include="..\..\SharedCode\helpers\Pi3Ccontour.h" />
     <ClInclude Include="..\..\SharedCode\helpers\Pi3CfastRead.h" />
@@ -315,6 +318,7 @@
     <ClInclude Include="..\..\SharedCode\helpers\Pi3Cshapes.h" />
     <ClInclude Include="..\..\SharedCode\helpers\Pi3Cutils.h" />
     <ClInclude Include="..\..\SharedCode\ui\Pi3Cimgui.h" />
+    <ClInclude Include="Source\LineEdit.h" />
     <ClInclude Include="Source\Modeller.h" />
     <ClInclude Include="Source\ModellerGUI.h" />
   </ItemGroup>

@@ -94,7 +94,7 @@ public:
 	//	return &vertBuffer[meshes[meshRef].bufRef];
 	//}
 
-	std::vector<float>* getMeshBuffer(const uint32_t meshRef)
+	std::vector<float>* getMeshBuffer(uint32_t meshRef)
 	{
 		if (meshRef < 0) return nullptr;
 		return &vertBuffer[meshes[meshRef].bufRef].verts;

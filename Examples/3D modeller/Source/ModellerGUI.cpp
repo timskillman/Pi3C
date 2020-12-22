@@ -166,6 +166,8 @@ void MGui::dragViewportBars(Modeller * md, Pi3Cpointi& wpos, int midht)
 	bool mb = md->window->mouse.LeftButton;
 	int mx = md->window->mouse.x;
 	int my = md->window->mouse.y;
+	bool notDraggingOthers = md->selectRect || draggingBarX || draggingBarY;
+
 	updateWorkArea(md);
 
 	if (md->fullview == viewInfo::INACTIVE) {
@@ -175,7 +177,7 @@ void MGui::dragViewportBars(Modeller * md, Pi3Cpointi& wpos, int midht)
 		bool touchDragBarH = gui.renderRect((int)dragBarThickness, midht, 0xffffffff);
 		if (touchDragBarH || draggingBarX) md->setDragBarH(true);
 
-		if (touchDragBarH && mb && !draggingBars()) {
+		if (touchDragBarH && mb && !notDraggingOthers) {
 			draggingBarX = true;
 		}
 		else if (draggingBarX && mb) {
@@ -191,7 +193,7 @@ void MGui::dragViewportBars(Modeller * md, Pi3Cpointi& wpos, int midht)
 		bool touchDragBarV = gui.renderRect(workWidth, (int)dragBarThickness, 0xffffffff);
 		if (touchDragBarV || draggingBarY) md->setDragBarV(true);
 
-		if (touchDragBarV && mb && !draggingBars()) {
+		if (touchDragBarV && mb && !notDraggingOthers) {
 			draggingBarY = true;
 		}
 		else if (draggingBarY && mb) {
@@ -320,6 +322,8 @@ void MGui::doShapesToolbar(Modeller * md, Pi3Cimgui::rectStyle& iconstyle, bool 
 		gui.renderBackIcon("butTop2.png", iconstyle.minWidth, btop);
 		if (gui.ButtonImage("extrude.png", md->createTool == Modeller::CT_EXTRUDE) && mb) md->setCreateTool(Modeller::CT_EXTRUDE);
 		if (gui.ButtonImage("lathe.png", md->createTool == Modeller::CT_LATHE) && mb) md->setCreateTool(Modeller::CT_LATHE);
+		if (gui.ButtonImage("butLine.png", md->createTool == Modeller::CT_LINE) && mb) md->setCreateTool(Modeller::CT_LINE);
+		if (gui.ButtonImage("blocks.png", md->createTool == Modeller::CT_BLOCKS) && mb) md->setCreateTool(Modeller::CT_BLOCKS);
 		gui.renderBackIcon("butBot2.png", iconstyle.minWidth, btop);
 
 		gui.renderBackIcon("butTop2.png", iconstyle.minWidth, btop);

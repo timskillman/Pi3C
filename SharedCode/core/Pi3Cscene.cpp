@@ -25,7 +25,7 @@ void Pi3Cscene::setup2D()
 
 void Pi3Cscene::render2D(const float ticks)
 {
-	//glClear(GL_DEPTH_BUFFER_BIT);
+	glClear(GL_DEPTH_BUFFER_BIT);
 	render(ticks, projMatrix2D, modelMatrix2D, models2D, nullptr);
 }
 
@@ -200,6 +200,13 @@ Pi3Ctouch Pi3Cscene::touch(const vec3f &mousexyz, const bool calcPerspective) //
 	}
 
 	return touch;
+}
+
+void Pi3Cscene::touchRect(Pi3Crecti touchRect)
+{
+	for (auto& model : models) {
+		if (model.touchRect(resource, &modelMatrix3D, touchRect)) model.selected = true; else model.selected = false;
+	}
 }
 
 Pi3Cmodel * Pi3Cscene::getSubModel(const int32_t * groupRefs, const int32_t maxlevel)

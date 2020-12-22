@@ -44,7 +44,7 @@ namespace Pi3Cshapes {
 	enum { FACE_FRONT, FACE_BACK, FACE_RIGHT, FACE_LEFT, FACE_TOP, FACE_BOTTOM };
 
 	Pi3Cmesh rect(const vec2f &pos, const vec2f &size, const vec2f &uvpos = vec2f(0.f, 0.f), const vec2f &uvsize = vec2f(1.f,1.f));
-	Pi3Cmesh rectLine(const vec2f &pos, const vec2f &size, const float thickness = 0, const vec2f &uvpos = vec2f(0.f, 0.f), const vec2f &uvsize = vec2f(1.f, 1.f));
+	Pi3Cmesh rectLine(const vec2f &pos, const vec2f &size, const float thickness = 0, const vec2f &uvpos = vec2f(), const vec2f &uvsize = vec2f(1.f, 1.f));
 	Pi3Cmesh polyline(const std::vector<vec3f>& lines, const vec2f& uvpos, const vec2f& uvsize);
 	Pi3Cmesh quad(const vec3f &p1, const vec3f &p2, const vec3f &p3, const vec3f &p4, const vec2f &uvpos = vec2f(0.f, 0.f), const vec2f &uvsize = vec2f(1.f, 1.f));
 	Pi3Cmesh plane(const vec3f &pos, const vec2f &size, const uint32_t xdivs, const uint32_t ydivs, int direction, const vec2f &uvsize = vec2f(1.f, 1.f));
@@ -71,6 +71,7 @@ namespace Pi3Cshapes {
 	//void storeVNTC(std::vector<float>& verts, uint32_t& vc, const vec3f& pos, const vec3f& norm, const vec2f& texcoords, const uint32_t col);
 	void addPoint(vertsPtr& vp, const vec3f& pos);
 	void texMap(std::vector<float> &verts, uint32_t vc, uint32_t stride, uint32_t uvoffset, uint8_t x, uint8_t y);
+	void rectLine_verts(std::vector<float>& verts, uint32_t& vc, const vec2f& pos, const vec2f& size, const vec2f& uvpos, const vec2f& uvsize, const uint32_t col);
 	void polyline_verts(std::vector<float>& verts, uint32_t& vc, const std::vector<vec3f>& lines, const vec2f& uvpos, const vec2f& uvsize, const uint32_t col);
 	void cube_verts(std::vector<float>& verts, uint32_t& vc, const vec3f& pos, const vec3f& size, const int divx, const int divy, const int divz, const uint32_t col);
 	void sphere_verts(std::vector<float>& verts, uint32_t& vc, const vec3f& pos, const float radius, const float hemi = 0.0f, const int slices = Pi3C_SIDES / 2, const int sides = Pi3C_SIDES, const bool invert = false);

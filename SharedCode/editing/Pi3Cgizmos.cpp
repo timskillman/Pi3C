@@ -91,6 +91,12 @@ namespace Pi3Cgizmos {
 		float col = (float)(colint & 255) / 256.f + (float)((colint >> 8) & 255) + (float)((colint >> 16) & 255) * 256.f;
 		storeVC(verts, vc, vec3f(0, 0, 0), col);
 		storeVC(verts, vc, vec3f(size, 0, 0), col);
+		storeVC(verts, vc, vec3f(size, 0, -1), col);
+		storeVC(verts, vc, vec3f(size, 0, 1), col);
+		storeVC(verts, vc, vec3f(size, 0, 1), col);
+		storeVC(verts, vc, vec3f(size+2, 0, 1), col);
+		storeVC(verts, vc, vec3f(size + 2, 0, 1), col);
+		storeVC(verts, vc, vec3f(size, 0, -1), col);
 		colint = 0xff00;
 		col = (float)(colint & 255) / 256.f + (float)((colint >> 8) & 255) + (float)((colint >> 16) & 255) * 256.f;
 		storeVC(verts, vc, vec3f(0, 0, 0), col);
@@ -106,11 +112,11 @@ namespace Pi3Cgizmos {
 		Pi3Cmesh mesh("moveGizmo");
 		mesh.stride = 9;
 
-		moveGixmo_verts(mesh.verts, mesh.vc, 1.f);
+		moveGixmo_verts(mesh.verts, mesh.vc, 3.f);
 
 		mesh.bbox.bboxFromVerts(mesh.verts, 0, mesh.vc, mesh.stride);
 		mesh.materialRef = 0;
-		mesh.mode = GL_LINE_STRIP;
+		mesh.mode = GL_LINES;
 		return mesh;
 	}
 

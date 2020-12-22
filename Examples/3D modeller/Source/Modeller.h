@@ -19,7 +19,7 @@ public:
 	~Modeller();
 
 	enum EditMode { ED_SELECT, ED_ROTATE, ED_MOVE, ED_SCALE, ED_CREATE, ED_CONTOUR, ED_ROTATESCENE, ED_DROPMAN };
-	enum CreateTool { CT_CUBOID, CT_SPHERE, CT_CYLINDER, CT_CONE, CT_TCONE, CT_TUBE, CT_TORUS, CT_WEDGE, CT_EXTRUDE, CT_LATHE, CT_TEXT, CT_LIBSHAPE, CT_LANDSCAPE, CT_LINE, CT_NONE };
+	enum CreateTool { CT_CUBOID, CT_SPHERE, CT_CYLINDER, CT_CONE, CT_TCONE, CT_TUBE, CT_TORUS, CT_WEDGE, CT_EXTRUDE, CT_LATHE, CT_TEXT, CT_LIBSHAPE, CT_LANDSCAPE, CT_LINE, CT_BLOCKS, CT_NONE };
 	enum SceneAction { SA_NONE, SA_PANNING, SA_ZOOMING, SA_ROTATING, SA_DRAGBAR };
 
 	void setupGUI(loadOptions &opts);
@@ -51,7 +51,7 @@ public:
 	viewInfo setupView(const viewInfo::ViewProject view);
 	bool isPerspective() { return views[currentView].projection == viewInfo::PERSPECTIVE;  }
 	bool initialised() { return (resource != nullptr); }
-	void createShape(const Pi3Cmesh& mesh, const vec3f& pos, int32_t groupId, const uint32_t colour = 0xffffffff);
+	void createShape(const Pi3Cmesh& mesh, const vec3f& pos, int32_t groupId, const uint32_t colour = 0xffffffff, std::string txfile="");
 	void createLandscape(const vec3f pos, const uint32_t colour);
 	void saveFile(const std::string& path, const std::string& filename, bool selected = false) { 
 		std::string err; Pi3CfileOBJ::save(path, filename, &scene, selected, nullptr, err); 
@@ -118,6 +118,10 @@ public:
 	bool keypress = false;
 	bool fullscreen = false;
 
+	bool selectRect = false;
+	Pi3Crecti selRect;
+	int32_t selRectRef;
+
 	Pi3Ctouch touch;
 
 	viewInfo views[6];
@@ -170,11 +174,13 @@ private:
 	void touchObject(Pi3Cmodel& selmodel);
 	void setDragBar(bool on, SDL_Cursor * newCursor);
 	void setSelectionBox();
+	void setSelectionRect();
 	void moveSelections(const vec3f& vec);
 	void setCurrentSelView(int32_t selview);
 	void handleKeyPresses();
 	void createShapes();
 	void creatingShape();
+	void createBlocks(const vec3f pos);
 	void ClickLeftMouseButton(viewInfo& view);
 	void ClickRightMouseButton(viewInfo& view);
 	void MouseButtonUp();
@@ -184,8 +190,14 @@ private:
 	void resetZoom();
 	void navikeys(SDL_Scancode key, SDL_Scancode keyA, SDL_Scancode KeyB);
 	void addLinePoint(const vec3f point);
+	void delLinePoint();
+	void updateLineIndexes();
 	void finishLine();
 	void transformLines(std::vector<vec3f>& lines, std::vector<vec2f>& contour, Pi3Cmatrix& matrix, int32_t start = 0);
 	float getShapeHeight(vec3f& pos, vec3f& v1, vec3f& v2);
 	void renderView(const viewInfo::SceneLayout projection, const Pi3Crecti& rect, int32_t mx, int32_t my);
+	void resetLineDrawing();
+
+	Pi3Cmodel* brush() { return &scene.models[brushref]; }
+	Pi3Cmodel* selRectangle() { return &scene.models[selRectRef]; }
 };

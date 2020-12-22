@@ -80,9 +80,10 @@ void Pi3Cmodel::refreshMesh(Pi3Cresource* resource)
 void Pi3Cmodel::create(Pi3Cresource *resource, Pi3Cmesh *mesh, int32_t groupId, uint32_t diffuseColour)
 {	
 	meshRef = resource->addMesh(mesh, groupId);
-	if (mesh->mode==GL_TRIANGLES) resource->addMeshOutlines(meshRef);
+	if (mesh->mode==GL_TRIANGLES && mesh->lineIndexes.size()==0) resource->addMeshOutlines(meshRef);
 	material = *resource->defaultMaterial();
 	material.SetColDiffuse(diffuseColour);
+	material.rendermode = mesh->mode;
 	bbox = resource->meshes[meshRef].bbox;
 	//Create a selection mesh ...
 	//Pi3Cmesh selMesh = Pi3Cgizmos::selectBoxGizmo(bbox.min, bbox.size(), 0xffffff);
@@ -473,7 +474,7 @@ void Pi3Cmodel::touch(const Pi3Cresource *resource, const Pi3Cmatrix *parent_mat
 		if (eyeDistance < lodFrom || eyeDistance >= lodToo) return;
 	}
 
-	//render the group (or chosen group model if choice set) ...
+	//touch the group (or chosen group model if choice set) ...
 	float dist = touch.prevDist;
 	if (choice >= 0 && choice < (int32_t)group.size()) {
 		group[choice].touch(resource, &tmat, touch, level + 1);
@@ -501,6 +502,42 @@ void Pi3Cmodel::touch(const Pi3Cresource *resource, const Pi3Cmatrix *parent_mat
 			touch.maxlevel = level-1;
 		}
 	}
+}
+
+bool Pi3Cmodel::touchRect(Pi3Cresource* resource, const Pi3Cmatrix* parent_matrix, const Pi3Crecti& rect)
+{
+	if (!touchable || !visible || deleted) return false;
+
+	Pi3Cmatrix tmat = (parent_matrix) ? matrix * *parent_matrix : matrix;
+
+	if (lodToo > 0) {
+		float eyeDistance = tmat.position().length();
+		if (eyeDistance < lodFrom || eyeDistance >= lodToo) return false;
+	}
+
+	if (meshRef >= 0) {
+		Pi3Cmesh& mesh = resource->meshes[meshRef];
+
+		std::vector<uint32_t> pointIndexes;
+		std::vector<uint32_t> edgeIndexes;
+		std::vector<uint32_t> faceIndexes;
+		Pi3Cbbox2d bbox;
+		bbox.update(vec2f((float)rect.x, (float)rect.y));
+		bbox.update(vec2f((float)(rect.x + rect.width), (float)(rect.y + rect.height)));
+		mesh.insideRect(bbox, pointIndexes, edgeIndexes, faceIndexes, false, tmat, *(resource->getMeshBuffer(meshRef)));
+		return pointIndexes.size() > 0;
+	}
+
+	if (choice >= 0 && choice < (int32_t)group.size()) {
+		if (group[choice].touchRect(resource, &tmat, rect)) return true;
+	}
+	else {
+		for (size_t i = 0; i < group.size(); i++) {
+			if (group[i].touchRect(resource, &tmat, rect)) return true;
+		}
+	}
+
+	return false;
 }
 
 Pi3Cmodel* Pi3Cmodel::find(const std::string &name)

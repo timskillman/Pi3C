@@ -68,8 +68,12 @@ namespace Pi3Cshapes {
 	{
 		if (lines.size() < 3) return;
 		vec3f n = lines[0].trinormal(lines[1], lines[2]);
-		for (int v=0; v<lines.size(); v++) {
-			storeVNTC(verts, vc, lines[v], n, uvpos, col);
+		vec3f cp = (lines[0] ^ lines[1]).unit() * 10.f;
+		
+		for (int v=1; v<lines.size(); v++) {
+			vec3f cp = (lines[v] ^ lines[(v+1)%lines.size()]).unit() * 10.f;
+			storeVNTC(verts, vc, lines[v]+cp, n, uvpos, col);
+
 		}
 	}
 
@@ -78,9 +82,9 @@ namespace Pi3Cshapes {
 		vec3f n(0, -1.f, 0);
 		vec3f pos3(pos.x, pos.y, DEPTH2D);
 		storeVNTC(verts, vc, pos3 + vec3f(0, 0, 0), n, uvpos, col);
-		storeVNTC(verts, vc, pos3 + vec3f(0, size.y, 0), n, vec2f(uvpos.x, uvpos.y + uvsize.y), col);
+		storeVNTC(verts, vc, pos3 + vec3f(size.x, 0, 0), n, vec2f(uvpos.x, uvpos.y + uvsize.y), col);
 		storeVNTC(verts, vc, pos3 + vec3f(size.x, size.y, 0), n, uvpos + uvsize, col);
-		storeVNTC(verts, vc, pos3 + vec3f(size.x, 0, 0), n, vec2f(uvpos.x + uvsize.x, uvpos.y), col);
+		storeVNTC(verts, vc, pos3 + vec3f(0, size.y, 0), n, vec2f(uvpos.x + uvsize.x, uvpos.y), col);
 		storeVNTC(verts, vc, pos3 + vec3f(0, 0, 0), n, uvpos, col);
 	}
 
@@ -340,9 +344,10 @@ namespace Pi3Cshapes {
 		Pi3Cmesh mesh("rectline");
 		if (thickness == 0) {
 			rectLine_verts(mesh.verts, mesh.vc, pos, size, uvpos, uvsize, 0xffffffff);
+			mesh.mode = GL_LINE_STRIP;
 		}
 		else {
-			rectThickLine_verts(mesh.verts, mesh.vc, pos, size, thickness, uvpos, uvsize, 0xffffffff, true); //GL_TRIANGLE_STRIP = false
+			rectThickLine_verts(mesh.verts, mesh.vc, pos, size, thickness, uvpos, uvsize, 0xffffffff, true);
 		}
 		mesh.materialRef = 0;
 		return mesh;
