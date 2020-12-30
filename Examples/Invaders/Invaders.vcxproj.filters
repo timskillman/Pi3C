@@ -156,6 +156,9 @@
     <ClCompile Include="..\..\SharedCode\helpers\Pi3CfastRead.cpp">
       <Filter>SharedCode\helpers</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\SharedCode\core\Pi3Cbbox2d.cpp">
+      <Filter>SharedCode\core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\SharedCode\core\Pi3Cbbox3d.h">
@@ -301,6 +304,9 @@
     </ClInclude>
     <ClInclude Include="..\..\SharedCode\helpers\Pi3CfastRead.h">
       <Filter>SharedCode\helpers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\SharedCode\core\Pi3Cbbox2d.h">
+      <Filter>SharedCode\core</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

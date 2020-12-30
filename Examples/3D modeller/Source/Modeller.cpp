@@ -271,15 +271,31 @@ void Modeller::navikeys(SDL_Scancode key, SDL_Scancode keyA, SDL_Scancode KeyB)
 
 void Modeller::createBlocks(const vec3f pos)
 {
-	Blocks block;
-	Pi3Cmesh blockmesh = block.createTestMap(128, 128, 256);
-	blockmesh.updateBounds();
-	blockmesh.materialRef = 0;
-	createShape(blockmesh, pos, modelGroupId, 0xffffffff, "assets/maps/SurvivalCraft512x512.png");
-	Pi3Cmodel& model = scene.models.back();
-	model.material.alpha = 0.999f;
-	//model.material = *resource->defaultMaterial();
-	//model.addTexture(resource, );
+	int mapSize = 8;
+	Blocks block(mapSize);
+	for (int zb = 0; zb < mapSize; zb++) {
+		for (int xb = 0; xb < mapSize; xb++) {
+			block.createMapChunk(xb, zb);
+		}
+	}
+
+	for (int zb = 0; zb < mapSize; zb++) {
+		for (int xb = 0; xb < mapSize; xb++) {
+			block.createTrees(xb, zb);
+		}
+	}
+
+	for (int zb = 1; zb < mapSize-1; zb++) {
+		for (int xb = 1; xb < mapSize-1; xb++) {
+			Pi3Cmesh blockmesh;
+			block.createMeshChunk(blockmesh, xb, zb);
+			blockmesh.updateBounds();
+			blockmesh.materialRef = 0;
+			createShape(blockmesh, pos, modelGroupId, 0xffffffff);
+			Pi3Cmodel& model = scene.models.back();
+			model.addTexture(resource, "assets/maps/SurvivalCraft256x256.png", false);
+		}
+	}
 }
 
 void Modeller::createLandscape(const vec3f pos, const uint32_t colour)

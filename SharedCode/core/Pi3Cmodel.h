@@ -97,7 +97,7 @@ public:
 	void loadModelAndCollider(Pi3Cresource *resource, std::string path, std::string model, int32_t groupId, std::string collider, std::function<void(float)> showProgressCB);
 	void touch(const Pi3Cresource *resource, const Pi3Cmatrix *parent_matrix, Pi3Ctouch &touch, const int32_t level);
 	bool touchRect(Pi3Cresource* resource, const Pi3Cmatrix* parent_matrix, const Pi3Crecti& rect);
-	int32_t addTexture(Pi3Cresource *resource, const std::string &txfile);
+	int32_t addTexture(Pi3Cresource *resource, const std::string &txfile, bool smooth = true);
 	int32_t addTexture(Pi3Cresource *resource, const std::shared_ptr<Pi3Ctexture> &texture);
 	int32_t addPicture(Pi3Cresource *resource, const std::shared_ptr<Pi3Ctexture> &texture);
 	void createRect2D(Pi3Cresource *resource, const vec2f &pos = vec2f(0, -1.f), const vec2f &size = vec2f(1.f, 1.f), const uint32_t colour = 0xffffffff);

@@ -102,7 +102,7 @@ int32_t Pi3Cresource::createDefaultTexture(int32_t &texRef)
 	std::shared_ptr<Pi3Ctexture> Texture;
 	Texture.reset(new Pi3Ctexture());
 	Texture->createColour(0xffffffff);
-	Texture->upload();
+	Texture->upload(true);
 
 	//keep texture - don't destroy it!
 	texRef = textures.size();
@@ -123,10 +123,10 @@ void Pi3Cresource::updateMesh(const uint32_t meshRef, uint32_t vertCount, const 
 	updateGPUverts(mesh.bufRef, mesh.vertOffset*mesh.stride, mesh.vc, vertBuffer[mesh.bufRef].verts);
 }
 
-int32_t Pi3Cresource::addTexture(const std::shared_ptr<Pi3Ctexture> &Texture, int32_t &texRef)
+int32_t Pi3Cresource::addTexture(const std::shared_ptr<Pi3Ctexture> &Texture, int32_t &texRef, bool smooth)
 {
 	if (Texture.get() != nullptr) {
-		Texture->upload();
+		Texture->upload(smooth);
 		texRef = textures.size();		//Texture reference in resource textures array
 		textures.push_back(Texture);	//keep texture - don't destroy it
 		return Texture->textureID;		//return GL texture ID
@@ -136,7 +136,7 @@ int32_t Pi3Cresource::addTexture(const std::shared_ptr<Pi3Ctexture> &Texture, in
 	return -1;
 }
 
-int32_t Pi3Cresource::loadTexture(const std::string &path, const std::string &texname, int32_t &texRef) {
+int32_t Pi3Cresource::loadTexture(const std::string &path, const std::string &texname, int32_t &texRef, bool smooth) {
 
 	for (size_t i = 0; i < materials.size(); i++) {
 		if (texname == materials[i].texName) {
@@ -158,7 +158,7 @@ int32_t Pi3Cresource::loadTexture(const std::string &path, const std::string &te
 		return -1;
 	}
 
-	return addTexture(Texture, texRef);
+	return addTexture(Texture, texRef, smooth);
 }
 
 void Pi3Cresource::addMeshOutlines(uint32_t meshref)

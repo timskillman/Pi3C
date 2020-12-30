@@ -27,7 +27,7 @@ void Pi3Cmesh::updateBounds(const vertsPtr* vp)
 
 void Pi3Cmesh::addPackedVert(const vec3f &position, const vec3f &normal, const vec2f &uv, const uint32_t col)
 {
-	if (vc + stride > verts.size()) verts.resize(vc + 1000);
+	if (vc + stride > verts.size()) verts.resize(vc + 10000);
 	verts[vc++] = position.x;
 	verts[vc++] = position.y;
 	verts[vc++] = position.z;

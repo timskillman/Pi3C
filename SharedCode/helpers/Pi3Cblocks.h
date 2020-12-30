@@ -2,24 +2,51 @@
 
 #include "Pi3Cvector.h"
 #include "Pi3Cmodel.h"
+#include "FastNoiseLite.h"
 
 class Blocks {
 public:
-	Blocks() {
-		createTexPackUV();
+	Blocks(int MapSize, int ChunkWidth = 16, int ChunkDepth = 16, int ChunkHeight = 256);
+
+	void createMapChunk(int x, int z);
+	void createTexPackUV();
+	void createMeshChunk(Pi3Cmesh& mesh, int chunkX, int chunkZ);
+	void createTrees(int x, int z);
+	void insertBlock(uint8_t val, uint32_t mp, int x, int y, int z);
+
+	uint32_t calcChunkPtr(int chunkX, int chunkZ) { 
+		return (chunkX % mapSize)* chunkSlice + (chunkZ % mapSize) * mapSize * chunkSize; 
 	}
 
-	Pi3Cmesh createTestMap(int w, int h, int d);
-	void createTexPackUV();
-	void createMapMeshChunk(std::vector<uint8_t>& map, uint32_t mapWidth, uint32_t mapHeight, uint32_t mapDepth, Pi3Cmesh& mesh, int32_t x, int32_t y, int32_t w, int32_t h);
-
 private:
-	void addQuadTopBottom(Pi3Cmesh& mesh, int x, int h, int y, uint8_t mapval, uint8_t faceVal, int tb);
-	void addQuadLeftRight(Pi3Cmesh& mesh, int x, int h, int y, uint8_t mapval, uint8_t faceVal, int lr);
-	void addQuadFrontBack(Pi3Cmesh& mesh, int x, int h, int y, uint8_t mapval, uint8_t faceVal, int fb);
+	void addQuadTopBottom(Pi3Cmesh& mesh, int x, int h, int y, uint8_t mapval, uint8_t faceVal, int tb, int light);
+	void addQuadLeftRight(Pi3Cmesh& mesh, int x, int h, int y, uint8_t mapval, uint8_t faceVal, int lr, int light);
+	void addQuadFrontBack(Pi3Cmesh& mesh, int x, int h, int y, uint8_t mapval, uint8_t faceVal, int fb, int light);
+	void addQuadLeft(Pi3Cmesh& mesh, int x, int y, int z, uint8_t mapVal, uint8_t faceVal, int light);
+	void addTree(uint32_t chunkPtr, int x, int z, int size);
+
+	uint32_t leftBlock(uint32_t ptr, int32_t x);
+	uint32_t rightBlock(uint32_t ptr, int32_t x);
+	uint32_t backBlock(uint32_t ptr, int32_t z);
+	uint32_t frontBlock(uint32_t ptr, int32_t z);
 
 	std::vector<std::vector<vec2f>> texPackUV; //uvs for pixel (cube) sides (top, left, right, front, back, bottom)
 
+	FastNoiseLite noise;
+
+	//Chunk data containing all data within view
+	std::vector<uint8_t> chunks;
+	int32_t mapSize = 8;
+	int32_t chunkMapSize;
+	int32_t chunkSize = 0;
+	int32_t chunkWidth = 16;
+	int32_t chunkDepth = 16;
+	int32_t chunkHeight = 256;
+	int32_t chunkSlice, chunkPitch, chunkPitchHeight;
+	int32_t chunkLeft, chunkRight, chunkBack, chunkFront;
+	int32_t chunkLeftBack, chunkRightBack, chunkLeftFront, chunkRightFront;
+
+	float textureDiv = 1.f / 16.f; //Assumes texture is 16x16 texture map
 };
 
 class ivec
@@ -403,7 +430,7 @@ static const blockInfo typToTex[256] = {
 	blockInfo(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)						//null = 255
 };
 
-namespace txr
+namespace blockType
 {
 	const uint16_t Air = 0;
 	const uint16_t Bedrock = 1;

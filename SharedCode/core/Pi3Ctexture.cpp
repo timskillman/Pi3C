@@ -6,11 +6,11 @@ Pi3Ctexture::Pi3Ctexture()
 	init();
 }
 
-Pi3Ctexture::Pi3Ctexture(const char* file, bool _upload)
+Pi3Ctexture::Pi3Ctexture(const char* file, bool _upload, bool smooth)
 {
 	init();
 	loadFromFile(file);
-	if (_upload) upload();
+	if (_upload) upload(smooth);
 }
 
 Pi3Ctexture::~Pi3Ctexture()
@@ -215,14 +215,14 @@ void Pi3Ctexture::saveAsPNG(const char* file)
 	}
 }
 
-void Pi3Ctexture::upload()
+void Pi3Ctexture::upload(bool smooth)
 {
 	if (!uploaded && pixels) {
 		glGenTextures(1, &textureID);
 		glBindTexture(GL_TEXTURE_2D, textureID);
 		glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, pixels);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, (smooth) ? GL_LINEAR : GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, (smooth) ? GL_LINEAR : GL_NEAREST);
 		uploaded = true;
 	}
 }

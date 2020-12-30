@@ -1,5 +1,6 @@
 #include "Pi3Cmodel.h"
 #include "Pi3CfileOBJ.h"
+#include "Pi3Cbbox2d.h"
 //#include "Pi3Cgizmos.h"
 
 //Pi3Cmodel::Pi3Cmodel(const modelParams mp)
@@ -200,10 +201,10 @@ void Pi3Cmodel::updateMesh(Pi3Cresource* resource, const Pi3Cmesh &umesh)
 	//updateSelBox(resource);
 }
 
-int32_t Pi3Cmodel::addTexture(Pi3Cresource *resource, const std::string &txfile)
+int32_t Pi3Cmodel::addTexture(Pi3Cresource *resource, const std::string &txfile, bool smooth)
 {
 	if (txfile == "") return -1;
-	material.texID = resource->loadTexture("", txfile, material.texRef);
+	material.texID = resource->loadTexture("", txfile, material.texRef, smooth);
 	if (material.texID >= 0) {
 		material.texName = txfile;
 		resource->materials.push_back(material);

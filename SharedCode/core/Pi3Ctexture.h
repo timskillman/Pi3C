@@ -37,7 +37,7 @@ class Pi3Ctexture
 {
 public:
 	Pi3Ctexture();
-	Pi3Ctexture(const char* file, bool upload = true);
+	Pi3Ctexture(const char* file, bool upload = true, bool smooth = true);
 	Pi3Ctexture(const uint32_t width, const uint32_t height, const uint32_t bytesPerPixel) { create(width, height, bytesPerPixel); }
 	Pi3Ctexture(const uint32_t width, const uint32_t height, std::vector<uint8_t>& img, const uint32_t bytesPerPixel) { fromImage(width, height, img, bytesPerPixel); }
 	~Pi3Ctexture();
@@ -47,7 +47,7 @@ public:
 	void fromSurface(SDL_Surface* Surface);
 	//void fromSurfaceXY(SDL_Surface* Surface, const int x, const int y);
 	void fromTextSurface(SDL_Surface* Surface);
-	void upload();
+	void upload(bool smooth = true);
 	void update();
 	void Delete();
 	void changeTexels(uint8_t * pTexels, const GLint x = 0, const GLint y = 0, GLint w = 0, GLint h = 0);
