@@ -27,7 +27,7 @@ private:
 	void addQuadLeftRight(Pi3Cmesh& mesh, int x, int h, int y, uint8_t mapval, uint8_t faceVal, int lr, int light);
 	void addQuadFrontBack(Pi3Cmesh& mesh, int x, int h, int y, uint8_t mapval, uint8_t faceVal, int fb, int light);
 	void addQuadLeft(Pi3Cmesh& mesh, int x, int y, int z, uint8_t mapVal, uint8_t faceVal, int light);
-	void addTree(uint32_t chunkPtr, int x, int z, int size);
+	void addTree(uint32_t chunkPtr, int x, int z, int size, uint16_t bark, uint16_t leaves);
 	void insertSphere(int blockType, uint32_t chunkPtr, const vec3f& pos, const vec3f& size, bool hemi, bool hollow, bool noDelete);
 
 	void fillCircBit(int blockType, uint32_t chunkPtr, int xc, int yc, int zc, int x, int y, int z);

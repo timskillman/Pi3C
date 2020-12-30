@@ -377,13 +377,20 @@ void Blocks::createTrees(int chunkX, int chunkZ)
 
 	for (int z = 0; z < chunkDepth; z++) {
 		for (int x = 0; x < chunkWidth; x++) {
-			if (rand() % 30 == 0)
-				addTree(chunkPtr, x, z, 5 + (rand() % 20));
+			if (rand() % 30 == 0) {
+				uint16_t bark = blockType::OakWood;
+				uint16_t leaves = blockType::OakLeaves;
+				if (rand() % 10 > 7) {
+					bark = blockType::BirchWood;
+					leaves = blockType::BirchLeaves;
+				}
+				addTree(chunkPtr, x, z, 5 + (rand() % 20), bark, leaves);
+			}
 		}
 	}
 }
 
-void Blocks::addTree(uint32_t chunkPtr, int x, int z, int size)
+void Blocks::addTree(uint32_t chunkPtr, int x, int z, int size, uint16_t bark, uint16_t leaf)
 {
 	uint32_t basePtr = chunkPtr + (x + z * chunkPitch) * chunkHeight;
 	uint32_t ptr = basePtr + chunkHeight - 1;
@@ -392,7 +399,8 @@ void Blocks::addTree(uint32_t chunkPtr, int x, int z, int size)
 		return; //exit if coords outside or no air found
 
 	//Find solid ground ...
-	while (ptr > basePtr && (chunks[ptr] == blockType::Air || chunks[ptr] == blockType::OakLeaves || chunks[ptr] == blockType::OakWood)) ptr--; //find ground
+	while (ptr > basePtr && (chunks[ptr] == blockType::Air || chunks[ptr] == blockType::OakLeaves || chunks[ptr] == blockType::BirchLeaves)) ptr--; //find ground
+	if (chunks[ptr] == blockType::OakWood || chunks[ptr] == blockType::BirchWood) return;
 
 	int xtr = x;
 	int ytr = ptr - basePtr;
@@ -405,9 +413,9 @@ void Blocks::addTree(uint32_t chunkPtr, int x, int z, int size)
 
 	if (bh < 3) return;
 
-	bresSphere(blockType::OakLeaves, chunkPtr, xtr, ytr + bh*0.7f, ztr, size / 4);
+	bresSphere(leaf, chunkPtr, xtr, ytr + bh*0.7f, ztr, size / 4);
 
 	for (int t = ptr; t < (ptr + (int)bh); t++) 
-		chunks[t] = blockType::OakWood;
+		chunks[t] = bark;
 
 }

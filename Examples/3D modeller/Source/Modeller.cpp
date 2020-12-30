@@ -271,7 +271,7 @@ void Modeller::navikeys(SDL_Scancode key, SDL_Scancode keyA, SDL_Scancode KeyB)
 
 void Modeller::createBlocks(const vec3f pos)
 {
-	int mapSize = 22;
+	int mapSize = 10;
 	Blocks block(mapSize);
 	for (int zb = 0; zb < mapSize; zb++) {
 		for (int xb = 0; xb < mapSize; xb++) {
