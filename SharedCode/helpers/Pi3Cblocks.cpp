@@ -124,25 +124,12 @@ void Blocks::createMapChunk(int chunkX, int chunkZ)
 	}
 }
 
-void Blocks::insertBlock(uint8_t val, uint32_t mp, int x, int y, int z)
+void Blocks::insertBlock(uint8_t blockType, uint32_t chunkPtr, int x, int y, int z)
 {
-	if (x < 0 || z < 0 || x >= chunkWidth || z >= chunkDepth) return;
-	uint32_t ptr = mp + x * chunkHeight + z * chunkSlice + y;
-	chunks[ptr] = val;
-}
-
-void Blocks::createTrees(int chunkX, int chunkZ)
-{
-	uint32_t chunkPtr = calcChunkPtr(chunkX, chunkZ);
-
-	for (int z = 0; z < chunkDepth; z++) {
-		for (int x = 0; x < chunkWidth; x++) {
-			int mp = chunkPtr + x * chunkHeight + z * chunkSlice;
-			srand(mp);
-			if (rand() % 50 == 0)
-				addTree(chunkPtr, x, z, 5 + rand() % 15);
-		}
-	}
+	//if (x < 0 || z < 0 || x >= chunkWidth || z >= chunkDepth) return;
+	uint32_t ptr = calcVoxelPtr(chunkPtr, x, z) + y;
+	if (ptr<0 || ptr>chunkMapSize) return;
+	if (chunks[ptr]==blockType::Air) chunks[ptr] = blockType;
 }
 
 void Blocks::createMeshChunk(Pi3Cmesh& mesh, int chunkX, int chunkZ)
@@ -323,22 +310,92 @@ void Blocks::addQuadFrontBack(Pi3Cmesh &mesh, int x, int h, int z, uint8_t mapVa
 	mesh.addPackedVert(vec3f((float)(x + (1 - fb)), (float)(h - 1), zz), norm, tex + vec2f(textureDiv, textureDiv), col);
 }
 
+void Blocks::fillCircBit(int blockType, uint32_t chunkPtr, int xc, int yc, int zc, int x, int y, int z)
+{
+	int rd = 80;
 
+	for (int xx = xc - x; xx <= xc + x; xx++) {
+		if (rand() % 100 > rd) insertBlock(blockType, chunkPtr, xx, yc + y, zc);
+		if (rand() % 100 > rd) insertBlock(blockType, chunkPtr, xx, yc - y, zc);
+	}
+
+	for (int xx = xc - y; xx <= xc + y; xx++) {
+		if (rand() % 100 > rd) insertBlock(blockType, chunkPtr, xx, yc + x, zc);
+		if (rand() % 100 > rd) insertBlock(blockType, chunkPtr, xx, yc - x, zc);
+	}
+
+} 
+
+void Blocks::bresSphere(int blockType, uint32_t chunkPtr, int xc, int yc, int zc, int radius)
+{
+	int x = 0, z = radius, y = 0;
+	int d = 3 - 2 * radius;
+	fillCirc(blockType, chunkPtr, xc, yc, zc + z, x);
+	fillCirc(blockType, chunkPtr, xc, yc, zc - z, x);
+	fillCirc(blockType, chunkPtr, xc, yc, zc + x, z);
+	fillCirc(blockType, chunkPtr, xc, yc, zc - x, z);
+	while (z >= x)
+	{
+		x++;
+		if (d > 0)
+		{
+			z--;
+			d = d + 4 * (x - z) + 10;
+		}
+		else
+			d = d + 4 * x + 6;
+		fillCirc(blockType, chunkPtr, xc, yc, zc + z, x);
+		fillCirc(blockType, chunkPtr, xc, yc, zc - z, x);
+		fillCirc(blockType, chunkPtr, xc, yc, zc + x, z);
+		fillCirc(blockType, chunkPtr, xc, yc, zc - x, z);
+	}
+}
+
+void Blocks::fillCirc(int blockType, uint32_t chunkPtr, int xc, int yc, int zc, int radius)
+{
+	int x = 0, y = radius, z = 0;
+	int d = 3 - 2 * radius;
+	fillCircBit(blockType, chunkPtr, xc, yc, zc, x, y, z);
+	while (y >= x)
+	{
+		x++;
+		if (d > 0)
+		{
+			y--;
+			d = d + 4 * (x - y) + 10;
+		}
+		else
+			d = d + 4 * x + 6;
+		fillCircBit(blockType, chunkPtr, xc, yc, zc, x, y, z);
+	}
+}
+
+void Blocks::createTrees(int chunkX, int chunkZ)
+{
+	uint32_t chunkPtr = calcChunkPtr(chunkX, chunkZ);
+	srand(chunkX + chunkZ * 10000); //set random seed for this chunk based on chunk position
+
+	for (int z = 0; z < chunkDepth; z++) {
+		for (int x = 0; x < chunkWidth; x++) {
+			if (rand() % 30 == 0)
+				addTree(chunkPtr, x, z, 5 + (rand() % 20));
+		}
+	}
+}
 
 void Blocks::addTree(uint32_t chunkPtr, int x, int z, int size)
 {
-	uint32_t ptr = chunkPtr + x * chunkHeight + z * chunkSlice + chunkHeight - 1;
-	uint32_t endPtr = ptr - chunkHeight;
+	uint32_t basePtr = chunkPtr + (x + z * chunkPitch) * chunkHeight;
+	uint32_t ptr = basePtr + chunkHeight - 1;
 
 	if (ptr<0 || ptr>=chunkMapSize || chunks[ptr] != blockType::Air) 
 		return; //exit if coords outside or no air found
 
-	if (size > (ptr - endPtr)) size = ptr - endPtr; //tree can't go above sky limit
-
-	while (ptr > endPtr && (chunks[ptr] == blockType::Air || chunks[ptr] == blockType::OakLeaves || chunks[ptr] == blockType::OakWood)) ptr--; //find ground
+	//Find solid ground ...
+	while (ptr > basePtr && (chunks[ptr] == blockType::Air || chunks[ptr] == blockType::OakLeaves || chunks[ptr] == blockType::OakWood)) ptr--; //find ground
 
 	int xtr = x;
-	int ytr = ptr - endPtr;
+	int ytr = ptr - basePtr;
 	int ztr = z;
 	int branches = 1;
 	int leaves = 30;
@@ -348,47 +405,9 @@ void Blocks::addTree(uint32_t chunkPtr, int x, int z, int size)
 
 	if (bh < 3) return;
 
+	bresSphere(blockType::OakLeaves, chunkPtr, xtr, ytr + bh*0.7f, ztr, size / 4);
+
 	for (int t = ptr; t < (ptr + (int)bh); t++) 
 		chunks[t] = blockType::OakWood;
-
-	return;
-
-
-	for (int yl = 2; yl < (int)bh; yl++) {
-		for (int zl = 0; zl < 5; zl++) {
-			for (int xl = 0; xl < 5; xl++) {
-				if (!(zl == 2 && xl == 2) && rand() % 3 == 0) {
-					insertBlock(blockType::OakLeaves, chunkPtr, x + xl - 2, ytr + yl, z + zl - 2);
-				}
-			}
-		}
-	}
-
-	//for (int j = 0; j < leaves; j++) {
-	//	int xx = x + rand() % 5 - 2;
-	//	int yy = ytr + 2 + (rand() % ((int)bh - 2));
-	//	int zz = z + rand() % 5 - 2;
-	//	insertBlock(blockType::OakLeaves, map, w, h, d, xx, yy, zz);
-	//}
-
-	//for (int j = 0; j < branches; j++) {
-	//	float yr = (size * 0.3) + jh * j;
-	//	float hr = 2.0f + (size - yr) * 0.5f;
-	//	float r = (rand() % 628) / 100.0f;
-	//	float xr = cos(r) * hr * 0.7; // rand() % (int)hr) - hr / 2;
-	//	float zr = sin(r) * hr * 0.7; //(rand() % (int)hr) - hr / 2;
-
-	//	for (int k = 0; k < leaves; k++) {
-	//		float r = 3 + (rand() % (int)size / 2);
-	//		float a = (rand() % 628) / 100;
-	//		float b = (rand() % 628) / 100;
-	//		float x = cos(a) * r;
-	//		float y = sin(a) * r;
-
-	//		insertBlock(blockType::OakLeaves, map, w, h, d, xtr + xr * 0.9 + cos(b) * x, ytr + yr + y, ztr + zr + sin(b) * x);
-	//	}
-	//}
-
-	for (int t = ptr; t < (ptr + (int)bh); t++) chunks[t] = blockType::OakWood;
 
 }
