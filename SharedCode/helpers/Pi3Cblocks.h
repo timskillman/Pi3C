@@ -6,38 +6,42 @@
 
 class Blocks {
 public:
+	Blocks() {}
 	Blocks(int MapSize, int ChunkWidth = 16, int ChunkDepth = 16, int ChunkHeight = 256);
 
+	void createBlocks(int MapSize, int ChunkWidth = 16, int ChunkDepth = 16, int ChunkHeight = 256);
 	void createMapChunk(int x, int z);
 	void createTexPackUV();
 	void createMeshChunk(Pi3Cmesh& mesh, int chunkX, int chunkZ);
-	void createTrees(int x, int z);
+	void createTrees(int x, int z, int dispersion);
 	void insertBlock(uint8_t blockType, uint32_t chunkPtr, int x, int y, int z);
 
 	uint32_t calcChunkPtr(int chunkX, int chunkZ) { 
-		return (chunkX % mapSize)* chunkSlice + (chunkZ % mapSize) * mapSize * chunkSize; 
+		return ((chunkX + mapSize) % mapSize) * chunkSlice + ((chunkZ + mapSize) % mapSize) * mapSize * chunkSize;
 	}
 
 	uint32_t calcVoxelPtr(const uint32_t chunkPtr, const int x, const int z) {
 		return chunkPtr + (x + z * chunkPitch) * chunkHeight;
 	}
 
+	uint32_t calcRelativePositionPtr(const vec3f& chunkCorner, const vec3f& position);
+	int getGroundHeight(const vec3f& chunkCorner, const vec3f& position);
+	int getHeightAtPoint(const vec3f& chunkCorner, const vec3f& position);
+
 private:
-	void addQuadTopBottom(Pi3Cmesh& mesh, int x, int h, int y, uint8_t mapval, uint8_t faceVal, int tb, int light);
-	void addQuadLeftRight(Pi3Cmesh& mesh, int x, int h, int y, uint8_t mapval, uint8_t faceVal, int lr, int light);
-	void addQuadFrontBack(Pi3Cmesh& mesh, int x, int h, int y, uint8_t mapval, uint8_t faceVal, int fb, int light);
-	void addQuadLeft(Pi3Cmesh& mesh, int x, int y, int z, uint8_t mapVal, uint8_t faceVal, int light);
-	void addTree(uint32_t chunkPtr, int x, int z, int size, uint16_t bark, uint16_t leaves);
-	void insertSphere(int blockType, uint32_t chunkPtr, const vec3f& pos, const vec3f& size, bool hemi, bool hollow, bool noDelete);
+	void addQuadTopBottom(Pi3Cmesh& mesh, int x, int h, int y, uint8_t mapval, uint8_t faceVal, int tb, int light, int shadowEdge);
+	void addQuadLeftRight(Pi3Cmesh& mesh, int x, int h, int y, uint8_t mapval, uint8_t faceVal, int lr, int light, int shadowEdge);
+	void addQuadFrontBack(Pi3Cmesh& mesh, int x, int h, int y, uint8_t mapval, uint8_t faceVal, int fb, int light, int shadowEdge);
+	void addXshape(Pi3Cmesh& mesh, int x, int y, int z, uint8_t mapVal, int light, int shadowEdge);
+	void addTree(uint32_t chunkPtr, int x, int z, int size, int bark, int leaves);
 
-	void fillCircBit(int blockType, uint32_t chunkPtr, int xc, int yc, int zc, int x, int y, int z);
-	void bresSphere(int blockType, uint32_t chunkPtr, int xc, int yc, int zc, int radius);
+	void fillCircXY(int blockType, uint32_t chunkPtr, int xc, int yc, int zc, int x, int y, int z);
+	void fillCircXZ(int blockType, uint32_t chunkPtr, int xc, int yc, int zc, int x, int y, int z);
 	void fillCirc(int blockType, uint32_t chunkPtr, int xc, int yc, int zc, int radius);
+	void fillDisk(int blockType, uint32_t chunkPtr, int xc, int yc, int zc, int radius);
 
-	uint32_t leftBlock(uint32_t ptr, int32_t x);
-	uint32_t rightBlock(uint32_t ptr, int32_t x);
-	uint32_t backBlock(uint32_t ptr, int32_t z);
-	uint32_t frontBlock(uint32_t ptr, int32_t z);
+	void bresSphere(int blockType, uint32_t chunkPtr, int xc, int yc, int zc, int radius);
+	void bresCone(int blockType, uint32_t chunkPtr, int xc, int yc, int zc, int radius, int height);
 
 	std::vector<std::vector<vec2f>> texPackUV; //uvs for pixel (cube) sides (top, left, right, front, back, bottom)
 
@@ -79,40 +83,6 @@ public:
 	xblock(float _x, float _y, float _z, uint32_t  _b, bool _doorTop) { x = _x; y = _y; z = _z; b = _b; doorTop = _doorTop; }
 };
 
-
-static const vec2f uiconRefs[30] = {
-	vec2f(0, 0), 			//Add block
-	vec2f(1, 0),			//Add line
-	vec2f(2, 0),			//Stack grid
-	vec2f(3, 0),			//Grid to top
-	vec2f(4, 0),			//Back
-	vec2f(5, 0),			//Block
-	vec2f(6, 0),			//Fill
-	vec2f(7, 0),			//Flip
-	vec2f(0, 1),			//Fly
-	vec2f(1, 1),			//walk
-	vec2f(2, 1),			//grid
-	vec2f(3, 1),			//Move down
-	vec2f(4, 1),			//Move up
-	vec2f(5, 1),			//Paint
-	vec2f(6, 1),			//Rotate90
-	vec2f(7, 1),			//Schematics
-	vec2f(0, 2),			//Inventory
-	vec2f(0, 2),			//...
-	vec2f(0, 5),			//Move button off
-	vec2f(2, 5),			//Look button off
-	vec2f(4, 5),			//Move button on
-	vec2f(6, 5),			//Look button on
-	vec2f(0, 7),			//Right button off
-	vec2f(1, 7),			//Left button off
-	vec2f(2, 7),			//Down button off
-	vec2f(3, 7),			//Up button off
-	vec2f(4, 7),			//Right button on
-	vec2f(5, 7),			//Left button on
-	vec2f(6, 7),			//Down button on
-	vec2f(7, 7)				//Up button on
-};
-
 namespace uic {
 	const uint16_t addBlock = 0;
 	const uint16_t addLine = 1;
@@ -146,7 +116,7 @@ namespace uic {
 	const uint16_t upButtonOn = 29;
 }
 
-enum blockTypes { air, solid, slabs, stairs, leaves };
+enum blockTypes { air, solid, seethrough, water, xshape, stick, table, unknown, steps, slab, door, ladder, thinslab, verythin  };
 
 static const uint32_t  paintCols[16] = {
 	0xffffff, 0xaaffff, 0xffaaff, 0xaaaaff, 0xffffaa, 0xaaffaa, 0xffaaaa, 0xaaaaaa,
@@ -170,46 +140,46 @@ public:
 	uint8_t  backy;
 	uint32_t  colSides;
 	uint32_t  col;		//Colour (RRGGBB)
-	uint8_t  g;			//Geometry ref
+	uint8_t  geomType;	//Geometry ref
 	uint8_t  h;			//hard material (i.e. stackable)
 
 	blockInfo(uint8_t  _topx, uint8_t  _topy, uint8_t  _sidesx, uint8_t  _sidesy, uint8_t  _frontx, uint8_t  _fronty, uint8_t  _backx, uint8_t  _backy, uint32_t  _colSides, uint32_t  _col, uint8_t  _g, uint8_t  _h)
 	{
-		topx = _topx; topy = _topy; sidesx = _sidesx; sidesy = _sidesy; frontx = _frontx; fronty = _fronty; backx = _backx; backy = _backy; colSides = _colSides;  col = _col;  g = _g;  h = _h;
+		topx = _topx; topy = _topy; sidesx = _sidesx; sidesy = _sidesy; frontx = _frontx; fronty = _fronty; backx = _backx; backy = _backy; colSides = _colSides;  col = _col;  geomType = _g;  h = _h;
 	}
 };
 
 static const blockInfo typToTex[256] = {
 	//TOP TEXTURES (x,y,block_flag)...
-	blockInfo(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),						//Air = 0;
-	blockInfo(1, 1, 1, 1, 1, 1, 1, 1, 0xffffff, 0xffffff, 1, 1),		//Bedrock = 1;
-	blockInfo(2, 0, 2, 0, 2, 0, 2, 0, 0xffffff, 0xffffff, 1, 1),		//Dirt = 2;
-	blockInfo(1, 0, 1, 0, 1, 0, 1, 0, 0xffffff, 0xffffff, 1, 1),		//Granite = 3;
-	blockInfo(0, 11, 0, 11, 0, 11, 0, 11, 0xffffff, 0xffffff, 1, 1),	//Sandstone = 4
-	blockInfo(0, 1, 0, 1, 0, 1, 0, 1, 0xffffff, 0xffffff, 1, 1),		//Cobblestone = 5
-	blockInfo(3, 1, 3, 1, 3, 1, 3, 1, 0xffffff, 0xffffff, 1, 1),		//Gravel = 6
-	blockInfo(2, 1, 2, 1, 2, 1, 2, 1, 0xffffff, 0xffffff, 1, 1),		//Sand = 7
-	blockInfo(0, 0, 3, 0, 3, 0, 3, 0, 0xffffff, 0x4DCC4D, 1, 1),		//Grass block = 8
-	blockInfo(5, 1, 4, 1, 4, 1, 4, 1, 0xffffff, 0xffffff, 1, 1),		//Oak Wood = 9
-	blockInfo(5, 1, 5, 7, 5, 7, 5, 7, 0xffffff, 0xffffff, 1, 1),		//Birch Wood = 10
-	blockInfo(5, 1, 4, 7, 4, 7, 4, 7, 0xffffff, 0xffffff, 1, 1),		//Spruce Wood = 11
-	blockInfo(4, 3, 4, 3, 4, 3, 4, 3, 0x80ff99, 0x80ff99, 2, 0),		//Oak Leaves = 12
-	blockInfo(4, 3, 4, 3, 4, 3, 4, 3, 0x80ff80, 0x80ff80, 2, 0),		//Birch Leaves = 13
-	blockInfo(4, 8, 4, 8, 4, 8, 4, 8, 0x80CC80, 0x80CC80, 2, 0),		//Spruce Leaves = 14
-	blockInfo(3, 4, 3, 4, 3, 4, 3, 4, 0xffffff, 0xffffff, 2, 1),		//Glass = 15
-	blockInfo(2, 2, 2, 2, 2, 2, 2, 2, 0xffffff, 0xffffff, 1, 1),		//Coal Ore = 16
-	blockInfo(4, 0, 4, 13, 4, 13, 4, 13, 0xffffff, 0xffffff, 2, 1),		//Wicker Lamp = 17
-	blockInfo(13, 11, 13, 11, 13, 11, 13, 11, 0xE06666, 0xE06666, 3, 2), //Water = 18
-	blockInfo(5, 5, 5, 5, 5, 5, 5, 5, 0xffffff, 0x4DCC4D, 4, 0),		//Tall Grass = 19			X
-	blockInfo(12, 0, 12, 0, 12, 0, 12, 0, 0xffffff, 0xffffff, 4, 0),	//Red Flower = 20			X
-	blockInfo(4, 0, 4, 0, 4, 0, 4, 0, 0xffffff, 0xffffff, 1, 1),		//Planks = 21
-	blockInfo(14, 3, 14, 3, 14, 3, 14, 3, 0xffffff, 0xffffff, 1, 1),	//Coal Chunk = 22
-	blockInfo(3, 13, 3, 13, 3, 13, 3, 13, 0xffffff, 0xffffff, 5, 0),	//Stick = 23				thin box
-	blockInfo(13, 0, 13, 0, 13, 0, 13, 0, 0xffffff, 0xffffff, 4, 0),	//Purple Flower = 24		X
-	blockInfo(14, 0, 14, 0, 14, 0, 14, 0, 0xffffff, 0xffffff, 4, 0),	//White Flower = 25			X
-	blockInfo(6, 3, 6, 3, 6, 3, 6, 3, 0xffffff, 0xffffff, 1, 1),		//Stone Bricks = 26
-	blockInfo(11, 2, 15, 2, 15, 2, 15, 2, 0xffffff, 0xffffff, 6, 1),	//Crafting Table = 27		table
-	blockInfo(7, 3, 7, 3, 7, 3, 7, 3, 0xffffff, 0xffffff, 4, 0),		//Dry Bush = 28				X
+	blockInfo(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, blockTypes::air, 0),						//Air = 0;
+	blockInfo(1, 1, 1, 1, 1, 1, 1, 1, 0xffffff, 0xffffff, blockTypes::solid, 1),		//Bedrock = 1;
+	blockInfo(2, 0, 2, 0, 2, 0, 2, 0, 0xffffff, 0xffffff, blockTypes::solid, 1),		//Dirt = 2;
+	blockInfo(1, 0, 1, 0, 1, 0, 1, 0, 0xffffff, 0xffffff, blockTypes::solid, 1),		//Granite = 3;
+	blockInfo(0, 11, 0, 11, 0, 11, 0, 11, 0xffffff, 0xffffff, blockTypes::solid, 1),	//Sandstone = 4
+	blockInfo(0, 1, 0, 1, 0, 1, 0, 1, 0xffffff, 0xffffff, blockTypes::solid, 1),		//Cobblestone = 5
+	blockInfo(3, 1, 3, 1, 3, 1, 3, 1, 0xffffff, 0xffffff, blockTypes::solid, 1),		//Gravel = 6
+	blockInfo(2, 1, 2, 1, 2, 1, 2, 1, 0xffffff, 0xffffff, blockTypes::solid, 1),		//Sand = 7
+	blockInfo(0, 0, 3, 0, 3, 0, 3, 0, 0xffffff, 0x4DCC4D, blockTypes::solid, 1),		//Grass block = 8
+	blockInfo(5, 1, 4, 1, 4, 1, 4, 1, 0xffffff, 0xffffff, blockTypes::solid, 1),		//Oak Wood = 9
+	blockInfo(5, 1, 5, 7, 5, 7, 5, 7, 0xffffff, 0xffffff, blockTypes::solid, 1),		//Birch Wood = 10
+	blockInfo(5, 1, 4, 7, 4, 7, 4, 7, 0xffffff, 0xffffff, blockTypes::solid, 1),		//Spruce Wood = 11
+	blockInfo(4, 3, 4, 3, 4, 3, 4, 3, 0x80ffaa, 0x80ffaa, blockTypes::seethrough, 0),		//Oak Leaves = 12
+	blockInfo(4, 3, 4, 3, 4, 3, 4, 3, 0x80ee80, 0x80ee80, blockTypes::seethrough, 0),		//Birch Leaves = 13
+	blockInfo(4, 8, 4, 8, 4, 8, 4, 8, 0x90CC80, 0x90CC80, blockTypes::seethrough, 0),		//Spruce Leaves = 14
+	blockInfo(3, 4, 3, 4, 3, 4, 3, 4, 0xffffff, 0xffffff, blockTypes::seethrough, 1),		//Glass = 15
+	blockInfo(2, 2, 2, 2, 2, 2, 2, 2, 0xffffff, 0xffffff, blockTypes::solid, 1),		//Coal Ore = 16
+	blockInfo(4, 0, 4, 13, 4, 13, 4, 13, 0xffffff, 0xffffff, blockTypes::seethrough, 1),		//Wicker Lamp = 17
+	blockInfo(13, 11, 13, 11, 13, 11, 13, 11, 0xE06666, 0xE06666, blockTypes::water, 2), //Water = 18
+	blockInfo(5, 5, 5, 5, 5, 5, 5, 5, 0x4DCC4D, 0x4DCC4D, blockTypes::xshape, 0),		//Tall Grass = 19			X
+	blockInfo(12, 0, 12, 0, 12, 0, 12, 0, 0xffffff, 0xffffff, blockTypes::xshape, 0),	//Red Flower = 20			X
+	blockInfo(4, 0, 4, 0, 4, 0, 4, 0, 0xffffff, 0xffffff, blockTypes::solid, 1),		//Planks = 21
+	blockInfo(14, 3, 14, 3, 14, 3, 14, 3, 0xffffff, 0xffffff, blockTypes::solid, 1),	//Coal Chunk = 22
+	blockInfo(3, 13, 3, 13, 3, 13, 3, 13, 0xffffff, 0xffffff, blockTypes::stick, 0),	//Stick = 23				thin box
+	blockInfo(13, 0, 13, 0, 13, 0, 13, 0, 0xffffff, 0xffffff, blockTypes::xshape, 0),	//Purple Flower = 24		X
+	blockInfo(14, 0, 14, 0, 14, 0, 14, 0, 0xffffff, 0xffffff, blockTypes::xshape, 0),	//White Flower = 25			X
+	blockInfo(6, 3, 6, 3, 6, 3, 6, 3, 0xffffff, 0xffffff, blockTypes::solid, 1),		//Stone Bricks = 26
+	blockInfo(11, 2, 15, 2, 15, 2, 15, 2, 0xffffff, 0xffffff, blockTypes::table, 1),	//Crafting Table = 27		table
+	blockInfo(7, 3, 7, 3, 7, 3, 7, 3, 0xffffff, 0xffffff, blockTypes::xshape, 0),		//Dry Bush = 28				X
 	blockInfo(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),						//Stone Axe = 29
 	blockInfo(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),						//Wooden Shovel = 30
 	blockInfo(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 0),						//Torch = 31				thin box (angled/rotated)
@@ -220,47 +190,47 @@ static const blockInfo typToTex[256] = {
 	blockInfo(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),						//Iron Shovel = 36
 	blockInfo(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),						//Iron Axe = 37
 	blockInfo(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),						//Iron Pickaxe = 38
-	blockInfo(1, 2, 1, 2, 1, 2, 1, 2, 0xffffff, 0xffffff, 1, 1),		//Iron Ore = 39
+	blockInfo(1, 2, 1, 2, 1, 2, 1, 2, 0xffffff, 0xffffff, blockTypes::solid, 1),		//Iron Ore = 39
 	blockInfo(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1),						//Iron Ingot = 40
-	blockInfo(0, 2, 0, 2, 0, 2, 0, 2, 0xffffff, 0xffffff, 1, 1),		//Copper Ore = 41
+	blockInfo(0, 2, 0, 2, 0, 2, 0, 2, 0xffffff, 0xffffff, blockTypes::solid, 1),		//Copper Ore = 41
 	blockInfo(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1),						//Copper Ingot = 42
-	blockInfo(3, 11, 3, 11, 3, 11, 3, 11, 0xffffff, 0xffffff, 1, 1),	//Malachite Chunk = 43
-	blockInfo(3, 5, 3, 5, 3, 5, 3, 5, 0xffffff, 0xffffff, 2, 1),		//Framed Glass = 44
-	blockInfo(10, 2, 9, 1, 11, 1, 10, 1, 0xffffff, 0xffffff, 1, 1),		//Chest = 45
-	blockInfo(15, 3, 15, 3, 15, 3, 15, 3, 0xffffff, 0xffffff, 1, 1),	//Solid Iron Block = 46
-	blockInfo(5, 11, 5, 11, 5, 11, 5, 11, 0xffffff, 0xffffff, 1, 1),	//Solid Copper Block = 47
-	blockInfo(0, 1, 0, 1, 0, 1, 0, 1, 0xffffff, 0xffffff, 8, 1),		//Cobblestone Stairs = 48		steps
-	blockInfo(4, 0, 4, 0, 4, 0, 4, 0, 0xffffff, 0xffffff, 8, 1),		//Wooden Stairs = 49			steps
-	blockInfo(6, 3, 6, 3, 6, 3, 6, 3, 0xffffff, 0xffffff, 8, 1),		//Stone Brick Stairs = 50		steps
-	blockInfo(0, 11, 0, 11, 0, 11, 0, 11, 0xffffff, 0xffffff, 8, 1),	//Sandstone Stairs = 51			steps
-	blockInfo(0, 11, 0, 11, 0, 11, 0, 11, 0xffffff, 0xffffff, 9, 1),	//Sandstone Slab = 52  (20)		half height box
-	blockInfo(0, 1, 0, 1, 0, 1, 0, 1, 0xffffff, 0xffffff, 9, 1),		//Cobblestone Slab = 53			half height box
-	blockInfo(6, 3, 6, 3, 6, 3, 6, 3, 0xffffff, 0xffffff, 9, 1),		//Stone Brick Slab = 54			half height box
-	blockInfo(4, 0, 4, 0, 4, 0, 4, 0, 0xffffff, 0xffffff, 9, 1),		//Wooden Slab = 55				half height box
-	blockInfo(4, 0, 4, 0, 1, 6, 1, 6, 0xffffff, 0xffffff, 10, 0),		//Wooden Door = 56				Rotated box
-	blockInfo(0, 0, 0, 0, 2, 6, 2, 6, 0xffffff, 0xffffff, 10, 0),		//Iron Door = 57				Rotated box
-	blockInfo(0, 0, 0, 0, 0, 6, 0, 6, 0xffffff, 0xffffff, 10, 0),		//Cell Door = 58				Rotated box
-	blockInfo(4, 0, 4, 0, 4, 0, 4, 0, 0xffffff, 0xffffff, 11, 3),		//Ladder = 59					3x boxes
-	blockInfo(3, 6, 3, 6, 3, 6, 3, 6, 0xffffff, 0xffffff, 2, 1),		//Window = 60
-	blockInfo(2, 4, 2, 4, 2, 4, 2, 4, 0xffffff, 0xffffff, 12, 0),		//Snow = 61						thin slab
-	blockInfo(1, 4, 1, 4, 1, 4, 1, 4, 0xffffff, 0xffffff, 12, 0),		//Ice = 62						thin slab
+	blockInfo(3, 11, 3, 11, 3, 11, 3, 11, 0xffffff, 0xffffff, blockTypes::solid, 1),	//Malachite Chunk = 43
+	blockInfo(3, 5, 3, 5, 3, 5, 3, 5, 0xffffff, 0xffffff, blockTypes::seethrough, 1),		//Framed Glass = 44
+	blockInfo(10, 2, 9, 1, 11, 1, 10, 1, 0xffffff, 0xffffff, blockTypes::solid, 1),		//Chest = 45
+	blockInfo(15, 3, 15, 3, 15, 3, 15, 3, 0xffffff, 0xffffff, blockTypes::solid, 1),	//Solid Iron Block = 46
+	blockInfo(5, 11, 5, 11, 5, 11, 5, 11, 0xffffff, 0xffffff, blockTypes::solid, 1),	//Solid Copper Block = 47
+	blockInfo(0, 1, 0, 1, 0, 1, 0, 1, 0xffffff, 0xffffff, blockTypes::steps, 1),		//Cobblestone Stairs = 48		steps
+	blockInfo(4, 0, 4, 0, 4, 0, 4, 0, 0xffffff, 0xffffff, blockTypes::steps, 1),		//Wooden Stairs = 49			steps
+	blockInfo(6, 3, 6, 3, 6, 3, 6, 3, 0xffffff, 0xffffff, blockTypes::steps, 1),		//Stone Brick Stairs = 50		steps
+	blockInfo(0, 11, 0, 11, 0, 11, 0, 11, 0xffffff, 0xffffff, blockTypes::steps, 1),	//Sandstone Stairs = 51			steps
+	blockInfo(0, 11, 0, 11, 0, 11, 0, 11, 0xffffff, 0xffffff, blockTypes::slab, 1),	//Sandstone Slab = 52  (20)		half height box
+	blockInfo(0, 1, 0, 1, 0, 1, 0, 1, 0xffffff, 0xffffff, blockTypes::slab, 1),		//Cobblestone Slab = 53			half height box
+	blockInfo(6, 3, 6, 3, 6, 3, 6, 3, 0xffffff, 0xffffff, blockTypes::slab, 1),		//Stone Brick Slab = 54			half height box
+	blockInfo(4, 0, 4, 0, 4, 0, 4, 0, 0xffffff, 0xffffff, blockTypes::slab, 1),		//Wooden Slab = 55				half height box
+	blockInfo(4, 0, 4, 0, 1, 6, 1, 6, 0xffffff, 0xffffff, blockTypes::door, 0),		//Wooden Door = 56				Rotated box
+	blockInfo(0, 0, 0, 0, 2, 6, 2, 6, 0xffffff, 0xffffff, blockTypes::door, 0),		//Iron Door = 57				Rotated box
+	blockInfo(0, 0, 0, 0, 0, 6, 0, 6, 0xffffff, 0xffffff, blockTypes::door, 0),		//Cell Door = 58				Rotated box
+	blockInfo(4, 0, 4, 0, 4, 0, 4, 0, 0xffffff, 0xffffff, blockTypes::ladder, 3),		//Ladder = 59					3x boxes
+	blockInfo(3, 6, 3, 6, 3, 6, 3, 6, 0xffffff, 0xffffff, blockTypes::seethrough, 1),		//Window = 60
+	blockInfo(2, 4, 2, 4, 2, 4, 2, 4, 0xffffff, 0xffffff, blockTypes::thinslab, 0),		//Snow = 61						thin slab
+	blockInfo(1, 4, 1, 4, 1, 4, 1, 4, 0xffffff, 0xffffff, blockTypes::thinslab, 0),		//Ice = 62						thin slab
 	blockInfo(0, 0, 0, 0, 0, 0, 0, 0, 0xffffff, 0xffffff, 14, 0),		//Christmas Tree = 63			Xmas tree
 	blockInfo(12, 2, 12, 2, 14, 2, 12, 2, 0xffffff, 0xffffff, 46, 1),	//Furnace = 64
 	blockInfo(12, 2, 12, 2, 14, 2, 12, 2, 0xffffff, 0xffffff, 46, 1),	//Furnace = 65
-	blockInfo(5, 0, 5, 0, 5, 0, 5, 0, 0xffffff, 0xffffff, 1, 1),		//Limestone = 66
-	blockInfo(6, 0, 6, 0, 6, 0, 6, 0, 0xffffff, 0xffffff, 1, 1),		//Basalt = 67
-	blockInfo(7, 0, 7, 0, 7, 0, 7, 0, 0xffffff, 0xffffff, 1, 1),		//Marble = 68
-	blockInfo(7, 0, 7, 0, 7, 0, 7, 0, 0xffffff, 0xffffff, 8, 1),		//Marble Stairs = 69				steps
-	blockInfo(7, 0, 7, 0, 7, 0, 7, 0, 0xffffff, 0xffffff, 9, 1),		//Marble Slab = 70				half height box
-	blockInfo(3, 11, 3, 11, 3, 11, 3, 11, 0xffffff, 0xffffff, 1, 1),	//Malachite Block = 71
-	blockInfo(8, 0, 8, 0, 8, 0, 8, 0, 0xffffff, 0xffffff, 1, 1),		//Clay = 72
-	blockInfo(6, 4, 6, 4, 6, 4, 6, 4, 0xffffff, 0xffffff, 1, 1),		//Brick Wall = 73
-	blockInfo(6, 4, 6, 4, 6, 4, 6, 4, 0xffffff, 0xffffff, 1, 1),		//Brick = 74
-	blockInfo(6, 4, 6, 4, 6, 4, 6, 4, 0xffffff, 0xffffff, 9, 1),		//Brick Slab = 75				half height box
-	blockInfo(6, 4, 6, 4, 6, 4, 6, 4, 0xffffff, 0xffffff, 8, 1),		//Brick Stairs = 76				steps
+	blockInfo(5, 0, 5, 0, 5, 0, 5, 0, 0xffffff, 0xffffff, blockTypes::solid, 1),		//Limestone = 66
+	blockInfo(6, 0, 6, 0, 6, 0, 6, 0, 0xffffff, 0xffffff, blockTypes::solid, 1),		//Basalt = 67
+	blockInfo(7, 0, 7, 0, 7, 0, 7, 0, 0xffffff, 0xffffff, blockTypes::solid, 1),		//Marble = 68
+	blockInfo(7, 0, 7, 0, 7, 0, 7, 0, 0xffffff, 0xffffff, blockTypes::steps, 1),		//Marble Stairs = 69				steps
+	blockInfo(7, 0, 7, 0, 7, 0, 7, 0, 0xffffff, 0xffffff, blockTypes::slab, 1),		//Marble Slab = 70				half height box
+	blockInfo(3, 11, 3, 11, 3, 11, 3, 11, 0xffffff, 0xffffff, blockTypes::solid, 1),	//Malachite Block = 71
+	blockInfo(8, 0, 8, 0, 8, 0, 8, 0, 0xffffff, 0xffffff, blockTypes::solid, 1),		//Clay = 72
+	blockInfo(6, 4, 6, 4, 6, 4, 6, 4, 0xffffff, 0xffffff, blockTypes::solid, 1),		//Brick Wall = 73
+	blockInfo(6, 4, 6, 4, 6, 4, 6, 4, 0xffffff, 0xffffff, blockTypes::solid, 1),		//Brick = 74
+	blockInfo(6, 4, 6, 4, 6, 4, 6, 4, 0xffffff, 0xffffff, blockTypes::slab, 1),		//Brick Slab = 75				half height box
+	blockInfo(6, 4, 6, 4, 6, 4, 6, 4, 0xffffff, 0xffffff, blockTypes::steps, 1),		//Brick Stairs = 76				steps
 	blockInfo(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),						//Raw Bird = 77
 	blockInfo(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),						//Cooked Bird = 78
-	blockInfo(1, 1, 1, 1, 1, 1, 1, 1, 0xffffff, 0xffffff, 1, 1),		//Stone Chunk = 79
+	blockInfo(1, 1, 1, 1, 1, 1, 1, 1, 0xffffff, 0xffffff, blockTypes::solid, 1),		//Stone Chunk = 79
 	blockInfo(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),						//Wooden Spear = 80
 	blockInfo(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),						//Stone Spear = 81
 	blockInfo(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),						//Iron Spear = 82
@@ -273,16 +243,16 @@ static const blockInfo typToTex[256] = {
 	blockInfo(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),						//Cooked Bacon = 89
 	blockInfo(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),						//Bucket = 90
 	blockInfo(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),						//Water Bucket = 91
-	blockInfo(14, 7, 14, 7, 14, 7, 14, 7, 0xffffff, 0xffffff, 1, 1),	//Magma = 92
+	blockInfo(14, 7, 14, 7, 14, 7, 14, 7, 0xffffff, 0xffffff, blockTypes::solid, 1),	//Magma = 92
 	blockInfo(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),						//Magma Bucket = 93
 	blockInfo(15, 2, 15, 2, 15, 2, 15, 2, 0xffffff, 0xffffff, 16, 1),	//Wooden Fence = 94
-	blockInfo(6, 0, 6, 0, 6, 0, 6, 0, 0xffffff, 0xffffff, 9, 1),		//Basalt Slab = 95				half height box
-	blockInfo(6, 0, 6, 0, 6, 0, 6, 0, 0xffffff, 0xffffff, 8, 1),		//Basalt Stairs = 96			steps
+	blockInfo(6, 0, 6, 0, 6, 0, 6, 0, 0xffffff, 0xffffff, blockTypes::slab, 1),		//Basalt Slab = 95				half height box
+	blockInfo(6, 0, 6, 0, 6, 0, 6, 0, 0xffffff, 0xffffff, blockTypes::steps, 1),		//Basalt Stairs = 96			steps
 	blockInfo(4, 0, 4, 0, 4, 0, 4, 0, 0xffffff, 0xffffff, 17, 0),		//Sign = 97						signboard
 	blockInfo(4, 0, 4, 0, 4, 0, 4, 0, 0xffffff, 0xffffff, 17, 0),		//Sign = 98						signboard
-	blockInfo(7, 4, 7, 4, 7, 4, 7, 4, 0xffffff, 0xffffff, 4, 0),		//Large Dry Bush = 99			X
-	blockInfo(3, 2, 3, 2, 3, 2, 3, 2, 0xffffff, 0xffffff, 1, 1),		//Saltpeter Ore = 100
-	blockInfo(4, 2, 4, 2, 4, 2, 4, 2, 0xffffff, 0xffffff, 1, 1),		//Sulphur Ore = 101
+	blockInfo(7, 4, 7, 4, 7, 4, 7, 4, 0xffffff, 0xffffff, blockTypes::xshape, 0),		//Large Dry Bush = 99			X
+	blockInfo(3, 2, 3, 2, 3, 2, 3, 2, 0xffffff, 0xffffff, blockTypes::solid, 1),		//Saltpeter Ore = 100
+	blockInfo(4, 2, 4, 2, 4, 2, 4, 2, 0xffffff, 0xffffff, blockTypes::solid, 1),		//Sulphur Ore = 101
 	blockInfo(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),						//Saltpeter Chunk = 102
 	blockInfo(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),						//Sulphur Chunk = 103
 	blockInfo(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 18, 0),						//Fire = 104
@@ -292,24 +262,24 @@ static const blockInfo typToTex[256] = {
 	blockInfo(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),						//Match = 108
 	blockInfo(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),						//Gunpowder = 109
 	blockInfo(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),						//Milk Bucket = 110
-	blockInfo(6, 11, 6, 11, 6, 11, 6, 11, 0xffffff, 0xffffff, 1, 1),	//Diamond = 111
-	blockInfo(0, 3, 0, 3, 0, 3, 0, 3, 0xffffff, 0xffffff, 1, 1),		//Diamond Ore = 112
+	blockInfo(6, 11, 6, 11, 6, 11, 6, 11, 0xffffff, 0xffffff, blockTypes::solid, 1),	//Diamond = 111
+	blockInfo(0, 3, 0, 3, 0, 3, 0, 3, 0xffffff, 0xffffff, blockTypes::solid, 1),		//Diamond Ore = 112
 	blockInfo(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),						//Diamond Edge Shovel= 113
 	blockInfo(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),						//Diamond Edge Axe= 114
 	blockInfo(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),						//Diamond Tip Pickaxe= 115
 	blockInfo(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),						//Diamond Tip Spear = 116
 	blockInfo(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),						//Compass = 117
 	blockInfo(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),						//Egg = 118
-	blockInfo(8, 4, 8, 4, 8, 4, 8, 4, 0xffffff, 0xffffff, 4, 0),		//Sapling = 119					X
+	blockInfo(8, 4, 8, 4, 8, 4, 8, 4, 0xffffff, 0xffffff, blockTypes::xshape, 0),		//Sapling = 119					X
 	blockInfo(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),						//Thermometer = 120
 	blockInfo(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),						//Hygrometer = 121
 	blockInfo(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),						//Wooden Machete = 122
 	blockInfo(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),						//Stone Machete = 123
 	blockInfo(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),						//Iron Machete = 124
 	blockInfo(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),						//Diamond Edge Machete = 125
-	blockInfo(6, 11, 6, 11, 6, 11, 6, 11, 0xffffff, 0xffffff, 1, 1),	//Solid Diamond Block = 126
+	blockInfo(6, 11, 6, 11, 6, 11, 6, 11, 0xffffff, 0xffffff, blockTypes::solid, 1),	//Solid Diamond Block = 126
 	blockInfo(5, 6, 4, 6, 4, 6, 4, 6, 0xffffff, 0xffffff, 22, 0),		//Cactus = 127					tall box
-	blockInfo(7, 1, 7, 1, 7, 1, 7, 1, 0xffffff, 0xffffff, 1, 1),		//Painted Planks = 128			
+	blockInfo(7, 1, 7, 1, 7, 1, 7, 1, 0xffffff, 0xffffff, blockTypes::solid, 1),		//Painted Planks = 128			
 	blockInfo(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),						//Paint Bucket = 129
 	blockInfo(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),						//White Pigment = 130
 	blockInfo(6, 6, 6, 6, 6, 6, 6, 6, 0xffffff, 0xffffff, 23, 0),		//Pumpkin = 131					pumpkin
@@ -317,23 +287,23 @@ static const blockInfo typToTex[256] = {
 	blockInfo(0, 0, 0, 0, 0, 0, 0, 0, 0xffffff, 0xffffff, 24, 0),		//Electric Wire = 133
 	blockInfo(0, 0, 0, 0, 0, 0, 0, 0, 0xffffff, 0xffffff, 24, 0),		//Electric Wire = 134
 	blockInfo(0, 0, 0, 0, 0, 0, 0, 0, 0xffffff, 0xffffff, 24, 0),		//Electric Wire = 135
-	blockInfo(0, 0, 0, 0, 0, 0, 0, 0, 0xffffff, 0xffffff, 9, 1),		//Granite slab = 136
+	blockInfo(0, 0, 0, 0, 0, 0, 0, 0, 0xffffff, 0xffffff, blockTypes::slab, 1),		//Granite slab = 136
 	blockInfo(14, 4, 14, 4, 5, 8, 14, 4, 0xffffff, 0xffffff, 25, 0),	//Logic AND Gate = 137
-	blockInfo(7, 7, 6, 7, 6, 7, 6, 7, 0xffffff, 0xffffff, 1, 1),		//Battery = 138
-	blockInfo(15, 4, 15, 4, 8, 6, 15, 4, 0xffffff, 0xffffff, 12, 0),	//Lightbulb = 139
+	blockInfo(7, 7, 6, 7, 6, 7, 6, 7, 0xffffff, 0xffffff, blockTypes::solid, 1),		//Battery = 138
+	blockInfo(15, 4, 15, 4, 8, 6, 15, 4, 0xffffff, 0xffffff, blockTypes::thinslab, 0),	//Lightbulb = 139
 	blockInfo(14, 4, 14, 4, 6, 9, 14, 4, 0xffffff, 0xffffff, 27, 0),	//Logic NOT Gate = 140
 	blockInfo(0, 0, 0, 0, 0, 0, 0, 0, 0xffffff, 0xffffff, 28, 0),		//Switch = 141
 	blockInfo(0, 0, 0, 0, 0, 0, 0, 0, 0xffffff, 0xffffff, 29, 0),		//Button = 142
 	blockInfo(14, 4, 14, 4, 5, 9, 14, 4, 0xffffff, 0xffffff, 30, 0),	//Logic OR Gate = 143
-	blockInfo(4, 0, 4, 0, 4, 0, 4, 0, 0xffffff, 0xffffff, 12, 0),		//Pressure Plate = 144
+	blockInfo(4, 0, 4, 0, 4, 0, 4, 0, 0xffffff, 0xffffff, blockTypes::thinslab, 0),		//Pressure Plate = 144
 	blockInfo(14, 4, 14, 4, 6, 10, 14, 4, 0xffffff, 0xffffff, 32, 0),	//Delay Gate = 145
 	blockInfo(0, 0, 0, 0, 0, 0, 0, 0, 0xffffff, 0xffffff, 33, 0),		//SR Latch = 146
 	blockInfo(0, 0, 0, 0, 0, 0, 0, 0, 0xffffff, 0xffffff, 34, 0),		//Electric Detonator = 147
-	blockInfo(1, 3, 1, 3, 1, 3, 1, 3, 0xffffff, 0xffffff, 1, 1),		//Germanium Ore = 148
+	blockInfo(1, 3, 1, 3, 1, 3, 1, 3, 0xffffff, 0xffffff, blockTypes::solid, 1),		//Germanium Ore = 148
 	blockInfo(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),						//Germanium Crystal = 149
-	blockInfo(14, 3, 14, 3, 14, 3, 14, 3, 0xffffff, 0xffffff, 1, 1),	//Solid Coal Block = 150
+	blockInfo(14, 3, 14, 3, 14, 3, 14, 3, 0xffffff, 0xffffff, blockTypes::solid, 1),	//Solid Coal Block = 150
 	blockInfo(0, 0, 0, 0, 0, 0, 0, 0, 0xffffff, 0xffffff, 35, 0),		//Photodiode = 151
-	blockInfo(14, 4, 14, 4, 8, 7, 14, 4, 0xffffff, 0xffffff, 12, 0),	//LED = 152
+	blockInfo(14, 4, 14, 4, 8, 7, 14, 4, 0xffffff, 0xffffff, blockTypes::thinslab, 0),	//LED = 152
 	blockInfo(4, 0, 4, 0, 8, 10, 8, 10, 0xffffff, 0xffffff, 48, 0),		//Wire Through Planks = 153
 	blockInfo(0, 0, 0, 0, 8, 11, 8, 11, 0xffffff, 0xffffff, 48, 0),		//Wire Through Stone = 154
 	blockInfo(14, 4, 14, 4, 8, 7, 8, 7, 0xffffff, 0xffffff, 48, 0),		//Wire Through Semiconductor = 155
@@ -349,27 +319,27 @@ static const blockInfo typToTex[256] = {
 	blockInfo(6, 0, 6, 0, 6, 0, 6, 0, 0xffffff, 0xffffff, 45, 1),		//Basalt Fence = 165
 	blockInfo(0, 0, 0, 0, 0, 0, 0, 0, 0xffffff, 0xffffff, 37, 1),		//Wooden Fence Gate = 166			fence
 	blockInfo(0, 0, 0, 0, 0, 0, 0, 0, 0xffffff, 0xffffff, 38, 0),		//Magnet = 167						magnet
-	blockInfo(5, 2, 2, 0, 2, 0, 2, 0, 0xffffff, 0xffffff, 1, 1),		//Soil = 168						thin slab
+	blockInfo(5, 2, 2, 0, 2, 0, 2, 0, 0xffffff, 0xffffff, blockTypes::solid, 1),		//Soil = 168						thin slab
 	blockInfo(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),						//Wooden Rake = 169
 	blockInfo(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),						//Stone Rake = 170
 	blockInfo(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),						//Iron Rake = 171
 	blockInfo(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),						//Diamond Spikes Rake = 172
 	blockInfo(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),						// = 173
-	blockInfo(14, 5, 14, 5, 14, 5, 14, 5, 0xffffff, 0xffffff, 4, 0),	//Rye = 174							X	
+	blockInfo(14, 5, 14, 5, 14, 5, 14, 5, 0xffffff, 0xffffff, blockTypes::xshape, 0),	//Rye = 174							X	
 	blockInfo(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),						//Flour = 175
 	blockInfo(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),						//Dough = 176
 	blockInfo(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),						//Bread = 177
 	blockInfo(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),						//Boat = 178
 	blockInfo(0, 0, 0, 0, 0, 0, 0, 0, 0xffffff, 0xffffff, 39, 0),		//Motion Detector = 179
-	blockInfo(14, 4, 14, 4, 9, 8, 14, 4, 0xffffff, 0xffffff, 12, 0),	//Digital To Analog Converter = 180
-	blockInfo(14, 4, 14, 4, 9, 9, 14, 4, 0xffffff, 0xffffff, 12, 0),	//Analog To Digital Converter = 181
-	blockInfo(14, 4, 14, 4, 9, 10, 14, 4, 0xffffff, 0xffffff, 12, 0),	//4-LED = 182
+	blockInfo(14, 4, 14, 4, 9, 8, 14, 4, 0xffffff, 0xffffff, blockTypes::thinslab, 0),	//Digital To Analog Converter = 180
+	blockInfo(14, 4, 14, 4, 9, 9, 14, 4, 0xffffff, 0xffffff, blockTypes::thinslab, 0),	//Analog To Digital Converter = 181
+	blockInfo(14, 4, 14, 4, 9, 10, 14, 4, 0xffffff, 0xffffff, blockTypes::thinslab, 0),	//4-LED = 182
 	blockInfo(14, 4, 14, 4, 9, 11, 14, 4, 0xffffff, 0xffffff, 40, 0),	//Sound Generator = 183
 	blockInfo(14, 4, 14, 4, 9, 13, 14, 4, 0xffffff, 0xffffff, 41, 0),	//4-Bit Counter = 184
 	blockInfo(14, 4, 14, 4, 9, 12, 14, 4, 0xffffff, 0xffffff, 41, 0),	//7-Segment Display = 185
-	blockInfo(14, 4, 14, 4, 8, 14, 14, 4, 0xffffff, 0xffffff, 12, 0),	//Memory Bank = 186
-	blockInfo(14, 4, 14, 4, 9, 14, 14, 4, 0xffffff, 0xffffff, 12, 0),	//Real Time Clock = 187
-	blockInfo(14, 4, 14, 4, 10, 7, 14, 4, 0xffffff, 0xffffff, 12, 0),	//Truth Table Circuit = 188
+	blockInfo(14, 4, 14, 4, 8, 14, 14, 4, 0xffffff, 0xffffff, blockTypes::thinslab, 0),	//Memory Bank = 186
+	blockInfo(14, 4, 14, 4, 9, 14, 14, 4, 0xffffff, 0xffffff, blockTypes::thinslab, 0),	//Real Time Clock = 187
+	blockInfo(14, 4, 14, 4, 10, 7, 14, 4, 0xffffff, 0xffffff, blockTypes::thinslab, 0),	//Truth Table Circuit = 188
 	blockInfo(9, 2, 9, 2, 9, 2, 9, 2, 0xffffff, 0xffffff, 41, 0),		//Gravestone = 189					Gravestone
 	blockInfo(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),						//Treasure Generator = 190
 	blockInfo(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),						//Bow = 191
@@ -389,7 +359,7 @@ static const blockInfo typToTex[256] = {
 	blockInfo(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),						//null = 205
 	blockInfo(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),						//null = 206
 	blockInfo(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),						//null = 207	
-	blockInfo(6, 2, 6, 2, 6, 2, 6, 2, 0xffffff, 0xffffff, 12, 0),		//carpet = 208						thin box
+	blockInfo(6, 2, 6, 2, 6, 2, 6, 2, 0xffffff, 0xffffff, blockTypes::thinslab, 0),		//carpet = 208						thin box
 	blockInfo(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),						//null = 209
 	blockInfo(0, 0, 0, 0, 0, 0, 0, 0, 0xffffff, 0xffffff, 17, 0),		//Granite sign = 210
 	blockInfo(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),						//null = 211
@@ -398,7 +368,7 @@ static const blockInfo typToTex[256] = {
 	blockInfo(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),						//null = 214
 	blockInfo(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),						//null = 215
 	blockInfo(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),						//null = 216
-	blockInfo(1, 0, 1, 0, 1, 0, 1, 0, 0xffffff, 0xffffff, 8, 1),		//Granite steps = 217					steps (rotated, cornerstone)
+	blockInfo(1, 0, 1, 0, 1, 0, 1, 0, 0xffffff, 0xffffff, blockTypes::steps, 1),		//Granite steps = 217					steps (rotated, cornerstone)
 	blockInfo(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),						//null = 218
 	blockInfo(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),						//null = 219
 	blockInfo(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),						//null = 220
@@ -406,7 +376,7 @@ static const blockInfo typToTex[256] = {
 	blockInfo(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),						//null = 222
 	blockInfo(6, 4, 6, 4, 8, 9, 8, 9, 0xffffff, 0xffffff, 48, 1),		//wire brick = 223
 	blockInfo(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),						//null = 224
-	blockInfo(4, 8, 4, 8, 4, 8, 4, 8, 0x80CC80, 0x80CC80, 2, 0),		//Spruce leaves = 225
+	blockInfo(4, 8, 4, 8, 4, 8, 4, 8, 0x80CC80, 0x80CC80, blockTypes::seethrough, 0),		//Spruce leaves = 225
 	blockInfo(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),						//null = 226
 	blockInfo(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),						//null = 227
 	blockInfo(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),						//null = 228

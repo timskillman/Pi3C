@@ -203,9 +203,9 @@ void Pi3Cmodel::updateMesh(Pi3Cresource* resource, const Pi3Cmesh &umesh)
 
 int32_t Pi3Cmodel::addTexture(Pi3Cresource *resource, const std::string &txfile, bool smooth)
 {
-	if (txfile == "") return -1;
-	material.texID = resource->loadTexture("", txfile, material.texRef, smooth);
-	if (material.texID >= 0) {
+	material.texRef = resource->loadTexture("", txfile, smooth);
+	if (material.texRef >= 0) {
+		material.texID = resource->getTextureID(material.texRef);
 		material.texName = txfile;
 		resource->materials.push_back(material);
 	}
@@ -214,9 +214,10 @@ int32_t Pi3Cmodel::addTexture(Pi3Cresource *resource, const std::string &txfile,
 
 int32_t Pi3Cmodel::addTexture(Pi3Cresource *resource, const std::shared_ptr<Pi3Ctexture> &texture)
 {
-	material.texID = resource->addTexture(texture, material.texRef); //resource->loadTexture("", txfile, material.texRef);
-	if (material.texID >= 0) {
+	material.texRef = resource->addTexture(texture); //resource->loadTexture("", txfile, material.texRef);
+	if (material.texRef >= 0) {
 		Pi3Ctexture *tx = texture.get();
+		material.texID = resource->getTextureID(material.texRef);
 		material.texWidth = tx->GetWidth();
 		material.texHeight = tx->GetHeight();
 		resource->materials.push_back(material);

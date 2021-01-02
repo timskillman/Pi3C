@@ -11,6 +11,7 @@
 #include "Pi3Cediting.h"
 #include "Pi3CfileOBJ.h"
 #include "Pi3CviewInfo.h"
+#include "Pi3Cblocks.h"
 
 class Modeller {
 public:
@@ -51,7 +52,7 @@ public:
 	viewInfo setupView(const viewInfo::ViewProject view);
 	bool isPerspective() { return views[currentView].projection == viewInfo::PERSPECTIVE;  }
 	bool initialised() { return (resource != nullptr); }
-	void createShape(const Pi3Cmesh& mesh, const vec3f& pos, int32_t groupId, const uint32_t colour = 0xffffffff, std::string txfile="");
+	void createModel(const Pi3Cmesh& mesh, const vec3f& pos, int32_t groupId, const uint32_t colour = 0xffffffff, std::string txfile="");
 	void createLandscape(const vec3f pos, const uint32_t colour);
 	void saveFile(const std::string& path, const std::string& filename, bool selected = false) { 
 		std::string err; Pi3CfileOBJ::save(path, filename, &scene, selected, nullptr, err); 
@@ -167,6 +168,7 @@ private:
 	//Pi3Cbbox3d selbbox;
 
 	std::string info;
+	Blocks blockMap;
 
 	void touchView(viewInfo &vi);
 	void touchPerspectiveView(viewInfo &vi);

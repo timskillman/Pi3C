@@ -123,42 +123,44 @@ void Pi3Cresource::updateMesh(const uint32_t meshRef, uint32_t vertCount, const 
 	updateGPUverts(mesh.bufRef, mesh.vertOffset*mesh.stride, mesh.vc, vertBuffer[mesh.bufRef].verts);
 }
 
-int32_t Pi3Cresource::addTexture(const std::shared_ptr<Pi3Ctexture> &Texture, int32_t &texRef, bool smooth)
+int32_t Pi3Cresource::getTextureID(int32_t texRef)
+{
+	return textures[texRef]->textureID;
+}
+
+int32_t Pi3Cresource::addTexture(const std::shared_ptr<Pi3Ctexture> &Texture, bool smooth)
 {
 	if (Texture.get() != nullptr) {
 		Texture->upload(smooth);
-		texRef = textures.size();		//Texture reference in resource textures array
+		//texRef = textures.size();		//Texture reference in resource textures array
 		textures.push_back(Texture);	//keep texture - don't destroy it
-		return Texture->textureID;		//return GL texture ID
+		return textures.size()-1;		//return texture reference in resource textures array
 	}
 
-	texRef = -1;
+	//texRef = -1;
 	return -1;
 }
 
-int32_t Pi3Cresource::loadTexture(const std::string &path, const std::string &texname, int32_t &texRef, bool smooth) {
-
+int32_t Pi3Cresource::loadTexture(const std::string &path, const std::string &file, bool smooth) 
+{
+	if (file == "") return -1;
 	for (size_t i = 0; i < materials.size(); i++) {
-		if (texname == materials[i].texName) {
-			texRef = materials[i].texRef;
-			//SDL_Log("Using existing texture '%s'", texname.c_str());
-			return materials[i].texID;
+		if (file == materials[i].texName) {
+			return materials[i].texRef;
 		}
 	}
 
 	std::shared_ptr<Pi3Ctexture> Texture;
 	Texture.reset(new Pi3Ctexture());
 
-	std::string filename = path + texname;
-	//SDL_Log("Loading texture '%s'", filename.c_str());
-
+	std::string filename = path + file;
 	Texture->loadFromFile(filename.c_str());
 	if (Texture.get()==nullptr){
 		SDL_Log("ERROR! texture '%s' not found!!", filename.c_str());
 		return -1;
 	}
 
-	return addTexture(Texture, texRef, smooth);
+	return addTexture(Texture, smooth);
 }
 
 void Pi3Cresource::addMeshOutlines(uint32_t meshref)
@@ -201,7 +203,7 @@ int32_t Pi3Cresource::addMesh(Pi3Cmesh * mesh, int32_t groupId, uint32_t maxsize
 
 		//Create and reserve buffer in GPU ...
 		glGenBuffers(1, &VBOid[currentBuffer]);
-		SDL_Log("VBO:%d, Uploading floats = %d, mvsize=%d", VBOid[currentBuffer], maxsize, mvsize);
+		SDL_Log("VBO:%d, Uploading floats = %d, mvsize=%d, remaining:%d", VBOid[currentBuffer], maxsize, mvsize, VBOid[currentBuffer]-(vertBuffer[currentBuffer].verts.front()+mvsize));
 		glBindBuffer(GL_ARRAY_BUFFER, VBOid[currentBuffer]);
 		glBufferData(GL_ARRAY_BUFFER, maxsize * sizeof(float), &vertBuffer[currentBuffer].verts.front(), GL_DYNAMIC_DRAW);
 		vertBuffer[currentBuffer].bufferRef = VBOid[currentBuffer];
@@ -216,6 +218,7 @@ int32_t Pi3Cresource::addMesh(Pi3Cmesh * mesh, int32_t groupId, uint32_t maxsize
 			uint32_t vcbytes = mesh->vc * sizeof(float);	
 			if (!vertsMoved) {
 				memcpy(&mverts[bufferPtr], &mesh->verts[0], vcbytes);
+				SDL_Log("VBO:%d, Uploading floats = %d, mvsize=%d, remaining:%d", VBOid[currentBuffer], maxsize, mvsize, maxsize - (bufferPtr + mvsize));
 				mesh->verts.resize(0); //delete verts from original mesh as these have been stored and uploaded to GPU
 				glBindBuffer(GL_ARRAY_BUFFER, VBOid[cbuf]);
 				glBufferSubData(GL_ARRAY_BUFFER, bufferPtr * sizeof(float), vcbytes, &mverts[bufferPtr]); // This transfer requires vcbytes 

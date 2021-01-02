@@ -119,7 +119,7 @@ void Modeller::init()
 	selboxModel.touchable = false;
 	selboxRef = scene.append3D(selboxModel);
 
-	Pi3Cmodel selRectModel = Pi3Cmodel(resource, Pi3Cshapes::rectLine(vec2f(0, 0), vec2f(50, 50)), 3);
+	Pi3Cmodel selRectModel = Pi3Cmodel(resource, Pi3Cshapes::rectLine(vec2f(0, 0), vec2f(50, 50)), -1);
 	selRectModel.touchable = false;
 	selRectModel.material.SetColAmbient(0xffffffff);
 	selRectRef = scene.append2D(selRectModel);
@@ -272,28 +272,35 @@ void Modeller::navikeys(SDL_Scancode key, SDL_Scancode keyA, SDL_Scancode KeyB)
 void Modeller::createBlocks(const vec3f pos)
 {
 	int mapSize = 10;
-	Blocks block(mapSize);
+	blockMap.createBlocks(mapSize);
+	
 	for (int zb = 0; zb < mapSize; zb++) {
 		for (int xb = 0; xb < mapSize; xb++) {
-			block.createMapChunk(xb, zb);
+			blockMap.createMapChunk(xb, zb);
 		}
 	}
 
 	for (int zb = 0; zb < mapSize; zb++) {
 		for (int xb = 0; xb < mapSize; xb++) {
-			block.createTrees(xb, zb);
+			blockMap.createTrees(xb, zb, 20);
 		}
 	}
+
+	int blocksId = modelGroupId;
+	int texRef = resource->loadTexture("assets/maps/", "SurvivalCraft256x256.png", false);
 
 	for (int zb = 1; zb < mapSize-1; zb++) {
 		for (int xb = 1; xb < mapSize-1; xb++) {
-			Pi3Cmesh blockmesh;
-			block.createMeshChunk(blockmesh, xb, zb);
-			blockmesh.updateBounds();
-			blockmesh.materialRef = 0;
-			createShape(blockmesh, pos, modelGroupId, 0xffffffff);
+
+			Pi3Cmesh blockmesh("ChunkMesh");
+			blockMap.createMeshChunk(blockmesh, xb, zb);
+
+			createModel(blockmesh, pos, blocksId, 0xffffffff);
 			Pi3Cmodel& model = scene.models.back();
-			model.addTexture(resource, "assets/maps/SurvivalCraft256x256.png", false);
+			model.name = "ChunkModel";
+			model.material.texRef = texRef;
+			model.material.texID = resource->getTextureID(texRef);
+			blocksId++; //TODO: Clear scene doesn't delete these block ID's ATM
 		}
 	}
 }
@@ -301,10 +308,10 @@ void Modeller::createBlocks(const vec3f pos)
 void Modeller::createLandscape(const vec3f pos, const uint32_t colour)
 {
 	Pi3Ctexture maptex = Pi3Ctexture("assets/maps/mountainsHgt2.png", false);
-	createShape(Pi3Cshapes::elevationMap(maptex, vec3f(0, -200.f, 0), vec3f(3000.f, 400.f, 3000.f), 128, 128, 0), pos, modelGroupId, colour);
+	createModel(Pi3Cshapes::elevationMap(maptex, vec3f(0, -200.f, 0), vec3f(3000.f, 400.f, 3000.f), 128, 128, 0), pos, modelGroupId, colour);
 }
 
-void Modeller::createShape(const Pi3Cmesh& mesh, const vec3f& pos, int32_t groupId, const uint32_t colour, const std::string txfile)
+void Modeller::createModel(const Pi3Cmesh& mesh, const vec3f& pos, int32_t groupId, const uint32_t colour, const std::string txfile)
 {
 	Pi3Cmodel shape = Pi3Cmodel(resource, mesh, groupId, colour);
 	if (shape.meshRef >= 0) {
@@ -341,13 +348,13 @@ void Modeller::createShapes()
 		maxSteps = 0;
 
 		switch (createTool) {
-		case CT_CUBOID: createShape(Pi3Cshapes::cuboid(vec3f(), vec3f(.01f, .01f, .01f)), pos, modelGroupId, currentColour); maxSteps = 2; break;
-		case CT_CYLINDER: createShape(Pi3Cshapes::cylinder(vec3f(), .01f, .01f), pos, modelGroupId, currentColour); maxSteps = 2; break;
-		case CT_TUBE: createShape(Pi3Cshapes::tube(vec3f(), 0.005f, .01f, .01f), pos, modelGroupId, currentColour); maxSteps = 3; break;
-		case CT_CONE: createShape(Pi3Cshapes::cone(vec3f(), .01f, .01f), pos, modelGroupId, currentColour); maxSteps = 2; break;
-		case CT_TCONE: createShape(Pi3Cshapes::tcone(vec3f(), .01f, .01f, .01f), pos, modelGroupId, currentColour); maxSteps = 3; break;
-		case CT_SPHERE: createShape(Pi3Cshapes::sphere(vec3f(), 0.05f), pos, modelGroupId, currentColour); maxSteps = 1; break;
-		case CT_TORUS: createShape(Pi3Cshapes::torus(vec3f(), .01f, .01f), pos, modelGroupId, currentColour); maxSteps = 2; break;
+		case CT_CUBOID: createModel(Pi3Cshapes::cuboid(vec3f(), vec3f(.01f, .01f, .01f)), pos, modelGroupId, currentColour); maxSteps = 2; break;
+		case CT_CYLINDER: createModel(Pi3Cshapes::cylinder(vec3f(), .01f, .01f), pos, modelGroupId, currentColour); maxSteps = 2; break;
+		case CT_TUBE: createModel(Pi3Cshapes::tube(vec3f(), 0.005f, .01f, .01f), pos, modelGroupId, currentColour); maxSteps = 3; break;
+		case CT_CONE: createModel(Pi3Cshapes::cone(vec3f(), .01f, .01f), pos, modelGroupId, currentColour); maxSteps = 2; break;
+		case CT_TCONE: createModel(Pi3Cshapes::tcone(vec3f(), .01f, .01f, .01f), pos, modelGroupId, currentColour); maxSteps = 3; break;
+		case CT_SPHERE: createModel(Pi3Cshapes::sphere(vec3f(), 0.05f), pos, modelGroupId, currentColour); maxSteps = 1; break;
+		case CT_TORUS: createModel(Pi3Cshapes::torus(vec3f(), .01f, .01f), pos, modelGroupId, currentColour); maxSteps = 2; break;
 		case CT_WEDGE: break;
 		case CT_EXTRUDE: maxSteps = 0; break;
 		case CT_LATHE: maxSteps = 0; break;
@@ -484,7 +491,7 @@ void Modeller::finishLine()
 				//lm = lp.size();
 			}
 
-			createShape(Pi3Cshapes::extrude("Extrude", vec3f(), contours, 1.f, 1), vec3f(), modelGroupId, currentColour);
+			createModel(Pi3Cshapes::extrude("Extrude", vec3f(), contours, 1.f, 1), vec3f(), modelGroupId, currentColour);
 			scene.lastModel()->transformVerts(resource, views[currentView].rotMatrix);
 			break;
 		case CT_LATHE:
@@ -497,7 +504,7 @@ void Modeller::finishLine()
 				for (auto& p : contour) {
 					p.x -= fp.x;
 				}
-				createShape(Pi3Cshapes::lathe("Lathe", vec3f(fp.x, 0, 0.f), contour, true), vec3f(0, 0, 0.f), modelGroupId, currentColour);
+				createModel(Pi3Cshapes::lathe("Lathe", vec3f(fp.x, 0, 0.f), contour, true), vec3f(0, 0, 0.f), modelGroupId, currentColour);
 				scene.lastModel()->transformVerts(resource, views[currentView].rotMatrix);
 			}
 			break;
@@ -763,9 +770,19 @@ void Modeller::ClickLeftMouseButton(viewInfo& view)
 			if (!window->ctrlKey) clearSelections();
 			touchScene();
 			if (touch.selmodel) {
-				brush()->matrix.move(touch.intersection);
-				editUndo.selectModel(scene.models, &scene.models[touch.parent()], window->ctrlKey);
-				//scene.models[touch.groupRefs[0]].selected = touch.selmodel->selected;
+				//if (touch.selmodel->name == "ChunkModel") {
+				//	vec3f chunkPos = touch.selmodel->matrix.transformVec(touch.selmodel->bbox.min);
+				//	vec3f touchPos = touch.intersection - chunkPos;
+				//	int voxelx = (int)touchPos.x;
+				//	int voxely = (int)touchPos.y;
+				//	int voxelz = (int)touchPos.z;
+				//	blockMap.insertBlock(0,)
+				//}
+				//else {
+					brush()->matrix.move(touch.intersection);
+					editUndo.selectModel(scene.models, &scene.models[touch.parent()], window->ctrlKey);
+					//scene.models[touch.groupRefs[0]].selected = touch.selmodel->selected;
+				//}
 			}
 			else
 			{

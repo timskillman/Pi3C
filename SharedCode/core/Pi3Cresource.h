@@ -65,8 +65,9 @@ public:
 	//void appendMesh(Pi3Cmesh mesh) { meshes.push_back(mesh); }
 	size_t meshCount() { return meshes.size(); }
 
-	int32_t loadTexture(const std::string &path, const std::string &name, int32_t &texRef, bool smooth = true);  //loads a texture and returns a texture reference to the textures array (else -1 if failed)
-	int32_t addTexture(const std::shared_ptr<Pi3Ctexture> &Texture, int32_t &texRef, bool smooth = true);
+	int32_t loadTexture(const std::string &path, const std::string &file, bool smooth = true);  //loads a texture and returns a texture reference to the textures array (else -1 if failed)
+	int32_t addTexture(const std::shared_ptr<Pi3Ctexture> &Texture, bool smooth = true);
+	int32_t getTextureID(int32_t texRef);
 	void createDefaultMaterial(const std::string &name = "default");
 	Pi3Cmesh createRect(const vec3f& pos, const vec2f& size, const uint32_t col, const vec2f& uvpos = vec2f(0,0), const vec2f& uvsize = vec2f(1.f,1.f));
 	int32_t createDefaultTexture(int32_t &texID);

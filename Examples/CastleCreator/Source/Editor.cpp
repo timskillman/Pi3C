@@ -537,7 +537,7 @@ void Editor::loadModelLibraryJSON(const std::string &file)
 				}
 
 				model.name = modelID;
-				model.desc = modelname;
+				//model.desc = modelname;
 				float lodfrom = 0.f;
 				for (size_t j = 0; j < LODmodels.size(); j++) {
 					std::string colliderFile = (j == 0) ? collider : "";

@@ -51,7 +51,7 @@ public:
 
 	void init(const avatarParams &p);
 	void setTicks(float tick) { ticks = tick; }
-	void setPosition(vec3f position) { pos = position; this->matrix.move(position); }
+	void setPosition(vec3f position) { pos = position; nextpos = position;  this->matrix.move(position); }
 	void setSize(vec3f size) { this->size = size; }
 	void setRotation(vec3f rot) { this->rot = rot; }
 	vec3f getPosition() { return pos; }
@@ -77,6 +77,10 @@ public:
 	bool moved;
 	float flyspeed = 1.f;
 	float altitude = 0;
+	float walkSpeed;
+	float runSpeed;
+	float fallSpeed;
+	moveType movement;
 
 private:
 
@@ -85,11 +89,8 @@ private:
 	vec3f size;
 	std::vector<vec3f> eye;
 
-	float walkSpeed;
-	float runSpeed;
-	float fallSpeed;
+
 	
-	moveType movement;
 	bool faster;
 	bool onground;
 

@@ -58,24 +58,8 @@ public:
 
 	enum modelFlags { SELECTED = 1, DELETED = 2, VISIBLE = 4, TOUCHABLE = 8, GRIDLOCK = 16, NORMALLOCK = 32 };
 
-	//struct modelParams {
-	//	std::string name;
-	//	Pi3Cresource *resource = nullptr;
-	//	Pi3Cmesh *mesh = nullptr;
-	//	uint32_t diffuseColour = 0xffffffff;
-	//	std::string path;
-	//	std::string modelfile;
-	//	std::string colliderfile;
-	//	std::function<void(float)> showProgressCB = nullptr;
-	//	bool asCollider = false;
-	//	bool reserveBuffer = false;
-	//	uint32_t bufferSize = 65535;
-	//	bool deleteVerts = false;
-	//	vec3f position = {};
-	//	vec3f rotate = {};
-	//};
+// Constructors
 
-	//Pi3Cmodel(const modelParams mp);
 	Pi3Cmodel() {}
 	Pi3Cmodel(Pi3Cresource *resource, Pi3Cmesh mesh, int32_t groupId, uint32_t diffuseColour = 0xffffffff);
 	Pi3Cmodel(Pi3Cresource *resource, const std::string &name, Pi3Cmesh mesh, int32_t groupId, uint32_t diffuseColour = 0xffffffff); //add mesh with name
@@ -132,8 +116,8 @@ public:
 // Variables
 
 	std::string name;				//model name (used for search)
-	std::string desc;				//model description (long name)
-	std::string command;			//command string used to generate model (e.g. "Sphere(pos:[10.1,15.5,4.0],radius:[5.0],colour:[#FFFFFF]") )
+	//std::string desc;				//model description (long name)
+	//std::string command;			//command string used to generate model (e.g. "Sphere(pos:[10.1,15.5,4.0],radius:[5.0],colour:[#FFFFFF]") )
 
 									// Sphere(pos:[x,y,z],radius:[r],hemi:[h],slices:[n],segments:[n],colour:[hexcolour])
 									// Cuboid(pos:[x,y,z],size:[x,y,z],divx:[n],divy:[n],divz:[n],colour:[hexcolour])
@@ -151,9 +135,8 @@ public:
 	vec2f randomScale = { 1.f, 1.f };
 	vec2f randomRotation = { 0,0 };
 
-	uint32_t flags = 0;
+	//uint32_t flags = 0;
 	int32_t meshRef = -1;			//mesh reference to mesh in resources (-1 is no ref - nothing to render)
-	//int32_t meshSel = -1;			//mesh reference to mesh selector in resources (-1 is no ref - nothing to render) - rendered if selected
 	int32_t materialRef = -1;		//material reference to original material in resource
 
 	bool visible = true;			//visible in scene

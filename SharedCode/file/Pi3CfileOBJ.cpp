@@ -125,20 +125,20 @@ namespace Pi3CfileOBJ {
 						objmat.animFrames = 0;
 					}
 					else if (com == "map_Kd") {
-						objmat.texRef = -1;
-						objmat.texID = resource->loadTexture(path, vals, objmat.texRef);
+						objmat.texRef = resource->loadTexture(path, vals);
 						if (objmat.texRef >= 0) {
+							objmat.texID = resource->getTextureID(objmat.texRef);
 							objmat.texName = vals;
 							//if (resource->textures[objmat.texRef]->GetDepth() == 4) 
 							//	objmat.alpha = 0.999f; //if 32bit, then mark as alpha channel image
 						}
 					}
-					else if (com == "map_Bump") {
-						objmat.texRef = -1;
-						objmat.texBumpID = resource->loadTexture(path, vals, objmat.texRef);
-						if (objmat.texBumpID >= 0)
-							objmat.texBumpName = vals;
-					}
+					//else if (com == "map_Bump") {
+					//	objmat.texRef = resource->loadTexture(path, vals);
+					//	if (objmat.texRef >= 0)
+					//		objmat.texBumpID = resource->getTextureID(objmat.texRef);
+					//		objmat.texBumpName = vals;
+					//}
 				}
 			}
 		}

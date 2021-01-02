@@ -148,7 +148,7 @@ void Pi3Cscene::addTexture(Pi3Cmodel& model, const std::string &txfile, bool sha
 {
 	if (txfile != "") {
 		model.addTexture(resource, txfile);
-		model.material.illum = (shaded) ? 2 : 1; //non shaded illumination
+		model.material.illum = (shaded) ? 2 : 1;		//If shaded, material has max illumination
 		model.material.alpha = (shaded) ? 1.f : 0.99f;
 	}
 }
