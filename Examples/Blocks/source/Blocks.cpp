@@ -4,10 +4,10 @@
 
 int main(int argc, char *argv[])
 {
-	Pi3C pi3c("Blocks", 800, 600);
+	Pi3C pi3c("Blocks", 800, 600, true);
 
 	//Setup your scene here ...
-	int mapSize = 12;
+	int mapSize = 7;
 	int chunkSize = 16;
 	int chunkHeight = 128;
 	Blocks chunkMap(mapSize, chunkSize, chunkSize, chunkHeight);
@@ -22,7 +22,7 @@ int main(int argc, char *argv[])
 	player.walkSpeed = 0.1f;
 	player.runSpeed = 0.2f;
 
-
+	pi3c.scene.setPerspective3D(800,600,300,0.01f,5000.f);
 	int oht = -1e8;
 	int ht = chunkHeight/2-5;
 	bool tooHigh = false;
