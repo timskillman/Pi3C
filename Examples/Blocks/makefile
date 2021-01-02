@@ -1,4 +1,4 @@
-TARGET = HelloWorld
+TARGET = Blocks
 
 CC = g++
 CFLAGS = -std=c++17 -Wall
@@ -25,7 +25,7 @@ BUILDPATH = ../../../_build/Projects/$(TARGET)/
 GLES_DIR = /opt/vc/include
 CPATH = $(GLES_DIR)
 
-SRC_DIR:= $(SHARED_DIR) $(FILE_DIR) $(UI_DIR) $(HELPS_DIR) $(EDIT_DIR) $(TESS_DIR) $(GLES_DIR) $(RJSON_DIR) Source
+SRC_DIR:= $(SHARED_DIR) $(FILE_DIR) $(UI_DIR) $(HELPS_DIR) $(EDIT_DIR) $(TESS_DIR) $(GLES_DIR) $(RJSON_DIR) source
 BUILD_DIR:= $(addprefix $(BUILDPATH),$(SRC_DIR))
 
 SRC:= $(foreach sdir,$(SRC_DIR),$(wildcard $(sdir)/*.cpp $(sdir)/*.c))

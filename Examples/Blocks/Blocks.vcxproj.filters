@@ -36,7 +36,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Source\HelloWorld.cpp">
+    <ClCompile Include="Source\Blocks.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\SharedCode\glutess\dict.c">
@@ -156,7 +156,16 @@
     <ClCompile Include="..\..\SharedCode\helpers\Pi3Chtml.cpp">
       <Filter>Shared Code\helpers</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\SharedCode\helpers\Pi3Cblocks.cpp">
+      <Filter>Shared Code\helpers</Filter>
+    </ClCompile>
+    <ClCompile Include="source\BlockMap.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\SharedCode\helpers\Pi3CfastRead.cpp">
+      <Filter>Shared Code\helpers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\SharedCode\helpers\Pi3Cavatar.cpp">
       <Filter>Shared Code\helpers</Filter>
     </ClCompile>
   </ItemGroup>
@@ -302,25 +311,40 @@
     <ClInclude Include="..\..\SharedCode\helpers\Pi3Chtml.h">
       <Filter>Shared Code\helpers</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\SharedCode\helpers\FastNoiseLite.h">
+      <Filter>Shared Code\helpers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\SharedCode\helpers\Pi3Cblocks.h">
+      <Filter>Shared Code\helpers</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\SharedCode\helpers\Pi3Ccolours.h">
       <Filter>Shared Code\helpers</Filter>
+    </ClInclude>
+    <ClInclude Include="BlockMap.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\BlockMap.h">
+      <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\SharedCode\helpers\Pi3CfastRead.h">
       <Filter>Shared Code\helpers</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\SharedCode\helpers\Pi3Cavatar.h">
+      <Filter>Shared Code\helpers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
+    <None Include="Shaders\fs1.glsl">
+      <Filter>assets</Filter>
+    </None>
+    <None Include="Shaders\vs1.glsl">
+      <Filter>assets</Filter>
+    </None>
     <None Include="..\..\SharedCode\glutess\LICENSE">
       <Filter>Shared Code\glutess</Filter>
     </None>
     <None Include="..\..\SharedCode\glutess\README.md">
       <Filter>Shared Code\glutess</Filter>
-    </None>
-    <None Include="assets\shaders\fs1.glsl">
-      <Filter>assets</Filter>
-    </None>
-    <None Include="assets\shaders\vs1.glsl">
-      <Filter>assets</Filter>
     </None>
   </ItemGroup>
 </Project>
