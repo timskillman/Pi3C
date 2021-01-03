@@ -47,15 +47,20 @@ int main(int argc, char *argv[])
 	vec3f ppos(0, 0, 0);
 	vec3f opos(0, 0, 0);
 
+	SDL_WarpMouseInWindow(pi3c.window.handle(), 100, 100);
+	SDL_ShowCursor(SDL_DISABLE);
+
 	while (pi3c.is_running())
 	{
 		pi3c.clear_window(Pi3Ccolours::SkyBlue);
 		
 		player.doKeys();
-		vec3f rotDelta(pi3c.window.mouse.deltaXY.y / 800.f, -pi3c.window.mouse.deltaXY.x / 800.f, 0);
+		
+		vec3f rotDelta((float)(pi3c.window.mouse.y-100) / 800.f, -(float)(pi3c.window.mouse.x-100) / 800.f, 0);
+		SDL_WarpMouseInWindow(pi3c.window.handle(), 100, 100);
+
 		if (oht != -1e8) prot += rotDelta;
 		player.rotate(prot);
-		pi3c.window.mouse.deltaXY = vec2f(0, 0);
 		player.updateAndCollide(&pi3c.scene, pi3c.window.getTicks());
 
 		if (!tooHigh) opos = ppos;
@@ -101,7 +106,7 @@ int main(int argc, char *argv[])
 		pi3c.scene.setMatrix(player.getPosition(), vec3f(0, 0, 0), player.getRotation());
 		pi3c.render3D();
 		prot = prot * 0.9f;
-		pi3c.showFPS();
+
 		pi3c.swap_buffers();
 	}
 
