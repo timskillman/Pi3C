@@ -5,6 +5,7 @@
 
 int main(int argc, char *argv[])
 {
+
 	//loadOptions opts("options.txt");
 	Pi3Cwindow::options winopts;
 	winopts.title = "Blocks"; // opts.asString("title");
@@ -33,7 +34,7 @@ int main(int argc, char *argv[])
 	player.walkSpeed = 0.1f;
 	player.runSpeed = 0.2f;
 
-
+	pi3c.scene.setPerspective3D(800,600,300,0.01f,5000.f);
 	int oht = -1e8;
 	int ht = chunkHeight/2-5;
 	bool tooHigh = false;
