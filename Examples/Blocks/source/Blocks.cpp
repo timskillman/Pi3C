@@ -11,7 +11,7 @@ int main(int argc, char *argv[])
 	winopts.title = "Blocks"; // opts.asString("title");
 	winopts.width = 800; // opts.asInt("screenWidth");
 	winopts.height = 600; // opts.asInt("screenHeight");
-	winopts.antialiasLevel = 4;
+	winopts.antialiasLevel = 0;
 	winopts.fullscreen = true; // opts.asBool("fullscreen");
 	winopts.perspective = 300;
 	Pi3C pi3c(winopts);
