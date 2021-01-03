@@ -114,5 +114,9 @@ int main(int argc, char *argv[])
 		pi3c.swap_buffers();
 	}
 
+	SDL_Log("Average FPS:%f", pi3c.getAverageFPS());
+	SDL_ShowCursor(SDL_SYSTEM_CURSOR_ARROW);
+	pi3c.window.destroy();
+	
 	return 0;
 }
