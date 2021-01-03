@@ -54,6 +54,7 @@ public:
 			SDL_WINDOW_RESIZABLE;
 		uint32_t width = 800;			//Window/screen width
 		uint32_t height = 600;			//Window/screen height
+		uint32_t perspective = 800;
 		uint32_t antialiasLevel = 0;	//Antialias samples level (0 samples (fast), 4 samples (slow - max for RPi), 8 samples (PC))
 		bool fullscreen = false;		//Fullscreen mode (if true) else windowed
 		uint8_t majorVsn = 2;			//OpenGL major version (2 default)
@@ -63,6 +64,8 @@ public:
 		bool doubleBuffer = 1;			//Double buffer (default 1)
 		bool alphaBlending = true;		//Alpha blending (default true)
 		uint32_t clearColour = 0x505050;		//Screen clear colour (default 0 - black)
+		float nearZ = 0.1f;
+		float farZ = 5000.f;
 	};
 
 	struct MouseParams {

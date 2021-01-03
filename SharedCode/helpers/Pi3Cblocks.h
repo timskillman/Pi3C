@@ -2,6 +2,8 @@
 
 #include "Pi3Cvector.h"
 #include "Pi3Cmodel.h"
+#include "Pi3Cresource.h"
+#include "Pi3Cscene.h"
 #include "FastNoiseLite.h"
 
 class Blocks {
@@ -13,8 +15,10 @@ public:
 	void createMapChunk(int x, int z);
 	void createTexPackUV();
 	void createMeshChunk(Pi3Cmesh& mesh, int chunkX, int chunkZ);
+	void updateMeshChunk(Pi3Cresource* resource, Pi3Cscene* scene, const vec3f& chunkCorner, const vec3f& position);
 	void createTrees(int x, int z, int dispersion);
 	void insertBlock(uint8_t blockType, uint32_t chunkPtr, int x, int y, int z);
+	void insertBlock(uint8_t blockType, const vec3f& chunkCorner, const vec3f& position);
 
 	uint32_t calcChunkPtr(int chunkX, int chunkZ) { 
 		return ((chunkX + mapSize) % mapSize) * chunkSlice + ((chunkZ + mapSize) % mapSize) * mapSize * chunkSize;

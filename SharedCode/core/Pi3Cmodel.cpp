@@ -181,24 +181,25 @@ void Pi3Cmodel::appendMesh(Pi3Cresource *resource, Pi3Cmesh mesh, int32_t groupI
 //	resource->updateMesh(meshSel);
 //}
 
-void Pi3Cmodel::updateMesh(Pi3Cresource* resource, const Pi3Cmesh &umesh)
+void Pi3Cmodel::updateMesh(Pi3Cresource* resource, Pi3Cmesh &umesh)
 {
 	//Pi3Cmesh& mesh = resource->meshes[meshRef];
 	//uint32_t stride = mesh.stride;
 	vertsPtr vp = resource->getMeshVerts(meshRef);
 
-	if (umesh.verts.size() != (*vp.verts).size()) return;
+	//if (umesh.verts.size() != (*vp.verts).size()) return;
 
 	for (uint32_t i = 0; i < umesh.verts.size(); i++) {
 		(*vp.verts)[vp.offset++] = umesh.verts[i];
-		//vp.ptr++;
-		//(*vp.verts)[vp.ptr + 1] = umesh.verts[i + 1]; 
-		//(*vp.verts)[vp.ptr + 2] = umesh.verts[i + 2]; 
-		//vp.ptr += stride;
 	}
+	umesh.verts.clear(); //discard update mesh vertices as they've been uploaded to the buffer
+
+	Pi3Cmesh& mesh = resource->meshes[meshRef];
+	mesh.vertSize = umesh.vc / umesh.stride;
+	mesh.vc = umesh.vc;
+	mesh.bbox = umesh.bbox;
+	mesh.lineIndexes = umesh.lineIndexes;
 	resource->updateMesh(meshRef);
-	//bbox.update(resource->meshes[meshRef].bbox);
-	//updateSelBox(resource);
 }
 
 int32_t Pi3Cmodel::addTexture(Pi3Cresource *resource, const std::string &txfile, bool smooth)

@@ -138,6 +138,14 @@ void Blocks::createMapChunk(int chunkX, int chunkZ)
 	}
 }
 
+void Blocks::insertBlock(uint8_t blockType, const vec3f& chunkCorner, const vec3f& position)
+{
+	uint32_t chunkXZ = calcRelativePositionPtr(chunkCorner, position);
+	int ptr = chunkXZ + ((int)(position.y)+ chunkHeight / 2);
+	if (ptr<0 || ptr>chunkMapSize) return;
+	chunks[ptr] = blockType;
+}
+
 void Blocks::insertBlock(uint8_t blockType, uint32_t chunkPtr, int x, int y, int z)
 {
 	uint32_t ptr = calcVoxelPtr(chunkPtr, x, z) + y;
@@ -148,6 +156,17 @@ void Blocks::insertBlock(uint8_t blockType, uint32_t chunkPtr, int x, int y, int
 void lightRecovery(int& light, int lightRecover)
 {
 	light = (light + lightRecover < 255) ? light + lightRecover : 255;
+}
+
+void Blocks::updateMeshChunk(Pi3Cresource* resource, Pi3Cscene* scene, const vec3f& chunkCorner, const vec3f& position)
+{
+	vec3f offset = position - chunkCorner;
+	int chunkOffsetX = (int)(offset.x / chunkWidth);
+	int chunkOffsetZ = (int)(offset.z / chunkDepth);
+	int blockId = chunkOffsetX + chunkOffsetZ * mapSize;
+	Pi3Cmesh newmesh;
+	createMeshChunk(newmesh, chunkOffsetX, chunkOffsetZ);
+	scene->models[blockId].updateMesh(resource, newmesh);
 }
 
 void Blocks::createMeshChunk(Pi3Cmesh& mesh, int chunkX, int chunkZ)
@@ -165,33 +184,43 @@ void Blocks::createMeshChunk(Pi3Cmesh& mesh, int chunkX, int chunkZ)
 			uint32_t ptr = calcVoxelPtr(chunkPtr, xx, zz);
 			uint32_t p = ptr + chunkHeight - 2; //skip top byte height level
 			int light = 255; //start with max light
-
+			int geomtype;
 			//Create all surfaces ...
 			while (p > ptr) {
+
+				bool onfarLeft = chunkX == 0 && xx == 0;
+				bool onfarRight = chunkX == mapSize - 1 && xx == chunkWidth - 1;
+				bool onfarBack = chunkZ == 0 && zz == 0;
+				bool onfarFront = chunkZ == mapSize - 1 && zz == chunkDepth - 1;
 
 				//skip air blocks (but create faces adjacent to air blocks)
 				int shadow = 0;
 				while (p > ptr && chunks[p] == blockType::Air) {
 					int ht = p - ptr;
 
-					int geomtype = typToTex[chunks[p + chunkLeft]].geomType;
-					if (geomtype < blockTypes::xshape && geomtype > blockTypes::air) {
-						addQuadLeftRight(mesh, cx + xx, ht - halfDepth, cz + zz, chunks[p + chunkLeft], 1, 0, light, shadow);
+					if (!onfarLeft) {
+						geomtype = typToTex[chunks[p + chunkLeft]].geomType;
+						if (geomtype < blockTypes::xshape && geomtype > blockTypes::air) {
+							addQuadLeftRight(mesh, cx + xx, ht - halfDepth, cz + zz, chunks[p + chunkLeft], 1, 0, light, shadow);
+						}
+						else {
+							if (light < 255) lightRecovery(light, lightRecover);
+						}
 					}
-					else {
-						if (light < 255) lightRecovery(light, lightRecover);
-					}
-					geomtype = typToTex[chunks[p + chunkBack]].geomType;
-					if (geomtype < blockTypes::xshape && geomtype > blockTypes::air) {
-						addQuadFrontBack(mesh, cx + xx, ht - halfDepth, cz + zz, chunks[p + chunkBack], 3, 0, light, shadow);
-					}
-					else {
-						if (light < 255) lightRecovery(light, lightRecover);
+
+					if (!onfarBack) {
+						geomtype = typToTex[chunks[p + chunkBack]].geomType;
+						if (geomtype < blockTypes::xshape && geomtype > blockTypes::air) {
+							addQuadFrontBack(mesh, cx + xx, ht - halfDepth, cz + zz, chunks[p + chunkBack], 3, 0, light, shadow);
+						}
+						else {
+							if (light < 255) lightRecovery(light, lightRecover);
+						}
 					}
 
 					if (light < 255) {
-						if (chunks[p + chunkRight] == blockType::Air) lightRecovery(light, lightRecover);
-						if (chunks[p + chunkFront] == blockType::Air) lightRecovery(light, lightRecover);
+						if (!onfarRight && chunks[p + chunkRight] == blockType::Air) lightRecovery(light, lightRecover);
+						if (!onfarFront && chunks[p + chunkFront] == blockType::Air) lightRecovery(light, lightRecover);
 					}
 					p--;
 				}
@@ -199,14 +228,16 @@ void Blocks::createMeshChunk(Pi3Cmesh& mesh, int chunkX, int chunkZ)
 				//work out shadow edges for ground quad ...
 				shadow = 0;
 				int blockAbove = p + 1;
-				if (chunks[blockAbove + chunkLeftBack]) shadow = shadow | 1;
-				if (chunks[blockAbove + chunkRightBack]) shadow = shadow | 2;
-				if (chunks[blockAbove + chunkRightFront]) shadow = shadow | 4;
-				if (chunks[blockAbove + chunkLeftFront]) shadow = shadow | 8;
-				if (chunks[blockAbove + chunkBack]) shadow = shadow | 3;
-				if (chunks[blockAbove + chunkFront]) shadow = shadow | 12;
-				if (chunks[blockAbove + chunkLeft]) shadow = shadow | 9;
-				if (chunks[blockAbove + chunkRight]) shadow = shadow | 6;
+
+					if (!(onfarLeft || onfarBack) && chunks[blockAbove + chunkLeftBack]) shadow = shadow | 1;
+					if (!(onfarRight || onfarBack) && chunks[blockAbove + chunkRightBack]) shadow = shadow | 2;
+					if (!(onfarRight || onfarFront) && chunks[blockAbove + chunkRightFront]) shadow = shadow | 4;
+					if (!(onfarLeft || onfarFront) && chunks[blockAbove + chunkLeftFront]) shadow = shadow | 8;
+					if (!onfarBack && chunks[blockAbove + chunkBack]) shadow = shadow | 3;
+					if (!onfarFront && chunks[blockAbove + chunkFront]) shadow = shadow | 12;
+					if (!onfarLeft && chunks[blockAbove + chunkLeft]) shadow = shadow | 9;
+					if (!onfarRight && chunks[blockAbove + chunkRight]) shadow = shadow | 6;
+
 
 				//create ground plane ...
 				if (typToTex[chunks[p]].geomType < blockTypes::xshape) {
@@ -229,11 +260,11 @@ void Blocks::createMeshChunk(Pi3Cmesh& mesh, int chunkX, int chunkZ)
 					int ht = p - ptr - halfDepth;
 					int geomtype = typToTex[chunks[p]].geomType;
 					if (geomtype < blockTypes::xshape) {
-						if (chunks[p + chunkLeft] == blockType::Air) {
+						if (!onfarLeft && chunks[p + chunkLeft] == blockType::Air) {
 							if (light < 255) lightRecovery(light, lightRecover);
 							addQuadLeftRight(mesh, cx + xx, ht, cz + zz, chunks[p], 2, 1, light, shadow);
 						}
-						if (chunks[p + chunkBack] == blockType::Air) {
+						if (!onfarBack && chunks[p + chunkBack] == blockType::Air) {
 							if (light < 255) lightRecovery(light, lightRecover);
 							addQuadFrontBack(mesh, cx + xx, ht, cz + zz, chunks[p], 4, 1, light, shadow);
 						}
@@ -251,16 +282,16 @@ void Blocks::createMeshChunk(Pi3Cmesh& mesh, int chunkX, int chunkZ)
 					//If this is a 'see-through' block, then create edges of blocks adjacent to it ...
 					if (geomtype > 1) {
 						if (geomtype == 2) { shadow = 15; }
-						if (typToTex[chunks[p + chunkLeft]].geomType == 1) {
+						if (!onfarLeft && typToTex[chunks[p + chunkLeft]].geomType == 1) {
 							addQuadLeftRight(mesh, cx + xx, ht, cz + zz, chunks[p + chunkLeft], 1, 0, light, shadow);
 						}
-						if (typToTex[chunks[p + chunkRight]].geomType == 1) {
+						if (!onfarRight && typToTex[chunks[p + chunkRight]].geomType == 1) {
 							addQuadLeftRight(mesh, cx + xx + 1, ht, cz + zz, chunks[p + chunkRight], 2, 1, light, shadow);
 						}
-						if (typToTex[chunks[p + chunkBack]].geomType == 1) {
+						if (!onfarBack && typToTex[chunks[p + chunkBack]].geomType == 1) {
 							addQuadFrontBack(mesh, cx + xx, ht, cz + zz, chunks[p + chunkBack], 3, 0, light, shadow);
 						}
-						if (typToTex[chunks[p + chunkFront]].geomType == 1) {
+						if (!onfarFront && typToTex[chunks[p + chunkFront]].geomType == 1) {
 							addQuadFrontBack(mesh, cx + xx, ht, cz + zz + 1, chunks[p + chunkFront], 4, 1, light, shadow);
 						}
 						if ((p - 1) > ptr && typToTex[chunks[p - 1]].geomType == 1) {
@@ -269,8 +300,8 @@ void Blocks::createMeshChunk(Pi3Cmesh& mesh, int chunkX, int chunkZ)
 					}
 
 					if (light < 255) {
-						if (chunks[p + chunkRight] == blockType::Air) lightRecovery(light, lightRecover);
-						if (chunks[p + chunkFront] == blockType::Air) lightRecovery(light, lightRecover);
+						if (!onfarRight && chunks[p + chunkRight] == blockType::Air) lightRecovery(light, lightRecover);
+						if (!onfarFront && chunks[p + chunkFront] == blockType::Air) lightRecovery(light, lightRecover);
 					}
 					p--;
 				}

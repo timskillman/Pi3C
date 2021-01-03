@@ -53,13 +53,12 @@ void Pi3C::init(const Pi3Cwindow::options& winopts)
 		return;
 	}
 
-	
 	scene.init(&resource);
 	scene.selectShader(basicShaderRef);
 
 	scene.setFog(0xffffff, 10000.f, 25000.f);
-	scene.setViewport2D(Pi3Crecti(0, 0, winw, winh), 0.1f, 4000.f);
-	scene.setPerspective3D(winw, winh, PSPVALUE, 0.02f, 5000.f);
+	scene.setViewport2D(Pi3Crecti(0, 0, winw, winh), winopts.nearZ, winopts.farZ);
+	scene.setPerspective3D(winw, winh, winopts.perspective, winopts.nearZ, winopts.farZ);
 
 	gui.init(&resource, &window);
 	guifonts.push_back(gui.addFont("../../Resources/fonts/", "NotoSans-Regular.ttf", 18));

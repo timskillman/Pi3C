@@ -27,8 +27,8 @@ void BlockMap::createMap(Pi3Cresource* resource, Pi3Cscene* scene, Blocks* block
 	int blocksId = 1;
 	int texRef = resource->loadTexture("assets/textures/", "SurvivalCraft256x256.png", false);
 
-	for (int zb = 1; zb < mapSize - 1; zb++) {
-		for (int xb = 1; xb < mapSize - 1; xb++) {
+	for (int zb = 0; zb < mapSize; zb++) {
+		for (int xb = 0; xb < mapSize; xb++) {
 			Pi3Cmesh blockmesh("ChunkMesh");
 			block->createMeshChunk(blockmesh, xb, zb);
 			createModel(resource, scene, blockmesh, pos, blocksId);
@@ -36,7 +36,7 @@ void BlockMap::createMap(Pi3Cresource* resource, Pi3Cscene* scene, Blocks* block
 			model.name = "ChunkModel";
 			model.material.texRef = texRef;
 			model.material.texID = resource->getTextureID(texRef);
-			//blocksId++;
+			blocksId++;
 		}
 	}
 }

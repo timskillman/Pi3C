@@ -1,13 +1,24 @@
 #include "Pi3C.h"
 #include "Pi3Cavatar.h"
 #include "BlockMap.h"
+#include "Pi3CloadOptions.h"
 
 int main(int argc, char *argv[])
 {
-	Pi3C pi3c("Blocks", 800, 600);
+	//loadOptions opts("options.txt");
+	Pi3Cwindow::options winopts;
+	winopts.title = "Blocks"; // opts.asString("title");
+	winopts.width = 800; // opts.asInt("screenWidth");
+	winopts.height = 600; // opts.asInt("screenHeight");
+	winopts.antialiasLevel = 4;
+	winopts.fullscreen = true; // opts.asBool("fullscreen");
+	winopts.perspective = 300;
+	Pi3C pi3c(winopts);
+
+	//Pi3C pi3c("Blocks", 800, 600, true);
 
 	//Setup your scene here ...
-	int mapSize = 12;
+	int mapSize = 5;
 	int chunkSize = 16;
 	int chunkHeight = 128;
 	Blocks chunkMap(mapSize, chunkSize, chunkSize, chunkHeight);
@@ -55,6 +66,12 @@ int main(int argc, char *argv[])
 			jumpHeight = ht - 10;
 		}
 
+		if (keystate[SDL_SCANCODE_RETURN]) {
+			vec3f newblock(-ppos.x, -ht / 10, -ppos.z);
+			chunkMap.insertBlock(blockType::Diamond, chunkCorner, newblock);
+			chunkMap.updateMeshChunk(&pi3c.resource, &pi3c.scene, chunkCorner, newblock);
+		}
+
 		if (!jump && oht!=ht && oht != -1e8) {
 			if (!tooHigh)
 				oht += (oht < ht) ? 1 : -1;
@@ -82,8 +99,8 @@ int main(int argc, char *argv[])
 		pi3c.scene.setSun(0xffffff, vec3f(5000.f, 15000.f, -15000.f)); //transform sun position into scene
 		pi3c.scene.setMatrix(player.getPosition(), vec3f(0, 0, 0), player.getRotation());
 		pi3c.render3D();
-		prot = prot * 0.96f;
-
+		prot = prot * 0.9f;
+		pi3c.showFPS();
 		pi3c.swap_buffers();
 	}
 
