@@ -56,7 +56,7 @@ int main(int argc, char *argv[])
 		
 		player.doKeys();
 		
-		vec3f rotDelta((float)(pi3c.window.mouse.y-100) / 800.f, -(float)(pi3c.window.mouse.x-100) / 800.f, 0);
+		vec3f rotDelta((float)(pi3c.window.mouse.y-100) / 500.f, -(float)(pi3c.window.mouse.x-100) / 500.f, 0);
 		SDL_WarpMouseInWindow(pi3c.window.handle(), 100, 100);
 
 		if (oht != -1e8) prot += rotDelta;
