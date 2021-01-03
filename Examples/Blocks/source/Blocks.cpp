@@ -46,7 +46,8 @@ int main(int argc, char *argv[])
 	vec3f prot(0, 0, 0);
 	vec3f ppos(0, 0, 0);
 	vec3f opos(0, 0, 0);
-
+	int mx,my;
+	int flip = 0;
 	SDL_WarpMouseInWindow(pi3c.window.handle(), 100, 100);
 	SDL_ShowCursor(SDL_DISABLE);
 
@@ -56,9 +57,11 @@ int main(int argc, char *argv[])
 		
 		player.doKeys();
 		
-		vec3f rotDelta((float)(pi3c.window.mouse.y-100) / 500.f, -(float)(pi3c.window.mouse.x-100) / 500.f, 0);
-		SDL_WarpMouseInWindow(pi3c.window.handle(), 100, 100);
-
+		SDL_GetMouseState(&mx, &my);
+		vec3f rotDelta(((float)my - 100.f) / 500.f, -((float)mx - 100.f) / 500.f, 0);
+		flip=(flip+1)%2;
+		if (flip==0) SDL_WarpMouseInWindow(pi3c.window.handle(), 100, 100);
+		
 		if (oht != -1e8) prot += rotDelta;
 		player.rotate(prot);
 		player.updateAndCollide(&pi3c.scene, pi3c.window.getTicks());
@@ -106,6 +109,7 @@ int main(int argc, char *argv[])
 		pi3c.scene.setMatrix(player.getPosition(), vec3f(0, 0, 0), player.getRotation());
 		pi3c.render3D();
 		prot = prot * 0.9f;
+		
 
 		pi3c.swap_buffers();
 	}
