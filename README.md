@@ -125,14 +125,14 @@ Pi3C requires SDL 2.0 and the fastest implementation of hardware Open GL.
 
 Even though Raspbian OS comes with a version of SDL2, you need to download the latest SDL2 development libraries and SDL2's associated libraries for sound, images, network and font support.
 
-Open a terminal window, make sure you're connected to the internet and enter (You will be prompted to enter 'Y' before installing each of the following libraries);
+Open a terminal window and block copy & paste the following in the terminal to install the SDL libraries;
 
 ~~~~
- sudo apt-get install libsdl2-dev
- sudo apt-get install libsdl2-mixer-dev
- sudo apt-get install libsdl2-ttf-dev
- sudo apt-get install libsdl2-image-dev
- sudo apt-get install libsdl2-net-dev
+ sudo apt-get install libsdl2-dev -y
+ sudo apt-get install libsdl2-mixer-dev -y
+ sudo apt-get install libsdl2-ttf-dev -y
+ sudo apt-get install libsdl2-image-dev -y
+ sudo apt-get install libsdl2-net-dev -y
 ~~~~
 
 
