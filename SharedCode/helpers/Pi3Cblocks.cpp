@@ -188,6 +188,7 @@ void Blocks::createMeshChunk(Pi3Cmesh& mesh, int chunkX, int chunkZ)
 			//Create all surfaces ...
 			while (p > ptr) {
 
+				//edges should read values on opposite sides (i.e. wrapping)
 				bool onfarLeft = chunkX == 0 && xx == 0;
 				bool onfarRight = chunkX == mapSize - 1 && xx == chunkWidth - 1;
 				bool onfarBack = chunkZ == 0 && zz == 0;
