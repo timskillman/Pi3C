@@ -6,36 +6,37 @@
 int main(int argc, char *argv[])
 {
 
-	//loadOptions opts("options.txt");
+	loadOptions opts("options.txt");
 	Pi3Cwindow::options winopts;
-	winopts.title = "Blocks"; // opts.asString("title");
-	winopts.width = 1920; // opts.asInt("screenWidth");
-	winopts.height = 1080; // opts.asInt("screenHeight");
+	winopts.title = opts.asString("title");
+	winopts.width = opts.asInt("screenWidth");
+	winopts.height = opts.asInt("screenHeight");
 	winopts.antialiasLevel = 0;
-	winopts.fullscreen = false; // opts.asBool("fullscreen");
-	winopts.perspective = 500;
+	winopts.fullscreen = opts.asBool("fullscreen");
+	winopts.perspective = opts.asFloat("perspective");
 	Pi3C pi3c(winopts);
 
 	//Pi3C pi3c("Blocks", 800, 600, true);
 
 	//Setup your scene here ...
-	int mapSize = 7;
+	int mapSize = opts.asInt("mapSize");
 	int hmap = mapSize / 2;
-	int chunkSize = 16;
-	int chunkHeight = 128;
-
+	int chunkSize = opts.asInt("chunkSize");
+	int chunkHeight = opts.asInt("chunkHeight");
+	int trees = opts.asInt("trees");
+	
 	BlockMap blockMap(&pi3c.resource, mapSize, chunkSize, chunkSize, chunkHeight);
-	blockMap.createMap(-hmap, hmap + 1, -hmap, hmap + 1);
+	blockMap.createMap(-hmap, hmap + 1, -hmap, hmap + 1,trees);
 	blockMap.createMapMeshes(&pi3c.resource, &pi3c.scene, -hmap, hmap + 1, -hmap, hmap + 1);
 
 	Pi3Cavatar player;
 	//player.movement = Pi3Cavatar::move_fly;
 	player.flyspeed = 0;
-	player.walkSpeed = 0.5f;
-	player.runSpeed = 1.0f;
-	player.fallSpeed = 0.5f;
+	player.walkSpeed = opts.asFloat("walkSpeed");
+	player.runSpeed = opts.asFloat("runSpeed");
+	player.fallSpeed = opts.asFloat("fallSpeed");
 
-	pi3c.scene.setPerspective3D(800,600,300,0.01f,5000.f);
+	//pi3c.scene.setPerspective3D(winopts.width ,winopts.height,winopts.perspective,0.01f,5000.f);
 	int oht = -1e8;
 	int ht = chunkHeight/2-5;
 	bool tooHigh = false;
