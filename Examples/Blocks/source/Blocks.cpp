@@ -143,11 +143,11 @@ int main(int argc, char *argv[])
 		if (ocx != cx && x==7) {
 			//create new chunks on X axis ...
 			if (ocx < cx) {
-				blockMap.createMap(cx + hmap, cx + hmap+1, cz - hmap, cz + hmap+1);
+				blockMap.createMap(cx + hmap, cx + hmap+1, cz - hmap, cz + hmap+1, trees, caves | veg);
 				blockMap.updateMapMeshes(&pi3c.resource, &pi3c.scene, cx + (hmap-1), cx + hmap, cz - (hmap-1), cz + hmap);
 			}
 			else {
-				blockMap.createMap(cx - hmap, cx - hmap -1, cz - hmap, cz + hmap+1);
+				blockMap.createMap(cx - hmap, cx - hmap -1, cz - hmap, cz + hmap+1, trees, caves | veg);
 				blockMap.updateMapMeshes(&pi3c.resource, &pi3c.scene, cx - (hmap-1), cx - (hmap-2), cz - (hmap-1), cz + hmap);
 			}
 			ocx = cx;
@@ -156,11 +156,11 @@ int main(int argc, char *argv[])
 		//if (ocz != cz && z==7) {
 		//	//create new chunks on Z axis ...
 		//	if (ocz < cz) {
-		//		blockMap.createMap(cx - 3, cx + 4, cz + 3, cz + 4);
+		//		blockMap.createMap(cx - 3, cx + 4, cz + 3, cz + 4, trees, caves | veg);
 		//		blockMap.updateMapMeshes(&pi3c.resource, &pi3c.scene, cx - 3, cx + 4, cz + 2, cz + 3);
 		//	}
 		//	else {
-		//		blockMap.createMap(cx - 3, cx + 4, cz - 4, cz - 3);
+		//		blockMap.createMap(cx - 3, cx + 4, cz - 4, cz - 3, trees, caves | veg);
 		//		blockMap.updateMapMeshes(&pi3c.resource, &pi3c.scene, cx - 2, cx + 3, cz - 3, cz - 2);
 		//	}
 		//	ocz = cz;
