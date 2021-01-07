@@ -25,11 +25,11 @@ public:
 		return ((chunkX + mapSize*10000) % mapSize) * chunkSlice + ((chunkZ + mapSize*10000) % mapSize) * mapSize * chunkSize;
 	}
 
-	uint32_t calcVoxelPtr(const uint32_t chunkPtr, const int x, const int z) {
+	int32_t calcVoxelPtr(const uint32_t chunkPtr, const int x, const int z) {
 		return chunkPtr + (x + z * chunkPitch) * chunkHeight;
 	}
 
-	uint32_t calcRelativePositionPtr(const vec3f& position);
+	int32_t calcRelativePositionPtr(const vec3f& position);
 	int getGroundHeight(const vec3f& position);
 	int getHeightAtPoint(const vec3f& position);
 

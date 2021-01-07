@@ -112,7 +112,7 @@ int main(int argc, char *argv[])
 		}
 		if (tooHigh) ppos = opos;
 
-		player.setPosition(vec3f(ppos.x, (float)oht / 10 - 2, ppos.z));
+		player.setPosition(vec3f(ppos.x, (float)oht / 10 - 20, ppos.z));
 
 		//Draw your scene here ...
 		pi3c.scene.setSun(0xffffff, vec3f(5000.f, 15000.f, -15000.f)); //transform sun position into scene

@@ -157,14 +157,15 @@ void Blocks::insertBlock(uint8_t blockType, const vec3f& position)
 {
 	uint32_t chunkXZ = calcRelativePositionPtr(position);
 	int ptr = chunkXZ + ((int)(position.y)+ chunkHeight / 2);
-	if (ptr<0 || ptr>chunkMapSize) return;
+	//if (ptr<0 || ptr>chunkMapSize) return;
+	ptr = (ptr < 0) ? ptr + chunkMapSize : (ptr > chunkMapSize) ? ptr - chunkMapSize : ptr;
 	chunks[ptr] = blockType;
 }
 
 void Blocks::insertBlock(uint8_t blockType, uint32_t chunkPtr, int x, int y, int z)
 {
-	uint32_t ptr = calcVoxelPtr(chunkPtr, x, z) + y;
-	if (ptr<0 || ptr>chunkMapSize) return;
+	int32_t ptr = calcVoxelPtr(chunkPtr, x, z) + y;
+	ptr = (ptr < 0) ? ptr + chunkMapSize : (ptr > chunkMapSize) ? ptr - chunkMapSize : ptr;
 	if (chunks[ptr]==blockType::Air) chunks[ptr] = blockType;
 }
 
@@ -189,7 +190,10 @@ void Blocks::updateMeshChunk(Pi3Cresource* resource, Pi3Cscene* scene, const vec
 	createMeshChunk(resource, *mesh, chunkOffsetX, chunkOffsetZ);
 	mesh->vertSize = mesh->vc / mesh->stride;
 
-	resource->updateMesh(meshRef);
+	glBindBuffer(GL_ARRAY_BUFFER, resource->VBOid[mesh->bufRef]);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, mesh->vc * sizeof(float), &resource->vertBuffer[mesh->bufRef].verts[0] );
+
+	//resource->updateMesh(meshRef);
 	//model->updateMesh(resource, *mesh);
 }
 
@@ -213,7 +217,7 @@ void Blocks::createMeshChunk(Pi3Cresource* resource, Pi3Cmesh& mesh, int chunkX,
 	for (int32_t zz = 0; zz < chunkDepth; zz++) {
 		for (int32_t xx = 0; xx < chunkWidth; xx++) {
 
-			uint32_t ptr = calcVoxelPtr(chunkPtr, xx, zz);
+			int32_t ptr = calcVoxelPtr(chunkPtr, xx, zz);
 			uint32_t p = ptr + chunkHeight - 2; //skip top byte height level
 			int light = 255; //start with max light
 			int geomtype;
@@ -280,9 +284,9 @@ void Blocks::createMeshChunk(Pi3Cresource* resource, Pi3Cmesh& mesh, int chunkX,
 				}
 
 				//TODO:... adding line verts wont work until they're loaded into vert buffers (this must be fixed!)
-				int mpv = (mesh.verts.size() / mesh.stride); 
-				mesh.lineIndexes.push_back(mpv - 1);
-				mesh.lineIndexes.push_back(mpv - 2);
+				//int mpv = (mesh.verts.size() / mesh.stride); 
+				//mesh.lineIndexes.push_back(mpv - 1);
+				//mesh.lineIndexes.push_back(mpv - 2);
 				//mesh.lineIndexes.push_back(mpv - 3);
 				//mesh.lineIndexes.push_back(mpv - 4);
 				//mesh.lineIndexes.push_back(mpv - 5);
@@ -491,7 +495,7 @@ void Blocks::addXshape(std::vector<float>& verts, uint32_t& vc, int x, int y, in
 
 }
 
-uint32_t Blocks::calcRelativePositionPtr(const vec3f& position)
+int32_t Blocks::calcRelativePositionPtr(const vec3f& position)
 {
 	//vec3f offset = position+chunkCorner;
 	int xx = (int)(position.x + chunkWidth * 10000);

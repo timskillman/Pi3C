@@ -151,6 +151,8 @@ public:
 	int32_t letterSheetRef = -1;
 	int32_t lettersRef = -1;
 
+	GLuint VBOid[MAXVBO];
+
 private:
 	
 	template <class T>
@@ -161,9 +163,9 @@ private:
 		return T();
 	}
 
-void addMeshVerts(const Pi3Cmesh &mesh, std::vector<float> &newverts, const uint32_t to, const uint32_t size, const uint32_t vertsize, const bool deleteVerts);
+	void addMeshVerts(const Pi3Cmesh &mesh, std::vector<float> &newverts, const uint32_t to, const uint32_t size, const uint32_t vertsize, const bool deleteVerts);
 
-	GLuint VBOid[MAXVBO];
+	
 	//uint32_t stride;
 	int lastVBO = -1;
 	//int startVBO = 0;
