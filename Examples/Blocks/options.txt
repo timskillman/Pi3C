@@ -4,7 +4,7 @@ screenHeight:600
 perspective:300
 fullscreen:true
 antiAliasLevel:0
-mapSize:15
+mapSize:7
 chunkSize:16
 chunkHeight:128
 walkSpeed:0.2
