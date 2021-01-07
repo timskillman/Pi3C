@@ -2,7 +2,7 @@ TARGET = Blocks
 
 CC = g++
 CFLAGS = -std=c++17 -Wall
-LDLIBS = -lGL -lSDL2_image -lSDL2_mixer -lSDL2_ttf
+LDLIBS = -lGL -lGLU -lSDL2_image -lSDL2_mixer -lSDL2_ttf
 LDFLAGS = $(shell sdl2-config --cflags --libs)
 
 SHARED_DIR:= ../../SharedCode/core
