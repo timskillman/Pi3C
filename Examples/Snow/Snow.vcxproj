@@ -212,6 +212,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\SharedCode\core\Pi3Cbbox2d.cpp" />
     <ClCompile Include="..\..\SharedCode\core\Pi3Cbbox3d.cpp" />
     <ClCompile Include="..\..\SharedCode\core\Pi3Ccollision.cpp" />
     <ClCompile Include="..\..\SharedCode\core\Pi3Cfont.cpp" />
@@ -252,6 +253,7 @@
     <ClCompile Include="Source\Snow.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\SharedCode\core\Pi3Cbbox2d.h" />
     <ClInclude Include="..\..\SharedCode\core\Pi3Cbbox3d.h" />
     <ClInclude Include="..\..\SharedCode\core\Pi3Ccollision.h" />
     <ClInclude Include="..\..\SharedCode\core\Pi3Cfont.h" />

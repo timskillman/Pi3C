@@ -5,6 +5,7 @@
 #include "Pi3Cresource.h"
 #include "Pi3Cscene.h"
 #include "FastNoiseLite.h"
+#include "Pi3CvertsPtr.h"
 
 class Blocks {
 public:
@@ -14,29 +15,30 @@ public:
 	void createBlocks(int MapSize, int ChunkWidth = 16, int ChunkDepth = 16, int ChunkHeight = 256);
 	void createMapChunk(int x, int z);
 	void createTexPackUV();
-	void createMeshChunk(Pi3Cmesh& mesh, int chunkX, int chunkZ);
-	void updateMeshChunk(Pi3Cresource* resource, Pi3Cscene* scene, const vec3f& chunkCorner, const vec3f& position);
+	void createMeshChunk(Pi3Cresource* resource, Pi3Cmesh& mesh, int chunkX, int chunkZ);
+	void updateMeshChunk(Pi3Cresource* resource, Pi3Cscene* scene, const vec3f& position);
 	void createTrees(int x, int z, int dispersion);
 	void insertBlock(uint8_t blockType, uint32_t chunkPtr, int x, int y, int z);
-	void insertBlock(uint8_t blockType, const vec3f& chunkCorner, const vec3f& position);
+	void insertBlock(uint8_t blockType, const vec3f& position);
 
 	uint32_t calcChunkPtr(int chunkX, int chunkZ) { 
-		return ((chunkX + mapSize) % mapSize) * chunkSlice + ((chunkZ + mapSize) % mapSize) * mapSize * chunkSize;
+		return ((chunkX + mapSize*10000) % mapSize) * chunkSlice + ((chunkZ + mapSize*10000) % mapSize) * mapSize * chunkSize;
 	}
 
 	uint32_t calcVoxelPtr(const uint32_t chunkPtr, const int x, const int z) {
 		return chunkPtr + (x + z * chunkPitch) * chunkHeight;
 	}
 
-	uint32_t calcRelativePositionPtr(const vec3f& chunkCorner, const vec3f& position);
-	int getGroundHeight(const vec3f& chunkCorner, const vec3f& position);
-	int getHeightAtPoint(const vec3f& chunkCorner, const vec3f& position);
+	uint32_t calcRelativePositionPtr(const vec3f& position);
+	int getGroundHeight(const vec3f& position);
+	int getHeightAtPoint(const vec3f& position);
 
 private:
-	void addQuadTopBottom(Pi3Cmesh& mesh, int x, int h, int y, uint8_t mapval, uint8_t faceVal, int tb, int light, int shadowEdge);
-	void addQuadLeftRight(Pi3Cmesh& mesh, int x, int h, int y, uint8_t mapval, uint8_t faceVal, int lr, int light, int shadowEdge);
-	void addQuadFrontBack(Pi3Cmesh& mesh, int x, int h, int y, uint8_t mapval, uint8_t faceVal, int fb, int light, int shadowEdge);
-	void addXshape(Pi3Cmesh& mesh, int x, int y, int z, uint8_t mapVal, int light, int shadowEdge);
+	void updatePackedVert(std::vector<float>& verts, uint32_t& vc, const vec3f& position, const vec3f& normal, const vec2f& uv, const uint32_t col);
+	void addQuadTopBottom(std::vector<float>& verts, uint32_t& vc, int x, int h, int y, uint8_t mapval, uint8_t faceVal, int tb, int light, int shadowEdge);
+	void addQuadLeftRight(std::vector<float>& verts, uint32_t& vc, int x, int h, int y, uint8_t mapval, uint8_t faceVal, int lr, int light, int shadowEdge);
+	void addQuadFrontBack(std::vector<float>& verts, uint32_t& vc, int x, int h, int y, uint8_t mapval, uint8_t faceVal, int fb, int light, int shadowEdge);
+	void addXshape(std::vector<float>& verts, uint32_t& vc, int x, int y, int z, uint8_t mapVal, int light, int shadowEdge);
 	void addTree(uint32_t chunkPtr, int x, int z, int size, int bark, int leaves);
 
 	void fillCircXY(int blockType, uint32_t chunkPtr, int xc, int yc, int zc, int x, int y, int z);
@@ -62,6 +64,7 @@ private:
 	int32_t chunkSlice, chunkPitch, chunkPitchHeight;
 	int32_t chunkLeft, chunkRight, chunkBack, chunkFront;
 	int32_t chunkLeftBack, chunkRightBack, chunkLeftFront, chunkRightFront;
+	int32_t chunkWrapLeft, chunkWrapRight, chunkWrapBack, chunkWrapFront;
 
 	float textureDiv = 1.f / 16.f; //Assumes texture is 16x16 texture map
 };

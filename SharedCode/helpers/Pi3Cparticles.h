@@ -22,22 +22,23 @@ public:
 	}
 
 	void create(Pi3Cresource* resource, const uint32_t count, const vec3f& pos, const ixyz& area, const uint32_t minsize, const uint32_t maxsize, Pi3CspriteSheetInfo &spriteAni, int32_t groupId);
-	void update(const size_t ref, const vec2f size, const uint32_t type);
-	void createParticle(const vec3f& pos, const vec2f size, const uint32_t tileRef, Pi3CspriteSheetInfo& spriteAni, const ixyz& wandr);
 	void animate(const float d);
-	void updateParticleCoordsRotated(const std::vector<vec3f>& pos, const std::vector<vec2f>& size, const std::vector<float>& angle);
+	void updateParticles();
 	void updateStartArea(const ixyz& area);
 
 	vec3f startpos;
-	std::vector<vec3f> position;
+	std::vector<vec3f> positions;
 	std::vector<vec2f> sizes;
-	std::vector<float> angle;
+	std::vector<float> angles;
 	ixyz startsize;
 	float speed = 0.0001f;
 	Pi3Cmodel model;
 
 private:
 	
+	void update(const size_t ref, const vec2f size, const uint32_t type);
+	void createParticle(const vec3f& pos, const vec2f size, const uint32_t tileRef, Pi3CspriteSheetInfo& spriteAni, const ixyz& wandr);
+
 	std::unique_ptr<Pi3Cmesh> mesh;
 	
 	std::vector<vec3f> dir;

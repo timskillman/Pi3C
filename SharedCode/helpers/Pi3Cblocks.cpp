@@ -55,6 +55,11 @@ void Blocks::createBlocks(int MapSize, int ChunkWidth, int ChunkDepth, int Chunk
 	chunkRightBack = chunkRight + chunkBack;
 	chunkLeftFront = chunkLeft + chunkFront;
 	chunkRightFront = chunkRight + chunkFront;
+
+	chunkWrapLeft = chunkPitchHeight - chunkHeight;
+	chunkWrapRight = -chunkPitchHeight + chunkHeight;
+	chunkWrapBack = chunkMapSize - chunkPitchHeight;
+	chunkWrapFront = -chunkMapSize + chunkPitchHeight;
 }
 
 void Blocks::createMapChunk(int chunkX, int chunkZ)
@@ -138,9 +143,9 @@ void Blocks::createMapChunk(int chunkX, int chunkZ)
 	}
 }
 
-void Blocks::insertBlock(uint8_t blockType, const vec3f& chunkCorner, const vec3f& position)
+void Blocks::insertBlock(uint8_t blockType, const vec3f& position)
 {
-	uint32_t chunkXZ = calcRelativePositionPtr(chunkCorner, position);
+	uint32_t chunkXZ = calcRelativePositionPtr(position);
 	int ptr = chunkXZ + ((int)(position.y)+ chunkHeight / 2);
 	if (ptr<0 || ptr>chunkMapSize) return;
 	chunks[ptr] = blockType;
@@ -158,25 +163,42 @@ void lightRecovery(int& light, int lightRecover)
 	light = (light + lightRecover < 255) ? light + lightRecover : 255;
 }
 
-void Blocks::updateMeshChunk(Pi3Cresource* resource, Pi3Cscene* scene, const vec3f& chunkCorner, const vec3f& position)
+void Blocks::updateMeshChunk(Pi3Cresource* resource, Pi3Cscene* scene, const vec3f& position)
 {
-	vec3f offset = position - chunkCorner;
-	int chunkOffsetX = (int)(offset.x / chunkWidth);
-	int chunkOffsetZ = (int)(offset.z / chunkDepth);
-	int blockId = chunkOffsetX + chunkOffsetZ * mapSize;
-	Pi3Cmesh newmesh;
-	createMeshChunk(newmesh, chunkOffsetX, chunkOffsetZ);
-	scene->models[blockId].updateMesh(resource, newmesh);
+	int xx = (int)(position.x + chunkWidth * 10000);
+	int zz = (int)(position.z + chunkDepth * 10000);
+	int chx = (xx + mapSize * 10000) % mapSize;
+	int chz = (zz + mapSize * 10000) % mapSize;
+	int chunkOffsetX = xx / chunkWidth - 10000;
+	int chunkOffsetZ = zz / chunkDepth - 10000;
+	int blockId = chx + chz * mapSize;
+
+	Pi3Cmodel* model = &scene->models[blockId];
+	int32_t meshRef = model->meshRef;
+	Pi3Cmesh* mesh = &resource->meshes[meshRef];
+	createMeshChunk(resource, *mesh, chunkOffsetX, chunkOffsetZ);
+	mesh->vertSize = mesh->vc / mesh->stride;
+
+	resource->updateMesh(meshRef);
+	//model->updateMesh(resource, *mesh);
 }
 
-void Blocks::createMeshChunk(Pi3Cmesh& mesh, int chunkX, int chunkZ)
+void Blocks::createMeshChunk(Pi3Cresource* resource, Pi3Cmesh& mesh, int chunkX, int chunkZ)
 {
-	uint32_t chunkPtr = calcChunkPtr(chunkX, chunkZ);
+	//uint32_t chunkPtr = calcChunkPtr(chunkX, chunkZ);
+	//((chunkX + mapSize*10000) % mapSize) * chunkSlice + ((chunkZ + mapSize*10000) % mapSize) * mapSize * chunkSize;
+	int chx = (chunkX + mapSize * 10000) % mapSize;
+	int chz = (chunkZ + mapSize * 10000) % mapSize;
+	uint32_t chunkPtr = chx * chunkSlice + chz * mapSize * chunkSize;
 	int cx = chunkX * chunkWidth;
 	int cz = chunkZ * chunkDepth;
 	int halfDepth = chunkHeight / 2;
 	int lightRecover = 5;
 	int lightMax = 255 - lightRecover;
+
+	mesh.vc = 0;
+	uint32_t* vc = &mesh.vc;
+	std::vector<float>* verts = (mesh.verts.size() > 0) ? &mesh.verts : &resource->vertBuffer[mesh.bufRef].verts;
 
 	for (int32_t zz = 0; zz < chunkDepth; zz++) {
 		for (int32_t xx = 0; xx < chunkWidth; xx++) {
@@ -185,43 +207,43 @@ void Blocks::createMeshChunk(Pi3Cmesh& mesh, int chunkX, int chunkZ)
 			uint32_t p = ptr + chunkHeight - 2; //skip top byte height level
 			int light = 255; //start with max light
 			int geomtype;
+			uint8_t cp = 0;
+
 			//Create all surfaces ...
 			while (p > ptr) {
 
 				//edges should read values on opposite sides (i.e. wrapping)
-				bool onfarLeft = chunkX == 0 && xx == 0;
-				bool onfarRight = chunkX == mapSize - 1 && xx == chunkWidth - 1;
-				bool onfarBack = chunkZ == 0 && zz == 0;
-				bool onfarFront = chunkZ == mapSize - 1 && zz == chunkDepth - 1;
+				bool onfarLeft = chx == 0 && xx == 0;
+				bool onfarRight = chx == mapSize - 1 && xx == chunkWidth - 1;
+				bool onfarBack = chz == 0 && zz == 0;
+				bool onfarFront = chz == mapSize - 1 && zz == chunkDepth - 1;
 
 				//skip air blocks (but create faces adjacent to air blocks)
 				int shadow = 0;
 				while (p > ptr && chunks[p] == blockType::Air) {
 					int ht = p - ptr;
 
-					if (!onfarLeft) {
-						geomtype = typToTex[chunks[p + chunkLeft]].geomType;
-						if (geomtype < blockTypes::xshape && geomtype > blockTypes::air) {
-							addQuadLeftRight(mesh, cx + xx, ht - halfDepth, cz + zz, chunks[p + chunkLeft], 1, 0, light, shadow);
-						}
-						else {
-							if (light < 255) lightRecovery(light, lightRecover);
-						}
+					cp = chunks[(onfarLeft) ? p + chunkWrapLeft : p + chunkLeft];
+					geomtype = typToTex[cp].geomType;
+					if (geomtype < blockTypes::xshape && geomtype > blockTypes::air) {
+						addQuadLeftRight(*verts, *vc, cx + xx, ht - halfDepth, cz + zz, cp, 1, 0, light, shadow);
+					}
+					else {
+						if (light < 255) lightRecovery(light, lightRecover);
 					}
 
-					if (!onfarBack) {
-						geomtype = typToTex[chunks[p + chunkBack]].geomType;
-						if (geomtype < blockTypes::xshape && geomtype > blockTypes::air) {
-							addQuadFrontBack(mesh, cx + xx, ht - halfDepth, cz + zz, chunks[p + chunkBack], 3, 0, light, shadow);
-						}
-						else {
-							if (light < 255) lightRecovery(light, lightRecover);
-						}
+					cp = chunks[(onfarBack) ? p + chunkWrapBack : p + chunkBack];
+					geomtype = typToTex[cp].geomType;
+					if (geomtype < blockTypes::xshape && geomtype > blockTypes::air) {
+						addQuadFrontBack(*verts, *vc, cx + xx, ht - halfDepth, cz + zz, cp, 3, 0, light, shadow);
+					}
+					else {
+						if (light < 255) lightRecovery(light, lightRecover);
 					}
 
 					if (light < 255) {
-						if (!onfarRight && chunks[p + chunkRight] == blockType::Air) lightRecovery(light, lightRecover);
-						if (!onfarFront && chunks[p + chunkFront] == blockType::Air) lightRecovery(light, lightRecover);
+						if (chunks[(onfarRight) ? p + chunkWrapRight : p + chunkRight] == blockType::Air) lightRecovery(light, lightRecover);
+						if (chunks[(onfarFront) ? p + chunkWrapFront : p + chunkFront] == blockType::Air) lightRecovery(light, lightRecover);
 					}
 					p--;
 				}
@@ -230,20 +252,21 @@ void Blocks::createMeshChunk(Pi3Cmesh& mesh, int chunkX, int chunkZ)
 				shadow = 0;
 				int blockAbove = p + 1;
 
-					if (!(onfarLeft || onfarBack) && chunks[blockAbove + chunkLeftBack]) shadow = shadow | 1;
+					if (!(onfarLeft || onfarBack) && chunks[blockAbove + chunkLeftBack]) shadow = shadow | 1; //TODO
 					if (!(onfarRight || onfarBack) && chunks[blockAbove + chunkRightBack]) shadow = shadow | 2;
 					if (!(onfarRight || onfarFront) && chunks[blockAbove + chunkRightFront]) shadow = shadow | 4;
 					if (!(onfarLeft || onfarFront) && chunks[blockAbove + chunkLeftFront]) shadow = shadow | 8;
-					if (!onfarBack && chunks[blockAbove + chunkBack]) shadow = shadow | 3;
-					if (!onfarFront && chunks[blockAbove + chunkFront]) shadow = shadow | 12;
-					if (!onfarLeft && chunks[blockAbove + chunkLeft]) shadow = shadow | 9;
-					if (!onfarRight && chunks[blockAbove + chunkRight]) shadow = shadow | 6;
+
+					if (chunks[(onfarBack) ? p + chunkWrapBack : blockAbove + chunkBack]) shadow = shadow | 3;
+					if (chunks[(onfarFront) ? p + chunkWrapFront : blockAbove + chunkFront]) shadow = shadow | 12;
+					if (chunks[(onfarLeft) ? p + chunkWrapLeft : blockAbove + chunkLeft]) shadow = shadow | 9;
+					if (chunks[(onfarRight) ? p + chunkWrapRight : blockAbove + chunkRight]) shadow = shadow | 6;
 
 
 				//create ground plane ...
 				if (typToTex[chunks[p]].geomType < blockTypes::xshape) {
 					int ht = p - ptr;
-					addQuadTopBottom(mesh, cx + xx, ht - halfDepth, cz + zz, chunks[p], 0, 0, light, shadow);
+					addQuadTopBottom(*verts, *vc, cx + xx, ht - halfDepth, cz + zz, chunks[p], 0, 0, light, shadow);
 				}
 
 				//TODO:... adding line verts wont work until they're loaded into vert buffers (this must be fixed!)
@@ -261,48 +284,52 @@ void Blocks::createMeshChunk(Pi3Cmesh& mesh, int chunkX, int chunkZ)
 					int ht = p - ptr - halfDepth;
 					int geomtype = typToTex[chunks[p]].geomType;
 					if (geomtype < blockTypes::xshape) {
-						if (!onfarLeft && chunks[p + chunkLeft] == blockType::Air) {
+						if (chunks[(onfarLeft) ? p + chunkWrapLeft : p + chunkLeft] == blockType::Air) {
 							if (light < 255) lightRecovery(light, lightRecover);
-							addQuadLeftRight(mesh, cx + xx, ht, cz + zz, chunks[p], 2, 1, light, shadow);
+							addQuadLeftRight(*verts, *vc, cx + xx, ht, cz + zz, chunks[p], 2, 1, light, shadow);
 						}
-						if (!onfarBack && chunks[p + chunkBack] == blockType::Air) {
+						if (chunks[(onfarBack) ? p + chunkWrapBack : p + chunkBack] == blockType::Air) {
 							if (light < 255) lightRecovery(light, lightRecover);
-							addQuadFrontBack(mesh, cx + xx, ht, cz + zz, chunks[p], 4, 1, light, shadow);
+							addQuadFrontBack(*verts, *vc, cx + xx, ht, cz + zz, chunks[p], 4, 1, light, shadow);
 						}
 					}
 					else {
 						switch (geomtype) {
 						case blockTypes::xshape: 
-							addXshape(mesh, cx + xx, ht, cz + zz, chunks[p], light, 0);
+							addXshape(*verts, *vc, cx + xx, ht, cz + zz, chunks[p], light, 0);
 							break;
 						case blockTypes::stick: break;
 						case blockTypes::table: break;
 						}
 						shadow = 15;
-					}
+					}	
 					//If this is a 'see-through' block, then create edges of blocks adjacent to it ...
 					if (geomtype > 1) {
 						if (geomtype == 2) { shadow = 15; }
-						if (!onfarLeft && typToTex[chunks[p + chunkLeft]].geomType == 1) {
-							addQuadLeftRight(mesh, cx + xx, ht, cz + zz, chunks[p + chunkLeft], 1, 0, light, shadow);
+						cp = chunks[(onfarLeft) ? p + chunkWrapLeft : p + chunkLeft];
+						if (typToTex[cp].geomType == 1) {
+							addQuadLeftRight(*verts, *vc, cx + xx, ht, cz + zz, cp, 1, 0, light, shadow);
 						}
-						if (!onfarRight && typToTex[chunks[p + chunkRight]].geomType == 1) {
-							addQuadLeftRight(mesh, cx + xx + 1, ht, cz + zz, chunks[p + chunkRight], 2, 1, light, shadow);
+						cp = chunks[(onfarRight) ? p + chunkWrapRight : p + chunkRight];
+						if (typToTex[cp].geomType == 1) {
+							addQuadLeftRight(*verts, *vc, cx + xx + 1, ht, cz + zz, cp, 2, 1, light, shadow);
 						}
-						if (!onfarBack && typToTex[chunks[p + chunkBack]].geomType == 1) {
-							addQuadFrontBack(mesh, cx + xx, ht, cz + zz, chunks[p + chunkBack], 3, 0, light, shadow);
+						cp = chunks[(onfarBack) ? p + chunkWrapBack : p + chunkBack];
+						if (typToTex[cp].geomType == 1) {
+							addQuadFrontBack(*verts, *vc, cx + xx, ht, cz + zz, cp, 3, 0, light, shadow);
 						}
-						if (!onfarFront && typToTex[chunks[p + chunkFront]].geomType == 1) {
-							addQuadFrontBack(mesh, cx + xx, ht, cz + zz + 1, chunks[p + chunkFront], 4, 1, light, shadow);
+						cp = chunks[(onfarFront) ? p + chunkWrapFront : p + chunkFront];
+						if (typToTex[cp].geomType == 1) {
+							addQuadFrontBack(*verts, *vc, cx + xx, ht, cz + zz + 1, cp, 4, 1, light, shadow);
 						}
 						if ((p - 1) > ptr && typToTex[chunks[p - 1]].geomType == 1) {
-							addQuadTopBottom(mesh, cx + xx, ht-1, cz + zz, chunks[p - 1], 0, 0, light, shadow);
+							addQuadTopBottom(*verts, *vc, cx + xx, ht-1, cz + zz, chunks[p - 1], 0, 0, light, shadow);
 						}
 					}
 
 					if (light < 255) {
-						if (!onfarRight && chunks[p + chunkRight] == blockType::Air) lightRecovery(light, lightRecover);
-						if (!onfarFront && chunks[p + chunkFront] == blockType::Air) lightRecovery(light, lightRecover);
+						if (chunks[(onfarRight) ? p + chunkWrapRight : p + chunkRight] == blockType::Air) lightRecovery(light, lightRecover);
+						if (chunks[(onfarFront) ? p + chunkWrapFront : p + chunkFront] == blockType::Air) lightRecovery(light, lightRecover);
 					}
 					p--;
 				}
@@ -312,16 +339,28 @@ void Blocks::createMeshChunk(Pi3Cmesh& mesh, int chunkX, int chunkZ)
 					shadow = 0;
 					light = 128;
 					//if (light < 80) light = 80;
-					addQuadTopBottom(mesh, cx + xx, (p - ptr) - halfDepth, cz + zz, chunks[p + 1], 0, 1, light, shadow);
+					addQuadTopBottom(*verts, *vc, cx + xx, (p - ptr) - halfDepth, cz + zz, chunks[p + 1], 0, 1, light, shadow);
 				}
 			}
 		}
 	}
-	mesh.updateBounds();
+
+	mesh.bbox.bboxFromVerts(*verts, 0, *vc, mesh.stride);
 }
 
 
-
+void Blocks::updatePackedVert(std::vector<float>& verts, uint32_t& vc, const vec3f& position, const vec3f& normal, const vec2f& uv, const uint32_t col)
+{
+	verts[vc++] = position.x;
+	verts[vc++] = position.y;
+	verts[vc++] = position.z;
+	verts[vc++] = normal.x;
+	verts[vc++] = normal.y;
+	verts[vc++] = normal.z;
+	verts[vc++] = uv.x;
+	verts[vc++] = uv.y;
+	verts[vc++] = (float)(col & 255) / 256.f + (float)((col >> 8) & 255) + (float)((col >> 16) & 255) * 256.f; // Pack 32bit colour in float (65535.996f = 0xffffff)
+}
 
 uint32_t shadow(uint32_t col, float shadow)
 {
@@ -329,7 +368,7 @@ uint32_t shadow(uint32_t col, float shadow)
 	return (uint32_t)((float)(col & 255) * shadow) | ((uint32_t)((float)((col >> 8) & 255) * shadow) << 8) | ((uint32_t)((float)((col >> 16) & 255) * shadow) << 16) | 0xff000000;
 }
 
-void Blocks::addQuadTopBottom(Pi3Cmesh &mesh, int x, int h, int z, uint8_t mapVal, uint8_t faceVal, int tb, int light, int shadowEdge)
+void Blocks::addQuadTopBottom(std::vector<float>& verts, uint32_t& vc, int x, int h, int z, uint8_t mapVal, uint8_t faceVal, int tb, int light, int shadowEdge)
 {
 	vec3f norm(0, -(1.f - (float)((1 - tb) * 2)), 0);
 	float hh = (float)(h);
@@ -347,16 +386,16 @@ void Blocks::addQuadTopBottom(Pi3Cmesh &mesh, int x, int h, int z, uint8_t mapVa
 	uint32_t botRightLight = (shadowEdge & 4) ? shadow(col, shadowLight) : shadowCol;
 	uint32_t botLeftLight = (shadowEdge & 8) ? shadow(col, shadowLight) : shadowCol;
 
-	mesh.addPackedVert(vec3f((float)(x + 1), hh, (float)z), norm, tex + vec2f(textureDiv, 0), topRightLight);
-	mesh.addPackedVert(vec3f((float)x, hh, (float)(z + tb)), norm, tex + vec2f(0, textureDiv * ftb), (tb==0) ? topLeftLight : botLeftLight);
-	mesh.addPackedVert(vec3f((float)x, hh, (float)(z + (1 - tb))), norm, tex + vec2f(0, textureDiv * (1.f - ftb)), (tb == 0) ? botLeftLight : topLeftLight);
+	updatePackedVert(verts, vc, vec3f((float)(x + 1), hh, (float)z), norm, tex + vec2f(textureDiv, 0), topRightLight);
+	updatePackedVert(verts, vc, vec3f((float)x, hh, (float)(z + tb)), norm, tex + vec2f(0, textureDiv * ftb), (tb==0) ? topLeftLight : botLeftLight);
+	updatePackedVert(verts, vc, vec3f((float)x, hh, (float)(z + (1 - tb))), norm, tex + vec2f(0, textureDiv * (1.f - ftb)), (tb == 0) ? botLeftLight : topLeftLight);
 
-	mesh.addPackedVert(vec3f((float)(x + 1), hh, (float)z), norm, tex + vec2f(textureDiv, 0), topRightLight);
-	mesh.addPackedVert(vec3f((float)(x + tb), hh, (float)(z + 1)), norm, tex + vec2f(textureDiv * ftb, textureDiv), (tb == 0) ? botLeftLight : botRightLight);
-	mesh.addPackedVert(vec3f((float)(x + (1 - tb)), hh, (float)(z + 1)), norm, tex + vec2f(textureDiv * (1.f - ftb), textureDiv), (tb == 0) ? botRightLight : botLeftLight);
+	updatePackedVert(verts, vc, vec3f((float)(x + 1), hh, (float)z), norm, tex + vec2f(textureDiv, 0), topRightLight);
+	updatePackedVert(verts, vc, vec3f((float)(x + tb), hh, (float)(z + 1)), norm, tex + vec2f(textureDiv * ftb, textureDiv), (tb == 0) ? botLeftLight : botRightLight);
+	updatePackedVert(verts, vc, vec3f((float)(x + (1 - tb)), hh, (float)(z + 1)), norm, tex + vec2f(textureDiv * (1.f - ftb), textureDiv), (tb == 0) ? botRightLight : botLeftLight);
 }
 
-void Blocks::addQuadLeftRight(Pi3Cmesh &mesh, int x, int y, int z, uint8_t mapVal, uint8_t faceVal, int leftRight, int light, int shadowEdge)
+void Blocks::addQuadLeftRight(std::vector<float>& verts, uint32_t& vc, int x, int y, int z, uint8_t mapVal, uint8_t faceVal, int leftRight, int light, int shadowEdge)
 {
 	float xx = (float)x, yy = (float)y, zz = (float)z, lr = (float)leftRight, ilr = 1-lr;
 	static vec3f norm(1.f - ilr * 2, 0, 0);
@@ -365,16 +404,16 @@ void Blocks::addQuadLeftRight(Pi3Cmesh &mesh, int x, int y, int z, uint8_t mapVa
 	uint32_t col = typToTex[mapVal].colSides;
 	uint32_t shadowCol = shadow(col, (float)light / 255.f);
 
-	mesh.addPackedVert(vec3f(xx, yy, zz + lr), norm, tex + vec2f(textureDiv, 0), shadowCol);
-	mesh.addPackedVert(vec3f(xx, yy, zz + ilr), norm, tex, shadowCol);
-	mesh.addPackedVert(vec3f(xx, yy - 1, zz + ilr), norm, tex + vec2f(0, textureDiv), shadowCol);
+	updatePackedVert(verts, vc, vec3f(xx, yy, zz + lr), norm, tex + vec2f(textureDiv, 0), shadowCol);
+	updatePackedVert(verts, vc, vec3f(xx, yy, zz + ilr), norm, tex, shadowCol);
+	updatePackedVert(verts, vc, vec3f(xx, yy - 1, zz + ilr), norm, tex + vec2f(0, textureDiv), shadowCol);
 
-	mesh.addPackedVert(vec3f(xx, yy, zz + lr), norm, tex + vec2f(textureDiv, 0), shadowCol);
-	mesh.addPackedVert(vec3f(xx, yy - 1, zz + ilr), norm, tex + vec2f(0, textureDiv), shadowCol);
-	mesh.addPackedVert(vec3f(xx, yy - 1, zz + lr), norm, tex + vec2f(textureDiv, textureDiv), shadowCol);
+	updatePackedVert(verts, vc, vec3f(xx, yy, zz + lr), norm, tex + vec2f(textureDiv, 0), shadowCol);
+	updatePackedVert(verts, vc, vec3f(xx, yy - 1, zz + ilr), norm, tex + vec2f(0, textureDiv), shadowCol);
+	updatePackedVert(verts, vc, vec3f(xx, yy - 1, zz + lr), norm, tex + vec2f(textureDiv, textureDiv), shadowCol);
 }
 
-void Blocks::addQuadFrontBack(Pi3Cmesh &mesh, int x, int y, int z, uint8_t mapVal, uint8_t faceVal, int frontBack, int light, int shadowEdge)
+void Blocks::addQuadFrontBack(std::vector<float>& verts, uint32_t& vc, int x, int y, int z, uint8_t mapVal, uint8_t faceVal, int frontBack, int light, int shadowEdge)
 {
 	float xx = (float)x, yy = (float)y, zz = (float)z, fb = (float)frontBack, ifb = 1 - fb;
 	static vec3f norm(0, 0, 1.f - ifb * 2); // (1.f - (float)((1 - fb) * 2)));
@@ -383,16 +422,16 @@ void Blocks::addQuadFrontBack(Pi3Cmesh &mesh, int x, int y, int z, uint8_t mapVa
 	uint32_t col = typToTex[mapVal].colSides;
 	uint32_t shadowCol = shadow(col, (float)light / 255.f);
 
-	mesh.addPackedVert(vec3f(xx + ifb, yy, zz), norm, tex + vec2f(textureDiv, 0), shadowCol);
-	mesh.addPackedVert(vec3f(xx + fb, yy, zz), norm, tex, shadowCol);
-	mesh.addPackedVert(vec3f(xx + fb, yy - 1, zz), norm, tex + vec2f(0, textureDiv), shadowCol);
+	updatePackedVert(verts, vc,vec3f(xx + ifb, yy, zz), norm, tex + vec2f(textureDiv, 0), shadowCol);
+	updatePackedVert(verts, vc,vec3f(xx + fb, yy, zz), norm, tex, shadowCol);
+	updatePackedVert(verts, vc,vec3f(xx + fb, yy - 1, zz), norm, tex + vec2f(0, textureDiv), shadowCol);
 
-	mesh.addPackedVert(vec3f(xx + ifb, yy, zz), norm, tex + vec2f(textureDiv, 0), shadowCol);
-	mesh.addPackedVert(vec3f(xx + fb, yy - 1, zz), norm, tex + vec2f(0, textureDiv), shadowCol);
-	mesh.addPackedVert(vec3f(xx + ifb, yy - 1, zz), norm, tex + vec2f(textureDiv, textureDiv), shadowCol);
+	updatePackedVert(verts, vc,vec3f(xx + ifb, yy, zz), norm, tex + vec2f(textureDiv, 0), shadowCol);
+	updatePackedVert(verts, vc,vec3f(xx + fb, yy - 1, zz), norm, tex + vec2f(0, textureDiv), shadowCol);
+	updatePackedVert(verts, vc,vec3f(xx + ifb, yy - 1, zz), norm, tex + vec2f(textureDiv, textureDiv), shadowCol);
 }
 
-void Blocks::addXshape(Pi3Cmesh& mesh, int x, int y, int z, uint8_t mapVal, int light, int shadowEdge)
+void Blocks::addXshape(std::vector<float>& verts, uint32_t& vc, int x, int y, int z, uint8_t mapVal, int light, int shadowEdge)
 {
 	float xx = (float)x, yy = (float)y, zz = (float)z;
 
@@ -402,21 +441,21 @@ void Blocks::addXshape(Pi3Cmesh& mesh, int x, int y, int z, uint8_t mapVal, int 
 
 	vec3f v1(xx + 1, yy, zz + 1), v2(xx, yy, zz),  v3(xx, yy - 1, zz), v4(xx + 1, yy - 1, zz + 1);
 	vec3f norm = v1.trinormal(v2, v3);
-	mesh.addPackedVert(v1, norm, tex + vec2f(textureDiv, 0), shadowCol);
-	mesh.addPackedVert(v2, norm, tex, shadowCol);
-	mesh.addPackedVert(v3, norm, tex + vec2f(0, textureDiv), shadowCol);
+	updatePackedVert(verts, vc,v1, norm, tex + vec2f(textureDiv, 0), shadowCol);
+	updatePackedVert(verts, vc,v2, norm, tex, shadowCol);
+	updatePackedVert(verts, vc,v3, norm, tex + vec2f(0, textureDiv), shadowCol);
 
-	mesh.addPackedVert(v1, norm, tex + vec2f(textureDiv, 0), shadowCol);
-	mesh.addPackedVert(v3, norm, tex + vec2f(0, textureDiv), shadowCol);
-	mesh.addPackedVert(v4, norm, tex + vec2f(textureDiv, textureDiv), shadowCol);
+	updatePackedVert(verts, vc,v1, norm, tex + vec2f(textureDiv, 0), shadowCol);
+	updatePackedVert(verts, vc,v3, norm, tex + vec2f(0, textureDiv), shadowCol);
+	updatePackedVert(verts, vc,v4, norm, tex + vec2f(textureDiv, textureDiv), shadowCol);
 
-	mesh.addPackedVert(v2, -norm, tex, shadowCol);
-	mesh.addPackedVert(v1, -norm, tex + vec2f(textureDiv, 0), shadowCol);
-	mesh.addPackedVert(v4, -norm, tex + vec2f(textureDiv, textureDiv), shadowCol);
+	updatePackedVert(verts, vc,v2, -norm, tex, shadowCol);
+	updatePackedVert(verts, vc,v1, -norm, tex + vec2f(textureDiv, 0), shadowCol);
+	updatePackedVert(verts, vc,v4, -norm, tex + vec2f(textureDiv, textureDiv), shadowCol);
 
-	mesh.addPackedVert(v2, -norm, tex, shadowCol);
-	mesh.addPackedVert(v4, -norm, tex + vec2f(textureDiv, textureDiv), shadowCol);
-	mesh.addPackedVert(v3, -norm, tex + vec2f(0, textureDiv), shadowCol);
+	updatePackedVert(verts, vc,v2, -norm, tex, shadowCol);
+	updatePackedVert(verts, vc,v4, -norm, tex + vec2f(textureDiv, textureDiv), shadowCol);
+	updatePackedVert(verts, vc,v3, -norm, tex + vec2f(0, textureDiv), shadowCol);
 
 	v1 = vec3f(xx + 1, yy, zz);
 	v2 = vec3f(xx, yy, zz + 1);
@@ -424,48 +463,51 @@ void Blocks::addXshape(Pi3Cmesh& mesh, int x, int y, int z, uint8_t mapVal, int 
 	v4 = vec3f(xx + 1, yy - 1, zz);
 	norm = v1.trinormal(v2, v3);
 
-	mesh.addPackedVert(v1, norm, tex + vec2f(textureDiv, 0), shadowCol);
-	mesh.addPackedVert(v2, norm, tex, shadowCol);
-	mesh.addPackedVert(v3, norm, tex + vec2f(0, textureDiv), shadowCol);
+	updatePackedVert(verts, vc,v1, norm, tex + vec2f(textureDiv, 0), shadowCol);
+	updatePackedVert(verts, vc,v2, norm, tex, shadowCol);
+	updatePackedVert(verts, vc,v3, norm, tex + vec2f(0, textureDiv), shadowCol);
 
-	mesh.addPackedVert(v1, norm, tex + vec2f(textureDiv, 0), shadowCol);
-	mesh.addPackedVert(v3, norm, tex + vec2f(0, textureDiv), shadowCol);
-	mesh.addPackedVert(v4, norm, tex + vec2f(textureDiv, textureDiv), shadowCol);
+	updatePackedVert(verts, vc,v1, norm, tex + vec2f(textureDiv, 0), shadowCol);
+	updatePackedVert(verts, vc,v3, norm, tex + vec2f(0, textureDiv), shadowCol);
+	updatePackedVert(verts, vc,v4, norm, tex + vec2f(textureDiv, textureDiv), shadowCol);
 
-	mesh.addPackedVert(v2, -norm, tex, shadowCol);
-	mesh.addPackedVert(v1, -norm, tex + vec2f(textureDiv, 0), shadowCol);
-	mesh.addPackedVert(v4, -norm, tex + vec2f(textureDiv, textureDiv), shadowCol);
+	updatePackedVert(verts, vc,v2, -norm, tex, shadowCol);
+	updatePackedVert(verts, vc,v1, -norm, tex + vec2f(textureDiv, 0), shadowCol);
+	updatePackedVert(verts, vc,v4, -norm, tex + vec2f(textureDiv, textureDiv), shadowCol);
 
-	mesh.addPackedVert(v2, -norm, tex, shadowCol);
-	mesh.addPackedVert(v4, -norm, tex + vec2f(textureDiv, textureDiv), shadowCol);
-	mesh.addPackedVert(v3, -norm, tex + vec2f(0, textureDiv), shadowCol);
+	updatePackedVert(verts, vc,v2, -norm, tex, shadowCol);
+	updatePackedVert(verts, vc,v4, -norm, tex + vec2f(textureDiv, textureDiv), shadowCol);
+	updatePackedVert(verts, vc,v3, -norm, tex + vec2f(0, textureDiv), shadowCol);
 
 }
 
-uint32_t Blocks::calcRelativePositionPtr(const vec3f& chunkCorner, const vec3f& position)
+uint32_t Blocks::calcRelativePositionPtr(const vec3f& position)
 {
-	vec3f offset = position - chunkCorner;
-	//offset.z = (float)(chunkDepth * mapSize) - offset.z;
-	int chunkOffsetX = (int)(offset.x / chunkWidth);
-	int chunkOffsetZ = (int)(offset.z / chunkDepth);
-	int x = (int)offset.x % chunkWidth;
-	int z = (int)offset.z % chunkDepth;
+	//vec3f offset = position+chunkCorner;
+	int xx = (int)(position.x + chunkWidth * 10000);
+	int zz = (int)(position.z + chunkDepth * 10000);
+	int chunkOffsetX = xx / chunkWidth - 10000;
+	int chunkOffsetZ = zz / chunkDepth - 10000;
+	int x = xx % chunkWidth;
+	int z = zz % chunkDepth;
 	uint32_t chunkPtr = calcChunkPtr(chunkOffsetX, chunkOffsetZ);
-	//SDL_Log("Offsets: chunkX:%d, chunkZ:%d, x:%d, z:%d", chunkOffsetX, chunkOffsetZ, x, z);
+	//SDL_Log("Position: %f,%f,%f", offset.x, offset.y, offset.z);
+	//SDL_Log("Offsets: chunkX,x:%d,%d chunkZ,z:%d,%d", chunkOffsetX, x, chunkOffsetZ, z);
 	return calcVoxelPtr(chunkPtr, x, z);
 }
 
-int Blocks::getGroundHeight(const vec3f& chunkCorner, const vec3f& position)
+int Blocks::getGroundHeight(const vec3f& position)
 {
-	uint32_t chunkXZ = calcRelativePositionPtr(chunkCorner, position);
+	uint32_t chunkXZ = calcRelativePositionPtr(position);
 	int ht = chunks[chunkXZ + chunkHeight - 1] - chunkHeight / 2;
+	
 	return ht;
 }
 
-int Blocks::getHeightAtPoint(const vec3f& chunkCorner, const vec3f& position)
+int Blocks::getHeightAtPoint(const vec3f& position)
 {
-	uint32_t chunkXZ = calcRelativePositionPtr(chunkCorner, position);
-	int y = (int)(position.y - chunkCorner.y) + chunkHeight / 2;
+	uint32_t chunkXZ = calcRelativePositionPtr(position);
+	int y = (int)(position.y) + chunkHeight / 2;
 	while (chunks[chunkXZ + y] == blockType::Air && y > 0) y--;
 	return (y+1) - chunkHeight / 2;
 }

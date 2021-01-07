@@ -31,13 +31,13 @@ void Pi3Cparticles::create(Pi3Cresource* resources, const uint32_t count, const 
 
 void Pi3Cparticles::createParticle(const vec3f& pos, const vec2f size, const uint32_t tileRef, Pi3CspriteSheetInfo& spriteInfo, const ixyz& wandr) {
 	startpos = pos;
-	position.push_back(pos + vec3f((startsize.x==0) ? 0 : (float)(rand() % startsize.x), (startsize.y==0) ? 0 : (float)(rand() % startsize.y), (startsize.z==0) ? 0 : (float)(rand() % startsize.z)));
+	positions.push_back(pos + vec3f((startsize.x==0) ? 0 : (float)(rand() % startsize.x), (startsize.y==0) ? 0 : (float)(rand() % startsize.y), (startsize.z==0) ? 0 : (float)(rand() % startsize.z)));
 	dir.push_back(vec3f(0, (float)-((rand() % 100000) + 10000), 0));
 	wander.push_back(wandr);
 	sizes.push_back(size);
 	types.push_back(tileRef);
 
-	angle.push_back((float)(rand() % 628) / 100.f);
+	angles.push_back((float)(rand() % 628) / 100.f);
 	angleinc.push_back((float)(rand() % 1000 - 500) * speed);
 
 	mesh->addRect(pos, size, spriteInfo.getTilePosition(tileRef), spriteInfo.getTileSize());
@@ -50,28 +50,28 @@ void Pi3Cparticles::updateStartArea(const ixyz& area)
 
 void Pi3Cparticles::update(const size_t ref, const vec2f size, const uint32_t type)
 {
-	position[ref] = startpos + vec3f((startsize.x == 0) ? 0 : (float)(rand() % startsize.x), (startsize.y == 0) ? 0 : (float)(rand() % startsize.y), (startsize.z == 0) ? 0 : (float)(rand() % startsize.z));
+	positions[ref] = startpos + vec3f((startsize.x == 0) ? 0 : (float)(rand() % startsize.x), (startsize.y == 0) ? 0 : (float)(rand() % startsize.y), (startsize.z == 0) ? 0 : (float)(rand() % startsize.z));
 	dir[ref] = vec3f(0, (float)-((rand() % 100000) + 10000), 0);
 	sizes[ref] = size;
 	types[ref] = type;
-	angle[ref] = (float)(rand() % 628) / 100.f;
+	angles[ref] = (float)(rand() % 628) / 100.f;
 	angleinc[ref] = (float)(rand() % 1000 - 500) * speed;
 }
 
 void Pi3Cparticles::animate(const float d)
 {
-	for (uint32_t i = 0; i < position.size(); i++) {
-		position[i] += dir[i] * speed;
+	for (uint32_t i = 0; i < positions.size(); i++) {
+		positions[i] += dir[i] * speed;
 		if (wander[i].x) dir[i].x += (float)((rand() % wander[i].x) - wander[i].x / 2);
 		if (wander[i].y) dir[i].y += (float)((rand() % wander[i].y) - wander[i].y / 2);
 		if (wander[i].z) dir[i].z += (float)((rand() % wander[i].z) - wander[i].z / 2);
-		angle[i] += angleinc[i];
-		if (position[i].y < d) 
+		angles[i] += angleinc[i];
+		if (positions[i].y < d) 
 			update(i, sizes[i], rand() % 4); // dead[i] = true;
 	}
 }
 
-void Pi3Cparticles::updateParticleCoordsRotated(const std::vector<vec3f>& pos, const std::vector<vec2f>& size, const std::vector<float>& angle)
+void Pi3Cparticles::updateParticles()
 {
-	model.updateSpriteCoordsRotated(resource, pos, size, angle);
+	model.updateSpriteCoordsRotated(resource, positions, sizes, angles);
 }

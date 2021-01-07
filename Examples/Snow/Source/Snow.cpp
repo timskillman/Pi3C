@@ -53,7 +53,7 @@ int main(int argc, char* argv[])
 	snowsprite.tileY = 1;
 	snowsprite.frameCount = 4;
 
-	snowParticles.create(&pi3c.resource, 4000, startpos, startsize, 2, 8, snowsprite);
+	snowParticles.create(&pi3c.resource, 4000, startpos, startsize, 2, 8, snowsprite, 1);
 
 	snowParticles.speed = 0.0001f;
 
@@ -70,7 +70,7 @@ int main(int argc, char* argv[])
 		pi3c.clear_window();
 
 		snowParticles.animate(0);
-		snowParticles.updateParticleCoordsRotated(snowParticles.position, snowParticles.sizes, snowParticles.angle);
+		snowParticles.updateParticles();
 
 		pi3c.render2D();
 
