@@ -62,7 +62,7 @@ void Blocks::createBlocks(int MapSize, int ChunkWidth, int ChunkDepth, int Chunk
 	chunkWrapFront = -chunkMapSize + chunkPitchHeight;
 }
 
-void Blocks::createMapChunk(int chunkX, int chunkZ)
+void Blocks::createMapChunk(int chunkX, int chunkZ, uint32_t flags)
 {
 	uint32_t chunkPtr = calcChunkPtr(chunkX, chunkZ); //Ptr into the main visible chunk blocks
 	int cx = chunkX * chunkWidth;
@@ -74,7 +74,7 @@ void Blocks::createMapChunk(int chunkX, int chunkZ)
 
 			int mp = calcVoxelPtr(chunkPtr, x, z);
 
-			int glevel = halfDepth + (int)(noise.GetNoise((float)(cx + x), (float)(cz + z)) * 20.f);
+			int glevel2, glevel = halfDepth + (int)(noise.GetNoise((float)(cx + x), (float)(cz + z)) * 20.f);
 			//if (chunkX==1 && chunkZ==1) glevel = 250;
 
 			for (int air = chunkHeight - 2; air > glevel; air--)
@@ -82,53 +82,63 @@ void Blocks::createMapChunk(int chunkX, int chunkZ)
 
 			chunks[mp + chunkHeight - 1] = chunkHeight-glevel; //store ground level in top byte of chunk column
 
-			if ((rand() % 5) == 0) {
-				switch (rand() % 10) {
-				case 5:
-				case 6:
-				case 9:
-				case 0:chunks[mp + glevel + 1] = blockType::TallGrass; break;
-				case 1:chunks[mp + glevel + 1] = blockType::RedFlower; break;
-				case 2:chunks[mp + glevel + 1] = blockType::PurpleFlower; break;
-				case 3:chunks[mp + glevel + 1] = blockType::WhiteFlower; break;
-				case 7:
-				case 8:
-				case 4:chunks[mp + glevel + 1] = blockType::DryBush; break;
+			if (flags & BLK_VEGETATION) {
+				if ((rand() % 5) == 0) {
+					switch (rand() % 10) {
+					case 5:
+					case 6:
+					case 9:
+					case 0:chunks[mp + glevel + 1] = blockType::TallGrass; break;
+					case 1:chunks[mp + glevel + 1] = blockType::RedFlower; break;
+					case 2:chunks[mp + glevel + 1] = blockType::PurpleFlower; break;
+					case 3:chunks[mp + glevel + 1] = blockType::WhiteFlower; break;
+					case 7:
+					case 8:
+					case 4:chunks[mp + glevel + 1] = blockType::DryBush; break;
+					}
 				}
 			}
+			
 			chunks[mp + glevel] = blockType::Grass;
 
 			int caveLevel = (glevel - 5 > 0) ? glevel - 5 : 0;
 			for (int ground = glevel - 1; ground >= caveLevel; ground--) {
 				chunks[mp + ground] = blockType::Dirt;
 			}
-			chunks[mp + caveLevel] = blockType::Granite;
+			
+			if (flags & BLK_CAVES) {
+				chunks[mp + caveLevel] = blockType::Granite;
 
-			glevel = (halfDepth - 6 + (int)(-noise.GetNoise((float)(cx + x + 150), (float)(cz + z - 30)) * 15.f));
+				glevel = (halfDepth - 6 + (int)(-noise.GetNoise((float)(cx + x + 150), (float)(cz + z - 30)) * 15.f));
 
-			for (int ground = caveLevel - 1; ground >= glevel; ground--) {
-				chunks[mp + ground] = blockType::Granite;
+				for (int ground = caveLevel - 1; ground >= glevel; ground--) {
+					chunks[mp + ground] = blockType::Granite;
+				}
+
+				glevel2 = halfDepth - 7 + (int)(-noise.GetNoise((float)(cx + x + 21310), (float)(cz + z - 2430)) * 20.f);
+
+				caveLevel = glevel;
+
+				//int stalagtites = (rand() % 15 == 0) ? (rand() % 10)+3 : 0;
+				//glevel -= (caveLevel-glevel2<stalagtites) ? caveLevel-glevel2 : stalagtites;
+
+				//for (int st = caveLevel; st >= glevel; st--)
+				//	chunks[mp + st] = blockType::Basalt;
+
+
+				if (glevel2 < glevel) {
+					for (int air = glevel - 1; air > glevel2; air--) chunks[mp + air] = blockType::Air;  //map[mp + air] = 0
+				}
+				else {
+					glevel2 = glevel;
+				}
+				//chunks[mp + glevel] = blockType::Granite;
 			}
-
-			int glevel2 = halfDepth - 7 + (int)(-noise.GetNoise((float)(cx + x + 21310), (float)(cz + z - 2430)) * 20.f);
-
-			caveLevel = glevel;
-
-			//int stalagtites = (rand() % 15 == 0) ? (rand() % 10)+3 : 0;
-			//glevel -= (caveLevel-glevel2<stalagtites) ? caveLevel-glevel2 : stalagtites;
-
-			//for (int st = caveLevel; st >= glevel; st--)
-			//	chunks[mp + st] = blockType::Basalt;
-
-
-			if (glevel2 < glevel) {
-				for (int air = glevel - 1; air > glevel2; air--) chunks[mp + air] = blockType::Air;  //map[mp + air] = 0
+			else
+			{
+				glevel2 = caveLevel;
 			}
-			else {
-				glevel2 = glevel;
-			}
-			//chunks[mp + glevel] = blockType::Granite;
-
+		
 			for (int ground = glevel2 - 1; ground >= 0; ground--) {
 				chunks[mp + ground] = blockType::Granite; //map[mp + ground] = 1 + rand() % 14;
 			}

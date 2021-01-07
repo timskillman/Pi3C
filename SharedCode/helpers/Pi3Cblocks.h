@@ -13,7 +13,7 @@ public:
 	Blocks(int MapSize, int ChunkWidth = 16, int ChunkDepth = 16, int ChunkHeight = 256);
 
 	void createBlocks(int MapSize, int ChunkWidth = 16, int ChunkDepth = 16, int ChunkHeight = 256);
-	void createMapChunk(int x, int z);
+	void createMapChunk(int x, int z, uint32_t flags);
 	void createTexPackUV();
 	void createMeshChunk(Pi3Cresource* resource, Pi3Cmesh& mesh, int chunkX, int chunkZ);
 	void updateMeshChunk(Pi3Cresource* resource, Pi3Cscene* scene, const vec3f& position);
@@ -33,6 +33,8 @@ public:
 	int getGroundHeight(const vec3f& position);
 	int getHeightAtPoint(const vec3f& position);
 
+	enum { BLK_CAVES=1, BLK_VEGETATION=2 };
+	
 private:
 	void updatePackedVert(std::vector<float>& verts, uint32_t& vc, const vec3f& position, const vec3f& normal, const vec2f& uv, const uint32_t col);
 	void addQuadTopBottom(std::vector<float>& verts, uint32_t& vc, int x, int h, int y, uint8_t mapval, uint8_t faceVal, int tb, int light, int shadowEdge);

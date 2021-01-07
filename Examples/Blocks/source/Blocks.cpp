@@ -24,9 +24,11 @@ int main(int argc, char *argv[])
 	int chunkSize = opts.asInt("chunkSize");
 	int chunkHeight = opts.asInt("chunkHeight");
 	int trees = opts.asInt("trees");
+	uint32_t caves = (opts.asBool("caves")) ? 1 : 0;
+	uint32_t veg = 2;
 	
 	BlockMap blockMap(&pi3c.resource, mapSize, chunkSize, chunkSize, chunkHeight);
-	blockMap.createMap(-hmap, hmap + 1, -hmap, hmap + 1,trees);
+	blockMap.createMap(-hmap, hmap + 1, -hmap, hmap + 1,trees, caves | veg);
 	blockMap.createMapMeshes(&pi3c.resource, &pi3c.scene, -hmap, hmap + 1, -hmap, hmap + 1);
 
 	Pi3Cavatar player;

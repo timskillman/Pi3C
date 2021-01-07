@@ -20,12 +20,12 @@ void BlockMap::createModel(Pi3Cresource* resource, Pi3Cscene* scene, const Pi3Cm
 	}
 }
 
-void BlockMap::createMap(int sx, int bx, int sz, int bz, int trees)
+void BlockMap::createMap(int sx, int bx, int sz, int bz, int trees, uint32_t flags)
 {
 	//Blocks block(mapSize);
 	for (int zb = sz; zb < bz; zb++) {
 		for (int xb = sx; xb < bx; xb++) {
-			chunkMap.createMapChunk(xb, zb);
+			chunkMap.createMapChunk(xb, zb, flags);
 		}
 	}
 

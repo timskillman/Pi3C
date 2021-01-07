@@ -10,7 +10,7 @@ chunkHeight:128
 walkSpeed:0.2
 runSpeed:0.5
 fallSpeed:0.5
-trees:50
+caves:false
 modelPath:../../Resources/models/
 logo:maps/logo.png
 skyboxPath:../../Resources/models/skyboxes
