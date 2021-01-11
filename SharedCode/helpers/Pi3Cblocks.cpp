@@ -60,6 +60,9 @@ void Blocks::createBlocks(int MapSize, int ChunkWidth, int ChunkDepth, int Chunk
 	chunkWrapRight = -chunkPitchHeight + chunkHeight;
 	chunkWrapBack = chunkMapSize - chunkPitchHeight;
 	chunkWrapFront = -chunkMapSize + chunkPitchHeight;
+
+	blockmesh.name = "ChunkMesh";
+	blockmesh.verts.resize(50000 * 9);
 }
 
 void Blocks::createMapChunk(int chunkX, int chunkZ, uint32_t flags)
@@ -68,6 +71,7 @@ void Blocks::createMapChunk(int chunkX, int chunkZ, uint32_t flags)
 	int cx = chunkX * chunkWidth;
 	int cz = chunkZ * chunkDepth;
 	int halfDepth = chunkHeight / 2;
+	int sealevel = halfDepth - 3;
 
 	for (int z = 0; z < chunkDepth; z++) {
 		for (int x = 0; x < chunkWidth; x++) {
@@ -77,35 +81,45 @@ void Blocks::createMapChunk(int chunkX, int chunkZ, uint32_t flags)
 			int glevel2, glevel = halfDepth + (int)(noise.GetNoise((float)(cx + x), (float)(cz + z)) * 20.f);
 			//if (chunkX==1 && chunkZ==1) glevel = 250;
 
-			for (int air = chunkHeight - 2; air > glevel; air--)
+			int surfLevel = (glevel < sealevel) ? sealevel : glevel;
+			for (int air = chunkHeight - 2; air > surfLevel; air--)
 				chunks[mp + air] = blockType::Air;
+
 
 			chunks[mp + chunkHeight - 1] = chunkHeight-glevel; //store ground level in top byte of chunk column
 
-			if (flags & BLK_VEGETATION) {
-				if ((rand() % 5) == 0) {
-					switch (rand() % 10) {
-					case 5:
-					case 6:
-					case 9:
-					case 0:chunks[mp + glevel + 1] = blockType::TallGrass; break;
-					case 1:chunks[mp + glevel + 1] = blockType::RedFlower; break;
-					case 2:chunks[mp + glevel + 1] = blockType::PurpleFlower; break;
-					case 3:chunks[mp + glevel + 1] = blockType::WhiteFlower; break;
-					case 7:
-					case 8:
-					case 4:chunks[mp + glevel + 1] = blockType::DryBush; break;
+			if (glevel < sealevel) {
+				for (int water = surfLevel; water > glevel; water--)
+					chunks[mp + water] = blockType::Water;
+				chunks[mp + glevel] = blockType::Sand;
+			}
+			else {
+				if (flags & BLK_VEGETATION) {
+					if ((rand() % 3) == 0) {
+						switch (rand() % 10) {
+						case 5:
+						case 6:
+						case 9:
+						case 0:chunks[mp + glevel + 1] = blockType::TallGrass; break;
+						case 1:chunks[mp + glevel + 1] = blockType::RedFlower; break;
+						case 2:chunks[mp + glevel + 1] = blockType::PurpleFlower; break;
+						case 3:chunks[mp + glevel + 1] = blockType::WhiteFlower; break;
+						case 7:
+						case 8:
+						case 4:chunks[mp + glevel + 1] = blockType::DryBush; break;
+						}
 					}
 				}
+
+				chunks[mp + glevel] = blockType::Grass;
+
 			}
-			
-			chunks[mp + glevel] = blockType::Grass;
 
 			int caveLevel = (glevel - 5 > 0) ? glevel - 5 : 0;
 			for (int ground = glevel - 1; ground >= caveLevel; ground--) {
 				chunks[mp + ground] = blockType::Dirt;
 			}
-			
+
 			if (flags & BLK_CAVES) {
 				chunks[mp + caveLevel] = blockType::Granite;
 
@@ -174,6 +188,16 @@ void lightRecovery(int& light, int lightRecover)
 	light = (light + lightRecover < 255) ? light + lightRecover : 255;
 }
 
+void Blocks::newMeshChunk(Pi3Cresource* resource, Pi3Cscene* scene, int cx, int cz, int blocksId, int texRef)
+{
+	createMeshChunk(resource, blockmesh, cx, cz);
+	Pi3Cmodel model = Pi3Cmodel(resource, blockmesh, blocksId);
+	model.name = "ChunkModel";
+	model.material.texRef = texRef;
+	model.material.texID = resource->getTextureID(texRef);
+	if (model.meshRef >= 0) scene->append3D(model);
+}
+
 void Blocks::updateMeshChunk(Pi3Cresource* resource, Pi3Cscene* scene, const vec3f& position)
 {
 	int xx = (int)(position.x + chunkWidth * 10000);
@@ -221,7 +245,7 @@ void Blocks::createMeshChunk(Pi3Cresource* resource, Pi3Cmesh& mesh, int chunkX,
 			uint32_t p = ptr + chunkHeight - 2; //skip top byte height level
 			int light = 255; //start with max light
 			int geomtype;
-			uint8_t cp = 0;
+			uint8_t bt, cp = 0;
 
 			//Create all surfaces ...
 			while (p > ptr) {
@@ -266,21 +290,21 @@ void Blocks::createMeshChunk(Pi3Cresource* resource, Pi3Cmesh& mesh, int chunkX,
 				shadow = 0;
 				int blockAbove = p + 1;
 
-					if (!(onfarLeft || onfarBack) && chunks[blockAbove + chunkLeftBack]) shadow = shadow | 1; //TODO
-					if (!(onfarRight || onfarBack) && chunks[blockAbove + chunkRightBack]) shadow = shadow | 2;
-					if (!(onfarRight || onfarFront) && chunks[blockAbove + chunkRightFront]) shadow = shadow | 4;
-					if (!(onfarLeft || onfarFront) && chunks[blockAbove + chunkLeftFront]) shadow = shadow | 8;
+				if (!(onfarLeft || onfarBack) && chunks[blockAbove + chunkLeftBack]) shadow = shadow | 1; //TODO
+				if (!(onfarRight || onfarBack) && chunks[blockAbove + chunkRightBack]) shadow = shadow | 2;
+				if (!(onfarRight || onfarFront) && chunks[blockAbove + chunkRightFront]) shadow = shadow | 4;
+				if (!(onfarLeft || onfarFront) && chunks[blockAbove + chunkLeftFront]) shadow = shadow | 8;
 
-					if (chunks[(onfarBack) ? p + chunkWrapBack : blockAbove + chunkBack]) shadow = shadow | 3;
-					if (chunks[(onfarFront) ? p + chunkWrapFront : blockAbove + chunkFront]) shadow = shadow | 12;
-					if (chunks[(onfarLeft) ? p + chunkWrapLeft : blockAbove + chunkLeft]) shadow = shadow | 9;
-					if (chunks[(onfarRight) ? p + chunkWrapRight : blockAbove + chunkRight]) shadow = shadow | 6;
+				if (chunks[(onfarBack) ? p + chunkWrapBack : blockAbove + chunkBack]) shadow = shadow | 3;
+				if (chunks[(onfarFront) ? p + chunkWrapFront : blockAbove + chunkFront]) shadow = shadow | 12;
+				if (chunks[(onfarLeft) ? p + chunkWrapLeft : blockAbove + chunkLeft]) shadow = shadow | 9;
+				if (chunks[(onfarRight) ? p + chunkWrapRight : blockAbove + chunkRight]) shadow = shadow | 6;
 
 
 				//create ground plane ...
 				if (typToTex[chunks[p]].geomType < blockTypes::xshape) {
 					int ht = p - ptr;
-					addQuadTopBottom(*verts, *vc, cx + xx, ht - halfDepth, cz + zz, chunks[p], 0, 0, light, shadow);
+					addQuadTopBottom(*verts, *vc, cx + xx, (float)(ht - halfDepth), cz + zz, chunks[p], 0, 0, light, shadow);
 				}
 
 				//TODO:... adding line verts wont work until they're loaded into vert buffers (this must be fixed!)
@@ -294,6 +318,7 @@ void Blocks::createMeshChunk(Pi3Cresource* resource, Pi3Cmesh& mesh, int chunkX,
 
 				shadow = 0;
 				//skip non-air blocks (but create 'air' faces adjacent to solid blocks)
+
 				while (p > ptr && chunks[p] != blockType::Air) {
 					int ht = p - ptr - halfDepth;
 					int geomtype = typToTex[chunks[p]].geomType;
@@ -314,30 +339,35 @@ void Blocks::createMeshChunk(Pi3Cresource* resource, Pi3Cmesh& mesh, int chunkX,
 							break;
 						case blockTypes::stick: break;
 						case blockTypes::table: break;
+						case blockTypes::water:
+							if (chunks[p+1]!=blockType::Water) addQuadTopBottom(*verts, *vc, cx + xx, (float)ht-0.3f, cz + zz, chunks[p], 0, 0, light, shadow);
+							break;
 						}
 						shadow = 15;
 					}	
 					//If this is a 'see-through' block, then create edges of blocks adjacent to it ...
-					if (geomtype > 1) {
-						if (geomtype == 2) { shadow = 15; }
-						cp = chunks[(onfarLeft) ? p + chunkWrapLeft : p + chunkLeft];
-						if (typToTex[cp].geomType == 1) {
+					if (geomtype > blockTypes::solid) {
+						shadow = 15;
+						bool seethru = (geomtype == blockTypes::seethrough || geomtype == blockTypes::water);
+						cp = chunks[(onfarLeft) ? p + chunkWrapLeft : p + chunkLeft]; bt = typToTex[cp].flags;
+						if ((bt & blockFlags::bf_block) && !(bt & blockFlags::bf_seethrough && seethru)) {
 							addQuadLeftRight(*verts, *vc, cx + xx, ht, cz + zz, cp, 1, 0, light, shadow);
 						}
-						cp = chunks[(onfarRight) ? p + chunkWrapRight : p + chunkRight];
-						if (typToTex[cp].geomType == 1) {
+						cp = chunks[(onfarRight) ? p + chunkWrapRight : p + chunkRight]; bt = typToTex[cp].flags;
+						if ((bt & blockFlags::bf_block) && !(bt & blockFlags::bf_seethrough && seethru)) {
 							addQuadLeftRight(*verts, *vc, cx + xx + 1, ht, cz + zz, cp, 2, 1, light, shadow);
 						}
-						cp = chunks[(onfarBack) ? p + chunkWrapBack : p + chunkBack];
-						if (typToTex[cp].geomType == 1) {
+						cp = chunks[(onfarBack) ? p + chunkWrapBack : p + chunkBack]; bt = typToTex[cp].flags;
+						if ((bt & blockFlags::bf_block) && !(bt & blockFlags::bf_seethrough && seethru)) {
 							addQuadFrontBack(*verts, *vc, cx + xx, ht, cz + zz, cp, 3, 0, light, shadow);
 						}
-						cp = chunks[(onfarFront) ? p + chunkWrapFront : p + chunkFront];
-						if (typToTex[cp].geomType == 1) {
-							addQuadFrontBack(*verts, *vc, cx + xx, ht, cz + zz + 1, cp, 4, 1, light, shadow);
+						cp = chunks[(onfarFront) ? p + chunkWrapFront : p + chunkFront]; bt = typToTex[cp].flags;
+						if ((bt & blockFlags::bf_block) && !(bt & blockFlags::bf_seethrough && seethru)) {
+							addQuadFrontBack(*verts, *vc, cx + xx, ht, cz + zz + 1, cp, 4, 1, light, shadow); //(zz == 15 && cp != 0) ? blockType::Diamond : 
 						}
-						if ((p - 1) > ptr && typToTex[chunks[p - 1]].geomType == 1) {
-							addQuadTopBottom(*verts, *vc, cx + xx, ht-1, cz + zz, chunks[p - 1], 0, 0, light, shadow);
+						bt = typToTex[chunks[p - 1]].flags;
+						if ((p - 1) > ptr && (bt & blockFlags::bf_block) && !(bt & blockFlags::bf_seethrough && seethru)) {
+							addQuadTopBottom(*verts, *vc, cx + xx, (float)(ht-1), cz + zz, chunks[p - 1], 0, 0, light, shadow);
 						}
 					}
 
@@ -353,7 +383,7 @@ void Blocks::createMeshChunk(Pi3Cresource* resource, Pi3Cmesh& mesh, int chunkX,
 					shadow = 0;
 					light = 128;
 					//if (light < 80) light = 80;
-					addQuadTopBottom(*verts, *vc, cx + xx, (p - ptr) - halfDepth, cz + zz, chunks[p + 1], 0, 1, light, shadow);
+					addQuadTopBottom(*verts, *vc, cx + xx, (float)((p - ptr) - halfDepth), cz + zz, chunks[p + 1], 0, 1, light, shadow);
 				}
 			}
 		}
@@ -382,10 +412,10 @@ uint32_t shadow(uint32_t col, float shadow)
 	return (uint32_t)((float)(col & 255) * shadow) | ((uint32_t)((float)((col >> 8) & 255) * shadow) << 8) | ((uint32_t)((float)((col >> 16) & 255) * shadow) << 16) | 0xff000000;
 }
 
-void Blocks::addQuadTopBottom(std::vector<float>& verts, uint32_t& vc, int x, int h, int z, uint8_t mapVal, uint8_t faceVal, int tb, int light, int shadowEdge)
+void Blocks::addQuadTopBottom(std::vector<float>& verts, uint32_t& vc, int x, float h, int z, uint8_t mapVal, uint8_t faceVal, int tb, int light, int shadowEdge)
 {
 	vec3f norm(0, -(1.f - (float)((1 - tb) * 2)), 0);
-	float hh = (float)(h);
+	float hh = h;
 	vec2f tex = texPackUV[mapVal][faceVal];
 	float ftb = (float)tb;
 	//float shadow = (float)light / 255.f;
@@ -630,29 +660,45 @@ void Blocks::bresCone(int blockType, uint32_t chunkPtr, int xc, int yc, int zc, 
 
 
 
-void Blocks::createTrees(int chunkX, int chunkZ, int dispersion)
+void Blocks::createTrees(int chunkX, int chunkZ, int trees)
 {
 	uint32_t chunkPtr = calcChunkPtr(chunkX, chunkZ);
 
 	//set random seed for this chunk based on chunk position
 	srand(chunkX + chunkZ * 10000); 
 
-	for (int z = 0; z < chunkDepth; z++) {
-		for (int x = 0; x < chunkWidth; x++) {
-			if (rand() % dispersion == 0) {
-				uint16_t bark = blockType::OakWood, leaves = blockType::OakLeaves;
-				switch (rand() % 7)
-				{
-				case 3: bark = blockType::BirchWood; leaves = blockType::BirchLeaves; break;
-				case 4: bark = blockType::BirchWood; leaves = blockType::BirchLeaves; break;
-				case 5: bark = blockType::SpruceWood; leaves = blockType::SpruceLeaves; break;
-				case 6: bark = blockType::SpruceWood; leaves = blockType::SpruceLeaves; break;
-				}
+	for (int i = 0; i < trees; i++) {
+		int xr = rand() % chunkWidth;
+		int zr = rand() % chunkDepth;
 
-				addTree(chunkPtr, x, z, 5 + (rand() % 12), bark, leaves);
-			}
+		uint16_t bark = blockType::OakWood, leaves = blockType::OakLeaves;
+		switch (rand() % 7)
+		{
+		case 3: bark = blockType::BirchWood; leaves = blockType::BirchLeaves; break;
+		case 4: bark = blockType::BirchWood; leaves = blockType::BirchLeaves; break;
+		case 5: bark = blockType::SpruceWood; leaves = blockType::SpruceLeaves; break;
+		case 6: bark = blockType::SpruceWood; leaves = blockType::SpruceLeaves; break;
 		}
+
+		addTree(chunkPtr, xr, zr, 5 + (rand() % 12), bark, leaves);
 	}
+
+	//for (int z = 0; z < chunkDepth; z++) {
+	//	for (int x = 0; x < chunkWidth; x++) {
+	//		if (rand() % dispersion == 0) {
+	//			uint16_t bark = blockType::OakWood, leaves = blockType::OakLeaves;
+	//			switch (rand() % 7)
+	//			{
+	//			case 3: bark = blockType::BirchWood; leaves = blockType::BirchLeaves; break;
+	//			case 4: bark = blockType::BirchWood; leaves = blockType::BirchLeaves; break;
+	//			case 5: bark = blockType::SpruceWood; leaves = blockType::SpruceLeaves; break;
+	//			case 6: bark = blockType::SpruceWood; leaves = blockType::SpruceLeaves; break;
+	//			}
+
+	//			addTree(chunkPtr, x, z, 5 + (rand() % 12), bark, leaves);
+	//		}
+	//	}
+	//}
 }
 
 void Blocks::addTree(uint32_t chunkPtr, int x, int z, int size, int bark, int leaves)
@@ -664,11 +710,10 @@ void Blocks::addTree(uint32_t chunkPtr, int x, int z, int size, int bark, int le
 	if (ptr<0 || ptr>=chunkMapSize || chunks[ptr] != blockType::Air) return; 
 
 	//Find solid ground ...
-	while (ptr > basePtr && (typToTex[chunks[ptr]].geomType != 1)) ptr--; //find solid ground
+	while (ptr > basePtr && (typToTex[chunks[ptr]].geomType != blockTypes::solid)) ptr--; //find solid ground
+	if (chunks[ptr+1] == blockType::Water) return; //if under water, return
 
-	//Create trunk
 	int trunkHeight = (uint32_t)((float)size * 0.6f);
-
 
 	//Create leaves (eroded sphere)
 	int y = ptr - basePtr;
@@ -679,6 +724,7 @@ void Blocks::addTree(uint32_t chunkPtr, int x, int z, int size, int bark, int le
 	else {
 		bresSphere(leaves, chunkPtr, x, y + size * 0.6f, z, size / 4);
 	}
+	//Create trunk
 	for (uint32_t t = ptr; t < (ptr + trunkHeight); t++) chunks[t] = bark;
 
 }

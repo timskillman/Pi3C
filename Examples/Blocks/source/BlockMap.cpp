@@ -1,6 +1,6 @@
 #include "BlockMap.h"
 
-BlockMap::BlockMap(Pi3Cresource* resource, int MapSize, int ChunkWidth, int ChunkDepth, int ChunkHeight)
+BlockMap::BlockMap(Pi3Cresource* resource, Pi3Cscene* scene, int MapSize, int ChunkWidth, int ChunkDepth, int ChunkHeight)
 {
 	mapSize = MapSize;
 	chunkWidth = ChunkWidth;
@@ -44,14 +44,7 @@ void BlockMap::createMapMeshes(Pi3Cresource* resource, Pi3Cscene* scene, int sx,
 	int mph = mapSize / 2;
 	for (int zb = sz; zb < bz; zb++) {
 		for (int xb = sx; xb < bx; xb++) {
-			Pi3Cmesh blockmesh("ChunkMesh");
-			blockmesh.verts.resize(50000*9);
-			chunkMap.createMeshChunk(resource, blockmesh, xb, zb);
-			createModel(resource, scene, blockmesh, vec3f(), blocksId);
-			Pi3Cmodel& model = scene->models.back();
-			model.name = "ChunkModel";
-			model.material.texRef = texRef;
-			model.material.texID = resource->getTextureID(texRef);
+			chunkMap.newMeshChunk(resource, scene, xb, zb, blocksId, texRef);
 			blocksId++;
 		}
 	}
@@ -63,7 +56,7 @@ void BlockMap::updateMapMeshes(Pi3Cresource* resource, Pi3Cscene* scene, int sx,
 	for (int zb = sz; zb < bz; zb++) {
 		for (int xb = sx; xb < bx; xb++) {
 			vec3f moff((float)((xb + mph) * chunkWidth), 0, (float)((zb + mph) * chunkDepth));
-			SDL_Log("moff = %f,%f,%f", moff.x, moff.y, moff.z);
+			//SDL_Log("moff = %f,%f,%f", moff.x, moff.y, moff.z);
 			chunkMap.updateMeshChunk(resource, scene, moff);
 		}
 	}

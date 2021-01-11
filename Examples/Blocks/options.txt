@@ -1,7 +1,7 @@
 title:Pi3C Blocks
-screenWidth:800
-screenHeight:600
-perspective:300
+screenWidth:1920
+screenHeight:1080
+perspective:800
 fullscreen:true
 antiAliasLevel:0
 mapSize:7
@@ -10,7 +10,11 @@ chunkHeight:128
 walkSpeed:0.2
 runSpeed:0.5
 fallSpeed:0.5
-trees:150
+height:2
+fogColour:ffffff
+fogNear:20
+fogFar:100
+trees:3
 caves:false
 modelPath:../../Resources/models/
 logo:maps/logo.png

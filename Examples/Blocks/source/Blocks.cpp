@@ -21,14 +21,15 @@ int main(int argc, char *argv[])
 	//Setup your scene here ...
 	int mapSize = opts.asInt("mapSize");
 	int hmap = mapSize / 2;
+	int hm1 = hmap - 1;
 	int chunkSize = opts.asInt("chunkSize");
 	int chunkHeight = opts.asInt("chunkHeight");
 	int trees = opts.asInt("trees");
 	uint32_t caves = (opts.asBool("caves")) ? 1 : 0;
 	uint32_t veg = 2;
 	
-	BlockMap blockMap(&pi3c.resource, mapSize, chunkSize, chunkSize, chunkHeight);
-	blockMap.createMap(-hmap, hmap + 1, -hmap, hmap + 1,trees, caves | veg);
+	BlockMap blockMap(&pi3c.resource, &pi3c.scene, mapSize, chunkSize, chunkSize, chunkHeight);
+	blockMap.createMap(-hmap, hmap + 1, -hmap, hmap + 1, trees, caves | veg);
 	blockMap.createMapMeshes(&pi3c.resource, &pi3c.scene, -hmap, hmap + 1, -hmap, hmap + 1);
 
 	Pi3Cavatar player;
@@ -37,8 +38,14 @@ int main(int argc, char *argv[])
 	player.walkSpeed = opts.asFloat("walkSpeed");
 	player.runSpeed = opts.asFloat("runSpeed");
 	player.fallSpeed = opts.asFloat("fallSpeed");
+	float pheight = opts.asFloat("height");
 
-	//pi3c.scene.setPerspective3D(winopts.width ,winopts.height,winopts.perspective,0.01f,5000.f);
+	uint32_t skyColour = Pi3Ccolours::GhostWhite;
+
+	 //opts.asHex("fogColour")
+	pi3c.scene.setFog(skyColour, opts.asFloat("fogNear"), opts.asFloat("fogFar"));
+	pi3c.scene.setPerspective3D(winopts.width ,winopts.height,winopts.perspective,0.1f,500.f);
+
 	int oht = -1e8;
 	int ht = chunkHeight/2-5;
 	bool tooHigh = false;
@@ -65,12 +72,12 @@ int main(int argc, char *argv[])
 
 	while (pi3c.is_running())
 	{
-		pi3c.clear_window(Pi3Ccolours::SkyBlue);
+		pi3c.clear_window(skyColour);
 		
 		player.doKeys();
 		
 		SDL_GetMouseState(&mx, &my);
-		vec3f rotDelta(((float)my - 100.f) / 500.f, -((float)mx - 100.f) / 500.f, 0);
+		vec3f rotDelta(((float)my - 100.f) / 800.f, -((float)mx - 100.f) / 800.f, 0);
 		flip=(flip+1)%2;
 		if (flip==0) SDL_WarpMouseInWindow(pi3c.window.handle(), 100, 100);
 		
@@ -112,11 +119,11 @@ int main(int argc, char *argv[])
 		}
 		if (tooHigh) ppos = opos;
 
-		player.setPosition(vec3f(ppos.x, (float)oht / 10 - 20, ppos.z));
+		player.setPosition(vec3f(ppos.x, (float)oht / 10 - pheight, ppos.z));
 
 		//Draw your scene here ...
 		pi3c.scene.setSun(0xffffff, vec3f(5000.f, 15000.f, -15000.f)); //transform sun position into scene
-		pi3c.scene.setMatrix(player.getPosition(), vec3f(0, 0, 0), player.getRotation());
+		pi3c.scene.setMatrix(player.getPosition(), vec3f(0, 0, 1), player.getRotation());
 		pi3c.render3D();
 		prot = prot * 0.9f;
 		
@@ -127,7 +134,7 @@ int main(int argc, char *argv[])
 		const std::string fps = "FPS:" + std::to_string((int)pi3c.getCurrentFPS());
 		pi3c.gui.Text(fps, 0xffffffff);
 
-		vec3f offset = -ppos; // -chunkCorner;
+		vec3f offset = -ppos;
 		int xx = (int)(offset.x + chunkSize * 10000);
 		int zz = (int)(offset.z + chunkSize * 10000);
 		int cx = xx / chunkSize - 10000;
@@ -143,28 +150,28 @@ int main(int argc, char *argv[])
 		if (ocx != cx && x==7) {
 			//create new chunks on X axis ...
 			if (ocx < cx) {
-				blockMap.createMap(cx + hmap, cx + hmap+1, cz - hmap, cz + hmap+1, trees, caves | veg);
-				blockMap.updateMapMeshes(&pi3c.resource, &pi3c.scene, cx + (hmap-1), cx + hmap, cz - (hmap-1), cz + hmap);
+				blockMap.createMap(cx + hmap, cx + hmap + 1, cz - hmap, cz + hmap + 1, trees, caves | veg);
+				blockMap.updateMapMeshes(&pi3c.resource, &pi3c.scene, cx + hmap, cx + hmap + 1, cz - hm1, cz + hmap);
 			}
 			else {
-				blockMap.createMap(cx - hmap, cx - hmap -1, cz - hmap, cz + hmap+1, trees, caves | veg);
-				blockMap.updateMapMeshes(&pi3c.resource, &pi3c.scene, cx - (hmap-1), cx - (hmap-2), cz - (hmap-1), cz + hmap);
+				blockMap.createMap(cx - hmap, cx - hm1, cz - hmap, cz + hmap + 1, trees, caves | veg);
+				blockMap.updateMapMeshes(&pi3c.resource, &pi3c.scene, cx - hm1, cx - (hmap - 2), cz - hm1, cz + hmap);
 			}
 			ocx = cx;
 		}
 
-		//if (ocz != cz && z==7) {
-		//	//create new chunks on Z axis ...
-		//	if (ocz < cz) {
-		//		blockMap.createMap(cx - 3, cx + 4, cz + 3, cz + 4, trees, caves | veg);
-		//		blockMap.updateMapMeshes(&pi3c.resource, &pi3c.scene, cx - 3, cx + 4, cz + 2, cz + 3);
-		//	}
-		//	else {
-		//		blockMap.createMap(cx - 3, cx + 4, cz - 4, cz - 3, trees, caves | veg);
-		//		blockMap.updateMapMeshes(&pi3c.resource, &pi3c.scene, cx - 2, cx + 3, cz - 3, cz - 2);
-		//	}
-		//	ocz = cz;
-		//}
+		if (ocz != cz && z==7) {
+			//create new chunks on Z axis ...
+			if (ocz < cz) {
+				blockMap.createMap(cx - hmap, cx + hmap + 1, cz + hmap, cz + hmap + 1, trees, caves | veg);
+				blockMap.updateMapMeshes(&pi3c.resource, &pi3c.scene, cx - hm1, cx + hmap, cz + hmap, cz + hmap + 1);
+			}
+			else {
+				blockMap.createMap(cx - hmap, cx + hmap + 1, cz - hmap, cz - hm1, trees, caves | veg);
+				blockMap.updateMapMeshes(&pi3c.resource, &pi3c.scene, cx - hm1, cx + hmap, cz - hm1, cz + (hmap-2));
+			}
+			ocz = cz;
+		}
 
 		pi3c.swap_buffers();
 	}
