@@ -4,7 +4,7 @@ screenHeight:600
 perspective:300
 fullscreen:true
 antiAliasLevel:0
-mapSize:9
+mapSize:7
 chunkSize:16
 chunkHeight:128
 walkSpeed:0.2
@@ -12,8 +12,8 @@ runSpeed:0.5
 fallSpeed:0.2
 height:1.75
 fogColour:ffffff
-fogNear:15
-fogFar:50
+fogNear:20
+fogFar:100
 trees:3
 caves:false
 modelPath:../../Resources/models/

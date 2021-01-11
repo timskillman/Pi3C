@@ -41,7 +41,7 @@ int main(int argc, char *argv[])
 	float pheight = opts.asFloat("height");
 	float baseHeight = pheight;
 
-	uint32_t skyColour = Pi3Ccolours::GhostWhite;
+	uint32_t skyColour = Pi3Ccolours::AntiqueWhite;
 
 	 //opts.asHex("fogColour")
 	pi3c.scene.setFog(skyColour, opts.asFloat("fogNear"), opts.asFloat("fogFar"));
@@ -70,6 +70,7 @@ int main(int argc, char *argv[])
 	int ocx = (int)(-ppos.x / chunkSize);
 	int ocz = (int)(-ppos.z / chunkSize);
 	int fallspeed = 5;
+	float jiggle = 0;
 
 	while (pi3c.is_running())
 	{
@@ -79,8 +80,14 @@ int main(int argc, char *argv[])
 		
 		SDL_GetMouseState(&mx, &my);
 		vec3f rotDelta(((float)my - 100.f) / 800.f, -((float)mx - 100.f) / 800.f, 0);
+
 		flip=(flip+1)%2;
-		if (flip==0) SDL_WarpMouseInWindow(pi3c.window.handle(), 100, 100);
+		if (flip == 0) {
+			SDL_WarpMouseInWindow(pi3c.window.handle(), 100, 100);
+			rotDelta.x += (sinf(jiggle)) / 100000.f;
+			rotDelta.y += (cosf(jiggle)) / 100000.f;
+			jiggle += .01f;
+		}
 		
 		if (oht != -1e8) prot += rotDelta;
 		player.rotate(prot);
@@ -130,7 +137,7 @@ int main(int argc, char *argv[])
 		player.setPosition(vec3f(ppos.x, (float)oht / 10 - pheight, ppos.z));
 
 		//Draw your scene here ...
-		pi3c.scene.setSun(0xffffff, vec3f(5000.f, 15000.f, -15000.f)); //transform sun position into scene
+		pi3c.scene.setSun(0xffffff, vec3f(-2000.f, 1500.f, -1500.f)); //transform sun position into scene
 		pi3c.scene.setMatrix(player.getPosition(), vec3f(0, 0, 1), player.getRotation());
 		pi3c.render3D();
 		prot = prot * 0.9f;
