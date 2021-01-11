@@ -39,6 +39,7 @@ int main(int argc, char *argv[])
 	player.runSpeed = opts.asFloat("runSpeed");
 	player.fallSpeed = opts.asFloat("fallSpeed");
 	float pheight = opts.asFloat("height");
+	float baseHeight = pheight;
 
 	uint32_t skyColour = Pi3Ccolours::GhostWhite;
 
@@ -98,6 +99,13 @@ int main(int argc, char *argv[])
 			blockMap.insertBlock(&pi3c.resource, &pi3c.scene, blockType::Diamond, vec3f(-ppos.x, -ht / 10, -ppos.z));
 		}
 
+		if (keystate[SDL_SCANCODE_R]) {
+			pheight+=1.f;
+		}
+		else if (keystate[SDL_SCANCODE_F] && pheight>baseHeight) {
+			pheight-=1.f;
+		}
+		
 		if (!jump && oht!=ht && oht != -1e8) {
 			if (!tooHigh)
 				oht += (oht < ht) ? fallspeed : -fallspeed;
@@ -151,7 +159,7 @@ int main(int argc, char *argv[])
 			//create new chunks on X axis ...
 			if (ocx < cx) {
 				blockMap.createMap(cx + hmap, cx + hmap + 1, cz - hmap, cz + hmap + 1, trees, caves | veg);
-				blockMap.updateMapMeshes(&pi3c.resource, &pi3c.scene, cx + hmap, cx + hmap + 1, cz - hm1, cz + hmap);
+				blockMap.updateMapMeshes(&pi3c.resource, &pi3c.scene, cx + hm1, cx + hmap, cz - hm1, cz + hmap);
 			}
 			else {
 				blockMap.createMap(cx - hmap, cx - hm1, cz - hmap, cz + hmap + 1, trees, caves | veg);
@@ -164,7 +172,7 @@ int main(int argc, char *argv[])
 			//create new chunks on Z axis ...
 			if (ocz < cz) {
 				blockMap.createMap(cx - hmap, cx + hmap + 1, cz + hmap, cz + hmap + 1, trees, caves | veg);
-				blockMap.updateMapMeshes(&pi3c.resource, &pi3c.scene, cx - hm1, cx + hmap, cz + hmap, cz + hmap + 1);
+				blockMap.updateMapMeshes(&pi3c.resource, &pi3c.scene, cx - hm1, cx + hmap, cz + hm1, cz + hmap);
 			}
 			else {
 				blockMap.createMap(cx - hmap, cx + hmap + 1, cz - hmap, cz - hm1, trees, caves | veg);
