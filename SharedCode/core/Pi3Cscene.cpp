@@ -3,19 +3,19 @@
 #include <cstring>
 #include "Pi3CfileOBJ.h"
 
-void Pi3Cscene::render(const float ticks, Pi3Cmatrix &projMatrix, Pi3Cmatrix &modelMatrix, std::vector<Pi3Cmodel> &mods, Pi3Cmaterial *materialOverride)
+void Pi3Cscene::render(const float ticks, Pi3Cmatrix &projMatrix, Pi3Cmatrix &modelMatrix, std::vector<Pi3Cmodel> &mods, Pi3Cmaterial *materialOverride, uint32_t flags)
 {
 	resource->shaders[currentShader].ticks = ticks;
 	resource->shaders[currentShader].setProjectionMatrix(projMatrix);
 	for (auto &model : mods) {
 		Pi3Cmaterial *mat = (model.selected && materialOverride) ? &selectMaterial : materialOverride;
-		model.render(resource, resource->shaders[currentShader], &modelMatrix, mat);
+		model.render(resource, resource->shaders[currentShader], &modelMatrix, mat, flags);
 	}
 }
 
-void Pi3Cscene::render3D(const float ticks, Pi3Cmaterial *materialOverride)
+void Pi3Cscene::render3D(const float ticks, Pi3Cmaterial *materialOverride, uint32_t flags)
 {
-	render(ticks, projMatrix3D, modelMatrix3D, models, materialOverride);
+	render(ticks, projMatrix3D, modelMatrix3D, models, materialOverride, flags);
 }
 
 void Pi3Cscene::setup2D()

@@ -82,7 +82,7 @@ public:
 	}
 
 	//int32_t addMesh(Pi3Cmesh &mesh, const bool deleteVerts = true, const bool dynamicBuffer = false, const uint32_t vertSize = 2000000);		//returns mesh reference (or -1 if failed)
-	int32_t addMesh(Pi3Cmesh * mesh, int32_t groupId, uint32_t maxsize = 500000);
+	int32_t addMesh(Pi3Cmesh * mesh, int32_t groupId, uint32_t maxsize = 500000, bool deleteVerts = true);
 
 	void addMeshOutlines(uint32_t meshref);
 

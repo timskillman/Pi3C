@@ -75,7 +75,7 @@ public:
 		selectMaterial.illum = 0;
 	}
 	void setMatrix(vec3f const &firstpos, vec3f const &thirdpos, vec3f const &rot);
-	void render3D(const float ticks = 1.f, Pi3Cmaterial *materialOverride = nullptr);
+	void render3D(const float ticks = 1.f, Pi3Cmaterial *materialOverride = nullptr, uint32_t flags = Pi3Cmodel::mdf_alpha | Pi3Cmodel::mdf_solid);
 	void render2D(const float ticks = 1.f);
 	void setup2D();
 	void renderSkybox(const vec3f &pos, const int32_t skyboxref = 0, float ticks = 1.f);
@@ -145,7 +145,7 @@ private:
 	Pi3Cmaterial selectMaterial;
 
 	std::string getPathFile(std::string &filepath) const;
-	void render(const float ticks, Pi3Cmatrix &projMatrix, Pi3Cmatrix &modelMatrix, std::vector<Pi3Cmodel> &models, Pi3Cmaterial *materialOverride);
+	void render(const float ticks, Pi3Cmatrix &projMatrix, Pi3Cmatrix &modelMatrix, std::vector<Pi3Cmodel> &models, Pi3Cmaterial *materialOverride, uint32_t flags = Pi3Cmodel::mdf_alpha | Pi3Cmodel::mdf_solid);
 	//void appendLight(Pi3Clight &light) { lights.push_back(light); }
 	//void appendCamera(Pi3Ccamera &camera) { cameras.push_back(camera); }
 

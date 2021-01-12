@@ -169,8 +169,9 @@ void Pi3Cresource::addMeshOutlines(uint32_t meshref)
 	mesh.createTriangleEdges(vertBuffer[mesh.bufRef].verts);
 }
 
-int32_t Pi3Cresource::addMesh(Pi3Cmesh * mesh, int32_t groupId, uint32_t maxsize)
+int32_t Pi3Cresource::addMesh(Pi3Cmesh * mesh, int32_t groupId, uint32_t maxsize, bool deleteVerts)
 {
+	if (maxsize == 0) maxsize = 500000;
 	//Are we requesting too much?  Then attempt it ...
 	uint32_t mvsize = (mesh) ? mesh->verts.size() : 0;
 	if (mvsize > maxsize) maxsize = mvsize; // return -1;
@@ -219,7 +220,7 @@ int32_t Pi3Cresource::addMesh(Pi3Cmesh * mesh, int32_t groupId, uint32_t maxsize
 			if (!vertsMoved) {
 				memcpy(&mverts[bufferPtr], &mesh->verts[0], vcbytes);
 				SDL_Log("VBO:%d, Uploading floats = %d, mvsize=%d, remaining:%d", VBOid[currentBuffer], maxsize, mvsize, maxsize - (bufferPtr + mvsize));
-				mesh->verts.resize(0); //delete verts from original mesh as these have been stored and uploaded to GPU
+				if (deleteVerts) mesh->verts.resize(0); //delete verts from original mesh as these have been stored and uploaded to GPU
 				glBindBuffer(GL_ARRAY_BUFFER, VBOid[cbuf]);
 				glBufferSubData(GL_ARRAY_BUFFER, bufferPtr * sizeof(float), vcbytes, &mverts[bufferPtr]); // This transfer requires vcbytes 
 			}
@@ -325,6 +326,8 @@ Pi3Crect Pi3Cresource::renderText(const int meshRef, Pi3Cfont *font, const std::
 void Pi3Cresource::renderMesh(const int meshRef, const GLenum rendermode)
 {
 	Pi3Cmesh &mesh = meshes[meshRef];
+	if (mesh.vc == 0) return;
+
 	setRenderBuffer(mesh.bufRef, mesh.stride);
 
 	if (rendermode == GL_TRIANGLES || mesh.mode== GL_LINE_STRIP) mesh.render(rendermode);

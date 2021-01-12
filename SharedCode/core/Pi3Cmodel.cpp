@@ -126,7 +126,7 @@ void Pi3Cmodel::renderBasic(Pi3Cresource *resource, Pi3Cshader * shader, const P
 	}
 }
 
-void Pi3Cmodel::render(Pi3Cresource *resource, Pi3Cshader &shader, const Pi3Cmatrix *parent_matrix, Pi3Cmaterial *materialOverride)
+void Pi3Cmodel::render(Pi3Cresource *resource, Pi3Cshader &shader, const Pi3Cmatrix *parent_matrix, Pi3Cmaterial *materialOverride, uint32_t flags)
 {
 	if (!visible || deleted) return;
 	
@@ -143,34 +143,54 @@ void Pi3Cmodel::render(Pi3Cresource *resource, Pi3Cshader &shader, const Pi3Cmat
 		group[choice].render(resource, shader, &newmatrix, materialOverride);
 	}
 	else {
-		for (auto &sg : group) sg.render(resource, shader, &newmatrix, materialOverride);
+		for (auto &sg : group) sg.render(resource, shader, &newmatrix, materialOverride, flags);
 	}
 
 	//finally, render the mesh itself (not usually set if there's a group with the model) ...
 	if (meshRef >= 0) {
+
 		Pi3Cmaterial *selectedMaterial = (materialOverride) ? materialOverride : &material;
-		if (materialOverride) selectedMaterial->SetColDiffuse(material.colDiffuse);
-		shader.SetModelMatrix(newmatrix);
-		shader.setMaterial(selectedMaterial);
-		resource->renderMesh(meshRef, selectedMaterial->rendermode);
+		bool opaque = (selectedMaterial->alpha == 1.f);
+		if (((flags & mdf_alpha) && !opaque) || ((flags & mdf_solid) && opaque)) {
+
+			if (materialOverride) selectedMaterial->SetColDiffuse(material.colDiffuse);
+			shader.SetModelMatrix(newmatrix);
+			shader.setMaterial(selectedMaterial);
+			resource->renderMesh(meshRef, selectedMaterial->rendermode);
+		}
 	}
 }
 
-void Pi3Cmodel::appendMesh(Pi3Cresource *resource, Pi3Cmesh mesh, int32_t groupId, bool asCollider)
+void Pi3Cmodel::setMesh(Pi3Cresource* resource, Pi3Cmesh mesh, int32_t groupId)
 {
-	//int32_t i = resource->addMesh(mesh);
 	int32_t i = resource->addMesh(&mesh, groupId);
+	meshRef = i;
+	bbox = resource->meshes[i].bbox;
+}
+
+void Pi3Cmodel::appendMesh(Pi3Cresource *resource, Pi3Cmesh mesh, int32_t groupId)
+{
+	int32_t i = resource->addMesh(&mesh, groupId);
+	//Appends first mesh into model itself (if none exists at start)...
 	if (group.size() == 0 && meshRef<0) {
 		meshRef = i;
 		bbox = resource->meshes[i].bbox;
-		//updateSelBox(resource);
 		return;
 	}
-	Pi3Cmodel newMesh;
-	newMesh.meshRef = i;
+	//Else append further meshes to group ...
+	Pi3Cmodel newGroupMesh;
+	newGroupMesh.meshRef = i;
 	bbox.update(resource->meshes[i].bbox);
-	//updateSelBox(resource);
-	group.push_back(newMesh);
+	group.push_back(newGroupMesh);
+}
+
+void Pi3Cmodel::appendMeshToGroup(Pi3Cresource* resource, Pi3Cmesh mesh, int32_t groupId, bool deleteVerts)
+{
+	int32_t i = resource->addMesh(&mesh, groupId, 0, false);
+	Pi3Cmodel newGroupMesh;
+	newGroupMesh.meshRef = i;
+	bbox.update(resource->meshes[i].bbox);
+	group.push_back(newGroupMesh);
 }
 
 //void Pi3Cmodel::updateSelBox(Pi3Cresource *resource)

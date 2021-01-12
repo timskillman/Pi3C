@@ -57,6 +57,7 @@ class Pi3Cmodel {
 public:
 
 	enum modelFlags { SELECTED = 1, DELETED = 2, VISIBLE = 4, TOUCHABLE = 8, GRIDLOCK = 16, NORMALLOCK = 32 };
+	enum mdf_flags { mdf_alpha = 1, mdf_solid = 2 };
 
 // Constructors
 
@@ -71,9 +72,11 @@ public:
 
 	void init();
 	void create(Pi3Cresource *resource, Pi3Cmesh *mesh, int32_t groupId, uint32_t diffuseColour = 0xffffffff);
-	void render(Pi3Cresource *resource, Pi3Cshader &shader, const Pi3Cmatrix *parent_matrix = nullptr, Pi3Cmaterial *materialOverride = nullptr);
+	void render(Pi3Cresource *resource, Pi3Cshader &shader, const Pi3Cmatrix *parent_matrix = nullptr, Pi3Cmaterial *materialOverride = nullptr, uint32_t flags = mdf_alpha | mdf_solid);
 	void renderBasic(Pi3Cresource *resource, Pi3Cshader * shader = nullptr, const Pi3Cmatrix *parent_matrix = nullptr, Pi3Cmaterial *materialOverride = nullptr);
-	void appendMesh(Pi3Cresource *resource, Pi3Cmesh mesh, int32_t groupId, bool asCollider);
+	void setMesh(Pi3Cresource* resource, Pi3Cmesh mesh, int32_t groupId);
+	void appendMesh(Pi3Cresource *resource, Pi3Cmesh mesh, int32_t groupId);
+	void appendMeshToGroup(Pi3Cresource* resource, Pi3Cmesh mesh, int32_t groupId, bool deleteVerts = true);
 	void updateMesh(Pi3Cresource* resource, Pi3Cmesh& umesh);
 	void loadOBJfile(Pi3Cresource *resource, std::string path, std::string modelfile, int32_t groupId, std::function<void(float)> showProgressCB, bool asCollider, bool addColliderGrid = false);
 	bool collide(const Pi3Cresource *resource, const Pi3Cmatrix *parent_matrix, const vec3f &pos, const vec3f &dir, const float radius) const;

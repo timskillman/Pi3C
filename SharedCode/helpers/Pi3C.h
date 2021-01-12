@@ -106,7 +106,7 @@ public:
 	float getFloorHeight(const uint32_t modelRef, const vec3f pos);
 
 	//Render functions
-	void render3D() { scene.render3D(window.getTicks()); }
+	void render3D(uint32_t flags = Pi3Cmodel::mdf_solid | Pi3Cmodel::mdf_alpha) { scene.render3D(window.getTicks(), nullptr, flags); }
 	void render2D() { scene.render2D(window.getTicks()); }
 
 	//Event handlers

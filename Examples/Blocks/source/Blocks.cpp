@@ -139,7 +139,8 @@ int main(int argc, char *argv[])
 		//Draw your scene here ...
 		pi3c.scene.setSun(0xffffff, vec3f(-2000.f, 1500.f, -1500.f)); //transform sun position into scene
 		pi3c.scene.setMatrix(player.getPosition(), vec3f(0, 0, 1), player.getRotation());
-		pi3c.render3D();
+		pi3c.render3D(Pi3Cmodel::mdf_solid);
+		pi3c.render3D(Pi3Cmodel::mdf_alpha);
 		prot = prot * 0.9f;
 		
 		pi3c.render2D();

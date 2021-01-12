@@ -63,6 +63,8 @@ void Blocks::createBlocks(int MapSize, int ChunkWidth, int ChunkDepth, int Chunk
 
 	blockmesh.name = "ChunkMesh";
 	blockmesh.verts.resize(50000 * 9);
+	watermesh.name = "WaterMesh";
+	watermesh.verts.resize(10000 * 9);
 }
 
 void Blocks::createMapChunk(int chunkX, int chunkZ, uint32_t flags)
@@ -190,12 +192,22 @@ void lightRecovery(int& light, int lightRecover)
 
 void Blocks::newMeshChunk(Pi3Cresource* resource, Pi3Cscene* scene, int cx, int cz, int blocksId, int texRef)
 {
-	createMeshChunk(resource, blockmesh, cx, cz);
-	Pi3Cmodel model = Pi3Cmodel(resource, blockmesh, blocksId);
+	createMeshChunk(resource, blockmesh, watermesh, cx, cz);
+	Pi3Cmodel model;
 	model.name = "ChunkModel";
-	model.material.texRef = texRef;
-	model.material.texID = resource->getTextureID(texRef);
-	if (model.meshRef >= 0) scene->append3D(model);
+	//model.material.texRef = texRef;
+	//model.material.texID = resource->getTextureID(texRef);
+	//watermesh.vertOffset = 40000;
+	model.appendMeshToGroup(resource, blockmesh, blocksId);
+	model.group[0].material.texRef = texRef;
+	model.group[0].material.texID = resource->getTextureID(texRef);
+
+	model.appendMeshToGroup(resource, watermesh, blocksId, false);
+	model.group[1].material.texRef = texRef;
+	model.group[1].material.texID = resource->getTextureID(texRef);
+	model.group[1].material.alpha = 0.8f;
+	//if (model.meshRef >= 0) 
+		scene->append3D(model);
 }
 
 void Blocks::updateMeshChunk(Pi3Cresource* resource, Pi3Cscene* scene, const vec3f& position)
@@ -209,19 +221,29 @@ void Blocks::updateMeshChunk(Pi3Cresource* resource, Pi3Cscene* scene, const vec
 	int blockId = chx + chz * mapSize;
 
 	Pi3Cmodel* model = &scene->models[blockId];
-	int32_t meshRef = model->meshRef;
+	int32_t meshRef = model->group[0].meshRef;
+	int32_t wmeshRef = model->group[1].meshRef;
 	Pi3Cmesh* mesh = &resource->meshes[meshRef];
-	createMeshChunk(resource, *mesh, chunkOffsetX, chunkOffsetZ);
+	Pi3Cmesh* watermesh = &resource->meshes[wmeshRef];
+	//watermesh->verts.resize(10000);
+
+	createMeshChunk(resource, *mesh, *watermesh, chunkOffsetX, chunkOffsetZ);
+
 	mesh->vertSize = mesh->vc / mesh->stride;
-
 	glBindBuffer(GL_ARRAY_BUFFER, resource->VBOid[mesh->bufRef]);
-	glBufferSubData(GL_ARRAY_BUFFER, 0, mesh->vc * sizeof(float), &resource->vertBuffer[mesh->bufRef].verts[0] );
+	glBufferSubData(GL_ARRAY_BUFFER, 0, mesh->vc * sizeof(float), &resource->vertBuffer[mesh->bufRef].verts[0]);
 
+	if (watermesh->vc > 0) {
+		watermesh->vertSize = watermesh->vc / watermesh->stride;
+		watermesh->vertOffset = mesh->vc / watermesh->stride; //copy water mesh verts after mesh verts
+		glBindBuffer(GL_ARRAY_BUFFER, resource->VBOid[watermesh->bufRef]);
+		glBufferSubData(GL_ARRAY_BUFFER, mesh->vc * sizeof(float), watermesh->vc * sizeof(float), &watermesh->verts[0]);
+	}
 	//resource->updateMesh(meshRef);
 	//model->updateMesh(resource, *mesh);
 }
 
-void Blocks::createMeshChunk(Pi3Cresource* resource, Pi3Cmesh& mesh, int chunkX, int chunkZ)
+void Blocks::createMeshChunk(Pi3Cresource* resource, Pi3Cmesh& mesh, Pi3Cmesh& watermesh, int chunkX, int chunkZ)
 {
 	//uint32_t chunkPtr = calcChunkPtr(chunkX, chunkZ);
 	//((chunkX + mapSize*10000) % mapSize) * chunkSlice + ((chunkZ + mapSize*10000) % mapSize) * mapSize * chunkSize;
@@ -237,6 +259,9 @@ void Blocks::createMeshChunk(Pi3Cresource* resource, Pi3Cmesh& mesh, int chunkX,
 	mesh.vc = 0;
 	uint32_t* vc = &mesh.vc;
 	std::vector<float>* verts = (mesh.verts.size() > 0) ? &mesh.verts : &resource->vertBuffer[mesh.bufRef].verts;
+	watermesh.vc = 0;
+	uint32_t* wvc = &watermesh.vc;
+	std::vector<float>* waterverts = &watermesh.verts;
 
 	for (int32_t zz = 0; zz < chunkDepth; zz++) {
 		for (int32_t xx = 0; xx < chunkWidth; xx++) {
@@ -340,7 +365,7 @@ void Blocks::createMeshChunk(Pi3Cresource* resource, Pi3Cmesh& mesh, int chunkX,
 						case blockTypes::stick: break;
 						case blockTypes::table: break;
 						case blockTypes::water:
-							if (chunks[p+1]!=blockType::Water) addQuadTopBottom(*verts, *vc, cx + xx, (float)ht-0.3f, cz + zz, chunks[p], 0, 0, light, shadow);
+							if (chunks[p+1]!=blockType::Water) addQuadTopBottom(*waterverts, *wvc, cx + xx, (float)ht-0.3f, cz + zz, chunks[p], 0, 0, light, shadow);
 							break;
 						}
 						shadow = 15;
@@ -348,6 +373,7 @@ void Blocks::createMeshChunk(Pi3Cresource* resource, Pi3Cmesh& mesh, int chunkX,
 					//If this is a 'see-through' block, then create edges of blocks adjacent to it ...
 					if (geomtype > blockTypes::solid) {
 						shadow = 15;
+
 						bool seethru = (geomtype == blockTypes::seethrough || geomtype == blockTypes::water);
 						cp = chunks[(onfarLeft) ? p + chunkWrapLeft : p + chunkLeft]; bt = typToTex[cp].flags;
 						if ((bt & blockFlags::bf_block) && !(bt & blockFlags::bf_seethrough && seethru)) {

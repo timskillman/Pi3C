@@ -16,7 +16,7 @@ public:
 	void createMapChunk(int x, int z, uint32_t flags);
 	void createTexPackUV();
 	void newMeshChunk(Pi3Cresource* resource, Pi3Cscene* scene, int cx, int cz, int blocksId, int texRef);
-	void createMeshChunk(Pi3Cresource* resource, Pi3Cmesh& mesh, int chunkX, int chunkZ);
+	void createMeshChunk(Pi3Cresource* resource, Pi3Cmesh& mesh, Pi3Cmesh& watermesh, int chunkX, int chunkZ);
 	void updateMeshChunk(Pi3Cresource* resource, Pi3Cscene* scene, const vec3f& position);
 	void createTrees(int x, int z, int trees);
 	void insertBlock(uint8_t blockType, uint32_t chunkPtr, int x, int y, int z);
@@ -72,7 +72,7 @@ private:
 	int32_t chunkWrapLeft, chunkWrapRight, chunkWrapBack, chunkWrapFront;
 
 	float textureDiv = 1.f / 16.f; //Assumes texture is 16x16 texture map
-	Pi3Cmesh blockmesh;
+	Pi3Cmesh blockmesh, watermesh;
 };
 
 class ivec
