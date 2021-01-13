@@ -86,9 +86,6 @@ void Pi3Cmodel::create(Pi3Cresource *resource, Pi3Cmesh *mesh, int32_t groupId, 
 	material.SetColDiffuse(diffuseColour);
 	material.rendermode = mesh->mode;
 	bbox = resource->meshes[meshRef].bbox;
-	//Create a selection mesh ...
-	//Pi3Cmesh selMesh = Pi3Cgizmos::selectBoxGizmo(bbox.min, bbox.size(), 0xffffff);
-	//meshSel = resource->addMesh(&selMesh);
 }
 
 void Pi3Cmodel::init()
@@ -111,11 +108,6 @@ void Pi3Cmodel::deleteTexture(Pi3Cresource *resource)
 
 void Pi3Cmodel::renderBasic(Pi3Cresource *resource, Pi3Cshader * shader, const Pi3Cmatrix *parent_matrix, Pi3Cmaterial *materialOverride)
 {
-	//if (!visible || deleted) return;
-
-	//Pi3Cmatrix newmatrix = (parent_matrix) ? matrix * *parent_matrix : matrix;
-
-	//for (auto &sg : group) sg.renderBasic(resource, shader, &newmatrix, materialOverride);
 	if (shader == nullptr) shader = &resource->shaders[0];
 
 	if (meshRef >= 0) {
@@ -152,7 +144,6 @@ void Pi3Cmodel::render(Pi3Cresource *resource, Pi3Cshader &shader, const Pi3Cmat
 		Pi3Cmaterial *selectedMaterial = (materialOverride) ? materialOverride : &material;
 		bool opaque = (selectedMaterial->alpha == 1.f);
 		if (((flags & mdf_alpha) && !opaque) || ((flags & mdf_solid) && opaque)) {
-
 			if (materialOverride) selectedMaterial->SetColDiffuse(material.colDiffuse);
 			shader.SetModelMatrix(newmatrix);
 			shader.setMaterial(selectedMaterial);
@@ -203,11 +194,7 @@ void Pi3Cmodel::appendMeshToGroup(Pi3Cresource* resource, Pi3Cmesh mesh, int32_t
 
 void Pi3Cmodel::updateMesh(Pi3Cresource* resource, Pi3Cmesh &umesh)
 {
-	//Pi3Cmesh& mesh = resource->meshes[meshRef];
-	//uint32_t stride = mesh.stride;
 	vertsPtr vp = resource->getMeshVerts(meshRef);
-
-	//if (umesh.verts.size() != (*vp.verts).size()) return;
 
 	for (uint32_t i = 0; i < umesh.verts.size(); i++) {
 		(*vp.verts)[vp.offset++] = umesh.verts[i];

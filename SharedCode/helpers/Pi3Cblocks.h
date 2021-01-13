@@ -6,6 +6,30 @@
 #include "Pi3Cscene.h"
 #include "FastNoiseLite.h"
 #include "Pi3CvertsPtr.h"
+#include "Pi3Cpoint.h"
+
+//class BlockPtr {
+//public:
+//
+//	inline int posiChunk(int c) { return (c + mapSize * 10000) % mapSize; }
+//
+//	uint32_t calcChunkPtr(int chunkX, int chunkZ) {
+//		return posiChunk(chunkX) * chunkSlice + posiChunk(chunkZ) * mapSize * chunkSize;
+//	}
+//
+//	void calcRelativePositionPtr(const vec3f& position) {
+//		xx = (int)(position.x + chunkWidth * 10000);
+//		zz = (int)(position.z + chunkDepth * 10000);
+//		chunkOffsetX = xx / chunkWidth - 10000;
+//		chunkOffsetZ = zz / chunkDepth - 10000;
+//		x = xx % chunkWidth;
+//		z = zz % chunkDepth;
+//		chunkPtr = calcChunkPtr(chunkOffsetX, chunkOffsetZ);
+//	}
+//
+//	int xx, zz, chunkOffsetX, chunkOffsetZ, x, z;
+//	uint32_t chunkPtr;
+//};
 
 class Blocks {
 public:
@@ -16,7 +40,7 @@ public:
 	void createMapChunk(int x, int z, uint32_t flags);
 	void createTexPackUV();
 	void newMeshChunk(Pi3Cresource* resource, Pi3Cscene* scene, int cx, int cz, int blocksId, int texRef);
-	void createMeshChunk(Pi3Cresource* resource, Pi3Cmesh& mesh, Pi3Cmesh& watermesh, int chunkX, int chunkZ);
+	void createMeshChunk(Pi3Cresource* resource, Pi3Cmesh& mesh, int chunkX, int chunkZ);
 	void updateMeshChunk(Pi3Cresource* resource, Pi3Cscene* scene, const vec3f& position);
 	void createTrees(int x, int z, int trees);
 	void insertBlock(uint8_t blockType, uint32_t chunkPtr, int x, int y, int z);
@@ -72,7 +96,7 @@ private:
 	int32_t chunkWrapLeft, chunkWrapRight, chunkWrapBack, chunkWrapFront;
 
 	float textureDiv = 1.f / 16.f; //Assumes texture is 16x16 texture map
-	Pi3Cmesh blockmesh, watermesh;
+	Pi3Cmesh blockmesh;
 };
 
 class ivec

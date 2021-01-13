@@ -359,6 +359,12 @@
     <ClInclude Include="..\..\SharedCode\helpers\FastNoiseLite.h">
       <Filter>Shared Code\helpers</Filter>
     </ClInclude>
+    <ClInclude Include="Pi3Cpoint.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\SharedCode\core\Pi3Cpoint.h">
+      <Filter>Shared Code\core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="assets\shaders\fs1.glsl">

@@ -16,7 +16,7 @@ int main(int argc, char *argv[])
 	winopts.perspective = opts.asFloat("perspective");
 	Pi3C pi3c(winopts);
 
-	//Pi3C pi3c("Blocks", 800, 600, true);
+	SDL_Delay(100);
 
 	//Setup your scene here ...
 	int mapSize = opts.asInt("mapSize");
@@ -28,9 +28,16 @@ int main(int argc, char *argv[])
 	uint32_t caves = (opts.asBool("caves")) ? 1 : 0;
 	uint32_t veg = 2;
 	
+	uint32_t tm = SDL_GetTicks();
+
 	BlockMap blockMap(&pi3c.resource, &pi3c.scene, mapSize, chunkSize, chunkSize, chunkHeight);
+	pi3c.clear_window(0xff606060); pi3c.swap_buffers();
 	blockMap.createMap(-hmap, hmap + 1, -hmap, hmap + 1, trees, caves | veg);
+	SDL_Log("Time generating block map: %d", SDL_GetTicks() - tm); tm = SDL_GetTicks();
+
+	pi3c.clear_window(0xffc0c0c0); pi3c.swap_buffers();
 	blockMap.createMapMeshes(&pi3c.resource, &pi3c.scene, -hmap, hmap + 1, -hmap, hmap + 1);
+	SDL_Log("Time generating blocks: %d", SDL_GetTicks() - tm);
 
 	Pi3Cavatar player;
 	//player.movement = Pi3Cavatar::move_fly;
@@ -139,8 +146,7 @@ int main(int argc, char *argv[])
 		//Draw your scene here ...
 		pi3c.scene.setSun(0xffffff, vec3f(-2000.f, 1500.f, -1500.f)); //transform sun position into scene
 		pi3c.scene.setMatrix(player.getPosition(), vec3f(0, 0, 1), player.getRotation());
-		pi3c.render3D(Pi3Cmodel::mdf_solid);
-		pi3c.render3D(Pi3Cmodel::mdf_alpha);
+		pi3c.render3D();
 		prot = prot * 0.9f;
 		
 		pi3c.render2D();
@@ -163,7 +169,7 @@ int main(int argc, char *argv[])
 
 		pi3c.gui.End();
 
-		if (ocx != cx && x==7) {
+		if (ocx != cx) { // && x==7
 			//create new chunks on X axis ...
 			if (ocx < cx) {
 				blockMap.createMap(cx + hmap, cx + hmap + 1, cz - hmap, cz + hmap + 1, trees, caves | veg);
@@ -176,7 +182,7 @@ int main(int argc, char *argv[])
 			ocx = cx;
 		}
 
-		if (ocz != cz && z==7) {
+		if (ocz != cz) { // && z==7
 			//create new chunks on Z axis ...
 			if (ocz < cz) {
 				blockMap.createMap(cx - hmap, cx + hmap + 1, cz + hmap, cz + hmap + 1, trees, caves | veg);

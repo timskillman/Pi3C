@@ -271,6 +271,7 @@
     <ClInclude Include="..\..\SharedCode\core\Pi3Cmatrix.h" />
     <ClInclude Include="..\..\SharedCode\core\Pi3Cmesh.h" />
     <ClInclude Include="..\..\SharedCode\core\Pi3Cmodel.h" />
+    <ClInclude Include="..\..\SharedCode\core\Pi3Cpoint.h" />
     <ClInclude Include="..\..\SharedCode\core\Pi3Crect.h" />
     <ClInclude Include="..\..\SharedCode\core\Pi3Cresource.h" />
     <ClInclude Include="..\..\SharedCode\core\Pi3Cscene.h" />
@@ -318,6 +319,7 @@
     <ClInclude Include="..\..\SharedCode\helpers\Pi3Cshapes.h" />
     <ClInclude Include="..\..\SharedCode\helpers\Pi3Cutils.h" />
     <ClInclude Include="..\..\SharedCode\ui\Pi3Cimgui.h" />
+    <ClInclude Include="Pi3Cpoint.h" />
     <ClInclude Include="Source\LineEdit.h" />
     <ClInclude Include="Source\Modeller.h" />
     <ClInclude Include="Source\ModellerGUI.h" />

@@ -202,6 +202,7 @@
     <ClInclude Include="..\..\SharedCode\core\Pi3Cmatrix.h" />
     <ClInclude Include="..\..\SharedCode\core\Pi3Cmesh.h" />
     <ClInclude Include="..\..\SharedCode\core\Pi3Cmodel.h" />
+    <ClInclude Include="..\..\SharedCode\core\Pi3Cpoint.h" />
     <ClInclude Include="..\..\SharedCode\core\Pi3Cresource.h" />
     <ClInclude Include="..\..\SharedCode\core\Pi3Cscene.h" />
     <ClInclude Include="..\..\SharedCode\core\Pi3Cshader.h" />
