@@ -28,8 +28,8 @@ public:
 	vec3f readVec3f(const Value& doc, const char * key);
 	Pi3Cmatrix readMatrix(const Value& doc, const char * key);
 	uint32_t readHex(const Value& doc, const char * key);
-	uint32_t readHexDefault(const Value& doc, const char* key, uint32_t default);
-	uint32_t readColour(const Value& doc, const char* key, const uint32_t default);
+	uint32_t readHexDefault(const Value& doc, const char* key, uint32_t def);
+	uint32_t readColour(const Value& doc, const char* key, const uint32_t def);
 	std::string readString(const Value& doc, const char * key);
 
 	void writeString(const char * key, const char * str);

@@ -135,6 +135,11 @@ Open a terminal window and block copy & paste the following in the terminal to i
  sudo apt-get install libsdl2-net-dev -y
 ~~~~
 
+**Alternatively, navigate to the Pi3C folder and enter:**
+~~~~
+sudo sh Installer.sh
+~~~~
+**This will install all the SDL 2.0 libraries, configure your GPU memory and enable the video drivers for your particular Raspberry Pi**
 
 3) <a name="downloadpi3c">**Downloading Pi3C**</a>
 

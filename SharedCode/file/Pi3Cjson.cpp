@@ -58,15 +58,15 @@ uint32_t Pi3Cjson::readHex(const Value& doc, const char * key)
 	return readHexVal(doc, key);
 }
 
-uint32_t Pi3Cjson::readHexDefault(const Value& doc, const char* key, uint32_t default)
+uint32_t Pi3Cjson::readHexDefault(const Value& doc, const char* key, uint32_t def)
 {
-	if (!doc.HasMember(key)) return default;
+	if (!doc.HasMember(key)) return def;
 	return readHexVal(doc, key);
 }
 
-uint32_t Pi3Cjson::readColour(const Value& doc, const char* key, const uint32_t default)
+uint32_t Pi3Cjson::readColour(const Value& doc, const char* key, const uint32_t def)
 {
-	if (!doc.HasMember(key)) return default;
+	if (!doc.HasMember(key)) return def;
 	return Pi3Ccolours::getPi3Ccolour(doc[key].GetString());
 }
 

@@ -3,6 +3,8 @@
 CONFIG=/boot/config.txt
 ASK_TO_REBOOT=0
 
+echo "Installing SDl 2.0 libraries ..."
+
 # Install packages
 PACKAGES="libsdl2-dev libsdl2-mixer-dev libsdl2-ttf-dev libsdl2-image-dev libsdl2-net-dev"
 apt-get update
@@ -50,7 +52,7 @@ if is_pifour ; then
         if ! sed -n "/\[pi4\]/,/\[/ !p" $CONFIG | grep -q "^dtoverlay=vc4-fkms-v3d" ; then
           printf "[all]\ndtoverlay=vc4-fkms-v3d\n" >> $CONFIG
         fi
-        STATUS="The fake KMS GL driver is enabled."
+        echo "The fake KMS GL driver is enabled on the Pi4."
 else
 	if ! sed -n "/\[pi4\]/,/\[/ !p" $CONFIG | grep -q "^dtoverlay=vc4-kms-v3d" ; then
           ASK_TO_REBOOT=1
@@ -60,7 +62,7 @@ else
         if ! sed -n "/\[pi4\]/,/\[/ !p" $CONFIG | grep -q "^dtoverlay=vc4-kms-v3d" ; then
           printf "[all]\ndtoverlay=vc4-kms-v3d\n" >> $CONFIG
         fi
-        STATUS="The full KMS GL driver is enabled."
+        echo "The full KMS GL driver is enabled."
 fi
 
 # If a line containing "gpu_mem" exists
@@ -75,13 +77,13 @@ else
 	echo "gpu_mem=64" >> $CONFIG
 fi
 
-  if [ $ASK_TO_REBOOT -eq 1 ]; then
-    whiptail --yesno "Would you like to reboot now?" 20 60 2
-    if [ $? -eq 0 ]; then # yes
-      sync
-      reboot
-    fi
-  fi
+#  if [ $ASK_TO_REBOOT -eq 1 ]; then
+#    whiptail --yesno "Would you like to reboot now?" 20 60 2
+#    if [ $? -eq 0 ]; then # yes
+#      sync
+#      reboot
+#    fi
+#  fi
 
-echo "Install complete, rebooting."
-reboot
+echo "Install complete, please reboot ..."
+#reboot
