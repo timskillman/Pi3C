@@ -1,0 +1,9 @@
+{
+	"GUIcolours": {
+		"BackCol": "Raspberry",
+		"IconCol": "Linen",
+		"SelectCol": "LightCoral",
+		"HighlightCol": "Salmon",
+		"BorderCol": "Red"
+	}
+}

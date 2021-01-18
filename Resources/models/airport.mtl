@@ -1,0 +1,63 @@
+
+newmtl ashphalt
+Kd 1 1 1
+Ks 1 1 1
+Ns 1000
+illum 2
+map_Kd maps/ashphalt.jpg
+
+newmtl ashphaltshaded
+Kd 1 1 1
+Ks 1 1 1
+illum 2
+map_Kd maps/ashphaltShaded.jpg
+
+newmtl stucco
+Kd 1 1 1
+Ks 1 1 1
+Ns 1000
+illum 2
+map_Kd maps/stucco.jpg
+
+newmtl glass
+Kd .5 .5 1
+Ks 1 1 1
+Ns 1000
+Tr 0.5
+illum 2
+
+newmtl white
+Kd 1 1 1
+Ks 1 1 1
+Ns 1000
+illum 2
+
+newmtl road
+Kd 1 1 1
+Ks 1 1 1
+Ns 1000
+illum 2
+map_Kd maps/road.jpg
+
+newmtl rustedsheet
+Kd 1 1 1
+Ks 1 1 1
+Ns 1000
+illum 2
+map_Kd maps/rustedSheet.png
+
+newmtl grill
+Kd 1 1 1
+Ks 1 1 1
+Ns 1000
+Tr 1.0
+illum 0
+map_Kd maps/grill.png
+
+newmtl runwaylights
+Kd 1 1 1
+Ks 1 1 1
+Ns 1000
+Tr 1.0
+illum 0
+map_Kd maps/runwaylights.png

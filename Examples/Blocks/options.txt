@@ -1,0 +1,25 @@
+title:Pi3C Blocks
+screenWidth:800
+screenHeight:600
+perspective:300
+fullscreen:false
+antiAliasLevel:0
+mapSize:7
+chunkSize:16
+chunkHeight:128
+walkSpeed:0.2
+runSpeed:0.5
+fallSpeed:0.2
+height:1.75
+fogColour:ffffff
+fogNear:20
+fogFar:100
+trees:3
+caves:false
+modelPath:../../Resources/models/
+logo:maps/logo.png
+skyboxPath:../../Resources/models/skyboxes
+skybox:sunnyday.obj
+skyboxScale:15.0
+fontsPath:../../Resources/fonts/
+font1:NotoSans-Regular.ttf

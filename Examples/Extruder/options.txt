@@ -1,0 +1,19 @@
+title:Polyline Extrusion Example
+fullscreen:false
+screenWidth:800
+screenHeight:600
+
+lightpos:0.0 1.0 0.0
+startpos:0.0 -30 0.0
+rotate:0.0 0.0 0.0
+perspective:800.0
+nearz:0.1
+farz:25000.0
+
+fogColour:0xc0c0c0
+fogFar:15000.0
+fogNear:2000.0
+
+contourFile:raspberry
+fontsPath:../../Resources/fonts/
+font1:NotoSans-Regular.ttf

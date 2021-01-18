@@ -1,0 +1,23 @@
+
+newmtl ashphaltShaded
+Kd 1 1 1
+Ks 1 1 1
+illum 2
+map_Kd maps/ashphaltShaded.jpg
+
+newmtl waterfall
+Kd 1 1 1
+Ks 1 1 1
+Ns 1000
+illum 0
+Tr 0.999
+animsheet 5 4 18
+map_Kd maps/waterfallFrames.png
+
+newmtl fastwater
+Kd 1 1 1
+Ks 1 1 1
+Ns 1000
+illum 0
+animsheet 5 3 13
+map_Kd maps/fastwaterFrames.png

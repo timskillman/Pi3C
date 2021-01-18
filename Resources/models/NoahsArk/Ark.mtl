@@ -1,0 +1,48 @@
+newmtl message
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 1
+map_Kd maps/noahsmessage.jpg
+
+newmtl pitchwood
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+map_Kd maps/pitchwood.jpg
+
+newmtl pine_bk
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 1
+map_Kd maps/pine_bk.png
+
+newmtl welcome
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 1
+map_Kd maps/noahsark.jpg
+
+newmtl note
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 1
+map_Kd maps/noahnote.jpg
+
+newmtl stripwood_bk
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 1
+map_Kd maps/stripwood_bk.png
+
+newmtl grass
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+map_Kd maps/grass.jpg

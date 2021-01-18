@@ -1,0 +1,44 @@
+newmtl mudgrass
+Ka 0.300000 0.300000 0.300000
+Kd 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Tr 1.000000
+illum 2
+Ns 0.000000
+map_Kd ../maps/cobbleTexs.jpg
+
+newmtl limestone
+Ka 0.300000 0.300000 0.300000
+Kd 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Tr 1.000000
+illum 2
+Ns 0.000000
+map_Kd ../maps/limestone.jpg
+
+newmtl fadewood
+Ka 0.300000 0.300000 0.300000
+Kd 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Tr 1.000000
+illum 2
+Ns 0.000000
+map_Kd ../maps/fadewood.png
+
+newmtl shambles
+Ka 0.300000 0.300000 0.300000
+Kd 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Tr 1.000000
+illum 2
+Ns 0.000000
+map_Kd ../maps/ShamsSml.png
+
+newmtl roof
+Ka 0.300000 0.300000 0.300000
+Kd 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Tr 1.000000
+illum 2
+Ns 0.000000
+map_Kd ../maps/tileroof.jpg

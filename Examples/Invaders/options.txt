@@ -1,0 +1,31 @@
+title:Invaders!
+fullscreen:true
+screenWidth:1440
+screenHeight:900
+
+trees:50000
+fly:true
+lightpos:0.0 1.0 0.0
+startpos:0.0 0.0 0.0
+rotate:0.0 0.0 0.0
+perspective:500.0
+nearz:0.1
+farz:25000.0
+avatarHeight:12.0
+avatarFallSpeed:10
+avatarWalkSpeed:10
+avatarRunSpeed:20
+fogColour:0xc0c0c0
+fogFar:15000.0
+fogNear:2000.0
+modelPath:../../Resources/models/
+musicPath:../../Resources/music/RafaelKrux
+soundPath:../../Resources/sounds
+
+#Landscape selection: Mountains.obj, landscape.obj
+landscape:Mountains.obj
+skyboxPath:../../Resources/models/skyboxes
+skybox:stormy2.obj
+skyboxScale:25.0
+fontsPath:../../Resources/fonts/
+font1:NotoSans-Regular.ttf

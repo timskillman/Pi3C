@@ -1,0 +1,38 @@
+title:Noahs Ark
+fullscreen:false
+screenWidth:1024	
+screenHeight:768
+
+#1440x900
+
+fly:false
+lightpos:0.0 1.0 0.0
+
+rotate:0.0 0.0 0.0
+perspective:800.0
+nearz:1.0
+farz:30000.0
+avatarFallSpeed:20
+avatarWalkSpeed:5
+avatarRunSpeed:10
+fogColour:1 1 1
+fogFar:50000.0
+fogNear:25000.0
+
+avatarHeight:60.0
+startpos:50.0 20.0 0.0
+modelPath:../../Resources/models/NoahsArk/
+model:Ark.obj
+collider:ArkCollider.obj
+
+#avatarHeight:16.0
+#startpos:0.0 0.0 0.0
+#modelPath:../../Resources/models/Yosemite/
+#model:Yosemite.obj
+#collider:Collider.obj
+
+skyboxPath:../../Resources/models/skyboxes
+skybox:miramar2.obj
+skyboxScale:15.0
+fontsPath:../../Resources/fonts/
+font1:NotoSans-Regular.ttf
