@@ -36,9 +36,8 @@ I hope that you will enjoy your experience with Pi3C as it develops!
 
 [**2. What you need and Setting up**](#whatyouneed)
 
-  - [Raspberry Pi setup](#pisetup)
   - [Downloading Pi3C](#downloadpi3c)
-  - [Setting up SDL 2.0 on the Raspberry Pi](#settingup)
+  - [Installing SDL 2.0 drivers and environment](#settingup)
   
 [**3. Trying the Examples**](#tryexamples)
   - [Pi3C folders](#pi3cfolders)
@@ -104,26 +103,8 @@ C++ is one of the most popular, industry standard programming languages.
  - HDMI cable
  - 16GB or 32GB Micro-SD card
 
-<a name="settingup">**Setting up Pi3C**</a>
 
-Pi3C requires SDL 2.0 and the fastest implementation of hardware Open GL.
-
-1) Ensure the fastest Open GL driver is running
-
-- Open a terminal window enter;
- 
- ~~~~
-  sudo raspi-config
- ~~~~
- 
- Select 'Advanced Options' and configure;
- 
-  - Full KMS, Open GL driver
-  - 64 megabytes of GPU memory(memory split option)
-  - Restart your Pi and setup SDL 2.0 (next section)
-
-
-2) <a name="downloadpi3c">**Downloading Pi3C**</a>
+1) <a name="downloadpi3c">**Downloading Pi3C**</a>
 
 The easiest ways to download and modify Pi3C for your own use it use [Git](https://projects.raspberrypi.org/en/projects/getting-started-with-git)
 
@@ -141,7 +122,9 @@ git clone https://github.com/timskillman/Pi3C.git
 
 Pi3C will be cloned onto your Pi and a Pi3C directory, with all the necessary code and resources, will be downloaded.
 
-3) <a name="settingup">**Setup your Raspberry Pi (All models including Pi4 and Zero)**</a>
+2) <a name="settingup">**Installing SDL 2.0 drivers and environment (All models including Pi4 and Zero)**</a>
+
+This will install all the SDL 2.0 libraries, configure your GPU memory and enable the video drivers for your particular Raspberry Pi.
 
 Navigate to the Pi3C folder and enter:
 
@@ -149,8 +132,8 @@ Navigate to the Pi3C folder and enter:
 sudo sh Installer.sh
 ~~~~
 
-This will install all the SDL 2.0 libraries, configure your GPU memory and enable the video drivers for your particular Raspberry Pi
 When prompted, type "Reboot" to restart your Raspberry Pi.
+
 
 Now you should be setup and ready to play with Pi3C ... **Congratulations!**
 
