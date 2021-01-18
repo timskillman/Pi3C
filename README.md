@@ -37,8 +37,8 @@ I hope that you will enjoy your experience with Pi3C as it develops!
 [**2. What you need and Setting up**](#whatyouneed)
 
   - [Raspberry Pi setup](#pisetup)
-  - [Setting up SDL 2.0 on the Raspberry Pi](#settingup)
   - [Downloading Pi3C](#downloadpi3c)
+  - [Setting up SDL 2.0 on the Raspberry Pi](#settingup)
   
 [**3. Trying the Examples**](#tryexamples)
   - [Pi3C folders](#pi3cfolders)
@@ -73,6 +73,7 @@ The following games can be explored in this repo ...
 The following apps can be explored in this repo ...
 - 3D Modeller
 - Castle Creator
+- Blocks (Minecraft experiment)
 
 <a name="demos">**Example Demo's**</a>
 - HelloWorld
@@ -120,28 +121,9 @@ Pi3C requires SDL 2.0 and the fastest implementation of hardware Open GL.
   - Full KMS, Open GL driver
   - 64 megabytes of GPU memory(memory split option)
   - Restart your Pi and setup SDL 2.0 (next section)
-  
-2) **Setting Up SDL 2.0 on your Raspberry Pi**
 
-Even though Raspbian OS comes with a version of SDL2, you need to download the latest SDL2 development libraries and SDL2's associated libraries for sound, images, network and font support.
 
-Open a terminal window and block copy & paste the following in the terminal to install the SDL libraries;
-
-~~~~
- sudo apt-get install libsdl2-dev -y
- sudo apt-get install libsdl2-mixer-dev -y
- sudo apt-get install libsdl2-ttf-dev -y
- sudo apt-get install libsdl2-image-dev -y
- sudo apt-get install libsdl2-net-dev -y
-~~~~
-
-**Alternatively, navigate to the Pi3C folder and enter:**
-~~~~
-sudo sh Installer.sh
-~~~~
-**This will install all the SDL 2.0 libraries, configure your GPU memory and enable the video drivers for your particular Raspberry Pi**
-
-3) <a name="downloadpi3c">**Downloading Pi3C**</a>
+2) <a name="downloadpi3c">**Downloading Pi3C**</a>
 
 The easiest ways to download and modify Pi3C for your own use it use [Git](https://projects.raspberrypi.org/en/projects/getting-started-with-git)
 
@@ -158,6 +140,17 @@ git clone https://github.com/timskillman/Pi3C.git
 ~~~~
 
 Pi3C will be cloned onto your Pi and a Pi3C directory, with all the necessary code and resources, will be downloaded.
+
+3) <a name="settingup">**Setup your Raspberry Pi (All models including Pi4 and Zero)**</a>
+
+Navigate to the Pi3C folder and enter:
+
+~~~~
+sudo sh Installer.sh
+~~~~
+
+This will install all the SDL 2.0 libraries, configure your GPU memory and enable the video drivers for your particular Raspberry Pi
+When prompted, type "Reboot" to restart your Raspberry Pi.
 
 Now you should be setup and ready to play with Pi3C ... **Congratulations!**
 
