@@ -244,12 +244,12 @@ namespace Pi3Cshapes {
 				p2 = path[i]; p3 = path[i + 1];
 				newPath.push_back(p2);
 				if ((p2 - p1).angleBetween(p3 - p2) > 0.5f) {
-					normals.push_back(p1.dot(p2));
+					normals.push_back(p1.dot(p2) * inv);
 					newPath.push_back(p2);
-					normals.push_back(p2.dot(p3));
+					normals.push_back(p2.dot(p3) * inv);
 				}
 				else {
-					normals.push_back((p1 - p2).dot(p3 - p2));
+					normals.push_back((p1 - p2).dot(p3 - p2) * inv);
 				}
 				p1 = p2;
 			}
@@ -261,10 +261,10 @@ namespace Pi3Cshapes {
 			if (joined) {
 				p3 = path[1];
 				if ((p2 - p1).angleBetween(p3 - p2) > 0.5f) {
-					normals.push_back(p1.dot(p2));
+					normals.push_back(p1.dot(p2) * inv);
 				}
 				else {
-					normals.push_back((p1 - p2).dot(p3 - p2));
+					normals.push_back((p1 - p2).dot(p3 - p2) * inv);
 				}
 			}
 			else
@@ -510,9 +510,9 @@ namespace Pi3Cshapes {
 
 	void lathe_verts(std::vector<float>& verts, uint32_t& vc, const uint32_t stride, const vec3f& pos, std::vector<vec2f>& path, const bool sidePath, const int edges, const float rise, const float startAngle, const float endAngle, const bool invert, const float creaseAngle, const vec2f prevPoint, const vec2f lastPoint, const uint32_t uvtype, const uint32_t col)
 	{
-		float inv = (invert) ? -1.0f : 1.0f;
 		std::vector<vec2f> normals;
-		calcPathNormals(path, normals, 60, true, inv);
+		calcPathNormals(path, normals, 60, true, (invert) ? -1.0f : 1.0f);
+
 		uint32_t sz = path.size();
 
 		float angDiff = endAngle - startAngle;
@@ -522,13 +522,36 @@ namespace Pi3Cshapes {
 		float tcx = 1.0f / (float)edges;
 		float rdiv = rise / (float)edges;
 
+		//Work out CW/CCW of leftmost polygon by working out area of polygon ...
+
 		//Find min y / max y of path
 		float miny = path[0].y; float maxy = miny;
-		for (size_t p = 0; p < sz; p++) {
-			if (path[p].y < miny) miny = path[p].y;
-			if (path[p].y > maxy) maxy = path[p].y;
+		float a = 0.f; size_t b = sz - 1;
+		for (size_t c = 0; c < sz ; c++) {
+			a += path[b].x * path[c].y - path[c].x * path[b].y;
+			b = c;
+			if (path[c].y < miny) miny = path[c].y;
+			if (path[c].y > maxy) maxy = path[c].y;
 		}
 		float cy = (maxy + miny) / 2.f;
+
+		//reverse contours if inverted
+		if (a > 0) {
+			for (size_t j = 0; j < (sz / 2); j++) {
+				std::swap(path[j], path[sz - j - 1]);
+				std::swap(normals[j], normals[sz - j - 1]);
+			}
+		}
+
+
+
+		//Find min y / max y of path
+		//float miny = path[0].y; float maxy = miny;
+		//for (size_t p = 0; p < sz; p++) {
+		//	if (path[p].y < miny) miny = path[p].y;
+		//	if (path[p].y > maxy) maxy = path[p].y;
+		//}
+		//float cy = (maxy + miny) / 2.f;
 
 		std::vector<float> vertTemp;
 		uint32_t tc = 0;
@@ -642,7 +665,7 @@ namespace Pi3Cshapes {
 		path.push_back(vec2f(0, height));
 		path.push_back(vec2f(radius, 0));
 		path.push_back(vec2f(0, 0));
-		lathe_verts(verts, vc, 9, pos, path, false, sides, 0, 0, 2.f*PI, true, 60.f, vec2f(-radius, height * 2), vec2f(-radius, 0), UVMAP_SPHERE, 0xffffffff);
+		lathe_verts(verts, vc, 9, pos, path, false, sides, 0, 0, 2.f*PI, height < 0, 60.f, vec2f(-radius, height * 2), vec2f(-radius, 0), UVMAP_SPHERE, 0xffffffff);
 	}
 
 	void tcone_verts(std::vector<float>& verts, uint32_t& vc, const vec3f &pos, const float botradius, const float topradius, const float height, const int sides)
@@ -652,7 +675,7 @@ namespace Pi3Cshapes {
 		path.push_back(vec2f(topradius, height));
 		path.push_back(vec2f(botradius, 0));
 		path.push_back(vec2f(0, 0));
-		lathe_verts(verts, vc, 9, pos, path, false, sides, 0, 0, 2.f*PI, true, 60.f, vec2f(-1.0f, height), vec2f(0, 0), UVMAP_SPHERE, 0xffffffff);
+		lathe_verts(verts, vc, 9, pos, path, false, sides, 0, 0, 2.f*PI, height < 0, 60.f, vec2f(-1.0f, height), vec2f(0, 0), UVMAP_SPHERE, 0xffffffff);
 	}
 
 	void cylinder_verts(std::vector<float>& verts, uint32_t& vc, const vec3f &pos, const float radius, const float height, const int sides)
@@ -662,18 +685,19 @@ namespace Pi3Cshapes {
 		path.push_back(vec2f(radius, height));
 		path.push_back(vec2f(radius, 0));
 		path.push_back(vec2f(0, 0));
-		lathe_verts(verts, vc, 9, pos, path, false, sides, 0, 0, 2.f*PI, true, 60.f, vec2f(-1.0f, height), vec2f(0, 0), UVMAP_SPHERE, 0xffffffff);
+		lathe_verts(verts, vc, 9, pos, path, false, sides, 0, 0, 2.f*PI, height < 0, 60.f, vec2f(-1.0f, height), vec2f(0, 0), UVMAP_SPHERE, 0xffffffff);
 	}
 	
-	void tube_verts(std::vector<float>& verts, uint32_t& vc, const vec3f &pos, const float radius1, const float radius2, const float height, const int sides)
+	void tube_verts(std::vector<float>& verts, uint32_t& vc, const vec3f &pos, float radius1, float radius2, const float height, const int sides)
 	{
 		std::vector<vec2f> path;
+		if (radius1 > radius2) std::swap(radius1, radius2);
 		path.push_back(vec2f(radius1, height));
 		path.push_back(vec2f(radius2, height));
 		path.push_back(vec2f(radius2, 0));
 		path.push_back(vec2f(radius1, 0));
 		path.push_back(vec2f(radius1, height));
-		lathe_verts(verts, vc, 9, pos, path, false, sides, 0, 0, 2.f*PI, true, 60.f, vec2f(0, 0), vec2f(0, 0), UVMAP_SPHERE, 0xffffffff);
+		lathe_verts(verts, vc, 9, pos, path, false, sides, 0, 0, 2.f*PI, height < 0, 60.f, vec2f(radius1, height), vec2f(0, 0), UVMAP_SPHERE, 0xffffffff);
 	}
 
 	void texMap(std::vector<float> &vertBuffer, uint32_t vc, uint32_t stride, uint32_t uvoffset, uint8_t x, uint8_t y)
