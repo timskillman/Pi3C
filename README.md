@@ -41,7 +41,7 @@ I hope that you will enjoy your experience with Pi3C as it develops!
   
 [**3. Trying the Examples**](#tryexamples)
   - [Pi3C folders](#pi3cfolders)
-  - [Projects Folder](#projects)
+  - [Examples Folder](#projects)
   - [Build, Run and Clean](#buildrunproj)
   - [Keeping up-to-date](#update)
   
@@ -152,25 +152,25 @@ Examples     (Example games, apps and demos in here)
 SharedCode   (Pi3C core and helper code)
 Resources    (Models, textures and sounds stored here)
 ThirdParty   (Windows only - not needed on the Pi, but keep if developing on a Windows machine as well)
-Projects     A place to put your projects and reference the Pi3C SharedCode
+MyProjects   A place to put your projects and reference the Pi3C SharedCode
 ~~~~
 
-<a name="projects">**Projects Folder**</a>
+<a name="projects">**Examples Folder**</a>
 
-The Projects folder contains all the examples to try out.  You can also add your own folder in this one or one next to it for creating your own projects.
+The Examples folder contains all the examples to try out.
 
-So lets try out some examples!
+**So lets try out some examples!**
 
-Opening the Projects folder you will see several examples such as 'Castle Creator' and others.
+Opening the Examples folder you will see several examples such as 'Castle Creator' and others.
 Let's try out Castle Creator first and see how it works ...
 
 Open a terminal window (if already closed) and navigate to;
 
 ~~~~
-cd Pi3C/Projects/CastleCreator
+cd Pi3C/Examples/CastleCreator
 ~~~~
 
-Now enter
+Run the Castlre Creator by entering ...
 
 ~~~~
 ./CastleCreator
@@ -183,7 +183,7 @@ Now enter
 
 You will notice the '**options.txt**' file and other txt files in the CastleCreator folder.  If you feel adventurous, open these files and try changing the screen resolution or set fullscreen to 'true'.  The 'options.txt' file is an easy way of customising a game or an app without having to recompile your code.
 
-Try the other examples such as **Invaders, Snow, 3D modeller** and others using the same info for CastleCreator.
+Try the other examples such as **Blocks, Invaders, Snow, 3D modeller** and others using the same info for CastleCreator.
 
 Of course, we're trying out precompiled examples - so let's get coding your own stuff!
 
