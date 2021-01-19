@@ -6,7 +6,7 @@ void UI_Style::LoadUIstyle(const std::string& file)
 
 	if (!json.doc.IsObject()) return;
 
-	const Value& gc = json.doc["GUIcolours"];
+	const rapidjson::Value& gc = json.doc["GUIcolours"];
 	backColour = json.readColour(gc,"BackCol", backColour);
 	iconColour = json.readColour(gc, "IconCol", iconColour);
 	selectColour = json.readColour(gc, "SelectCol", selectColour);
