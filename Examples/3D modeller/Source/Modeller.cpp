@@ -987,13 +987,12 @@ void Modeller::handleEvents(std::vector<uint32_t>& eventList)
 				int32_t modelRef = scene.loadModelOBJ("", file, touch.touching ? touch.intersection : vec3f(), true, modelGroupId);  // false, loadbarCallback);
 			}
 			else if (ext == ".png" || ext == ".jpg") {
+				setCurrentSelView(currentView);
+				setMousePosition(window->mouse.x, window->getHeight() - window->mouse.y);
 				touchView(views[currentView]);
-				//Pi3Ctexture texmap = Pi3Ctexture(file.c_str(), false);
 				if (touch.touching) {
 					touch.selmodel->addTexture(resource, file.c_str());
-					//touch.selmodel->material.SetColAmbient(0xffffffff);
 					touch.selmodel->material.SetColDiffuse(0xffffffff);
-					//touch.selmodel->material.SetColSpecular(0xff202020);
 				}
 			}
 			break;
@@ -1103,6 +1102,14 @@ void Modeller::setDragBar(bool on, SDL_Cursor *newCursor)
 	}
 }
 
+void Modeller::touchView(viewInfo& vi)
+{
+	switch (vi.projection) {
+	case viewInfo::PERSPECTIVE: touchPerspectiveView(vi); break;
+	case viewInfo::ORTHOGRAPHIC: touchOrthoView(vi); break;
+	}
+}
+
 void Modeller::touchPerspectiveView(viewInfo &vi)
 {
 	scene.setMatrix(vi.pan, vec3f(0, 0, -vi.zoom), vi.rot);
@@ -1142,14 +1149,6 @@ void Modeller::touchObject(Pi3Cmodel& selmodel)
 	setSelectionBox();
 	selectedName = selmodel.name;
 	scene.models[moveGizmoRef].matrix.move(selmodel.bbox.center());
-}
-
-void Modeller::touchView(viewInfo &vi)
-{
-	switch (vi.projection) {
-	case viewInfo::PERSPECTIVE: touchPerspectiveView(vi); break;
-	case viewInfo::ORTHOGRAPHIC: touchOrthoView(vi); break;
-	}
 }
 
 void Modeller::setTouchFlags(bool val)
