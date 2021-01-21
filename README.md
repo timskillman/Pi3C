@@ -6,7 +6,8 @@
 
 Pi3C is a fast, C++ graphics engine and toolkit tailored for all models of the Raspberry Pi and works on other platforms such as Windows. It's small size and innovative techniques make it fast enough to run highly detailed 3D games; even on the Pi Zero ... 
 
-![alt text](https://github.com/timskillman/Pi3C/blob/master/Resources/images/ShipRear.png "Complex 3D models even on the Pi Zero")
+![alt text](https://github.com/timskillman/Pi3C/blob/master/Resources/images/ShipRear.jpg "Complex 3D models even on the Pi Zero")
+![alt text](https://github.com/timskillman/Pi3C/blob/master/Resources/images/Blocks1.jpg "Or, a Minecraft style game!")
 
 Pi3C is designed to be simple to use and encourage youngsters (or anyone) new to programming by exploring the basic tutorials, games and apps provided.
 
@@ -126,7 +127,7 @@ Pi3C will be cloned onto your Pi and a Pi3C directory, with all the necessary co
 
 This will install all the SDL 2.0 libraries, configure your GPU memory and enable the video drivers for your particular Raspberry Pi.
 
-Navigate to the Pi3C folder and enter:
+Open a terminal window, navigate to the Pi3C folder and enter:
 
 ~~~~
 sudo sh Installer.sh
