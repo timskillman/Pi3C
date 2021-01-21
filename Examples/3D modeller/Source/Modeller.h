@@ -67,6 +67,8 @@ public:
 
 	void clearSelections();
 	void selectAll();
+	void deleteSelection();
+	void duplicateSelection();
 
 	Pi3Cresource *resource = nullptr;
 	Pi3Cwindow *window = nullptr;

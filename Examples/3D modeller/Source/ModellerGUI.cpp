@@ -234,9 +234,8 @@ void MGui::doMenus(Modeller * md)
 		if (gui.BeginMenu("Edit")) {
 			if (gui.MenuItem("Select All", "Ctrl+A")) md->selectAll();
 			if (gui.MenuItem("Clear selections", "")) md->clearSelections();
-			if (gui.MenuItem("Copy", "Ctrl+C")) {}
-			if (gui.MenuItem("Paste", "Ctrl+V")) {}
-			if (gui.MenuItem("Delete", "Del")) {}
+			if (gui.MenuItem("Duplicate", "Ctrl+C")) md->duplicateSelection();
+			if (gui.MenuItem("Delete", "Del")) md->deleteSelection();
 			if (gui.MenuItem("Undo", "Ctrl+X")) {}
 			if (gui.MenuItem("Redo", "Ctrl+Y")) {}
 			gui.EndMenu();
@@ -251,7 +250,7 @@ void MGui::doMenus(Modeller * md)
 }
 
 
-void MGui::doEditToolbar(Modeller * md, Pi3Cimgui::rectStyle& iconstyle, bool mb)
+void MGui::doEditToolbar(Modeller * md, Pi3Cimgui::rectStyle& iconstyle, bool mb, bool mu)
 {
 	int icw = bsIcons.halfWidth(); // (int)((float)bsIcons.minWidth*0.5f);
 	int ich = bsIcons.minHeight;
@@ -259,37 +258,43 @@ void MGui::doEditToolbar(Modeller * md, Pi3Cimgui::rectStyle& iconstyle, bool mb
 
 	if (gui.BeginGroupHorizontal("rendl.png", icw, ich)) {
 
-		if (gui.ButtonImage("butNew.png") && mb) md->clearScene();
-		if (gui.ButtonImage("butOpen.png") && mb) {}
-		if (gui.ButtonImage("butSave.png") && mb) saveAll(md);
+		if (gui.ButtonImage("butNew.png") && mb && mu) md->clearScene();
+		if (gui.ButtonImage("butOpen.png") && mb && mu) {}
+		if (gui.ButtonImage("butSave.png") && mb && mu) saveAll(md);
 		gui.renderBackIcon("butDiv.png", idw, ich);
 
-		if (gui.ButtonImage("butArrow.png", md->editMode == Modeller::ED_SELECT) && mb) md->setEditMode(Modeller::ED_SELECT);
-		if (gui.ButtonImage("butMove.png", md->editMode == Modeller::ED_MOVE) && mb) md->setEditMode(Modeller::ED_MOVE);
-		if (gui.ButtonImage("butRotate.png", md->editMode == Modeller::ED_ROTATE) && mb) md->setEditMode(Modeller::ED_ROTATE);
-		if (gui.ButtonImage("butScale.png", md->editMode == Modeller::ED_SCALE) && mb) md->setEditMode(Modeller::ED_SCALE);
-
-		gui.renderBackIcon("butDiv.png", idw, ich);
-
-		if (gui.ButtonImage("butSelectAll.png") && mb) md->selectAll();
-		if (gui.ButtonImage("butCut.png") && mb) {}
-		if (gui.ButtonImage("butPaste.png") && mb) {}
-		if (gui.ButtonImage("butCopy.png") && mb) md->snapshot();
+		if (gui.ButtonImage("butArrow.png", md->editMode == Modeller::ED_SELECT) && mb && mu) md->setEditMode(Modeller::ED_SELECT);
+		if (gui.ButtonImage("butMove.png", md->editMode == Modeller::ED_MOVE) && mb && mu) md->setEditMode(Modeller::ED_MOVE);
+		if (gui.ButtonImage("butRotate.png", md->editMode == Modeller::ED_ROTATE) && mb && mu) md->setEditMode(Modeller::ED_ROTATE);
+		if (gui.ButtonImage("butScale.png", md->editMode == Modeller::ED_SCALE) && mb && mu) md->setEditMode(Modeller::ED_SCALE);
 
 		gui.renderBackIcon("butDiv.png", idw, ich);
 
-		if (gui.ButtonImage("butUndo.png") && mb) {}
-		if (gui.ButtonImage("butRedo.png") && mb) {}
+		if (gui.ButtonImage("butSelectAll.png") && mb && mu) md->selectAll();
+		if (gui.ButtonImage("butDelete.png") && mb && mu) md->deleteSelection();
+		if (gui.ButtonImage("butCopy.png") && mb && mu) md->duplicateSelection(); //  snapshot();
+
+		gui.renderBackIcon("butDiv.png", idw, ich);
+
+		if (gui.ButtonImage("butGroup.png") && mb && mu) {}
+		if (gui.ButtonImage("butUngroup.png") && mb && mu) {}
+
+		gui.renderBackIcon("butDiv.png", idw, ich);
+
+		if (gui.ButtonImage("butUndo.png") && mb && mu) {}
+		if (gui.ButtonImage("butRedo.png") && mb && mu) {}
 
 		gui.EndGroupHorizontal("rendr.png", icw, ich);
 	}
 }
 
-void MGui::doTransformToolbar(Modeller * md, Pi3Cimgui::rectStyle& iconstyle, bool mb)
+void MGui::doTransformToolbar(Modeller * md, Pi3Cimgui::rectStyle& iconstyle, bool mb, bool mu)
 {
 	if (gui.BeginGroupHorizontal("rendl.png", iconstyle.halfWidth(), iconstyle.minHeight)) {
-		if (gui.ButtonImage("butMirror.png") && mb) {}
-		if (gui.ButtonImage("butFlip.png") && mb) {}
+		if (gui.ButtonImage("butMirror.png") && mb && mu) {}
+		if (gui.ButtonImage("butFlip.png") && mb && mu) {}
+		if (gui.ButtonImage("butInvertPolys.png") && mb && mu) {}
+		if (gui.ButtonImage("butInvertNorms.png") && mb && mu) {}
 		gui.EndGroupHorizontal("rendr.png", iconstyle.halfWidth(), iconstyle.minHeight);
 	}
 }
@@ -382,10 +387,10 @@ void MGui::doIMGUI(Modeller * md)
 	gui.setButtonStyle(bsIcons);
 
 	gui.setPosition(wpos.x + leftbarWidth, wpos.y - topbarHeight);
-	doEditToolbar(md, bsIcons, mb);
+	doEditToolbar(md, bsIcons, mb, mu);
 
 	gui.sameLine();
-	doTransformToolbar(md, bsIcons, mb);
+	doTransformToolbar(md, bsIcons, mb, mu);
 
 	gui.setPosition(winWidth - rightbarWidth - 150, workHeight + topbarHeight + menuHeight + 3);
 	doSceneToolbar(md, bsIcons, mb, mu);

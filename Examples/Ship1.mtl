@@ -1,0 +1,48 @@
+newmtl default_1
+Kd 1 1 1
+Ks 0.2 0.2 0.2
+Ka 0.3 0.3 0.3
+Ke 0 0 0
+illum 2
+map_Kd D:\Pi3Crepo\Pi3C\Resources\models\maps\spanel7.png
+
+newmtl default_2
+Kd 1 1 1
+Ks 0.2 0.2 0.2
+Ka 0.3 0.3 0.3
+Ke 0 0 0
+illum 2
+map_Kd D:\Pi3Crepo\Pi3C\Resources\models\maps\spanel4.png
+
+newmtl default_3
+Kd 1 1 1
+Ks 0.2 0.2 0.2
+Ka 0.3 0.3 0.3
+Ke 0 0 0
+illum 2
+map_Kd D:\Pi3Crepo\Pi3C\Resources\models\maps\spanel7.png
+
+newmtl default_4
+Kd 1 1 1
+Ks 0.2 0.2 0.2
+Ka 0.3 0.3 0.3
+Ke 0 0 0
+illum 2
+map_Kd D:\Pi3Crepo\Pi3C\Resources\models\maps\spanel7.png
+
+newmtl default_5
+Kd 1 1 1
+Ks 0.2 0.2 0.2
+Ka 0.3 0.3 0.3
+Ke 0 0 0
+illum 2
+map_Kd D:\Pi3Crepo\Pi3C\Resources\models\maps\angar.jpg
+
+newmtl default_6
+Kd 1 1 1
+Ks 0.2 0.2 0.2
+Ka 0.3 0.3 0.3
+Ke 0 0 0
+illum 2
+map_Kd D:\Pi3Crepo\Pi3C\Resources\models\maps\spanel3.png
+

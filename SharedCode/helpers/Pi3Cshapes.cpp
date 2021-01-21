@@ -508,7 +508,9 @@ namespace Pi3Cshapes {
 
 	//---------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-	void lathe_verts(std::vector<float>& verts, uint32_t& vc, const uint32_t stride, const vec3f& pos, std::vector<vec2f>& path, const bool sidePath, const int edges, const float rise, const float startAngle, const float endAngle, const bool invert, const float creaseAngle, const vec2f prevPoint, const vec2f lastPoint, const uint32_t uvtype, const uint32_t col)
+	void lathe_verts(std::vector<float>& verts, uint32_t& vc, const uint32_t stride, const vec3f& pos, std::vector<vec2f>& path, 
+		const bool sidePath, const int edges, const float rise, const float startAngle, const float endAngle, const bool invert, const float creaseAngle, 
+		const vec2f prevPoint, const vec2f lastPoint, const uint32_t uvtype, const uint32_t col)
 	{
 		std::vector<vec2f> normals;
 		calcPathNormals(path, normals, 60, true, (invert) ? -1.0f : 1.0f);

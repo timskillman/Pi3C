@@ -187,6 +187,19 @@ void Modeller::resetZoom()
 	}
 }
 
+void Modeller::deleteSelection()
+{
+	editUndo.deleteSelection(scene.models);
+	setTouchFlags(false);
+	brush()->visible = false;
+}
+
+void Modeller::duplicateSelection()
+{
+	editUndo.duplicateSelection(scene.models);
+	window->mouse.up = false;
+}
+
 void Modeller::handleKeyPresses()
 {
 	SDL_Scancode kp = window->getKeyPress();
@@ -194,7 +207,7 @@ void Modeller::handleKeyPresses()
 	if (window->ctrlKey) {
 		switch (kp) {
 		case SDL_SCANCODE_X:
-			editUndo.deleteSelection(scene.models);
+			deleteSelection();
 			break;
 		case SDL_SCANCODE_Z:
 			if (window->shiftKey)
@@ -207,6 +220,9 @@ void Modeller::handleKeyPresses()
 			break;
 		case SDL_SCANCODE_A:
 			selectAll();
+			break;
+		case SDL_SCANCODE_V:
+			duplicateSelection();
 			break;
 		}
 	}
@@ -587,7 +603,7 @@ void Modeller::creatingShape()
 		case CT_CUBOID:
 			csize = pos - createFirstPoint;
 			info = "Cuboid x:" + Pi3Cutils::ftostrdp(csize.x, 2) + " y:" + Pi3Cutils::ftostrdp(csize.y, 2) + " z:" + Pi3Cutils::ftostrdp(csize.z, 2);
-			Pi3Cshapes::cube_verts(*vp.verts, vp.offset, (pos - createFirstPoint) / 2.f, csize, 1, 1, 1, currentColour);
+			Pi3Cshapes::cube_verts(*vp.verts, vp.offset, (pos - createFirstPoint) / 2.f, csize, 1, 1, 1, 0xffffffff);
 			break;
 		case CT_CYLINDER:
 			info = "Cylinder radius:" + Pi3Cutils::ftostrdp(dist, 2);
@@ -626,7 +642,7 @@ void Modeller::creatingShape()
 		case CT_CUBOID:
 			{
 				info = "Cuboid height:" + Pi3Cutils::ftostrdp(ht, 2);
-				Pi3Cshapes::cube_verts(*vp.verts, vp.offset, v1 / 2.f + v2, v1, 1, 1, 1, currentColour);
+				Pi3Cshapes::cube_verts(*vp.verts, vp.offset, v1 / 2.f + v2, v1, 1, 1, 1, 0xffffffff);
 			}
 			break;
 		case CT_CYLINDER:
@@ -783,6 +799,7 @@ void Modeller::ClickLeftMouseButton(viewInfo& view)
 				//clearSelections();
 			break;
 		case ED_MOVE:
+			//if (!window->ctrlKey) clearSelections();
 			touchScene();
 			if (touch.selmodel) {
 				editUndo.selectModel(scene.models, touch.selmodel, window->ctrlKey);
@@ -970,8 +987,14 @@ void Modeller::handleEvents(std::vector<uint32_t>& eventList)
 				int32_t modelRef = scene.loadModelOBJ("", file, touch.touching ? touch.intersection : vec3f(), true, modelGroupId);  // false, loadbarCallback);
 			}
 			else if (ext == ".png" || ext == ".jpg") {
-				Pi3Ctexture texmap = Pi3Ctexture(file.c_str(), false);
-
+				touchView(views[currentView]);
+				//Pi3Ctexture texmap = Pi3Ctexture(file.c_str(), false);
+				if (touch.touching) {
+					touch.selmodel->addTexture(resource, file.c_str());
+					//touch.selmodel->material.SetColAmbient(0xffffffff);
+					touch.selmodel->material.SetColDiffuse(0xffffffff);
+					//touch.selmodel->material.SetColSpecular(0xff202020);
+				}
 			}
 			break;
 		}
