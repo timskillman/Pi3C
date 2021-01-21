@@ -965,8 +965,13 @@ void Modeller::handleEvents(std::vector<uint32_t>& eventList)
 			break;
 		case SDL_DROPFILE: 
 			std::string file = window->dropfile;
-			if (file.substr(file.size() - 4, 4) == ".obj") {
+			std::string ext = file.substr(file.size() - 4, 4);
+			if (ext == ".obj") {
 				int32_t modelRef = scene.loadModelOBJ("", file, touch.touching ? touch.intersection : vec3f(), true, modelGroupId);  // false, loadbarCallback);
+			}
+			else if (ext == ".png" || ext == ".jpg") {
+				Pi3Ctexture texmap = Pi3Ctexture(file.c_str(), false);
+
 			}
 			break;
 		}
