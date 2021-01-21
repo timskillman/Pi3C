@@ -126,7 +126,7 @@ Pi3C will be cloned onto your Pi and a Pi3C directory, with all the necessary co
 
 This will install all the SDL 2.0 libraries, configure your GPU memory and enable the video drivers for your particular Raspberry Pi.
 
-Navigate to the Pi3C folder and enter:
+Open a terminal window, navigate to the Pi3C folder and enter:
 
 ~~~~
 sudo sh Installer.sh
