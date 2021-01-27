@@ -333,7 +333,7 @@ void MGui::MaterialInfo(Modeller* md, Pi3Cmaterial& material)
 {
 	Pi3Cmodel rect;
 	rect.matrix.setz(-10.0f);
-	auto& p = gui.getCurrentPosition();
+	auto p = gui.getCurrentPosition();
 	int w = 600, h = 250, xc = p.x, yc = p.y + 10, bord = 10;
 	if (xc + w > md->window->getWidth()) xc = md->window->getWidth() - w;
 	float xf = (float)xc, yf = (float)yc;
