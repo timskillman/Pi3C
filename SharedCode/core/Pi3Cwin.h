@@ -78,7 +78,8 @@ public:
 
 		void reset() { 
 			x = 0; y = 0; wheel = 0;
-			up = false; wasDragging = false; 
+			up = true; 
+			wasDragging = false; 
 			resetButtons();
 			deltaXY = {}; XY = {}; 
 		}
@@ -87,7 +88,7 @@ public:
 		int y = 0;
 		int wheel = 0;
 		bool drag = false;
-		bool up = false;
+		bool up = true;
 		bool wasDragging = false;
 		bool RightButton = false;
 		bool MiddleButton = false;
@@ -114,7 +115,7 @@ public:
 		resized = true;
 	}
 	int getEvent() { return SDL_PollEvent(&ev); }
-	std::vector<uint32_t> event(); //return a list of event handles (if any)
+	std::vector<uint32_t> events(); //return a list of event handles (if any)
 	void SwapBuffers();
 	float getTicks() { return ticks; }
 	void setClearColour(const float red, const float green, const float blue);
@@ -128,6 +129,7 @@ public:
 	Pi3Crecti getRect() { return Pi3Crecti(0, 0, mWidth, mHeight); }
 	bool hasMouseFocus();
 	bool hasKeyboardFocus();
+	void waitForMouseUp() { mouse.up = false; }
 	void forceMouseUp();
 	void centreMouse() { SDL_WarpMouseInWindow(mWindow, mWidth / 2, mHeight / 2); }
 	bool isMinimized();

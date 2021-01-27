@@ -24,7 +24,8 @@ public:
 		read(size);
 		//container.clear();
 		for (size_t i = 0; i < size; ++i) {
-			if (stream->fail()) break;
+			if (stream->fail()) 
+				break;
 			typename ContainerClass::value_type value;
 			read(value);
 			container.push_back(value);

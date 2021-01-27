@@ -11,12 +11,13 @@ public:
 
 	//Functions ...
 	void init(loadOptions &opts, Pi3Cresource * resource, Pi3Cwindow *window, const std::string& defaultStyle);
-	void doIMGUI(Modeller * md);
+	bool doIMGUI(Modeller * md);
 	bool somethingSelected() { return gui.somethingSelected; }
 	void startSnapshot() { gui.startSnapshot(); }
 	void stopSnapshot() { gui.stopSnapshot(); }
 	void dragBars(Modeller* md);
-	void printText(Modeller* md, std::string text, int x, int y, uint32_t col = 0);
+	void printText(const std::string& text, int x, int y, uint32_t col = 0);
+	void showProgressCB(Pi3Cwindow* window, const std::string& message, const float pcnt);
 
 	Pi3Crecti getRectBottomRight();
 	Pi3Crecti getRectBottomLeft();
@@ -85,4 +86,7 @@ private:
 	void doTransformToolbar(Modeller * md, Pi3Cimgui::rectStyle& iconstyle, bool mb, bool mu);
 	void doSceneToolbar(Modeller * md, Pi3Cimgui::rectStyle& iconstyle, bool mb, bool mu);
 	void doShapesToolbar(Modeller * md, Pi3Cimgui::rectStyle& iconstyle, bool mb, bool mu);
+	void doMaterialsToolbar(Modeller* md, Pi3Cimgui::rectStyle& iconstyle, bool mb, bool mu);
+
+	void MaterialInfo(Modeller* md, Pi3Cmaterial& material);
 };

@@ -4,6 +4,7 @@
 #include "Pi3Ctexture.h"
 #include <vector>
 #include <string>
+#include <functional>
 
 // =======================================================================
 // Pi3C Raspberry Pi Graphics Library
@@ -64,7 +65,8 @@ namespace Pi3Cshapes {
 
 	Pi3Cmesh extrude(const std::string& name, const vec3f& pos, std::vector<std::vector<float>>& contours, const float depth, const uint16_t divs = 1);
 	Pi3Cmesh extrude(const std::string &name, const vec3f &pos, std::vector<std::vector<vec2f>> &contours, const float depth, const uint16_t divs = 1);
-	Pi3Cmesh elevationMap(Pi3Ctexture &tex, const vec3f &pos, const vec3f &size, const uint32_t xdivs, const uint32_t ydivs, const int direction, const vec2f &uvsize = vec2f(1.f, 1.f));
+	Pi3Cmesh elevationMap(Pi3Ctexture& tex, const vec3f& pos, const vec3f& size, const uint32_t xdivs, const uint32_t ydivs, const int direction, const vec2f& uvsize, const std::function<void(float)> showProgressCB);
+	Pi3Cmesh readSRTM(const std::string& file);
 
 	//Pi3Cmesh capsule(vec3f pos, float radius, float midlength = 2.0f, int slices = Pi3C_SIDES, int sides = Pi3C_SIDES);
 
@@ -84,7 +86,7 @@ namespace Pi3Cshapes {
 	void lathe_verts(std::vector<float>& verts, uint32_t& vc, const uint32_t stride, const vec3f& pos, std::vector<vec2f>& path, const bool sidePath, const int edges, const float rise, const float startAngle, const float endAngle, const bool invert, const float creaseAngle, const vec2f prevPoint, const vec2f lastPoint, const uint32_t uvtype, const uint32_t col);
 	void extrude_verts(std::vector<float> &verts, uint32_t &vc, const vec3f &pos, std::vector<std::vector<float>>& contours, const float depth, const uint16_t divs, const uint32_t col);
 	void grid_verts(std::vector<float>& verts, uint32_t& vc, const vec2f &size, const float majorStep, const float minorStep, const uint32_t mincol, const uint32_t majcol);
-	void elevationMap_verts(std::vector<float>& verts, uint32_t& vc, Pi3Ctexture &tex, const vec3f &pos, const vec3f &size, const uint32_t xdivs, const uint32_t ydivs, int direction, const vec2f &uvsize, const uint32_t col);
+	void elevationMap_verts(std::vector<float>& verts, uint32_t& vc, Pi3Ctexture &tex, const vec3f &pos, const vec3f &size, const uint32_t xdivs, const uint32_t ydivs, int direction, const vec2f &uvsize, const uint32_t col, const std::function<void(float)> showProgressCB);
 
 	void convertPathToFloats(std::vector<std::vector<vec2f>>& paths, std::vector<std::vector<float>>& contours);
 }

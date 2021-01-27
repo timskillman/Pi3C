@@ -5,6 +5,8 @@
 #include <fstream>
 #include <sstream>
 
+using std::placeholders::_1;
+
 Modeller::Modeller(Pi3Cresource *resource, Pi3Cwindow *window)
 {
 	// Setup shader ..
@@ -197,7 +199,7 @@ void Modeller::deleteSelection()
 void Modeller::duplicateSelection()
 {
 	editUndo.duplicateSelection(scene.models);
-	window->mouse.up = false;
+	window->waitForMouseUp();
 }
 
 void Modeller::handleKeyPresses()
@@ -239,15 +241,15 @@ void Modeller::handleKeyPresses()
 			break;
 		case SDL_SCANCODE_G:
 			scene.models[gridRef].visible = !scene.models[gridRef].visible;
-			window->mouse.up = false;
+			window->waitForMouseUp();
 			break;
 		case SDL_SCANCODE_P:
 			scene.renderOffscreen(views[currentSelView], &outlines);
-			window->mouse.up = false;
+			window->waitForMouseUp();
 			break;
 		case SDL_SCANCODE_T:
 			scene.renderOffscreen(views[currentSelView], &outlines, 160, 128);
-			window->mouse.up = false;
+			window->waitForMouseUp();
 			break;
 		case SDL_SCANCODE_W:
 		case SDL_SCANCODE_S:
@@ -323,8 +325,13 @@ void Modeller::createBlocks(const vec3f pos)
 
 void Modeller::createLandscape(const vec3f pos, const uint32_t colour)
 {
-	Pi3Ctexture maptex = Pi3Ctexture("assets/maps/mountainsHgt2.png", false);
-	createModel(Pi3Cshapes::elevationMap(maptex, vec3f(0, -200.f, 0), vec3f(3000.f, 400.f, 3000.f), 128, 128, 0), pos, modelGroupId, colour);
+	scene.setup2D();
+	std::function<void(float)> loadbarCallback = std::bind(&Modeller::loadingBar, this, _1);
+
+	Pi3Ctexture maptex = Pi3Ctexture("assets/maps/mahe2.png", false);
+	createModel(Pi3Cshapes::elevationMap(maptex, vec3f(0, -150.f, 0), vec3f(3000.f, 300.f, 3000.f), 764/2, 922 /2, 0,vec2f(1.f,1.f), loadbarCallback), pos, modelGroupId, colour);
+
+	//createModel(Pi3Cshapes::readSRTM("assets/maps/S05E055.hgt"), pos, modelGroupId, colour);
 }
 
 void Modeller::createModel(const Pi3Cmesh& mesh, const vec3f& pos, int32_t groupId, const uint32_t colour, const std::string txfile)
@@ -780,7 +787,7 @@ void Modeller::ClickLeftMouseButton(viewInfo& view)
 				creatingShape();
 			}
 			
-			window->mouse.up = false;
+			window->waitForMouseUp();
 			break;
 		case ED_SELECT:
 			if (!window->ctrlKey) clearSelections();
@@ -834,7 +841,7 @@ void Modeller::ClickRightMouseButton(viewInfo& view)
 			if (maxSteps == 0) {
 				finishLine();
 			}
-			window->mouse.up = false;
+			window->waitForMouseUp();
 			break;
 		case ED_SELECT:
 			touchScene();
@@ -922,6 +929,11 @@ void Modeller::touchScene()
 	}
 }
 
+void Modeller::loadingBar(float perc)
+{
+	mgui.showProgressCB(window, "Loading ", perc);
+}
+
 void Modeller::handleEvents(std::vector<uint32_t>& eventList)
 {
 	if (eventList.size() == 0) return;
@@ -940,10 +952,10 @@ void Modeller::handleEvents(std::vector<uint32_t>& eventList)
 		case SDL_MOUSEBUTTONUP:
 			SDL_Log("MouseUp");
 			if (selectRect) {
-				vec2f p1 = views[currentView].getMouseToWorldCoords(selRect.x, selRect.y);
-				vec2f p2 = views[currentView].getMouseToWorldCoords(selRect.x+selRect.width, selRect.y+selRect.height);
-				scene.touchRect(Pi3Crect(p1.x, p1.y, p2.x - p1.x, p2.y - p1.y), views[currentView]);
-				//scene.touchRect(Pi3Crect(selRect.x, selRect.y, selRect.width, selRect.height), views[currentView]);
+				//vec2f p1 = views[currentView].getMouseToWorldCoords(selRect.x, selRect.y);
+				//vec2f p2 = views[currentView].getMouseToWorldCoords(selRect.x + selRect.width, selRect.y + selRect.height);
+				//scene.touchRect(Pi3Crect(p1.x, p1.y, p2.x - p1.x, p2.y - p1.y), views[currentView]);
+				scene.touchRect(Pi3Crect(selRect.x, selRect.y, selRect.width, selRect.height), views[currentView]);
 				selRectangle()->visible = false;
 				selectRect = false;
 			}
@@ -959,8 +971,8 @@ void Modeller::handleEvents(std::vector<uint32_t>& eventList)
 					if (window->mouse.LeftButton) DragLeftMouseButton(view, mouseXYZ);
 				} else if (createCount > 0) {
 					creatingShape();
-					window->mouse.up = false;
-					return;
+					window->waitForMouseUp();
+					break;
 				}
 			}
 			break;
@@ -984,7 +996,9 @@ void Modeller::handleEvents(std::vector<uint32_t>& eventList)
 			std::string file = window->dropfile;
 			std::string ext = file.substr(file.size() - 4, 4);
 			if (ext == ".obj") {
-				int32_t modelRef = scene.loadModelOBJ("", file, touch.touching ? touch.intersection : vec3f(), true, modelGroupId);  // false, loadbarCallback);
+				scene.setup2D();
+				std::function<void(float)> loadbarCallback = std::bind(&Modeller::loadingBar, this, _1);
+				int32_t modelRef = scene.loadModelOBJ("", file, touch.touching ? touch.intersection : vec3f(), true, modelGroupId, false, loadbarCallback);
 			}
 			else if (ext == ".png" || ext == ".jpg") {
 				setCurrentSelView(currentView);
@@ -1036,19 +1050,20 @@ void Modeller::setFullScreen()
 		setCurrentSelView(currentView);
 	}
 	else {
-		
+
 		int r = SDL_SetWindowFullscreen(window->handle(), SDL_WINDOW_FULLSCREEN);
-		if (r<0) {
+		if (r < 0) {
 			r = SDL_SetWindowFullscreen(window->handle(), SDL_WINDOW_FULLSCREEN_DESKTOP);
-			if (r<0) {
+			if (r < 0) {
 				SDL_SetWindowFullscreen(window->handle(), 0);
-			} else {
+			}
+			else {
 				SDL_DisplayMode dm;
 				SDL_GetCurrentDisplayMode(0, &dm);
-				window->resizeWindow(dm.w,dm.h);
+				window->resizeWindow(dm.w, dm.h);
 			}
 		}
-		else 
+		else
 		{
 			window->resizeWindow(1440, 900);  //RPi can't seem to go fullscreen with a specified res - just drop it
 		}
@@ -1063,21 +1078,24 @@ void Modeller::setFullScreen()
 		setCurrentSelView(currentView);
 	}
 	fullscreen = !fullscreen;
-	window->mouse.up = false;
+
+	//window->waitForMouseUp();
 }
 
 void Modeller::setFullScene()
 {
-	if (fullview == viewInfo::INACTIVE) {
-		fullview = currentSelView;
-		views[viewInfo::FULL] = views[currentSelView];
-		setCurrentSelView(viewInfo::FULL);
+	if (window->mouse.up) {
+		if (fullview == viewInfo::INACTIVE) {
+			fullview = currentSelView;
+			views[viewInfo::FULL] = views[currentSelView];
+			setCurrentSelView(viewInfo::FULL);
+		}
+		else {
+			setCurrentSelView(fullview);
+			fullview = viewInfo::INACTIVE;
+		}
 	}
-	else {
-		setCurrentSelView(fullview);
-		fullview = viewInfo::INACTIVE;
-	}
-	window->mouse.up = false;
+	window->waitForMouseUp();
 }
 
 void Modeller::setCursor(SDL_Cursor *newCursor)
@@ -1192,7 +1210,17 @@ void Modeller::setEditMode(const EditMode mode)
 
 void Modeller::handleIMGUI()
 {
-	mgui.doIMGUI(this);
+	if (mgui.doIMGUI(this)) {
+		prevCursor = handCursor;
+		SDL_SetCursor(handCursor);
+	}
+	else if (prevCursor != currentCursor) {
+		SDL_SetCursor(currentCursor);
+		prevCursor = currentCursor;
+	}
+	//	SDL_SetCursor(currentCursor);
+	//};
+
 }
 
 void Modeller::renderScene(viewInfo &view)
@@ -1259,14 +1287,14 @@ void Modeller::render()
 	}
 
 	scene.setViewport(screenRect);
-	//scene.setup2D();
-	scene.render2D(window->getTicks());
+	scene.setup2D();
+	//scene.render2D(window->getTicks());
 	mgui.dragBars(this);
 
 	if (currentView != viewInfo::INACTIVE) {
 		std::string text = "X:" + Pi3Cutils::ftostrdp(currentPos.x, 2) + ", Y:" + Pi3Cutils::ftostrdp(currentPos.y, 2) + ", Z:" + Pi3Cutils::ftostrdp(currentPos.z, 2)+"    "+info;
 		Pi3Crecti prect = viewRect((viewInfo::SceneLayout)currentSelView);
-		mgui.printText(this, text, prect.x + 8, window->getHeight() - prect.y - 30, 0xffffffff);
+		mgui.printText(text, prect.x + 8, window->getHeight() - prect.y - 30, 0xffffffff);
 	}
 }
 

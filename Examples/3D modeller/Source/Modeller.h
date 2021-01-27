@@ -163,6 +163,7 @@ public:
 	SDL_Cursor * crossCursor = nullptr;
 	SDL_Cursor * textCursor = nullptr;
 	SDL_Cursor * currentCursor = nullptr;
+	SDL_Cursor* prevCursor = nullptr;
 	SDL_Cursor * WECursor = nullptr;
 	SDL_Cursor * NSCursor = nullptr;
 
@@ -202,6 +203,7 @@ private:
 	float getShapeHeight(vec3f& pos, vec3f& v1, vec3f& v2);
 	void renderView(const viewInfo::SceneLayout projection, const Pi3Crecti& rect, int32_t mx, int32_t my);
 	void resetLineDrawing();
+	void loadingBar(float perc);
 
 	Pi3Cmodel* brush() { return &scene.models[brushref]; }
 	Pi3Cmodel* selRectangle() { return &scene.models2D[selRectRef]; }

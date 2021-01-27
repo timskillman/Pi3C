@@ -12,4 +12,17 @@ namespace Pi3Cutils
 	bool snapShot(const Pi3Crecti &rect, std::vector<uint8_t> &snapShot);
 	void saveBufferToPNG(const char* filename, std::vector<uint8_t>& snapShot, const int width, const int height);
 	std::string ftostrdp(float n, int decimalPlaces);
+	std::string endstr(std::string const& str, size_t const length);
+	void drawRect2D(vec3f pos, vec3f size, uint32_t colour);
+
+
+	template <typename I> std::string numToHexstr(I w, size_t hex_len = sizeof(I) << 1)
+	{
+		//Credit: AndreyS Scherbakov
+		static const char* digits = "0123456789ABCDEF";
+		std::string rc(hex_len, '0');
+		for (size_t i = 0, j = (hex_len - 1) * 4; i < hex_len; ++i, j -= 4)
+			rc[i] = digits[(w >> j) & 0x0f];
+		return rc;
+	}
 }

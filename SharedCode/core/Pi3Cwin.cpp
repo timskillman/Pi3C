@@ -107,7 +107,7 @@ void Pi3Cwindow::SwapBuffers() {
 	lastTime = SDL_GetTicks();
 }
 
-std::vector<uint32_t> Pi3Cwindow::event()
+std::vector<uint32_t> Pi3Cwindow::events()
 {
 	std::vector<uint32_t> eventList;
 

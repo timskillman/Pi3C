@@ -231,6 +231,7 @@
     <ClCompile Include="..\..\SharedCode\editing\Pi3Cediting.cpp" />
     <ClCompile Include="..\..\SharedCode\editing\Pi3Cgizmos.cpp" />
     <ClCompile Include="..\..\SharedCode\editing\Pi3Cundo.cpp" />
+    <ClCompile Include="..\..\SharedCode\file\Pi3CbinStream.cpp" />
     <ClCompile Include="..\..\SharedCode\file\Pi3Cdirectory.cpp" />
     <ClCompile Include="..\..\SharedCode\file\Pi3CfileOBJ.cpp" />
     <ClCompile Include="..\..\SharedCode\file\Pi3Cjson.cpp" />
@@ -288,6 +289,7 @@
     <ClInclude Include="..\..\SharedCode\editing\Pi3Cediting.h" />
     <ClInclude Include="..\..\SharedCode\editing\Pi3Cgizmos.h" />
     <ClInclude Include="..\..\SharedCode\editing\Pi3Cundo.h" />
+    <ClInclude Include="..\..\SharedCode\file\Pi3CbinStream.h" />
     <ClInclude Include="..\..\SharedCode\file\Pi3Cdirectory.h" />
     <ClInclude Include="..\..\SharedCode\file\Pi3CfileOBJ.h" />
     <ClInclude Include="..\..\SharedCode\file\Pi3Cjson.h" />

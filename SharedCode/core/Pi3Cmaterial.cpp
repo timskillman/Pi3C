@@ -34,6 +34,10 @@ void Pi3Cmaterial::init(const std::string &name)
 	framespeed = 1.f/30.f; //30FPS
 }
 
+uint32_t vec4toUint32(const vec4f& col) {
+	return ((uint32_t)(col.x * 255.f)) + (((uint32_t)(col.y * 255.f)) << 8) + (((uint32_t)(col.z * 255.f)) << 16) + (((uint32_t)(col.w * 255.f)) << 24);
+}
+
 void Pi3Cmaterial::SetColAmbient(const uint32_t colour)
 {
 	colAmbient = vec4f((GLfloat)(colour & 255) / 255.f, (GLfloat)((colour >> 8) & 255) / 255.f,(GLfloat)((colour >> 16) & 255) / 255.f, (GLfloat)((colour >> 24) & 255) / 255.f);
@@ -46,6 +50,11 @@ void Pi3Cmaterial::SetColAmbient(const uint8_t r, const uint8_t g, const uint8_t
 	changed = true;
 }
 
+uint32_t Pi3Cmaterial::GetColAmbient()
+{
+	return vec4toUint32(colAmbient);
+}
+
 void Pi3Cmaterial::SetColEmissive(const uint32_t colour)
 {
 	colEmissive = vec4f((GLfloat)(colour & 255) / 255.f, (GLfloat)((colour >> 8) & 255) / 255.f,(GLfloat)((colour >> 16) & 255) / 255.f, (GLfloat)((colour >> 24) & 255) / 255.f);
@@ -56,6 +65,11 @@ void Pi3Cmaterial::SetColEmissive(const uint8_t r, const uint8_t g, const uint8_
 {
 	colEmissive = vec4f((GLfloat)r / 255.f, (GLfloat)g / 255.f,(GLfloat)b / 255.f, (GLfloat)a / 255.f);
 	changed = true;
+}
+
+uint32_t Pi3Cmaterial::GetColEmissive()
+{
+	return vec4toUint32(colEmissive);
 }
 
 void Pi3Cmaterial::SetColDiffuse(const uint32_t colour)
@@ -76,6 +90,11 @@ void Pi3Cmaterial::SetColDiffuse(const vec4f &col)
 	changed = true;
 }
 
+uint32_t Pi3Cmaterial::GetColDiffuse()
+{
+	return vec4toUint32(colDiffuse);
+}
+
 void Pi3Cmaterial::SetColSpecular(const uint32_t colour)
 {
 	colSpecular = vec4f((GLfloat)(colour & 255) / 255.f, (GLfloat)((colour >> 8) & 255) / 255.f,(GLfloat)((colour >> 16) & 255) / 255.f, (GLfloat)((colour >> 24) & 255) / 255.f);
@@ -86,6 +105,11 @@ void Pi3Cmaterial::SetColSpecular(const uint8_t r, const uint8_t g, const uint8_
 {
 	colSpecular = vec4f((GLfloat)r / 255.f, (GLfloat)g / 255.f,(GLfloat)b / 255.f, (GLfloat)a / 255.f);
 	changed = true;
+}
+
+uint32_t Pi3Cmaterial::GetColSpecular()
+{
+	return vec4toUint32(colSpecular);
 }
 
 void Pi3Cmaterial::SetAnimationTexture(const float stepx, const float stepy)

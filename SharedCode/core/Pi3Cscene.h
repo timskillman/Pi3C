@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Pi3Cresource.h"
+#include "Pi3Cwin.h"
 #include "Pi3Cmodel.h"
 #include "Pi3Cshader.h"
 #include "Pi3Cvector.h"

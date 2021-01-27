@@ -118,7 +118,7 @@ public:
 		identity = false;
 	}
 
-private:
-	bool identity = true; //used to avoid time wasted multiplying identity matrices!
 	float matrix[16] = {};
+	bool identity = true; //used to avoid time wasted multiplying identity matrices!
+	
 };

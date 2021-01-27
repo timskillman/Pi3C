@@ -61,7 +61,7 @@ int main(int argc, char *argv[])
 	while (!window.hasquit())
 	{
 		//needs processing for render so that GUI has priority over events (before modeller.handleEvents)
-		std::vector<uint32_t> eventList = window.event(); 
+		std::vector<uint32_t> eventList = window.events(); 
 
 		window.clear();
 		modeller.render();

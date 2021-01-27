@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Pi3Cscene.h"
+#include "Pi3Cwin.h"
 #include <string>
 #include <functional>
 

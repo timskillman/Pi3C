@@ -1,4 +1,5 @@
 #include "Pi3CfileOBJ.h"
+#include "Pi3Cutils.h"
 //#include "Pi3Cgizmos.h"
 #include <vector>
 #include <fstream>
@@ -37,9 +38,12 @@ namespace Pi3CfileOBJ {
 			objmat.texID = resource->defaultMaterial()->texID;
 			objmat.texRef = resource->defaultMaterial()->texRef;
 		}
-		//else if (objmat.texID >= 0) {
+		else if (objmat.texID >= 0) {
 		//	int32_t bpp = resource->textures[objmat.texRef]->GetDepth();
-		//}
+			auto& tex = resource->textures[objmat.texRef];
+			objmat.texWidth = tex->GetWidth();
+			objmat.texHeight = tex->GetHeight();
+		}
 
 		for (size_t i = 0; i < resource->materials.size(); i++) {
 			if (resource->materials[i].name == objmat.name) return;
@@ -73,6 +77,17 @@ namespace Pi3CfileOBJ {
 		return vec2f(mystrtof(vs1),mystrtof(vs2));
 	}
 	
+	std::string trimName(std::string name)
+	{
+		int i = name.find("/");
+		while (i >= 0) {
+			name = name.substr(i + 1);
+			i = name.find("/");
+		}
+		if (Pi3Cutils::endstr(name, 4) == ".mtl") name = name.substr(0, name.length() - 4);
+		return name;
+	}
+
 	void getMatLib(const std::string &path, const std::string &name, Pi3Cresource* resource, const uint32_t groupId)
 	{
 		std::string line;
@@ -101,7 +116,7 @@ namespace Pi3CfileOBJ {
 
 					if (com == "newmtl") {
 						if (objmat.name != "") addMaterial(resource, objmat);
-						objmat.init(name + "_" + vals);
+						objmat.init(trimName(name) + "_" + vals);
 					}
 					else if (com == "Ka") objmat.colAmbient = vec4f(readVec3f(vals), 1.f);
 					else if (com == "Kd") objmat.colDiffuse = vec4f(readVec3f(vals), 1.f);
@@ -128,7 +143,7 @@ namespace Pi3CfileOBJ {
 						objmat.texRef = resource->loadTexture(path, vals);
 						if (objmat.texRef >= 0) {
 							objmat.texID = resource->getTextureID(objmat.texRef);
-							objmat.texName = vals;
+							objmat.texName = vals; // .substr(2, vals.size() - 2);
 							//if (resource->textures[objmat.texRef]->GetDepth() == 4) 
 							//	objmat.alpha = 0.999f; //if 32bit, then mark as alpha channel image
 						}
@@ -348,7 +363,7 @@ namespace Pi3CfileOBJ {
 				case 'u':  //use material
 					if (com.substr(0,6) == "usemtl") {
 						//Find and set material ...
-						materialName = matlibname + "_" + vals;
+						materialName = trimName(matlibname) + "_" + vals;
 						materialfound = -1;
 
 						//SDL_Log("Use material: %s, %d", vals.c_str(),materials.size());

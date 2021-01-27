@@ -48,6 +48,23 @@ Pi3Cmodel * Pi3Cimgui::createImageRect(const std::string &text, const std::share
 	return create2ImageRect(text, ttex);
 }
 
+Pi3Cmodel* Pi3Cimgui::createImageRect2(const std::string& text, const int texRef)
+{
+	if (texRef>0) {
+		//Create an imageRect consisting of Container, Background and 2x Images ...
+		Pi3Cmodel container, texrect1, texrect2, bkgrect;
+
+		bkgrect.createRect2D(resource);
+		texrect1.createRect2D(resource);
+		texrect1.assignTexture(resource, texRef);
+		container.group.push_back(bkgrect);
+		container.group.push_back(texrect1);
+		auto obj = imageRect.emplace(text, container);
+		return &obj.first->second;
+	}
+	return nullptr;
+}
+
 Pi3Cmodel * Pi3Cimgui::create2ImageRect(const std::string &text, const std::shared_ptr<Pi3Ctexture> &ttex1, const std::shared_ptr<Pi3Ctexture> &ttex2)
 {
 	if (ttex1->isValid()) {
@@ -276,6 +293,20 @@ void Pi3Cimgui::renderRectAt(const Pi3Cpointi& size, const Pi3Cpointi& pos, cons
 	updateGroupSize(pos.x + size.x, pos.y + size.y);
 }
 
+void Pi3Cimgui::renderThickRect(const Pi3Crecti& rec, const int thickness, const uint32_t colour)
+{
+	Pi3Cmodel rect;
+	rect.matrix.setz(zpos - 1.f);
+	rect.createRect2D(resource, vec2f((float)rec.x, (float)rec.y), vec2f((float)(rec.width + 1), thickness), colour);
+	rect.renderBasic(resource);
+	rect.createRect2D(resource, vec2f((float)rec.x, (float)(rec.y + rec.height) - thickness), vec2f((float)(rec.width + 1), thickness), colour);
+	rect.renderBasic(resource);
+	rect.createRect2D(resource, vec2f((float)rec.x, (float)rec.y), vec2f(thickness, (float)rec.height), colour);
+	rect.renderBasic(resource);
+	rect.createRect2D(resource, vec2f((float)(rec.x + rec.width + 1) - thickness, (float)rec.y), vec2f(thickness, (float)rec.height), colour);
+	rect.renderBasic(resource);
+}
+
 Pi3Cpointi Pi3Cimgui::calcImageSize(int tw, int th, const int minwidth, const int minheight, bool squash)
 {
 	float aspect = (float)tw / (float)th;
@@ -418,6 +449,16 @@ bool Pi3Cimgui::ButtonImage(const std::string &img, const bool selected, const i
 	currentParams.selected = false;
 	if (touched) somethingSelected = true;
 	return clicked;
+}
+
+bool Pi3Cimgui::ButtonImage(const std::string& str, const int texRef, const bool selected, const int minWidth, const int minHeight)
+{
+	currentParams.selected = selected;
+	bool touched = renderButton(createImageRect2(str, texRef), minWidth, minHeight);
+	bool clicked = touched && window->mouse.LeftButton;
+	currentParams.selected = false;
+	if (touched) somethingSelected = true;
+	return touched;
 }
 
 bool Pi3Cimgui::SliderH(const std::string &text, const double from, const double too, double &value, const int minwidth, const int minheight)
@@ -663,19 +704,24 @@ bool Pi3Cimgui::Label(const std::string &text, const int minwidth, const int min
 	return renderText(text, minwidth, minheight);
 }
 
+Pi3Crect Pi3Cimgui::TextAt(const std::string& text, int x, int y, uint32_t col)
+{
+	return resource->renderText(resource->lettersRef, currentFont, text, vec3f((float)x, (float)y, zpos), 8000.f, col);
+}
+
 bool Pi3Cimgui::Text(const std::string &text, const int minwidth, const int minheight, const uint32_t colour)
 {
 	if (text == "") return false;
 	uint32_t col = (colour == 0) ? currentParams.textColour | 0xff000000 : colour;
 	pos = nextPos;
-	Pi3Crect textSize = resource->renderText(resource->lettersRef, currentFont, text, vec3f((float)nextPos.x, (float)nextPos.y, zpos), 8000.f, col);
+	Pi3Crect textSize = TextAt(text, nextPos.x, nextPos.y, col);
 	size.x = ((int32_t)textSize.width > minwidth) ? (int32_t)textSize.width : minwidth;
 	size.y = ((int32_t)textSize.height > minheight) ? (int32_t)textSize.height : minheight;
 	NextPos();
 	return false;
 }
 
-bool Pi3Cimgui::TextArea(std::string &text, const int minwidth, const int minheight)
+bool Pi3Cimgui::TextArea(const std::string &text, const int minwidth, const int minheight)
 {
 	pos = nextPos;
 	Pi3Crect textSize = resource->renderText(resource->lettersRef, currentFont, text, vec3f((float)pos.x, (float)pos.y, zpos), (float)minwidth);
@@ -702,6 +748,11 @@ void Pi3Cimgui::movePosition(const int x, const int y)
 Pi3Cpointi Pi3Cimgui::getPosition()
 {
 	return Pi3Cpointi(nextPos.x, window->getHeight() - nextPos.y);
+}
+
+Pi3Cpointi Pi3Cimgui::getCurrentPosition()
+{
+	return pos; // Pi3Cpointi(pos.x, window->getHeight() - pos.y);
 }
 
 void Pi3Cimgui::Begin() {
@@ -855,7 +906,7 @@ std::string Pi3Cimgui::OpenFileDialog(const rectStyle * style)
 	while (!window->hasquit() && !finished) {
 
 		window->clear();
-		std::vector<uint32_t> events = window->event();
+		std::vector<uint32_t> events = window->events();
 
 		drawSnapshot();
 

@@ -81,7 +81,7 @@ void Pi3Cmodel::refreshMesh(Pi3Cresource* resource)
 void Pi3Cmodel::create(Pi3Cresource *resource, Pi3Cmesh *mesh, int32_t groupId, uint32_t diffuseColour)
 {	
 	meshRef = resource->addMesh(mesh, groupId);
-	if (mesh->mode==GL_TRIANGLES && mesh->lineIndexes.size()==0) resource->addMeshOutlines(meshRef);
+	if (mesh->mode==GL_TRIANGLES && mesh->lineIndexes.size()==0) resource->addMeshOutlines(meshRef); //This is really SLOW on big models!
 	material = *resource->defaultMaterial();
 	material.SetColDiffuse(diffuseColour);
 	material.rendermode = mesh->mode;
@@ -229,6 +229,18 @@ int32_t Pi3Cmodel::addTexture(Pi3Cresource *resource, const std::shared_ptr<Pi3C
 		material.texWidth = tx->GetWidth();
 		material.texHeight = tx->GetHeight();
 		resource->materials.push_back(material);
+	}
+	return material.texID;
+}
+
+int32_t Pi3Cmodel::assignTexture(Pi3Cresource* resource, int texRef)
+{
+	material.texRef = texRef; //resource->loadTexture("", txfile, material.texRef);
+	if (material.texRef >= 0) {
+		Pi3Ctexture* tx = resource->textures[texRef].get();
+		material.texID = resource->getTextureID(material.texRef);
+		material.texWidth = tx->GetWidth();
+		material.texHeight = tx->GetHeight();
 	}
 	return material.texID;
 }
@@ -534,7 +546,7 @@ bool Pi3Cmodel::touchRect(Pi3Cresource* resource, const Pi3Cmatrix* parent_matri
 		Pi3Cbbox2d bbox;
 		bbox.update(vec2f(rect.x, rect.y));
 		bbox.update(vec2f(rect.x + rect.width, rect.y + rect.height));
-		Pi3Cmatrix pmat = tmat * projMatrix;
+		Pi3Cmatrix pmat =  tmat * projMatrix;
 		mesh.insideRect(bbox, pointIndexes, edgeIndexes, faceIndexes, false, pmat, *(resource->getMeshBuffer(meshRef)));
 		return pointIndexes.size() > 0;
 	}
@@ -561,7 +573,7 @@ Pi3Cmodel* Pi3Cmodel::find(const std::string &name)
 	return nullptr;
 }
 
-void Pi3Cmodel::createRect2D(Pi3Cresource *resource, const vec2f &pos, const vec2f &size, const uint32_t colour)
+void Pi3Cmodel::createRect2D(Pi3Cresource *resource, const vec2f &pos, const vec2f &size, const uint32_t colour, const int32_t texRef)
 {
 	if (resource->rectRef >= 0) {
 		meshRef = resource->rectRef;
@@ -570,6 +582,8 @@ void Pi3Cmodel::createRect2D(Pi3Cresource *resource, const vec2f &pos, const vec
 		material = *resource->defaultMaterial();  //The default material;
 		material.SetColDiffuse(colour);
 		material.illum = 1;					//non shaded illumination
+		if (texRef>=0) 
+			material.texID = assignTexture(resource, texRef);
 	}
 }
 

@@ -66,6 +66,7 @@ public:
 	void setPosition(const int x, const int y);
 	void movePosition(const int x, const int y);
 	Pi3Cpointi getPosition();
+	Pi3Cpointi getCurrentPosition();
 
 	void setFont(const std::string &fontName);
 
@@ -106,9 +107,11 @@ public:
 	bool ContainerEnd(const std::string &name);
 	bool Label(const std::string &text, const int minwidth = 0, const int minheight = 0);										/* Render static label (doesn't change)*/
 	bool Text(const std::string &text, const int minwidth = 0, const int minheight = 0, const uint32_t colour = 0);		/* Render dynamic text */
-	bool TextArea(std::string &text, const int minwidth, const int minheight);
+	bool TextArea(const std::string &text, const int minwidth, const int minheight);
+	Pi3Crect TextAt(const std::string& text, int x, int y, uint32_t col);
 	bool ButtonText(const std::string &text, const bool selected = false, const int minwidth = 0, const int minheight = 0);
 	bool ButtonImage(const std::string &img, const bool selected = false, const int minWidth = 0, const int minHeight = 0);
+	bool ButtonImage(const std::string& str, const int texRef, const bool selected = false, const int minWidth = 0, const int minHeight = 0);
 	bool SliderH(const std::string &text, const double from, const double too, double &value, const int minwidth = 0, const int minheight = 0);
 	bool SliderDoubleV(const std::string &text, const double from, const double too, double &value, const int minwidth = 0, const int minheight = 0);
 	bool SliderFloat(const std::string &text, const float from, const float too, float &value);
@@ -150,6 +153,7 @@ public:
 
 	bool renderRect(const int minwidth, const int minheight, uint32_t colour = 0);
 	void renderRectAt(const Pi3Cpointi& size, const Pi3Cpointi& pos, const uint32_t colour);
+	void renderThickRect(const Pi3Crecti& rec, const int thickness, const uint32_t colour);
 	bool renderIcon(const std::string &str, const int minwidth = 0, const int minheight = 0);
 	bool renderText(const std::string &str, const int minwidth = 0, const int minheight = 0, uint32_t colour = 0);
 	bool renderBackIcon(const std::string &str, const int minwidth = 0, const int minheight = 0);
@@ -162,6 +166,7 @@ public:
 
 
 	Pi3Cresource * resource = nullptr;
+	float zpos = -10.f;			//Uses Z-buffer to place windows/menus in front of each other
 
 private:
 
@@ -178,6 +183,7 @@ private:
 	Pi3Cmodel * findCreateImage(const std::string &str, const ButtonType type);
 	Pi3Cmodel * createImage(const std::string &text, const std::shared_ptr<Pi3Ctexture> &ttex);
 	Pi3Cmodel * createImageRect(const std::string &text, const std::shared_ptr<Pi3Ctexture> &ttex);
+	Pi3Cmodel * createImageRect2(const std::string& text, const int texRef);
 	Pi3Cmodel * create2ImageRect(const std::string &text, const std::shared_ptr<Pi3Ctexture> &ttex1, const std::shared_ptr<Pi3Ctexture> &ttex2 = nullptr);
 
 	Pi3Cwindow *window = nullptr;
@@ -193,7 +199,6 @@ private:
 	Pi3Cpointi pos{ 0,0 };			//Last position widget was drawn at (topleft corner)
 	Pi3Cpointi size{ 20, 10 };		//Last size widget was drawn as (width/height)
 	Pi3Cpointi nextPos{ 0,0 };		//Next position to draw widget
-	float zpos = -10.f;			//Uses Z-buffer to place windows/menus in front of each other
 	int leftpos = 0;		//returns to this leftmost position (used for indent etc..)
 
 	//size, positions of menus ...

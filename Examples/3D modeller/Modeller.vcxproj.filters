@@ -186,6 +186,9 @@
     <ClCompile Include="Source\UIStyles.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\SharedCode\file\Pi3CbinStream.cpp">
+      <Filter>Shared Code\file</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\SharedCode\glutess\dict.h">
@@ -373,6 +376,9 @@
     </ClInclude>
     <ClInclude Include="Source\UIStyles.h">
       <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\SharedCode\file\Pi3CbinStream.h">
+      <Filter>Shared Code\file</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

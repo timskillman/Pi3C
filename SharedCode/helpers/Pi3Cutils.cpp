@@ -98,4 +98,31 @@ namespace Pi3Cutils {
 		stream << std::fixed << std::setprecision(decimalPlaces) << n;
 		return stream.str();
 	}
+
+	std::string endstr(std::string const& str, size_t const length) {
+		if (length >= str.size()) return str;
+		return str.substr(str.size() - length);
+	}
+
+	void drawRect2D(vec3f pos, vec3f size, uint32_t colour)
+	{
+		glColor4f((GLfloat)(colour & 255) / 255.f, (GLfloat)((colour >> 8) & 255) / 255.f, (GLfloat)((colour >> 16) & 255) / 255.f, (GLfloat)((colour >> 24) & 255) / 255.f);
+		//glColor4f(1.f, 1.f, 1.f, 1.f);
+
+		static vec3f verts[4];
+		static uint16_t inds[4] = { 0,1,2,3 };
+
+		verts[0] = pos;
+		verts[1] = pos + vec3f(0, size.y, 0);
+		verts[2] = pos + vec3f(size.x, 0, 0);
+		verts[3] = pos + vec3f(size.x, size.y, 0);
+
+		glDisableClientState(GL_NORMAL_ARRAY);
+		glEnableClientState(GL_VERTEX_ARRAY);
+		glDisable(GL_BLEND);
+		glDisable(GL_CULL_FACE);
+		glVertexPointer(3, GL_FLOAT, 0, verts);
+		glDrawElements(GL_TRIANGLE_STRIP, 4, GL_UNSIGNED_SHORT, inds);
+	}
+
 }

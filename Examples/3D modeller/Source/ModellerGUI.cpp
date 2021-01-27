@@ -100,18 +100,7 @@ void MGui::renderBorder(uint32_t currentSelView)
 	}
 
 	if (rec.width > 0) {
-		Pi3Cmodel rect;
-		float rw = 4.f;
-		uint32_t col = guiStyle.borderColour;
-		rect.matrix.setz(-10.f);
-		rect.createRect2D(gui.resource, vec2f((float)rec.x, (float)rec.y), vec2f((float)(rec.width+1), rw), col);
-		rect.renderBasic(gui.resource);
-		rect.createRect2D(gui.resource, vec2f((float)rec.x, (float)(rec.y + rec.height) - rw), vec2f((float)(rec.width + 1), rw), col);
-		rect.renderBasic(gui.resource);
-		rect.createRect2D(gui.resource, vec2f((float)rec.x, (float)rec.y), vec2f(rw, (float)rec.height), col);
-		rect.renderBasic(gui.resource);
-		rect.createRect2D(gui.resource, vec2f((float)(rec.x + rec.width + 1) - rw, (float)rec.y), vec2f(rw, (float)rec.height), col);
-		rect.renderBasic(gui.resource);
+		gui.renderThickRect(rec, 4, guiStyle.borderColour);
 	}
 }
 
@@ -315,6 +304,7 @@ void MGui::doSceneToolbar(Modeller * md, Pi3Cimgui::rectStyle& iconstyle, bool m
 void MGui::doShapesToolbar(Modeller * md, Pi3Cimgui::rectStyle& iconstyle, bool mb, bool mu)
 {
 	int btop = (int)((float)iconstyle.minWidth * .34f);
+	bool mouseClick = mb && mu;
 	if (gui.BeginGroupVertical("butTop2.png", iconstyle.minWidth, btop)) {
 		if (gui.ButtonImage("cuboid.png", md->createTool == Modeller::CT_CUBOID) && mb) md->setCreateTool(Modeller::CT_CUBOID);
 		if (gui.ButtonImage("sphere.png", md->createTool == Modeller::CT_SPHERE) && mb) md->setCreateTool(Modeller::CT_SPHERE);
@@ -339,7 +329,66 @@ void MGui::doShapesToolbar(Modeller * md, Pi3Cimgui::rectStyle& iconstyle, bool 
 	}
 }
 
-void MGui::doIMGUI(Modeller * md)
+void MGui::MaterialInfo(Modeller* md, Pi3Cmaterial& material)
+{
+	Pi3Cmodel rect;
+	rect.matrix.setz(-10.0f);
+	auto& p = gui.getCurrentPosition();
+	int w = 600, h = 250, xc = p.x, yc = p.y + 10, bord = 10;
+	if (xc + w > md->window->getWidth()) xc = md->window->getWidth() - w;
+	float xf = (float)xc, yf = (float)yc;
+	rect.createRect2D(gui.resource, vec2f(xf, yf), vec2f((float)w, (float)h), guiStyle.iconColour);
+	rect.renderBasic(gui.resource);
+	rect.createRect2D(gui.resource, vec2f(xf + (float)(bord), yf + (float)(bord)), vec2f((float)(h - bord * 2), (float)(h - bord * 2)), 0xffffffff, material.texRef);
+	rect.renderBasic(gui.resource);
+	gui.setFont(smallFont);
+	int ht = h-bord/2; int hs = 22;
+	gui.TextAt("Name: " + ((material.name.length()>20) ? material.name.substr(0,30)+"..." : material.name), xc + h, yc + ht, 0x0); ht -= hs;
+	ht -= 5;
+	gui.TextAt("Diffuse colour : 0x" + Pi3Cutils::numToHexstr(material.GetColDiffuse()), xc + h, yc + ht, 0x0); ht -= hs;
+	gui.TextAt("Ambient colour : 0x" + Pi3Cutils::numToHexstr(material.GetColAmbient()), xc + h, yc + ht, 0x0); ht -= hs;
+	gui.TextAt("Emissive colour: 0x" + Pi3Cutils::numToHexstr(material.GetColEmissive()), xc + h, yc + ht, 0x0); ht -= hs;
+	gui.TextAt("Specular colour: 0x" + Pi3Cutils::numToHexstr(material.GetColSpecular()), xc + h, yc + ht, 0x0); ht -= hs;
+	if (material.texRef > 0) {
+		ht -= 5;
+		gui.TextAt("Texture width : " + std::to_string(material.texWidth), xc + h, yc + ht, 0x0); ht -= hs;
+		gui.TextAt("Texture height: " + std::to_string(material.texHeight), xc + h, yc + ht, 0x0); ht -= hs;
+		if (material.animFrames > 0) {
+			ht -= 5;
+			gui.TextAt("Anim frames: " + std::to_string(material.animFrames), xc + h, yc + ht, 0x0); ht -= hs;
+			gui.TextAt("Anim offset: " + Pi3Cutils::ftostrdp(material.animoffset.x, 2) + "," + Pi3Cutils::ftostrdp(material.animoffset.y, 2), xc + h, yc + ht, 0x0); ht -= hs;
+			gui.TextAt("Anim size  : " + Pi3Cutils::ftostrdp(material.animsize.x, 2) + "," + Pi3Cutils::ftostrdp(material.animsize.y, 2), xc + h, yc + ht, 0x0); ht -= hs;
+		}
+	}
+}
+
+void MGui::doMaterialsToolbar(Modeller* md, Pi3Cimgui::rectStyle& iconstyle, bool mb, bool mu)
+{
+	
+	if (gui.BeginGroupHorizontal("rendl.png", iconstyle.halfWidth(), iconstyle.minHeight)) {
+		
+		std::vector<Pi3Cmaterial>& materials = md->resource->materials;
+		std::vector<std::shared_ptr<Pi3Ctexture>>& textures = md->resource->textures;
+		int selMat = -1;
+		for (size_t m = 0; m < materials.size(); m++) {
+			auto& material = materials[m];
+			if (material.texRef > 0 && material.name!="default") {
+				gui.sameLine();
+				if (gui.ButtonImage(material.name, material.texRef, false, 32, 32)) {
+					MaterialInfo(md, material);
+					if (mb && mu) selMat = m;
+				}
+			}
+			else {
+
+			}
+		}
+		gui.sameLine();
+		gui.EndGroupHorizontal("rendr.png", iconstyle.halfWidth(), iconstyle.minHeight);
+	}
+}
+
+bool MGui::doIMGUI(Modeller * md)
 {
 
 	//uint32_t ticks = SDL_GetTicks();
@@ -351,13 +400,13 @@ void MGui::doIMGUI(Modeller * md)
 	bool mouseOverToolbars = gui.menuOpen || mx<leftbarWidth || mx>(winWidth - rightbarWidth) || my<(topbarHeight + menuHeight) || my>winHeight - botbarHeight;
 
 	//SDL_Log("Menus %s", gui.menuTouch);
-
+	
 	gui.Begin();
 
 	if (!mouseOverToolbars && gui.takenSnapshot == 2) {
 		gui.drawSnapshot();
 		glClear(GL_DEPTH_BUFFER_BIT);
-		return;
+		return false;
 	}
 
 	doMenus(md);
@@ -401,8 +450,11 @@ void MGui::doIMGUI(Modeller * md)
 	gui.setButtonStyle(bsButtons);
 	doShapesToolbar(md, bsButtons, mb, mu);
 
-	//gui.setPosition(leftbarWidth, workHeight + topbarHeight + menuHeight + 3);
+	gui.setPosition(leftbarWidth, workHeight + topbarHeight + menuHeight + 3);
 	//gui.setButtonStyle(bsHeading);
+
+	doMaterialsToolbar(md, bsIcons, mb, mu);
+
 	//static double v = 5;
 	//gui.SliderH("Scroll", 0, 10, v, 300, 24);
 
@@ -425,9 +477,10 @@ void MGui::doIMGUI(Modeller * md)
 	//SDL_Log("Ticks:%d",SDL_GetTicks()-ticks);
 	gui.End();
 	
+	return true;
 }
 
-void MGui::printText(Modeller* md, std::string text, int x, int y, uint32_t col)
+void MGui::printText(const std::string& text, int x, int y, uint32_t col)
 {
 	gui.setButtonStyle(bsMenu);
 	gui.setPosition(x, y);
@@ -442,3 +495,27 @@ void MGui::saveAll(Modeller * md)
 	if (savefile!="") md->saveFile("../", savefile);
 }
 
+void MGui::showProgressCB(Pi3Cwindow* window, const std::string &message, const float pcnt)
+{
+	//SDL_Log("Loading '%s' %d%% ...", message.c_str(), (int)pcnt);
+	float mWidth = window->getWidth();
+	float mHeight = window->getHeight();
+
+	window->clear();
+
+	Pi3Cmodel rect;
+	rect.matrix.setz(-10.f);
+	rect.createRect2D(gui.resource, vec2f(mWidth / 2.f - 110.f, mHeight / 2.f - 20.f), vec2f(220.f, 40.f), 0xffffffff);
+	rect.renderBasic(gui.resource);
+	rect.createRect2D(gui.resource, vec2f(mWidth / 2.f - 100.f, mHeight / 2.f - 10.f), vec2f(pcnt * 2.f, 20.f), 0xff00aa00);
+	rect.renderBasic(gui.resource);
+	rect.createRect2D(gui.resource, vec2f(mWidth / 2.f - 100.f + pcnt * 2.f, mHeight / 2.f - 10.f), vec2f((100.f - pcnt) * 2.f, 20.f), 0xff999999);
+	rect.renderBasic(gui.resource);
+
+	std::string text = message + Pi3Cutils::ftostrdp(pcnt, 0)+"%";
+	printText(text, mWidth / 2.f - 110.f, mHeight / 2.f - 50.f, 0xffffffff);
+
+	std::vector<uint32_t> eventList = window->events();
+
+	window->SwapBuffers();
+}

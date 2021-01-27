@@ -235,7 +235,7 @@ bool Pi3C::do_events()
 
 	//SDL_Delay(10);
 
-	eventList = window.event();
+	eventList = window.events();
 
 	if (eventList.size()==0) return false;
 
@@ -373,6 +373,6 @@ int32_t Pi3C::create_plane(const vec3f& pos, const vec2f& size, const uint32_t x
 
 int32_t Pi3C::create_elevationMap(const vec3f &pos, const vec3f &size, Pi3Ctexture &tex, const uint32_t xdivs, const uint32_t ydivs, const uint32_t colour, const std::string& texfile)
 {
-	Pi3Cmodel map(&resource, Pi3Cshapes::elevationMap(tex, pos, size, xdivs, ydivs, 0), MODEL_GPID, colour);
+	Pi3Cmodel map(&resource, Pi3Cshapes::elevationMap(tex, pos, size, xdivs, ydivs, 0, vec2f(1.f,1.f),0), MODEL_GPID, colour);
 	return scene.append3D(map, texfile);
 }

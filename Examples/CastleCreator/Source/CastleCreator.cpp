@@ -59,7 +59,7 @@ int main(int argc, char *argv[])
 
 	while (!window.hasquit())
 	{
-		std::vector<uint32_t> eventList = window.event();
+		std::vector<uint32_t> eventList = window.events();
 
 		castleEditor.handleKeys();
 		//castleEditor.handleEvents(eventList);

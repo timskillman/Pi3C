@@ -53,6 +53,11 @@ public:
 	void SetAnimationSheet(const int divx, const int divy, const int frames = 0);
 	void AnimateTexture(const float ticks = 1.f);
 
+	uint32_t GetColAmbient();
+	uint32_t GetColEmissive();
+	uint32_t GetColDiffuse();
+	uint32_t GetColSpecular();
+
 	enum {
 		ALPHA_NONE = 0,
 		ALPHA_HALF = 1,

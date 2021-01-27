@@ -9,6 +9,7 @@
 //#include "tessellate.h"
 
 #include <algorithm>
+#include "Pi3CbinStream.h"
 
 #define DEPTH2D -10.f
 
@@ -484,13 +485,56 @@ namespace Pi3Cshapes {
 		return lathe;
 	}
 
-	Pi3Cmesh elevationMap(Pi3Ctexture &tex, const vec3f &pos, const vec3f &size, const uint32_t xdivs, const uint32_t ydivs, const int direction, const vec2f &uvsize)
+	Pi3Cmesh readSRTM(const std::string& filestr)
+	{
+		//Pi3CbinStream bs(filestr.c_str());
+		int srtm_size = 3601;
+		Pi3Ctexture srtmTex(srtm_size, srtm_size, 4);
+		uint8_t* map = srtmTex.GetTexels();
+		Pi3Cmesh msh;
+
+		std::ifstream file(filestr.c_str(), std::ios::in | std::ios::binary);
+		if (!file)
+		{
+			SDL_Log("Error opening file!");
+			return msh;
+		}
+
+
+		int p = 0;
+		int16_t i = 0;
+		unsigned char buffer[2];
+		for (int y = 0; y < srtm_size; y++) {
+			for (int x = 0; x < srtm_size; x++) {
+				//bs.read(i);
+
+				if (!file.read(reinterpret_cast<char*>(buffer), sizeof(buffer)))
+				{
+					SDL_Log("Error reading STRM file!");
+					return msh;
+				}
+				//height[i][j] = (buffer[0] << 8) | buffer[1];
+				int16_t grey = ((buffer[0] << 8) | buffer[1]) + 32;
+				if (grey < 0) grey = 0;
+				map[p++] = grey >> 2;
+				map[p++] = grey >> 2;
+				map[p++] = grey >> 2;
+				map[p++] = 255;
+				//map[p++] = (i == 0xffff) ? 0 : i>>8;
+			}
+		}
+
+		//srtmTex.saveAsPNG("SRTM.png");
+		return elevationMap(srtmTex, vec3f(), vec3f(srtm_size / 3, 50, srtm_size / 3), 600, 600, 0, vec2f(1.f,1.f), 0);
+	}
+
+	Pi3Cmesh elevationMap(Pi3Ctexture &tex, const vec3f &pos, const vec3f &size, const uint32_t xdivs, const uint32_t ydivs, const int direction, const vec2f &uvsize, const std::function<void(float)> showProgressCB)
 	{
 		Pi3Cmesh mesh("Map");
 		uint32_t col = 0xffffffff;
 		const float mapHeight = size.y;
 		mesh.verts.reserve((xdivs + 1)*(ydivs + 1) * 4 * 3 * 9);
-		elevationMap_verts(mesh.verts, mesh.vc, tex, pos, size, xdivs, ydivs, direction, uvsize, col);
+		elevationMap_verts(mesh.verts, mesh.vc, tex, pos, size, xdivs, ydivs, direction, uvsize, col, showProgressCB);
 		mesh.updateBounds();
 		mesh.materialRef = 0;
 		return mesh;
@@ -790,7 +834,7 @@ namespace Pi3Cshapes {
 
 #define twotris true
 
-	void elevationMap_verts(std::vector<float>& verts, uint32_t& vc, Pi3Ctexture &tex, const vec3f &pos, const vec3f &size, const uint32_t xdivs, const uint32_t ydivs, int direction, const vec2f &uvsize, const uint32_t col)
+	void elevationMap_verts(std::vector<float>& verts, uint32_t& vc, Pi3Ctexture& tex, const vec3f& pos, const vec3f& size, const uint32_t xdivs, const uint32_t ydivs, int direction, const vec2f& uvsize, const uint32_t col, const std::function<void(float)> showProgressCB)
 	{
 
 		uint32_t pitch = tex.GetPitch();
@@ -799,54 +843,65 @@ namespace Pi3Cshapes {
 		uint32_t h = tex.GetHeight();
 		uint32_t w = tex.GetWidth();
 
-		float wf = (float)w;
-		float hf = (float)h;
+		int th = h, tw = w;
+		while (tw > 512 && th > 512) {
+			tw /= 2; th /= 2;
+		}
 
+		float wf = (float)tw;
+		float hf = (float)th;
 
 		vec3f vec1, vec2, vec3, vec4, vec5;
 		float v1[3], v2[3], v3[3], v4[3];
 		int a = 0; int b = 1; int c = 2;
-		vec3f n(0, 0, -1.f);
-		vec2f sz = vec2f(size.x, size.z);
+		//vec3f n(0, 0, -1.f);
+		vec2f sz = vec2f(wf, hf);
 
-#ifndef twotris
+#if !twotris
 		float v5[3];
 #endif
 		switch (direction) {
 		case 0: sz.x = -sz.x; break;
-		case 1: n = vec3f(0, 0, 1.f); break;
-		case 2: a = 2; b = 1; c = 0; n = vec3f(-1.f, 0, 0); break;
-		case 3: a = 2; b = 1; c = 0; n = vec3f(1.f, 0, 0); sz.x = -sz.x; break;
-		case 4: a = 0; b = 2; c = 1; n = vec3f(0, -1.f, 0); break;
-		case 5: a = 0; b = 2; c = 1; n = vec3f(0, 1.f, 0); sz.x = -sz.x; break;
+		case 1: break;
+		case 2: a = 2; b = 1; c = 0; break;
+		case 3: a = 2; b = 1; c = 0; sz.x = -sz.x; break;
+		case 4: a = 0; b = 2; c = 1; break;
+		case 5: a = 0; b = 2; c = 1; sz.x = -sz.x; break;
 		}
 
-		const float xs = 1.f / static_cast<float>(xdivs);
-		const float ys = 1.f / static_cast<float>(ydivs);
-		const float xd = xs * sz.x;
-		const float yd = ys * sz.y;
+		uint32_t nydivs = (hf / wf) * xdivs;
+		const float xs = 1.f / static_cast<float>(tw);
+		const float ys = 1.f / static_cast<float>(th);
+		const float xd = size.x / wf;
+		const float yd = size.x / wf;
 		const float ux = xs * uvsize.x;
 		const float uy = ys * uvsize.y;
 
+
 		float mh = size.y / 255.f;
 
-		float xc = (wf-1.f) / (float)xdivs;
-		float yc = (hf-1.f) / (float)ydivs;
-		
+		float xc = ((float)w) / (wf + 1.f);
+		float yc = ((float)h) / (hf + 1.f);
+
 		float yy = 0;
 		for (float yi = -0.5f; yi < 0.499f; yi += ys) {
+			if (showProgressCB) showProgressCB((yi+0.5f) * 100.f);
 			float xx = 0;
 			for (float xi = -0.5f; xi < 0.499f; xi += xs) {
 
-				float x = xi * sz.x; 
-				float y = yi * sz.y;
-				float xu = xi * uvsize.x; 
-				float yu = yi * uvsize.y;
+				float x = xi * wf * xd; 
+				float y = yi * hf * yd;
+				float xu = xi * uvsize.x + 0.5f; 
+				float yu = 0.5f - yi * uvsize.y;
 
-				float h00 = ((float)((map[((uint32_t)xx) * bpp + ((uint32_t)yy) * pitch]) & 255)) * mh;
-				float h10 = ((float)((map[((uint32_t)(xx + xc)) * bpp + ((uint32_t)yy) * pitch]) & 255)) * mh;
-				float h01 = ((float)((map[((uint32_t)xx) * bpp + ((uint32_t)(yy + yc)) * pitch]) & 255)) * mh;
-				float h11 = ((float)((map[((uint32_t)(xx + xc)) * bpp + ((uint32_t)(yy + yc)) * pitch]) & 255)) * mh;
+				int ix0 = ((uint32_t)xx) * bpp;
+				int ix1 = ((uint32_t)(xx + xc)) * bpp;
+				int iy0 = ((uint32_t)yy) * pitch;
+				int iy1 = ((uint32_t)(yy + yc)) * pitch;
+				float h00 = ((float)((map[ix0 + iy0]) & 255)) * mh;
+				float h10 = ((float)((map[ix1 + iy0]) & 255)) * mh;
+				float h01 = ((float)((map[ix0 + iy1]) & 255)) * mh;
+				float h11 = ((float)((map[ix1 + iy1]) & 255)) * mh;
 				
 #if twotris
 				v1[a] = x + xd; v1[b] = h11; v1[c] = y + yd;
@@ -858,15 +913,15 @@ namespace Pi3Cshapes {
 				v4[a] = x + xd; v4[b] = h10; v4[c] = y;
 				memcpy(&vec4, &v4, sizeof(v4));
 
-				n = -vec1.trinormal(vec2, vec3);
-				storeVNTC(verts, vc, pos + vec1, n, vec2f(xu + ux, yu + uy), col);
-				storeVNTC(verts, vc, pos + vec3, n, vec2f(xu, yu + uy), col);
-				storeVNTC(verts, vc, pos + vec2, n, vec2f(xu, yu), col);
+				vec3f n = -vec1.trinormal(vec3, vec2);
+				storeVNTC(verts, vc, pos + vec1, n, vec2f(xu + ux, yu ), col);
+				storeVNTC(verts, vc, pos + vec2, n, vec2f(xu, yu + uy), col);
+				storeVNTC(verts, vc, pos + vec3, n, vec2f(xu, yu), col);
 
-				n = -vec1.trinormal(vec4, vec2);
-				storeVNTC(verts, vc, pos + vec1, n, vec2f(xu + ux, yu + uy), col);
-				storeVNTC(verts, vc, pos + vec2, n, vec2f(xu, yu), col);
-				storeVNTC(verts, vc, pos + vec4, n, vec2f(xu + ux, yu), col);
+				n = -vec1.trinormal(vec2, vec4);
+				storeVNTC(verts, vc, pos + vec1, n, vec2f(xu + ux, yu), col);
+				storeVNTC(verts, vc, pos + vec4, n, vec2f(xu + ux, yu + uy), col);
+				storeVNTC(verts, vc, pos + vec2, n, vec2f(xu, yu + uy), col);
 
 #else
 				float hh = (h00 + h01 + h10 + h11) / 4.0f; //avg height for centre point
@@ -882,25 +937,25 @@ namespace Pi3Cshapes {
 				v5[a] = x + xd * 0.5f; v5[b] = hh; v5[c] = y + yd * 0.5f; //centre point
 				memcpy(&vec5, &v5, sizeof(v5));
 
-				n = vec5.trinormal(vec2, vec3);
+				vec3f n = vec5.trinormal(vec3, vec2);
 				storeVNTC(verts, vc, pos + vec5, n, vec2f(xu + ux * 0.5f, yu + uy * 0.5f), col);
-				storeVNTC(verts, vc, pos + vec2, n, vec2f(xu, yu), col);
-				storeVNTC(verts, vc, pos + vec3, n, vec2f(xu, yu + uy), col);
+				storeVNTC(verts, vc, pos + vec3, n, vec2f(xu, yu), col);
+				storeVNTC(verts, vc, pos + vec2, n, vec2f(xu, yu + uy), col);
 
-				n = vec5.trinormal(vec3, vec1);
+				n = vec5.trinormal(vec1, vec3);
 				storeVNTC(verts, vc, pos + vec5, n, vec2f(xu + ux * 0.5f, yu + uy * 0.5f), col);
-				storeVNTC(verts, vc, pos + vec3, n, vec2f(xu, yu + uy), col);
-				storeVNTC(verts, vc, pos + vec1, n, vec2f(xu + ux, yu + uy), col);
+				storeVNTC(verts, vc, pos + vec1, n, vec2f(xu, yu + uy), col);
+				storeVNTC(verts, vc, pos + vec3, n, vec2f(xu + ux, yu + uy), col);
 
-				n = vec5.trinormal(vec1, vec4);
+				n = vec5.trinormal(vec4, vec1);
 				storeVNTC(verts, vc, pos + vec5, n, vec2f(xu + ux * 0.5f, yu + uy * 0.5f), col);
-				storeVNTC(verts, vc, pos + vec1, n, vec2f(xu + ux, yu + uy), col);
-				storeVNTC(verts, vc, pos + vec4, n, vec2f(xu + ux, yu), col);
+				storeVNTC(verts, vc, pos + vec4, n, vec2f(xu + ux, yu + uy), col);
+				storeVNTC(verts, vc, pos + vec1, n, vec2f(xu + ux, yu), col);
 
-				n = vec5.trinormal(vec4, vec2);
+				n = vec5.trinormal(vec2, vec4);
 				storeVNTC(verts, vc, pos + vec5, n, vec2f(xu + ux * 0.5f, yu + uy * 0.5f), col);
-				storeVNTC(verts, vc, pos + vec4, n, vec2f(xu + ux, yu), col);
-				storeVNTC(verts, vc, pos + vec2, n, vec2f(xu, yu), col);
+				storeVNTC(verts, vc, pos + vec2, n, vec2f(xu + ux, yu), col);
+				storeVNTC(verts, vc, pos + vec4, n, vec2f(xu, yu), col);
 #endif
 
 				xx += xc;

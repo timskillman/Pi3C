@@ -72,7 +72,8 @@ std::string Pi3Cscene::getPathFile(std::string &file) const
 	return path;
 }
 
-int32_t Pi3Cscene::loadModelOBJ(const std::string &path, const std::string &modelfile, const vec3f pos, const bool grouped, const int32_t groupId, bool addColliderGrid, const std::function<void(float)> showProgressCB)
+int32_t Pi3Cscene::loadModelOBJ(const std::string &path, const std::string &modelfile, const vec3f pos, const bool grouped, const int32_t groupId, bool addColliderGrid, 
+	const std::function<void(float)> showProgressCB)
 {
 	if (modelfile == "") return -1;
 	std::string newfile = modelfile;
@@ -253,7 +254,7 @@ void Pi3Cscene::setOrthographic3D(const Pi3Crecti& rect, const float zoom, const
 	//projMatrix3D.SetOrtho(rect.x, rect.x + rect.width, rect.y + rect.height, rect.y , znear, zfar);
 	//projMatrix3D.SetOrtho((int)(((float)rect.width)*zoom), (int)(((float)-rect.width)*zoom), (int)(((float)-rect.height)*zoom), (int)(((float)rect.height)*zoom), znear, zfar);
 	float izm = 1.f / zoom;
-	projMatrix3D.SetOrtho(rect.width * izm, -rect.width * izm, -rect.height * izm, rect.height * izm, znear, zfar, -1.f);
+	projMatrix3D.SetOrtho((float)rect.width * izm, -(float)rect.width * izm, -(float)rect.height * izm, (float)rect.height * izm, znear, zfar, -1.f);
 }
 
 void Pi3Cscene::setViewport(const Pi3Crecti &rect)
@@ -263,6 +264,7 @@ void Pi3Cscene::setViewport(const Pi3Crecti &rect)
 
 void Pi3Cscene::setSceneMatrix(const viewInfo& view)
 {
+	setViewport(view.viewport);
 	switch (view.projection)
 	{
 	case viewInfo::PERSPECTIVE:
