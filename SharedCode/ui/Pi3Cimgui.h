@@ -22,6 +22,7 @@ public:
 	enum Alignment { LEFT, CENTRE, RIGHT, TOP, BOTTOM };
 	enum ButtonType { TEXT, IMAGE };
 	enum ListBoxFlags { SCROLL_VERTICAL, SCROLL_HORIZONTAL };
+	enum snapShotState { SH_NONE, SH_TAKESHOT, SH_TAKENSHOT, SH_UISHOT };
 
 	struct containerStruct {
 		bool initialised = false;
@@ -29,6 +30,7 @@ public:
 		Pi3Cpointi size;
 		Pi3Cpointi scroll;
 		Pi3Cpointi endPos;
+		Pi3Crecti crect;
 	};
 
 	struct rectStyle {
@@ -67,6 +69,8 @@ public:
 	void movePosition(const int x, const int y);
 	Pi3Cpointi getPosition();
 	Pi3Cpointi getCurrentPosition();
+
+	void setSameLine(bool sameLine) { currentParams.sameLine = sameLine; }
 
 	void setFont(const std::string &fontName);
 
@@ -139,10 +143,11 @@ public:
 
 	void startContainer(const std::string& name);
 
-	void startSnapshot() { takenSnapshot = 1; }
-	void stopSnapshot() { takenSnapshot = 0; }
+	void startSnapshot() { takenSnapshot = SH_TAKESHOT; }
+	//void stopSnapshot() { takenSnapshot = 0; }
 	void takeSnapshot();
-	void drawSnapshot();
+	void checkForSnapShot();
+	bool drawSnapshot();
 
 	//Menu bar widget ...
 	bool BeginMenuBar(const std::string& name);
@@ -161,7 +166,7 @@ public:
 
 	bool somethingSelected = false;
 	bool menuOpen = false;
-	int takenSnapshot = 1;   //Force a snapshot at beginning
+	int takenSnapshot = SH_TAKESHOT;   //Force a snapshot at beginning
 	std::string menuTouch;		//Currently touch menu heading (for drawing correct menuItem groups)
 
 

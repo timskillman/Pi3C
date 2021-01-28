@@ -367,45 +367,54 @@ bool Pi3Cimgui::touched(const Pi3Cpointi &size)
 
 bool Pi3Cimgui::Container(const std::string &name, const int maxwidth, const int maxheight)
 {
-	Pi3Crecti rect;
+	//Pi3Crecti rect;
 	int w = maxwidth;
 	int h = maxheight;
 
 	auto cit = containers.find(name);
 	if (cit == containers.end()) {
 		containerStruct c;
-		c.pos = pos;
+		c.pos = nextPos;
 		containers.insert({ name, c });
 	}
 	else {
 		containerStruct &c = cit->second;
 		if (c.initialised) {
 			size = c.size;
+			int ss = 10;
+			//if (w > 0 && size.x - c.scroll.x > w) size.x = w;
+			//if (h > 0 && size.y - c.scroll.y > h) size.y = h;
 
-			if (w > 0 && size.x - c.scroll.x > w) size.x = w;
-			if (h > 0 && size.y - c.scroll.y > h) size.y = h;
-
-			rect.x = pos.x + currentParams.left;
-			rect.y = pos.y - currentParams.top - size.y;
-			rect.width = size.x - currentParams.left - currentParams.right;
-			rect.height = size.y - currentParams.top - currentParams.bottom;
-			glScissor(rect.x, rect.y, rect.width, rect.height);
+			c.crect.x = nextPos.x + currentParams.left;
+			c.crect.y = nextPos.y - currentParams.top - size.y;
+			c.crect.width = w; // size.x - currentParams.left - currentParams.right;
+			c.crect.height = size.y - currentParams.top - currentParams.bottom;
+			glScissor(c.crect.x, c.crect.y, c.crect.width, c.crect.height);
 
 			int mx = window->mouse.x;
 			int my = window->getHeight() - window->mouse.y;
 
-			if (rect.touch(mx, my)) {
-				if (mx < rect.x + 10 && c.scroll.x>0) c.scroll.x--;
-				if (mx > (rect.x + rect.width - 10) && c.scroll.x < (rect.width + maxwidth)) c.scroll.x++;
-				if (my < rect.y + 10 && c.scroll.y>0) c.scroll.y--;
-				if (my > (rect.y + rect.height - 10) && c.scroll.y < (rect.height-maxheight)) c.scroll.y++;
+			if (c.crect.touch(mx, my)) {
+				if (mx < c.crect.x + 10 && c.scroll.x>0) {
+					c.scroll.x -= ss;
+					if (c.scroll.x < 0) c.scroll.x = 0;
+				}
+				if (mx > (c.crect.x + c.crect.width - 10) && c.scroll.x < (c.size.x - w)) {
+					c.scroll.x += ss;
+					if (c.scroll.x > c.size.x - w) c.scroll.x = c.size.x - w;
+				}
+				//if (my < c.crect.y + 10 && c.scroll.y>0) c.scroll.y--;
+				//if (my > (c.crect.y + c.crect.height - 10) && c.scroll.y < (c.size.y-h)) c.scroll.y++;
 			}
 			nextPos.x -= c.scroll.x;
 			nextPos.y += c.scroll.y;
+
+			SDL_Log("scroll x: %d, %d, %d, %d", c.crect.y, c.scroll.y, c.crect.height, h);
 		}
 	}
 	
-	nextPos += Pi3Cpointi(currentParams.left, currentParams.top);
+	
+	//nextPos += Pi3Cpointi(currentParams.left, currentParams.top);
 	glEnable(GL_SCISSOR_TEST);
 	
 	return true;
@@ -425,8 +434,9 @@ bool Pi3Cimgui::ContainerEnd(const std::string &name)
 			c.size.y = (nextPos.y + size.y) - c.pos.y;
 			c.initialised = true;
 		}
+		nextPos.x = c.crect.x + c.crect.width;
 	}
-
+	
 	glDisable(GL_SCISSOR_TEST);
 	return false;
 }
@@ -768,7 +778,7 @@ void Pi3Cimgui::Begin() {
 
 void Pi3Cimgui::End()
 {
-	if (takenSnapshot>0) takeSnapshot();
+
 }
 
 void Pi3Cimgui::startContainer(const std::string& name)
@@ -863,12 +873,13 @@ bool Pi3Cimgui::MenuItem(const std::string &menuItem, const std::string &itemHot
 
 void Pi3Cimgui::resize() {
 	for (auto& c : containers) c.second.initialised = false;
-	if (takenSnapshot==2) takenSnapshot = 1;
+	//if (takenSnapshot==2) 
+		takenSnapshot = 1;
 }
 
 void Pi3Cimgui::takeSnapshot()
 {
-	if (takenSnapshot != 1) return;
+	if (takenSnapshot != SH_TAKESHOT) return;
 
 	//SDL_Log("Snapshot");
 
@@ -884,12 +895,35 @@ void Pi3Cimgui::takeSnapshot()
 	snapShotPic.matrix.setz(-30.f);
 	snapShotPic.material.SetColAmbient(0);
 
-	takenSnapshot = 2;
+	takenSnapshot = SH_TAKENSHOT;
+	SDL_Log("Snapshot");
 }
 
-void Pi3Cimgui::drawSnapshot()
+bool Pi3Cimgui::drawSnapshot()
 {
-	snapShotPic.renderBasic(resource);
+	if (takenSnapshot == SH_TAKENSHOT || takenSnapshot == SH_NONE) {
+		if (takenSnapshot == SH_TAKENSHOT) {
+			takenSnapshot = SH_UISHOT;
+		}
+		else {
+			snapShotPic.renderBasic(resource);
+			return true;
+		}
+	}
+	return false;
+}
+
+void Pi3Cimgui::checkForSnapShot()
+{
+	if (takenSnapshot == SH_UISHOT) {
+		takenSnapshot = SH_TAKESHOT;
+		takeSnapshot();
+		takenSnapshot = SH_NONE;
+	}
+	else {
+		if (takenSnapshot == SH_NONE) takenSnapshot = SH_TAKESHOT;
+		takeSnapshot();
+	}
 }
 
 std::string Pi3Cimgui::OpenFileDialog(const rectStyle * style)

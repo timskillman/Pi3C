@@ -1009,6 +1009,7 @@ void Modeller::handleEvents(std::vector<uint32_t>& eventList)
 					touch.selmodel->material.SetColDiffuse(0xffffffff);
 				}
 			}
+			mgui.startSnapshot();
 			break;
 		}
 	}
@@ -1197,7 +1198,7 @@ void Modeller::setCreateTool(const CreateTool tool)
 {
 	createTool = tool;
 	editMode = ED_CREATE;
-	mgui.startSnapshot();
+	//mgui.startSnapshot();
 	setCursor(crossCursor);
 }
 
@@ -1205,7 +1206,7 @@ void Modeller::setEditMode(const EditMode mode)
 {
 	createTool = CT_NONE;
 	editMode = mode;
-	mgui.startSnapshot();
+	//mgui.startSnapshot();
 }
 
 void Modeller::handleIMGUI()

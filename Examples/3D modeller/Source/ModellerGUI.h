@@ -14,7 +14,7 @@ public:
 	bool doIMGUI(Modeller * md);
 	bool somethingSelected() { return gui.somethingSelected; }
 	void startSnapshot() { gui.startSnapshot(); }
-	void stopSnapshot() { gui.stopSnapshot(); }
+	//void stopSnapshot() { gui.stopSnapshot(); }
 	void dragBars(Modeller* md);
 	void printText(const std::string& text, int x, int y, uint32_t col = 0);
 	void showProgressCB(Pi3Cwindow* window, const std::string& message, const float pcnt);
@@ -88,5 +88,5 @@ private:
 	void doShapesToolbar(Modeller * md, Pi3Cimgui::rectStyle& iconstyle, bool mb, bool mu);
 	void doMaterialsToolbar(Modeller* md, Pi3Cimgui::rectStyle& iconstyle, bool mb, bool mu);
 
-	void MaterialInfo(Modeller* md, Pi3Cmaterial& material);
+	void MaterialInfo(Modeller* md, Pi3Cmaterial& material, const Pi3Cpointi& p);
 };

@@ -245,36 +245,41 @@ void MGui::doEditToolbar(Modeller * md, Pi3Cimgui::rectStyle& iconstyle, bool mb
 	int ich = bsIcons.minHeight;
 	int idw = bsIcons.thirdWidth(); // (int)((float)bsIcons.minWidth*0.3f);
 
-	if (gui.BeginGroupHorizontal("rendl.png", icw, ich)) {
+	//gui.renderBackIcon("rendl.png", icw, ich);
+	//if (gui.Container("EditToolbar",400,32)) {
+		if (gui.BeginGroupHorizontal("rendl.png", icw, ich)) {
 
-		if (gui.ButtonImage("butNew.png") && mb && mu) md->clearScene();
-		if (gui.ButtonImage("butOpen.png") && mb && mu) {}
-		if (gui.ButtonImage("butSave.png") && mb && mu) saveAll(md);
-		gui.renderBackIcon("butDiv.png", idw, ich);
+			if (gui.ButtonImage("butNew.png") && mb && mu) md->clearScene();
+			if (gui.ButtonImage("butOpen.png") && mb && mu) {}
+			if (gui.ButtonImage("butSave.png") && mb && mu) saveAll(md);
+			gui.renderBackIcon("butDiv.png", idw, ich);
 
-		if (gui.ButtonImage("butArrow.png", md->editMode == Modeller::ED_SELECT) && mb && mu) md->setEditMode(Modeller::ED_SELECT);
-		if (gui.ButtonImage("butMove.png", md->editMode == Modeller::ED_MOVE) && mb && mu) md->setEditMode(Modeller::ED_MOVE);
-		if (gui.ButtonImage("butRotate.png", md->editMode == Modeller::ED_ROTATE) && mb && mu) md->setEditMode(Modeller::ED_ROTATE);
-		if (gui.ButtonImage("butScale.png", md->editMode == Modeller::ED_SCALE) && mb && mu) md->setEditMode(Modeller::ED_SCALE);
+			if (gui.ButtonImage("butArrow.png", md->editMode == Modeller::ED_SELECT) && mb && mu) md->setEditMode(Modeller::ED_SELECT);
+			if (gui.ButtonImage("butMove.png", md->editMode == Modeller::ED_MOVE) && mb && mu) md->setEditMode(Modeller::ED_MOVE);
+			if (gui.ButtonImage("butRotate.png", md->editMode == Modeller::ED_ROTATE) && mb && mu) md->setEditMode(Modeller::ED_ROTATE);
+			if (gui.ButtonImage("butScale.png", md->editMode == Modeller::ED_SCALE) && mb && mu) md->setEditMode(Modeller::ED_SCALE);
 
-		gui.renderBackIcon("butDiv.png", idw, ich);
+			gui.renderBackIcon("butDiv.png", idw, ich);
 
-		if (gui.ButtonImage("butSelectAll.png") && mb && mu) md->selectAll();
-		if (gui.ButtonImage("butDelete.png") && mb && mu) md->deleteSelection();
-		if (gui.ButtonImage("butCopy.png") && mb && mu) md->duplicateSelection(); //  snapshot();
+			if (gui.ButtonImage("butSelectAll.png") && mb && mu) md->selectAll();
+			if (gui.ButtonImage("butDelete.png") && mb && mu) md->deleteSelection();
+			if (gui.ButtonImage("butCopy.png") && mb && mu) md->duplicateSelection(); //  snapshot();
 
-		gui.renderBackIcon("butDiv.png", idw, ich);
+			gui.renderBackIcon("butDiv.png", idw, ich);
 
-		if (gui.ButtonImage("butGroup.png") && mb && mu) {}
-		if (gui.ButtonImage("butUngroup.png") && mb && mu) {}
+			if (gui.ButtonImage("butGroup.png") && mb && mu) {}
+			if (gui.ButtonImage("butUngroup.png") && mb && mu) {}
 
-		gui.renderBackIcon("butDiv.png", idw, ich);
+			gui.renderBackIcon("butDiv.png", idw, ich);
 
-		if (gui.ButtonImage("butUndo.png") && mb && mu) {}
-		if (gui.ButtonImage("butRedo.png") && mb && mu) {}
+			if (gui.ButtonImage("butUndo.png") && mb && mu) {}
+			if (gui.ButtonImage("butRedo.png") && mb && mu) {}
 
-		gui.EndGroupHorizontal("rendr.png", icw, ich);
+			gui.EndGroupHorizontal("rendr.png", icw, ich);
+		//}
+			//gui.ContainerEnd("EditToolbar");
 	}
+	//gui.renderBackIcon("rendr.png", icw, ich);
 }
 
 void MGui::doTransformToolbar(Modeller * md, Pi3Cimgui::rectStyle& iconstyle, bool mb, bool mu)
@@ -329,11 +334,11 @@ void MGui::doShapesToolbar(Modeller * md, Pi3Cimgui::rectStyle& iconstyle, bool 
 	}
 }
 
-void MGui::MaterialInfo(Modeller* md, Pi3Cmaterial& material)
+void MGui::MaterialInfo(Modeller* md, Pi3Cmaterial& material, const Pi3Cpointi& p)
 {
 	Pi3Cmodel rect;
 	rect.matrix.setz(-10.0f);
-	auto& p = gui.getCurrentPosition();
+	//auto& p = gui.getCurrentPosition();
 	int w = 600, h = 250, xc = p.x, yc = p.y + 10, bord = 10;
 	if (xc + w > md->window->getWidth()) xc = md->window->getWidth() - w;
 	float xf = (float)xc, yf = (float)yc;
@@ -364,27 +369,45 @@ void MGui::MaterialInfo(Modeller* md, Pi3Cmaterial& material)
 
 void MGui::doMaterialsToolbar(Modeller* md, Pi3Cimgui::rectStyle& iconstyle, bool mb, bool mu)
 {
-	
-	if (gui.BeginGroupHorizontal("rendl.png", iconstyle.halfWidth(), iconstyle.minHeight)) {
+	int icw = bsIcons.halfWidth();
+	int ich = bsIcons.minHeight;
+	int touchMaterial = -1;
+	int selMat = -1;
+	Pi3Cpointi touchMatPos;
+
+	gui.setSameLine(true);
+	gui.renderBackIcon("rendl.png", icw, ich);
+	if (gui.Container("MatToolbar", 400, 32)) {
+	//if (gui.BeginGroupHorizontal("rendl.png", iconstyle.halfWidth(), iconstyle.minHeight)) {
 		
 		std::vector<Pi3Cmaterial>& materials = md->resource->materials;
 		std::vector<std::shared_ptr<Pi3Ctexture>>& textures = md->resource->textures;
-		int selMat = -1;
+		
 		for (size_t m = 0; m < materials.size(); m++) {
 			auto& material = materials[m];
 			if (material.texRef > 0 && material.name!="default") {
-				gui.sameLine();
+				//gui.sameLine();
 				if (gui.ButtonImage(material.name, material.texRef, false, 32, 32)) {
-					MaterialInfo(md, material);
-					if (mb && mu) selMat = m;
+					touchMaterial = m;
+					touchMatPos = gui.getCurrentPosition();
 				}
 			}
 			else {
 
 			}
 		}
-		gui.sameLine();
-		gui.EndGroupHorizontal("rendr.png", iconstyle.halfWidth(), iconstyle.minHeight);
+		//gui.sameLine();
+
+		gui.ContainerEnd("MatToolbar");
+		gui.renderBackIcon("rendr.png", icw, ich);
+
+		//gui.EndGroupHorizontal("rendr.png", iconstyle.halfWidth(), iconstyle.minHeight);
+	}
+
+	if (touchMaterial >= 0) {
+		auto& material = md->resource->materials[touchMaterial];
+		MaterialInfo(md, material, touchMatPos);
+		if (mb && mu) selMat = touchMaterial;
 	}
 }
 
@@ -403,12 +426,11 @@ bool MGui::doIMGUI(Modeller * md)
 	
 	gui.Begin();
 
-	if (!mouseOverToolbars && gui.takenSnapshot == 2) {
-		gui.drawSnapshot();
+	if (!mouseOverToolbars && gui.drawSnapshot()) {
 		glClear(GL_DEPTH_BUFFER_BIT);
 		return false;
 	}
-
+	
 	doMenus(md);
 	updateWorkArea(md);
 
@@ -475,8 +497,10 @@ bool MGui::doIMGUI(Modeller * md)
 	}
 
 	//SDL_Log("Ticks:%d",SDL_GetTicks()-ticks);
+
 	gui.End();
-	
+	gui.checkForSnapShot();
+
 	return true;
 }
 
