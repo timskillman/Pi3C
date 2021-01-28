@@ -409,7 +409,7 @@ bool Pi3Cimgui::Container(const std::string &name, const int maxwidth, const int
 			nextPos.x -= c.scroll.x;
 			nextPos.y += c.scroll.y;
 
-			SDL_Log("scroll x: %d, %d, %d, %d", c.crect.y, c.scroll.y, c.crect.height, h);
+			//SDL_Log("scroll x: %d, %d, %d, %d", c.crect.y, c.scroll.y, c.crect.height, h);
 		}
 	}
 	
