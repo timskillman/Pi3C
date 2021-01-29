@@ -14,6 +14,7 @@ public:
 	bool doIMGUI(Modeller * md);
 	bool somethingSelected() { return gui.somethingSelected; }
 	void startSnapshot() { gui.startSnapshot(); }
+	void takeSnapshot() { gui.takenSnapshot = gui.SH_TAKESHOT; gui.takeSnapshot(); }
 	//void stopSnapshot() { gui.stopSnapshot(); }
 	void dragBars(Modeller* md);
 	void printText(const std::string& text, int x, int y, uint32_t col = 0);

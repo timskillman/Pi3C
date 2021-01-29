@@ -413,12 +413,9 @@ bool Pi3Cimgui::Container(const std::string &name, const int maxwidth, const int
 		}
 	}
 	
-	
-	//nextPos += Pi3Cpointi(currentParams.left, currentParams.top);
 	glEnable(GL_SCISSOR_TEST);
 	
 	return true;
-	//return mouseTouchRect;
 }
 
 bool Pi3Cimgui::ContainerEnd(const std::string &name)
@@ -897,6 +894,11 @@ void Pi3Cimgui::takeSnapshot()
 
 	takenSnapshot = SH_TAKENSHOT;
 	SDL_Log("Snapshot");
+}
+
+void Pi3Cimgui::drawSnap()
+{
+	snapShotPic.renderBasic(resource);
 }
 
 bool Pi3Cimgui::drawSnapshot()

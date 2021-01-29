@@ -148,6 +148,7 @@ public:
 	void takeSnapshot();
 	void checkForSnapShot();
 	bool drawSnapshot();
+	void drawSnap();
 
 	//Menu bar widget ...
 	bool BeginMenuBar(const std::string& name);

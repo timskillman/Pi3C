@@ -204,6 +204,7 @@ private:
 	void renderView(const viewInfo::SceneLayout projection, const Pi3Crecti& rect, int32_t mx, int32_t my);
 	void resetLineDrawing();
 	void loadingBar(float perc);
+	std::function<void(float)> Modeller::setCallback();
 
 	Pi3Cmodel* brush() { return &scene.models[brushref]; }
 	Pi3Cmodel* selRectangle() { return &scene.models2D[selRectRef]; }

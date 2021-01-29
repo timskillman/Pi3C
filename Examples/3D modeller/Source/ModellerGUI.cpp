@@ -347,7 +347,8 @@ void MGui::MaterialInfo(Modeller* md, Pi3Cmaterial& material, const Pi3Cpointi& 
 	rect.createRect2D(gui.resource, vec2f(xf + (float)(bord), yf + (float)(bord)), vec2f((float)(h - bord * 2), (float)(h - bord * 2)), 0xffffffff, material.texRef);
 	rect.renderBasic(gui.resource);
 	gui.setFont(smallFont);
-	int ht = h-bord/2; int hs = 22;
+
+	int ht = h-bord/2, hs = 22;
 	gui.TextAt("Name: " + ((material.name.length()>20) ? material.name.substr(0,30)+"..." : material.name), xc + h, yc + ht, 0x0); ht -= hs;
 	ht -= 5;
 	gui.TextAt("Diffuse colour : 0x" + Pi3Cutils::numToHexstr(material.GetColDiffuse()), xc + h, yc + ht, 0x0); ht -= hs;
@@ -392,15 +393,13 @@ void MGui::doMaterialsToolbar(Modeller* md, Pi3Cimgui::rectStyle& iconstyle, boo
 					touchMatPos = gui.getCurrentPosition();
 				}
 			}
-			else {
-
-			}
 		}
-		//gui.sameLine();
 
 		gui.ContainerEnd("MatToolbar");
 		gui.renderBackIcon("rendr.png", icw, ich);
 
+		Pi3Cpointi cp = gui.getCurrentPosition();
+		if (touchMatPos.x > cp.x) touchMaterial = -1;
 		//gui.EndGroupHorizontal("rendr.png", iconstyle.halfWidth(), iconstyle.minHeight);
 	}
 
@@ -426,6 +425,7 @@ bool MGui::doIMGUI(Modeller * md)
 	
 	gui.Begin();
 
+	//If mouse is not over the toolbars, then draw a snapshot of the toolsbar and don't process them ...
 	if (!mouseOverToolbars && gui.drawSnapshot()) {
 		glClear(GL_DEPTH_BUFFER_BIT);
 		return false;
@@ -449,10 +449,6 @@ bool MGui::doIMGUI(Modeller * md)
 	gui.renderRect(rightbarWidth, midht);
 	gui.setPosition(0, wpos.y + midht);
 	gui.renderRect(winWidth, botbarHeight);
-
-	//dragBars(md, wpos);
-
-
 
 	//Top menu bar icons ...
 	gui.setButtonStyle(bsIcons);
@@ -479,22 +475,6 @@ bool MGui::doIMGUI(Modeller * md)
 
 	//static double v = 5;
 	//gui.SliderH("Scroll", 0, 10, v, 300, 24);
-
-	//Draw xyz values
-	if (md->currentView != viewInfo::INACTIVE) {
-	
-		//Pi3Crecti &rect = md->views[md->currentView].viewport;
-		//gui.setButtonStyle(bsMenu);
-		//gui.setPosition(rect.x + 5, winHeight - rect.y - 26);
-		//gui.setPosition(leftbarWidth + 320, workHeight + topbarHeight + menuHeight + 3);
-		//std::string text = "X:" + Pi3Cutils::ftostrdp(md->currentPos.x, 2) + ", Y:" + Pi3Cutils::ftostrdp(md->currentPos.y, 2) + ", Z:" + Pi3Cutils::ftostrdp(md->currentPos.z, 2);
-		//printText(md, text, leftbarWidth + 320, workHeight + topbarHeight + menuHeight + 3);
-		//gui.Text(tpos, 0xffffffff);
-		//if (md->selectedName != "") {
-		//	gui.setPosition(leftbarWidth + 720, workHeight + topbarHeight + menuHeight + 3);
-		//	gui.Text(md->selectedName, 0xffffffff);
-		//}
-	}
 
 	//SDL_Log("Ticks:%d",SDL_GetTicks()-ticks);
 
@@ -526,6 +506,9 @@ void MGui::showProgressCB(Pi3Cwindow* window, const std::string &message, const 
 	float mHeight = window->getHeight();
 
 	window->clear();
+	gui.drawSnap();
+	gui.setPosition(0, 0);
+	gui.renderRect(mWidth, mHeight, Pi3Ccolours::TransparentBlack);
 
 	Pi3Cmodel rect;
 	rect.matrix.setz(-10.f);

@@ -323,13 +323,20 @@ void Modeller::createBlocks(const vec3f pos)
 	}
 }
 
+std::function<void(float)> Modeller::setCallback() 
+{
+	mgui.takeSnapshot();
+	scene.setup2D();
+	return std::bind(&Modeller::loadingBar, this, _1);
+}
+
 void Modeller::createLandscape(const vec3f pos, const uint32_t colour)
 {
-	scene.setup2D();
-	std::function<void(float)> loadbarCallback = std::bind(&Modeller::loadingBar, this, _1);
+	//scene.setup2D();
+	//std::function<void(float)> loadbarCallback = setCallback();
 
 	Pi3Ctexture maptex = Pi3Ctexture("assets/maps/mahe2.png", false);
-	createModel(Pi3Cshapes::elevationMap(maptex, vec3f(0, -150.f, 0), vec3f(3000.f, 300.f, 3000.f), 764/2, 922 /2, 0,vec2f(1.f,1.f), loadbarCallback), pos, modelGroupId, colour);
+	createModel(Pi3Cshapes::elevationMap(maptex, vec3f(0, -150.f, 0), vec3f(3000.f, 300.f, 3000.f), 764/2, 922 /2, 0,vec2f(1.f,1.f), setCallback()), pos, modelGroupId, colour);
 
 	//createModel(Pi3Cshapes::readSRTM("assets/maps/S05E055.hgt"), pos, modelGroupId, colour);
 }
@@ -996,9 +1003,10 @@ void Modeller::handleEvents(std::vector<uint32_t>& eventList)
 			std::string file = window->dropfile;
 			std::string ext = file.substr(file.size() - 4, 4);
 			if (ext == ".obj") {
-				scene.setup2D();
-				std::function<void(float)> loadbarCallback = std::bind(&Modeller::loadingBar, this, _1);
-				int32_t modelRef = scene.loadModelOBJ("", file, touch.touching ? touch.intersection : vec3f(), true, modelGroupId, false, loadbarCallback);
+				//mgui.takeSnapshot();
+				//scene.setup2D();
+				//std::function<void(float)> loadbarCallback = std::bind(&Modeller::loadingBar, this, _1);
+				int32_t modelRef = scene.loadModelOBJ("", file, touch.touching ? touch.intersection : vec3f(), true, modelGroupId, false, setCallback());
 			}
 			else if (ext == ".png" || ext == ".jpg") {
 				setCurrentSelView(currentView);
