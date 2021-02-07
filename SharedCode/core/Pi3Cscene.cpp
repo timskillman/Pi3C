@@ -57,48 +57,30 @@ float Pi3Cscene::collideFloor(const vec3f &pos) const
 	return ht; //and see where we land :)
 }
 
-
-std::string Pi3Cscene::getPathFile(std::string &file) const
-{
-	std::string path = "";
-	std::string fp = file;
-	int i = fp.size() - 1;
-	while (i>0 && fp[i] != '\\' && fp[i] != '/') i--;
-	if (i > 0) {
-		path = fp.substr(0,i+1);
-		fp = fp.substr(i + 1, file.size() - i);
-	}
-	file = fp;
-	return path;
-}
-
 int32_t Pi3Cscene::loadModelOBJ(const std::string &path, const std::string &modelfile, const vec3f pos, const bool grouped, const int32_t groupId, bool addColliderGrid, 
 	const std::function<void(float)> showProgressCB)
 {
 	if (modelfile == "") return -1;
 	std::string newfile = modelfile;
-	std::string newpath = (path == "") ? getPathFile(newfile) : path;
+	std::string newpath = (path == "") ? Pi3Cutils::extractPath(newfile) : path;
+
+	std::string error;
+	size_t meshStart = resource->meshes.size();
+	Pi3CfileOBJ::load(newpath, newfile, resource, showProgressCB, false, addColliderGrid, groupId, error);
+	size_t meshEnd = resource->meshes.size();
 
 	if (grouped) {
 		models.emplace_back();
 		Pi3Cmodel &model = models.back();
-		model.loadOBJfile(resource, newpath, newfile, groupId, showProgressCB, false, addColliderGrid);
+		model.addMeshes(resource, modelfile, meshStart, meshEnd);
 		model.matrix.move(pos);
 		model.asCollider = addColliderGrid;
 	}
 	else
 	{
-		std::string error;
-		size_t meshStart = resource->meshes.size();
-		Pi3CfileOBJ::load(newpath, newfile, resource, showProgressCB, false, addColliderGrid, groupId, error);
-		size_t meshEnd = resource->meshes.size();
-
 		if (meshEnd - meshStart > 0) {
 			for (size_t i = meshStart; i < meshEnd; i++) {
-				Pi3Cmodel newModel;
-				newModel.meshRef = i;
-				newModel.material = resource->materials[resource->meshes[i].materialRef]; 	//copy material into group model so it can change;
-				newModel.bbox = resource->meshes[i].bbox;
+				Pi3Cmodel newModel(resource, i);
 				newModel.matrix.Translate(pos);
 				newModel.asCollider = addColliderGrid;
 				models.push_back(newModel);

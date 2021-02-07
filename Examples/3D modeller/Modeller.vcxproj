@@ -102,7 +102,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>$(ProjectDir)\..\..\ThirdParty\SDL2\include;$(ProjectDir)\..\..\ThirdParty\SDL2_image\include;$(ProjectDir)\..\..\ThirdParty\SDL2_net\include;$(ProjectDir)\..\..\ThirdParty\SDL2_mixer\include;$(ProjectDir)\..\..\ThirdParty\SDL2_ttf\include;$(ProjectDir)\..\..\ThirdParty\glew\include;$(ProjectDir)\..\..\SharedCode\core;$(ProjectDir)\..\..\SharedCode\ui;$(ProjectDir)\..\..\SharedCode\file;$(ProjectDir)\..\..\SharedCode\helpers;$(ProjectDir)\..\..\SharedCode\glutess;$(ProjectDir)\..\..\SharedCode\editing;$(ProjectDir)\..\..\ThirdParty\rapidjson;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)\..\..\ThirdParty\SDL2\include;$(ProjectDir)\..\..\ThirdParty\SDL2_image\include;$(ProjectDir)\..\..\ThirdParty\SDL2_net\include;$(ProjectDir)\..\..\ThirdParty\SDL2_mixer\include;$(ProjectDir)\..\..\ThirdParty\SDL2_ttf\include;$(ProjectDir)\..\..\ThirdParty\glew\include;$(ProjectDir)\..\..\SharedCode\core;$(ProjectDir)\..\..\SharedCode\ui;$(ProjectDir)\..\..\SharedCode\file;$(ProjectDir)\..\..\SharedCode\helpers;$(ProjectDir)\..\..\SharedCode\glutess;$(ProjectDir)\..\..\SharedCode\editing;$(ProjectDir)\..\..\ThirdParty\rapidjson;$(ProjectDir)\..\..\ThirdParty\openFBX;$(ProjectDir)\..\..\ThirdParty\fbx\src;$(ProjectDir)\..\..\ThirdParty\gltf;$(IncludePath)</IncludePath>
     <LibraryPath>$(ProjectDir)\..\..\ThirdParty\SDL2_image\lib\x86;$(ProjectDir)\..\..\ThirdParty\SDL2\lib\x86;$(ProjectDir)\..\..\ThirdParty\glew\lib\x86;$(ProjectDir)\..\..\ThirdParty\SDL2_mixer\lib\x86;$(ProjectDir)\..\..\ThirdParty\SDL2_ttf\lib\x86;$(LibraryPath)</LibraryPath>
     <SourcePath>$(SourcePath)</SourcePath>
   </PropertyGroup>
@@ -233,7 +233,10 @@
     <ClCompile Include="..\..\SharedCode\editing\Pi3Cundo.cpp" />
     <ClCompile Include="..\..\SharedCode\file\Pi3CbinStream.cpp" />
     <ClCompile Include="..\..\SharedCode\file\Pi3Cdirectory.cpp" />
+    <ClCompile Include="..\..\SharedCode\file\Pi3CfileFBX.cpp" />
+    <ClCompile Include="..\..\SharedCode\file\Pi3CfileGLTF.cpp" />
     <ClCompile Include="..\..\SharedCode\file\Pi3CfileOBJ.cpp" />
+    <ClCompile Include="..\..\SharedCode\file\Pi3CfileScene.cpp" />
     <ClCompile Include="..\..\SharedCode\file\Pi3Cjson.cpp" />
     <ClCompile Include="..\..\SharedCode\glutess\dict.c" />
     <ClCompile Include="..\..\SharedCode\glutess\geom.c" />
@@ -247,6 +250,7 @@
     <ClCompile Include="..\..\SharedCode\glutess\tessellate.cpp" />
     <ClCompile Include="..\..\SharedCode\glutess\tessmono.c" />
     <ClCompile Include="..\..\SharedCode\helpers\Pi3C.cpp" />
+    <ClCompile Include="..\..\SharedCode\helpers\Pi3Canimate.cpp" />
     <ClCompile Include="..\..\SharedCode\helpers\Pi3Cavatar.cpp" />
     <ClCompile Include="..\..\SharedCode\helpers\Pi3Cblocks.cpp" />
     <ClCompile Include="..\..\SharedCode\helpers\Pi3Ccontour.cpp" />
@@ -259,6 +263,8 @@
     <ClCompile Include="..\..\SharedCode\helpers\Pi3Cshapes.cpp" />
     <ClCompile Include="..\..\SharedCode\helpers\Pi3Cutils.cpp" />
     <ClCompile Include="..\..\SharedCode\ui\Pi3Cimgui.cpp" />
+    <ClCompile Include="..\..\ThirdParty\openFBX\miniz.c" />
+    <ClCompile Include="..\..\ThirdParty\openFBX\ofbx.cpp" />
     <ClCompile Include="Source\Modeller.cpp" />
     <ClCompile Include="Source\main.cpp" />
     <ClCompile Include="Source\ModellerGUI.cpp" />
@@ -291,7 +297,10 @@
     <ClInclude Include="..\..\SharedCode\editing\Pi3Cundo.h" />
     <ClInclude Include="..\..\SharedCode\file\Pi3CbinStream.h" />
     <ClInclude Include="..\..\SharedCode\file\Pi3Cdirectory.h" />
+    <ClInclude Include="..\..\SharedCode\file\Pi3CfileFBX.h" />
+    <ClInclude Include="..\..\SharedCode\file\Pi3CfileGLTF.h" />
     <ClInclude Include="..\..\SharedCode\file\Pi3CfileOBJ.h" />
+    <ClInclude Include="..\..\SharedCode\file\Pi3CfileScene.h" />
     <ClInclude Include="..\..\SharedCode\file\Pi3Cjson.h" />
     <ClInclude Include="..\..\SharedCode\glutess\dict-list.h" />
     <ClInclude Include="..\..\SharedCode\glutess\dict.h" />
@@ -311,6 +320,7 @@
     <ClInclude Include="..\..\SharedCode\glutess\tessmono.h" />
     <ClInclude Include="..\..\SharedCode\helpers\FastNoiseLite.h" />
     <ClInclude Include="..\..\SharedCode\helpers\Pi3C.h" />
+    <ClInclude Include="..\..\SharedCode\helpers\Pi3Canimate.h" />
     <ClInclude Include="..\..\SharedCode\helpers\Pi3Cavatar.h" />
     <ClInclude Include="..\..\SharedCode\helpers\Pi3Cblocks.h" />
     <ClInclude Include="..\..\SharedCode\helpers\Pi3Ccolours.h" />
@@ -320,11 +330,15 @@
     <ClInclude Include="..\..\SharedCode\helpers\Pi3Chumanoid.h" />
     <ClInclude Include="..\..\SharedCode\helpers\Pi3CloadOptions.h" />
     <ClInclude Include="..\..\SharedCode\helpers\Pi3Cparticles.h" />
-    <ClInclude Include="..\..\SharedCode\helpers\Pi3Cpopulate.h" />
     <ClInclude Include="..\..\SharedCode\helpers\Pi3Cshapes.h" />
     <ClInclude Include="..\..\SharedCode\helpers\Pi3Cutils.h" />
     <ClInclude Include="..\..\SharedCode\ui\Pi3Cimgui.h" />
-    <ClInclude Include="Pi3Cpoint.h" />
+    <ClInclude Include="..\..\ThirdParty\gltf\json.hpp" />
+    <ClInclude Include="..\..\ThirdParty\gltf\stb_image.h" />
+    <ClInclude Include="..\..\ThirdParty\gltf\stb_image_write.h" />
+    <ClInclude Include="..\..\ThirdParty\gltf\tiny_gltf.h" />
+    <ClInclude Include="..\..\ThirdParty\openFBX\miniz.h" />
+    <ClInclude Include="..\..\ThirdParty\openFBX\ofbx.h" />
     <ClInclude Include="Source\Modeller.h" />
     <ClInclude Include="Source\ModellerGUI.h" />
     <ClInclude Include="Source\UIStyles.h" />

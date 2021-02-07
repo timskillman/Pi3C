@@ -49,6 +49,13 @@ Pi3Cmodel::Pi3Cmodel(Pi3Cresource *resource, const std::string &modelname, const
 	name = modelname;
 }
 
+Pi3Cmodel::Pi3Cmodel(Pi3Cresource* resource, int meshRef)
+{
+	this->meshRef = meshRef;
+	material = resource->materials[resource->meshes[meshRef].materialRef]; 	//copy material into group model so it can change;
+	bbox = resource->meshes[meshRef].bbox;
+}
+
 void Pi3Cmodel::loadModelAndCollider(Pi3Cresource *resource, std::string path, std::string modelfile, int32_t groupId, std::string collider, std::function<void(float)> showProgressCB)
 {
 	if (modelfile != "") loadOBJfile(resource, path, modelfile, groupId, showProgressCB, false);
@@ -175,12 +182,15 @@ void Pi3Cmodel::appendMesh(Pi3Cresource *resource, Pi3Cmesh mesh, int32_t groupI
 	group.push_back(newGroupMesh);
 }
 
-void Pi3Cmodel::appendMeshToGroup(Pi3Cresource* resource, Pi3Cmesh mesh, int32_t groupId, bool deleteVerts)
+void Pi3Cmodel::appendMeshToGroup(Pi3Cresource* resource, Pi3Cmesh mesh, int32_t groupId, uint32_t diffuseColour, bool deleteVerts)
 {
-	int32_t i = resource->addMesh(&mesh, groupId, 0, false);
+	int32_t meshRef = resource->addMesh(&mesh, groupId, 0, false);
+	if (mesh.mode == GL_TRIANGLES && mesh.lineIndexes.size() == 0) resource->addMeshOutlines(meshRef); //This is really SLOW on big models!
 	Pi3Cmodel newGroupMesh;
-	newGroupMesh.meshRef = i;
-	bbox.update(resource->meshes[i].bbox);
+	newGroupMesh.material = *resource->defaultMaterial();
+	newGroupMesh.material.SetColDiffuse(diffuseColour);
+	newGroupMesh.meshRef = meshRef;
+	bbox.update(resource->meshes[meshRef].bbox);
 	group.push_back(newGroupMesh);
 }
 
@@ -297,23 +307,22 @@ Pi3Cmodel * Pi3Cmodel::appendLOD(Pi3Cresource *resource, Pi3Cmodel model, float 
 }
 
 
-void Pi3Cmodel::loadOBJfile(Pi3Cresource *resource, std::string path, std::string modelfile, int32_t groupId, std::function<void(float)> showProgressCB, bool asCollider, bool addColliderGrid)
-{	
+void Pi3Cmodel::loadOBJfile(Pi3Cresource* resource, std::string path, std::string modelfile, int32_t groupId, std::function<void(float)> showProgressCB, bool asCollider, bool addColliderGrid)
+{
 	std::string error;
 	size_t meshStart = resource->meshes.size();
 	Pi3CfileOBJ::load(path, modelfile, resource, showProgressCB, asCollider, addColliderGrid, groupId, error);
 	size_t meshEnd = resource->meshes.size();
 	//collider = asCollider;
+	addMeshes(resource, modelfile, meshStart, meshEnd);
+}
 
+void Pi3Cmodel::addMeshes(Pi3Cresource* resource, const std::string& modelname, const size_t meshStart, const size_t meshEnd)
+{
 	if (meshEnd-meshStart > 0) {
-		name = modelfile;
+		name = modelname;
 		for (size_t i=meshStart; i<meshEnd; i++) {
-			Pi3Cmodel newGroupModel;
-			newGroupModel.meshRef = i;
-			newGroupModel.material = resource->materials[resource->meshes[i].materialRef]; 	//copy material into group model so it can change;
-			newGroupModel.bbox = resource->meshes[i].bbox;
-			bbox.update(resource->meshes[i].bbox);
-			//updateSelBox(resource);
+			Pi3Cmodel newGroupModel(resource, i);
 			group.push_back(newGroupModel);
 		}
 	}

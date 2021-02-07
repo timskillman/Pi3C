@@ -66,6 +66,7 @@ public:
 	Pi3Cmodel(Pi3Cresource *resource, const std::string &name, Pi3Cmesh mesh, int32_t groupId, uint32_t diffuseColour = 0xffffffff); //add mesh with name
 	Pi3Cmodel(Pi3Cresource *resource, const std::string &path, const  std::string &modelfile, int32_t groupId, const bool asCollider, std::function<void(float)> showProgressCB); //load model only
 	Pi3Cmodel(Pi3Cresource *resource, const std::string &modelname, const std::string &path, const std::string &model, int32_t groupId, const std::string &collider, std::function<void(float)> showProgressCB = nullptr); //load model and collider
+	Pi3Cmodel(Pi3Cresource* resource, const int meshRef);
 	~Pi3Cmodel() {}
 
 // Functions
@@ -76,9 +77,10 @@ public:
 	void renderBasic(Pi3Cresource *resource, Pi3Cshader * shader = nullptr, const Pi3Cmatrix *parent_matrix = nullptr, Pi3Cmaterial *materialOverride = nullptr);
 	void setMesh(Pi3Cresource* resource, Pi3Cmesh mesh, int32_t groupId);
 	void appendMesh(Pi3Cresource *resource, Pi3Cmesh mesh, int32_t groupId);
-	void appendMeshToGroup(Pi3Cresource* resource, Pi3Cmesh mesh, int32_t groupId, bool deleteVerts = true);
+	void appendMeshToGroup(Pi3Cresource* resource, Pi3Cmesh mesh, int32_t groupId, uint32_t diffuseColour = 0xffffffff, bool deleteVerts = true);
 	void updateMesh(Pi3Cresource* resource, Pi3Cmesh& umesh);
 	void loadOBJfile(Pi3Cresource *resource, std::string path, std::string modelfile, int32_t groupId, std::function<void(float)> showProgressCB, bool asCollider, bool addColliderGrid = false);
+	void addMeshes(Pi3Cresource* resource, const std::string& modelname, const size_t meshStart, const size_t meshEnd);
 	bool collide(const Pi3Cresource *resource, const Pi3Cmatrix *parent_matrix, const vec3f &pos, const vec3f &dir, const float radius) const;
 	float collideFloor(const Pi3Cresource *resource, const Pi3Cmatrix *parent_matrix, const vec3f &pos, float &prevHeight, const bool onehit = false) const;
 	void loadModelAndCollider(Pi3Cresource *resource, std::string path, std::string model, int32_t groupId, std::string collider, std::function<void(float)> showProgressCB);
@@ -135,6 +137,10 @@ public:
 	Pi3Cmatrix matrix;				//matrix used to transform mesh/group
 	Pi3Cmaterial material;			//used for rendering mesh - can be modified
 	vec3f rotation;
+	vec3f center;
+
+	vec3f spinRate;
+	vec3f spinAngles;
 
 	vec2f randomScale = { 1.f, 1.f };
 	vec2f randomRotation = { 0,0 };
@@ -149,6 +155,7 @@ public:
 	bool edit = true;				//model can/not be edited
 	bool selected = false;			//model selected (useful for editing)
 	bool asCollider = false;		//if true, then use this model as a collider as well as rendered
+	bool animated = false;
 
 	int32_t choice = -1;			//if set to value 0 and above, this option will choose which model in the group to render - the rest are ignored
 

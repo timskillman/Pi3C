@@ -303,6 +303,13 @@ void Pi3Cresource::setRenderBuffer(const int bufRef, const uint32_t stride)
 	lastVBO = bufRef;
 }
 
+Pi3Cpointi Pi3Cresource::getStringSize(const std::string& text, Pi3Cfont* font)
+{
+	int w, h;
+	font->getStringSize(text, w, h);
+	return Pi3Cpointi(w, h); 
+}
+
 Pi3Crect Pi3Cresource::renderText(const int meshRef, Pi3Cfont *font, const std::string &text, const vec3f &pos, const float wrapWidth, const uint32_t colour)
 {
 	//Text meshref's can only be used once per frame (otherwise using the same meshRef will simply overwrite the previous text)

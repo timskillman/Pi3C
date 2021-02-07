@@ -1,7 +1,10 @@
 #include "Modeller.h"
 #include "Pi3Cshapes.h"
 #include "Pi3Cblocks.h"
-#include "Pi3Cdirectory.h"
+#include "Pi3CfileScene.h"
+#include "Pi3CfileFBX.h"
+#include "Pi3CfileGLTF.h"
+
 #include <fstream>
 #include <sstream>
 
@@ -18,8 +21,6 @@ Modeller::Modeller(Pi3Cresource *resource, Pi3Cwindow *window)
 
 	this->resource = resource;
 	this->window = window;
-
-	std::vector<std::string> dir = Pi3Cdirectory::readDirectory("../");
 
 	// Setup scene ...
 	scene.init(resource);
@@ -1001,14 +1002,15 @@ void Modeller::handleEvents(std::vector<uint32_t>& eventList)
 			break;
 		case SDL_DROPFILE: 
 			std::string file = window->dropfile;
-			std::string ext = file.substr(file.size() - 4, 4);
-			if (ext == ".obj") {
+			std::string ext = Pi3Cutils::getExt(file); // .substr(file.size() - 4, 4);
+			//if (ext == ".obj" || ext==".fbx" || ext==".gltf") {
 				//mgui.takeSnapshot();
 				//scene.setup2D();
 				//std::function<void(float)> loadbarCallback = std::bind(&Modeller::loadingBar, this, _1);
-				int32_t modelRef = scene.loadModelOBJ("", file, touch.touching ? touch.intersection : vec3f(), true, modelGroupId, false, setCallback());
-			}
-			else if (ext == ".png" || ext == ".jpg") {
+			if (loadModelAt(file, touch.touching ? touch.intersection : vec3f(), setCallback())) { }
+				//int32_t modelRef = scene.loadModelOBJ("", file, touch.touching ? touch.intersection : vec3f(), true, modelGroupId, false, setCallback());
+			//}
+			else if (ext == "png" || ext == "jpg") {
 				setCurrentSelView(currentView);
 				setMousePosition(window->mouse.x, window->getHeight() - window->mouse.y);
 				touchView(views[currentView]);
@@ -1024,6 +1026,37 @@ void Modeller::handleEvents(std::vector<uint32_t>& eventList)
 
 }
 
+void Modeller::saveFile(const std::string& path, const std::string& filename, bool selected) 
+{
+	std::string err; 
+	Pi3CfileOBJ::save(path, filename, &scene, selected, nullptr, err);
+}
+
+void Modeller::saveScene(const std::string& path, const std::string& filename, bool selected, Pi3Cscene& scene)
+{
+	Pi3CfileScene fs(path, filename, selected, scene);
+}
+
+bool Modeller::loadModelAt(const std::string& modelfile, const vec3f pos, const std::function<void(float)> showProgressCB)
+{
+	std::string ext = Pi3Cutils::getExt(modelfile);
+	if (ext == "obj") {
+		int32_t modelRef = scene.loadModelOBJ("", modelfile, pos, true, modelGroupId, false, showProgressCB);
+		return true;
+	}
+	else if (ext == "fbx") {
+		Pi3CopenFBX fbx(modelfile);
+		fbx.importToScene(resource, &scene);
+		return true;
+	}
+	else if (ext == "gltf" || ext == "glb") {
+		Pi3Cgltf gltf(resource, &scene, modelfile);
+
+		return true;
+	}
+	return false;
+}
+
 void Modeller::moveSelections(const vec3f& vec)
 {
 	editUndo.moveSelections(scene.models, vec);
@@ -1032,10 +1065,7 @@ void Modeller::moveSelections(const vec3f& vec)
 
 void Modeller::setCurrentSelView(int32_t selview)
 {
-	if (currentSelView != selview) {
-		//if (selview != viewInfo::TOPLEFT) scene.snapShot(viewInfo::TOPLEFT);
-		currentSelView = selview;
-	}
+	if (currentSelView != selview) currentSelView = selview;
 }
 
 void Modeller::dropMan()
@@ -1215,6 +1245,11 @@ void Modeller::setEditMode(const EditMode mode)
 	createTool = CT_NONE;
 	editMode = mode;
 	//mgui.startSnapshot();
+}
+
+void Modeller::setMousePosition(int x, int y)
+{
+	currentPos = views[currentView].calcMouseXYZ(x, y);
 }
 
 void Modeller::handleIMGUI()

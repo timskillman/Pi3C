@@ -1,5 +1,6 @@
 #include "Pi3Cimgui.h"
 #include "Pi3Cshapes.h"
+#include "Pi3Cdirectory.h"
 
 std::string stripEndString(const std::string &str, const std::string &strip)
 {
@@ -695,9 +696,33 @@ bool Pi3Cimgui::ComboIcons(const std::string &text, const std::string &images, u
 	return false;
 }
 
-bool Pi3Cimgui::ListBox(const std::string &text, uint32_t &currentItem, const std::vector<std::string> &values, const int minwidth, const int minheight, const ListBoxFlags flags)
+bool Pi3Cimgui::ListBox(std::vector<std::vector<std::string>>& listXY, uint32_t &currentItem, const int minwidth, const int minheight, const ListBoxFlags flags)
 {
 	bool mb = window->mouse.LeftButton;
+
+	bool touch = renderRect(minwidth, minheight, Pi3Ccolours::White);
+	scissorRect(Pi3Crecti(pos.x, pos.y, minwidth, minheight));
+	uint32_t textcol = Pi3Ccolours::Black;
+
+	int coly = 0;
+	Pi3Cpointi lpos = pos;
+	int miny = pos.y - minheight;
+	for (auto& col :listXY) {
+		int maxWidth = 0;
+		lpos.y = pos.y;
+		std::vector<std::string>& rows = col;
+		for (auto& item : rows) {
+			Pi3Cpointi tsize = resource->getStringSize(item, currentFont);
+			if (tsize.x > maxWidth) maxWidth = tsize.x;
+			TextAt(item, lpos.x, lpos.y, textcol);
+			lpos.y -= tsize.y;
+			if (lpos.y < miny) break;
+		}
+		lpos.x += maxWidth;
+		if (lpos.x > (pos.x + minwidth)) break;
+	}
+
+	scissorEnd();
 
 	if (renderRect(minwidth, minheight) && mb) {
 
@@ -731,11 +756,25 @@ bool Pi3Cimgui::Text(const std::string &text, const int minwidth, const int minh
 bool Pi3Cimgui::TextArea(const std::string &text, const int minwidth, const int minheight)
 {
 	pos = nextPos;
-	Pi3Crect textSize = resource->renderText(resource->lettersRef, currentFont, text, vec3f((float)pos.x, (float)pos.y, zpos), (float)minwidth);
+	bool touch = renderRect(minwidth, minheight, Pi3Ccolours::White);
+	scissorRect(Pi3Crecti(pos.x, pos.y, minwidth, minheight));
+	Pi3Crect textSize = resource->renderText(resource->lettersRef, currentFont, text, vec3f((float)pos.x, (float)pos.y, zpos), (float)minwidth,0xff000000);
+	scissorEnd();
 	size.x = ((int32_t)textSize.width > minwidth) ? (int32_t)textSize.width : minwidth;
 	size.y = ((int32_t)textSize.height > minheight) ? (int32_t)textSize.height : minheight;
 	NextPos();
 	return false;
+}
+
+void Pi3Cimgui::scissorRect(const Pi3Crecti& rect)
+{
+	glScissor(rect.x, rect.y - rect.height, rect.width, rect.height);
+	glEnable(GL_SCISSOR_TEST);
+}
+
+void Pi3Cimgui::scissorEnd()
+{
+	glDisable(GL_SCISSOR_TEST);
 }
 
 void Pi3Cimgui::setPosition(const int x, const int y)
@@ -928,10 +967,14 @@ void Pi3Cimgui::checkForSnapShot()
 	}
 }
 
-std::string Pi3Cimgui::OpenFileDialog(const rectStyle * style)
+std::string Pi3Cimgui::OpenFileDialog(const std::string& folderpath, const rectStyle * style)
 {   
 	rectStyle prevstyle = currentParams;
 	if (style) setButtonStyle(*style);
+
+	std::vector<std::string> dir = Pi3Cdirectory::readDirectory(folderpath.c_str());
+	std::string dirlist;
+	for (auto& l : dir) dirlist += l+char(13)+char(10);
 
 	std::string inptext = "";
 	bool finished = false;
@@ -950,10 +993,10 @@ std::string Pi3Cimgui::OpenFileDialog(const rectStyle * style)
 		renderRect(window->getWidth(), window->getHeight(), Pi3Ccolours::TransparentBlack);
 
 		setPosition(100, 100);
-
+		TextArea(dirlist, 500, 300);
 		renderText("Enter Filename:", 200, 0, Pi3Ccolours::White);
 		nextLine();
-
+		
 		finished = InputText("Filename", inptext, 203, 0, Pi3Ccolours::Black);
 		//sameLine();
 		if (ButtonText("Save",false,80)) finished = true;
@@ -965,5 +1008,6 @@ std::string Pi3Cimgui::OpenFileDialog(const rectStyle * style)
 		window->SwapBuffers();
 	}
 	setButtonStyle(prevstyle);
+	startSnapshot();
 	return inptext;
 }

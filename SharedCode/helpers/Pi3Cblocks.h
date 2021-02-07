@@ -60,6 +60,8 @@ public:
 	int getGroundHeight(const vec3f& position);
 	int getHeightAtPoint(const vec3f& position);
 
+	uint8_t readChunkFile(const std::string& file);
+
 	enum { BLK_CAVES=1, BLK_VEGETATION=2 };
 	
 private:

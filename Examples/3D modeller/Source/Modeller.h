@@ -12,6 +12,7 @@
 #include "Pi3CfileOBJ.h"
 #include "Pi3CviewInfo.h"
 #include "Pi3Cblocks.h"
+#include "ofbx.h"
 
 class Modeller {
 public:
@@ -26,6 +27,8 @@ public:
 	void setupGUI(loadOptions &opts);
 	void setCreateTool(const CreateTool tool);
 	void setEditMode(const EditMode mode);
+	void setMousePosition(int x, int y);
+
 	void handleKeys();
 	void handleEvents(std::vector<uint32_t>& eventList);
 	void handleIMGUI();
@@ -43,36 +46,31 @@ public:
 	void setFullScreen();
 	void setFullScene();
 
-	void setMousePosition(int x, int y) {
-		currentPos = views[currentView].calcMouseXYZ(x, y);
-	}
-
-	//void saveScene(const std::string &file, Pi3Cmodel *models);
+	void saveScene(const std::string& path, const std::string& filename, bool selected, Pi3Cscene& scene);
 	void clearScene();
 	void clearGizmos();
-	viewInfo setupView(const viewInfo::ViewProject view);
 	bool isPerspective() { return views[currentView].projection == viewInfo::PERSPECTIVE;  }
 	bool initialised() { return (resource != nullptr); }
 	void createModel(const Pi3Cmesh& mesh, const vec3f& pos, int32_t groupId, const uint32_t colour = 0xffffffff, std::string txfile="");
 	void createLandscape(const vec3f pos, const uint32_t colour);
-	void saveFile(const std::string& path, const std::string& filename, bool selected = false) { 
-		std::string err; Pi3CfileOBJ::save(path, filename, &scene, selected, nullptr, err); 
-	}
-	Pi3Crecti viewRect(const viewInfo::SceneLayout projection);
-
+	void saveFile(const std::string& path, const std::string& filename, bool selected = false);
+	bool loadModelAt(const std::string& modelfile, const vec3f pos, const std::function<void(float)> showProgressCB);
 	bool currentViewIsActive() { return (currentView != viewInfo::INACTIVE && !mgui.somethingSelected()) || fullscreen; }
 
 	void snapshot();
-	//vec3f getRelativeMove(const vec3f& pos);
-
 	void clearSelections();
 	void selectAll();
 	void deleteSelection();
 	void duplicateSelection();
 
+	viewInfo setupView(const viewInfo::ViewProject view);
+	Pi3Crecti viewRect(const viewInfo::SceneLayout projection);
+
+
 	Pi3Cresource *resource = nullptr;
 	Pi3Cwindow *window = nullptr;
 	Pi3Cscene scene;
+
 
 	//void loadModelLibrary(const std::string &path, const std::vector<std::string> &vals);
 	//Pi3Cmodel loadScene(const std::string &file, vec3f &grid);

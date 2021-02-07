@@ -3,6 +3,9 @@
 #include <cstring>
 #include <sstream>
 #include <iomanip>
+#include <algorithm>
+#include <cctype>
+#include <string>
 
 namespace Pi3Cutils {
 
@@ -102,6 +105,38 @@ namespace Pi3Cutils {
 	std::string endstr(std::string const& str, size_t const length) {
 		if (length >= str.size()) return str;
 		return str.substr(str.size() - length);
+	}
+
+	std::string filepath(const std::string& path, const std::string& filename, const std::string& ext)
+	{
+		const std::string gpath = (path.size() > 0 && *(path.end() - 1) != '/') ? path + "/" : path;
+		return gpath + filename + ((ext[0] == '.') ? ext : "." + ext);
+	}
+
+	std::string extractPath(std::string& file)
+	{
+		std::size_t found = file.find_last_of("/\\");
+		std::string path = file.substr(0, found);
+		file = file.substr(found + 1);
+		return path;
+	}
+
+	std::string lowercase(const std::string& str)
+	{
+		std::string lc = str;
+		std::transform(lc.begin(), lc.end(), lc.begin(),
+			[](unsigned char c) { return std::tolower(c); });
+		return lc;
+	}
+
+	std::string getExt(const std::string& file)
+	{
+		std::size_t found = file.find_last_of(".");
+		return lowercase(file.substr(found + 1));
+	}
+
+	float colToFloat(const uint32_t col) { 
+		return (float)(col & 255) / 256.f + (float)((col >> 8) & 255) + (float)((col >> 16) & 255) * 256.f; 
 	}
 
 	void drawRect2D(vec3f pos, vec3f size, uint32_t colour)

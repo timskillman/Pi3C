@@ -11,6 +11,7 @@ void Pi3Cmesh::reset()
 	vertOffset = 0; 
 	vertSize = 0;
 	verts.resize(0);
+	lineIndexes.resize(0);
 	bbox.init();
 	materialRef = -1;
 	vc = 0;

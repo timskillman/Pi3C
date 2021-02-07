@@ -139,7 +139,7 @@ void Pi3Cjson::writeVec3f(const char * key, vec3f& v)
 	json_writer.EndArray();
 }
 
-void Pi3Cjson::writeMatrix(const char * key, Pi3Cmatrix& matrix)
+void Pi3Cjson::writeMatrix(const char * key, const Pi3Cmatrix& matrix)
 {
 	json_writer.Key(key);
 	json_writer.StartArray();

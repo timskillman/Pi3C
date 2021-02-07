@@ -1,6 +1,7 @@
 #pragma once
 #include <iostream>
 #include <fstream>
+#include <vector>
 
 class Pi3CbinStream {
 public:
@@ -12,10 +13,12 @@ public:
 	std::ifstream * stream = nullptr;
 
 	bool is_open() { return (stream && stream->is_open()); }
+	
+	size_t getSize();
 
 	template <typename T>
-	void read(T& item) {
-		stream->read(reinterpret_cast<char*>(&item), sizeof(T));
+	void read(T& value) {
+		stream->read(reinterpret_cast<char*>(&value), sizeof(T));
 	}
 
 	template<class ContainerClass>
@@ -30,5 +33,14 @@ public:
 			read(value);
 			container.push_back(value);
 		}
+	}
+
+	template <typename T>
+	size_t readAll(std::vector<T>& v) {
+		size_t size = getSize();
+		v.resize(size / sizeof(T));
+		stream->read((char*)&v[0], size);
+		stream->close();
+		return size;
 	}
 };

@@ -66,18 +66,17 @@ public:
 	//};
 
 	//struct meshHeader {
-	std::string name;
+	std::string name = "";
 	Pi3Cbbox3d bbox;
-	uint16_t mode;
+	uint16_t mode = GL_TRIANGLES;
 	std::vector<float> verts;
-	//std::vector<float> overts;	//outline vertices
 	std::vector<uint32_t> lineIndexes;
-	GLint vertOffset;
-	uint32_t vertSize;
-	uint32_t stride;
-	uint32_t vc;
-	GLint bufRef;
-	int32_t materialRef;
+	GLint vertOffset = 0;
+	uint32_t vertSize = 0;
+	uint32_t stride = defaultStride;
+	uint32_t vc = 0;
+	GLint bufRef = 0;
+	int32_t materialRef = 0;
 	float animval;			//Each tween must have the same number of vertices as the verts buffer since the verts buffer will hold the results
 //};
 

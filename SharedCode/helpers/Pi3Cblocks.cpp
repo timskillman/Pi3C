@@ -1,4 +1,5 @@
 #include "Pi3Cblocks.h"
+#include "Pi3CbinStream.h"
 
 void Blocks::createTexPackUV()
 {
@@ -727,4 +728,90 @@ void Blocks::addTree(uint32_t chunkPtr, int x, int z, int size, int bark, int le
 	//Create trunk
 	for (uint32_t t = ptr; t < (ptr + trunkHeight); t++) chunks[t] = bark;
 
+}
+
+uint8_t Blocks::readChunkFile(const std::string& file)
+{
+	//TODO: ONLY READS BUT DOES NOTHING YET
+
+	std::vector<uint32_t> chunkData(0);
+	Pi3CbinStream bs(file.c_str());
+	int chunkDataSize = bs.readAll(chunkData);
+	
+	uint8_t type = 0; //map type
+	
+	if (chunkData.size() > 0) {
+		uint32_t* chptr = (uint32_t*)&chunkData.front();
+
+		//Get mapdata and determine how many chunks and what area they cover ...
+
+		//Get info from first map coordinates and offset ..
+		int c = 0;
+		int cx = chptr[0];
+		int x1 = cx; int x2 = cx;
+		int cy = chptr[1];
+		int y1 = cy; int y2 = cy;
+		int offset = chptr[2];
+		int maxChunks = 0;
+		c++;
+
+		//newversion = false;
+		int chunkMapSize = 0;	//values used for calculating offsets
+		int chunkVoxelSize = (16 * 16 * 128 * 2) + (256 * 4) + 16;
+		int chunkSize = 1;      //
+		int blockstep = 2;
+		if (offset == 0) { //new version found 1.29+
+			chunkMapSize = 65536 * 12 + 12; //12 byte 'guard' at the end of the map directory
+			blockstep = 4;
+			chunkVoxelSize = (16 * 16 * 128 * 4) + (256 * 4) + 16;
+			chunkSize = chunkVoxelSize;  //4 bytes per block
+			//newversion = true;
+		}
+
+		//work out overall map chunk dimensions ...
+		while (!(cx == 0xDEADBEEF) && !(offset < 0)) {
+			//while (!((offset <= 0) && (cx == 0) && (cy == 0) && (c>1))) {
+			if (cx < x1) x1 = cx; else if (cx > x2) x2 = cx;
+			if (cy < y1) y1 = cy; else if (cy > y2) y2 = cy;
+			cx = chptr[c * 3];
+			cy = chptr[c * 3 + 1];
+			offset = chptr[c * 3 + 2];
+			c++;
+		}
+		x2++; y2++;
+		maxChunks = c - 1;
+
+		//Check if this is a model and not a map (i.e. the header is less than 65536 chunks)
+		if (cx == 0xDEADBEEF && (maxChunks * 12) < chunkMapSize) {
+			chunkMapSize = maxChunks * 12;
+			type = 1; // model type
+		}
+
+		//Now we know the size of the chunk map, save the offsets into a 2D array for x/z access ...
+		int mapWidth = x2 - x1;
+		int mapDepth = y2 - y1;
+		mapSize = mapWidth * mapDepth;
+
+		//if (mapOffsets) delete mapOffsets;
+		std::vector<uint64_t> mapOffsets(mapSize);
+		for (int i = 0; i < mapSize; i++) {
+			mapOffsets[i] = 0; //clear mapOffsets array
+		}
+
+		cx = chptr[0] - x1;
+		cy = chptr[1] - y1;
+		offset = chptr[2];
+		int originx = cx;   //First block
+		int originz = cy;
+		mapOffsets[cy * mapWidth + cx] = 16 + chunkMapSize + offset * chunkSize; //this points to chunk data (not the header)
+
+		for (int c = 1; c < maxChunks; c++) {
+			cx = chptr[c * 3] - x1;
+			cy = chptr[c * 3 + 1] - y1;
+			offset = chptr[c * 3 + 2];
+			mapOffsets[cy * mapWidth + cx] = 16 + chunkMapSize + offset * chunkSize; //this points to chunk data (not the header)
+		}
+	}
+
+	return type;
 }

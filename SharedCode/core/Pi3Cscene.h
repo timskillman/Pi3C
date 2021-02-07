@@ -9,6 +9,7 @@
 #include "Pi3Crect.h"
 #include "Pi3Cmaterial.h"
 #include "Pi3CviewInfo.h"
+#include "Pi3Cutils.h"
 #include <vector>
 #include <functional>
 
@@ -146,7 +147,6 @@ private:
 
 	Pi3Cmaterial selectMaterial;
 
-	std::string getPathFile(std::string &filepath) const;
 	void render(const float ticks, Pi3Cmatrix &projMatrix, Pi3Cmatrix &modelMatrix, std::vector<Pi3Cmodel> &models, Pi3Cmaterial *materialOverride, uint32_t flags = Pi3Cmodel::mdf_alpha | Pi3Cmodel::mdf_solid);
 	//void appendLight(Pi3Clight &light) { lights.push_back(light); }
 	//void appendCamera(Pi3Ccamera &camera) { cameras.push_back(camera); }

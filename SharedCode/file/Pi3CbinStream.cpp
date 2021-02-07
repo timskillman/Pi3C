@@ -13,3 +13,10 @@ Pi3CbinStream::~Pi3CbinStream()
 		delete stream;
 	}
 }
+
+size_t Pi3CbinStream::getSize() {
+	stream->seekg(0, std::ios_base::end);
+	auto size = stream->tellg();
+	stream->seekg(0, std::ios_base::beg);
+	return size;
+}
