@@ -2,7 +2,7 @@ title:Pi3C Blocks
 screenWidth:800
 screenHeight:600
 perspective:300
-fullscreen:false
+fullscreen:true
 antiAliasLevel:0
 mapSize:7
 chunkSize:16

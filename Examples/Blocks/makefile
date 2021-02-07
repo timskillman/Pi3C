@@ -12,6 +12,8 @@ HELPS_DIR:= ../../SharedCode/helpers
 EDIT_DIR:= ../../SharedCode/editing
 TESS_DIR:= ../../SharedCode/glutess
 RJSON_DIR:= ../../ThirdParty/rapidjson
+FBX_DIR:= ../../ThirdParty/openFBX
+GLTF_DIR:= ../../ThirdParty/gltf
 CPATH = $(SHARED_DIR)
 CPATH = $(FILE_DIR)
 CPATH = $(UI_DIR)
@@ -19,13 +21,15 @@ CPATH = $(HELPS_DIR)
 CPATH = $(EDIT_DIR)
 CPATH = $(TESS_DIR)
 CPATH = $(RJSON_DIR)
+CPATH = $(FBX_DIR)
+CPATH = $(GLTF_DIR)
 
 BUILDPATH = ../../../_build/Projects/$(TARGET)/
 
 GLES_DIR = /opt/vc/include
 CPATH = $(GLES_DIR)
 
-SRC_DIR:= $(SHARED_DIR) $(FILE_DIR) $(UI_DIR) $(HELPS_DIR) $(EDIT_DIR) $(TESS_DIR) $(GLES_DIR) $(RJSON_DIR) source
+SRC_DIR:= $(RJSON_DIR) $(SHARED_DIR) $(FILE_DIR) $(UI_DIR) $(HELPS_DIR) $(EDIT_DIR) $(TESS_DIR) $(GLES_DIR) $(FBX_DIR) $(GLTF_DIR) source
 BUILD_DIR:= $(addprefix $(BUILDPATH),$(SRC_DIR))
 
 SRC:= $(foreach sdir,$(SRC_DIR),$(wildcard $(sdir)/*.cpp $(sdir)/*.c))
