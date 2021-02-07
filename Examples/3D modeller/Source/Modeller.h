@@ -4,6 +4,7 @@
 #include "Pi3Cscene.h"
 #include "Pi3Cavatar.h"
 #include "Pi3CloadOptions.h"
+//#include "Pi3CfileScene.h"
 #include "Pi3Cimgui.h"
 #include "Pi3Crect.h"
 #include "ModellerGUI.h"
@@ -12,7 +13,6 @@
 #include "Pi3CfileOBJ.h"
 #include "Pi3CviewInfo.h"
 #include "Pi3Cblocks.h"
-#include "ofbx.h"
 
 class Modeller {
 public:

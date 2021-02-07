@@ -1,7 +1,6 @@
 #include "Modeller.h"
 #include "Pi3Cshapes.h"
 #include "Pi3Cblocks.h"
-#include "Pi3CfileScene.h"
 #include "Pi3CfileFBX.h"
 #include "Pi3CfileGLTF.h"
 
@@ -1034,7 +1033,7 @@ void Modeller::saveFile(const std::string& path, const std::string& filename, bo
 
 void Modeller::saveScene(const std::string& path, const std::string& filename, bool selected, Pi3Cscene& scene)
 {
-	Pi3CfileScene fs(path, filename, selected, scene);
+	//Pi3CfileScene fs(path, filename, selected, scene);
 }
 
 bool Modeller::loadModelAt(const std::string& modelfile, const vec3f pos, const std::function<void(float)> showProgressCB)
