@@ -94,8 +94,8 @@ public:
 	void textModel(Pi3Cresource *resource, Pi3Cfont *font, const std::string &text, const float wrapWidth, const Pi3Cfont::textReaderType textType = Pi3Cfont::RD_NONE);
 	void addColliderGrid(Pi3Cresource *resource);
 
-	Pi3Cmodel * append(Pi3Cresource *resource, Pi3Cmodel model, vec3f offset = vec3f(0, 0, 0), vec3f rotation = vec3f(0,0,0));
-	Pi3Cmodel * append(Pi3Cresource *resource, Pi3Cmodel model, Pi3Cmatrix matrix);
+	Pi3Cmodel * append(Pi3Cresource *resource, Pi3Cmodel model, vec3f offset, vec3f rotation);
+	Pi3Cmodel * append(Pi3Cresource *resource, const Pi3Cmodel& model); //, Pi3Cmatrix matrix
 	Pi3Cmodel * appendLOD(Pi3Cresource *resource, Pi3Cmodel model, float LODfrom, float LODtoo, vec3f offset = vec3f(0, 0, 0), vec3f rotation = vec3f(0, 0, 0));
 	Pi3Cmodel * appendCollider(Pi3Cresource *resource, Pi3Cmodel &model, vec3f offset = vec3f(0, 0, 0), vec3f rotation = vec3f(0, 0, 0));
 

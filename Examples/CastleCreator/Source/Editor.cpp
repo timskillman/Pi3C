@@ -600,7 +600,11 @@ Pi3Cmodel Editor::loadSceneJSON(const std::string &file, vec3f &grid)
 				if (ob.HasMember("name")) objname = ob["name"].GetString();
 				if (ob.HasMember("matrix")) matrix = json.readMatrix(ob, "matrix");
 				Pi3Cmodel* m = findModel(objname);
-				if (m) model.append(resource, *findModel(objname), matrix);
+				if (m) {
+					Pi3Cmodel tmod = *m;
+					tmod.matrix = matrix;
+					model.append(resource, tmod);
+				}
 			}
 		}
 	}

@@ -245,7 +245,7 @@ public:
 	inline vec3f unit() const // normalised to a length of 1
 	{
 		float l = length();
-		if (l == 0.0) return vec3f(0.f, 0.f, 0.f); //avoid divide by zero error
+		if (l == 0.f) return vec3f(); //avoid divide by zero error
 		return vec3f(x / l, y / l, z / l);
 	}
 	
@@ -257,7 +257,7 @@ public:
 	void normalise() // normalised to a length of 1
 	{
 		float l = length();
-		if (l != 0.0) {
+		if (l != 0.f) {
 			x /= l; y /= l; z /= l;
 		}
 	}
@@ -265,10 +265,17 @@ public:
 	vec3f norm() // normalised to a length of 1
 	{
 		float l = length();
-		if (l != 0.0) {
+		if (l != 0.f) {
 			x /= l; y /= l; z /= l;
 		}
 		return *this;
+	}
+
+	float angleBetween(vec3f v2, vec3f v3) const
+	{
+		vec3f a = *this - v2, b = v3 - v2, cp = a ^ b;
+		float ang = acosf(a.dot(b) / (a.length() * b.length()));
+		return ((cp.x + cp.y + cp.z) > 0) ? ang : -ang;
 	}
 
 	inline vec3f trinormal(vec3f v2, vec3f v3) const //calculate triangle normal (normalised)

@@ -65,8 +65,10 @@ public:
 	void SetLookAt(vec3f const &dir, vec3f const &up);
 	void rotateMatrixXY(const vec3f &rot);
 	void rotate(const vec3f &rot);
+	void rotateAXYZ(const float angle, const float x, const float y, const float z);
 	void setRotate(const vec3f &rot);
 	void setRotateXY(const vec3f &rot);
+	void scale(const vec3f& scale);
 
 	vec3f getScale() const;
 	vec3f getRotation() const;
@@ -115,6 +117,18 @@ public:
 		matrix[m10] = m1_0; matrix[m11] = m1_1; matrix[m12] = m1_2; matrix[m13] = m1_3;
 		matrix[m20] = m2_0; matrix[m21] = m2_1; matrix[m22] = m2_2; matrix[m23] = m2_3;
 		matrix[m30] = m3_0; matrix[m31] = m3_1; matrix[m32] = m3_2; matrix[m33] = m3_3;
+		identity = false;
+	}
+
+	void set(const double m0_0, const double m0_1, const double m0_2, const double m0_3,
+		const double m1_0, const double m1_1, const double m1_2, const double m1_3,
+		const double m2_0, const double m2_1, const double m2_2, const double m2_3,
+		const double m3_0, const double m3_1, const double m3_2, const double m3_3)
+	{
+		matrix[m00] = (float)m0_0; matrix[m01] = (float)m0_1; matrix[m02] = (float)m0_2; matrix[m03] = (float)m0_3;
+		matrix[m10] = (float)m1_0; matrix[m11] = (float)m1_1; matrix[m12] = (float)m1_2; matrix[m13] = (float)m1_3;
+		matrix[m20] = (float)m2_0; matrix[m21] = (float)m2_1; matrix[m22] = (float)m2_2; matrix[m23] = (float)m2_3;
+		matrix[m30] = (float)m3_0; matrix[m31] = (float)m3_1; matrix[m32] = (float)m3_2; matrix[m33] = (float)m3_3;
 		identity = false;
 	}
 

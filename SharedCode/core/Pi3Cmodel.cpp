@@ -277,9 +277,10 @@ Pi3Cmodel * Pi3Cmodel::append(Pi3Cresource *resource, Pi3Cmodel model, vec3f off
 	return &group.back();
 }
 
-Pi3Cmodel * Pi3Cmodel::append(Pi3Cresource *resource, Pi3Cmodel model, Pi3Cmatrix matrix)
+Pi3Cmodel * Pi3Cmodel::append(Pi3Cresource *resource, const Pi3Cmodel& model)
 {
-	model.matrix = matrix;
+	if (model.meshRef < 0 && model.group.size() == 0) return nullptr;
+	//model.matrix = matrix;
 	group.push_back(model);
 	bbox.update(model.bbox, &model.matrix);
 	//updateSelBox(resource);
@@ -324,6 +325,7 @@ void Pi3Cmodel::addMeshes(Pi3Cresource* resource, const std::string& modelname, 
 		for (size_t i=meshStart; i<meshEnd; i++) {
 			Pi3Cmodel newGroupModel(resource, i);
 			group.push_back(newGroupModel);
+			bbox.update(newGroupModel.bbox);
 		}
 	}
 }
