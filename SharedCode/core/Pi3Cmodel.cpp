@@ -142,7 +142,15 @@ void Pi3Cmodel::render(Pi3Cresource *resource, Pi3Cshader &shader, const Pi3Cmat
 		group[choice].render(resource, shader, &newmatrix, materialOverride);
 	}
 	else {
-		for (auto &sg : group) sg.render(resource, shader, &newmatrix, materialOverride, flags);
+		if (animated) {
+			if (group.size() > 0) {
+				group[(int)(frame/2) % group.size()].render(resource, shader, &newmatrix, materialOverride, flags);
+				frame++;
+			}
+		}
+		else {
+			for (auto& sg : group) sg.render(resource, shader, &newmatrix, materialOverride, flags);
+		}
 	}
 
 	//finally, render the mesh itself (not usually set if there's a group with the model) ...

@@ -549,7 +549,7 @@ void Pi3Cmesh::updateNormals(const uint32_t min, const uint32_t max)
 		memcpy(&v0, &verts[i], sizeof(vec3f));
 		memcpy(&v1, &verts[i + x2], sizeof(vec3f));
 		memcpy(&v2, &verts[i + x3], sizeof(vec3f));
-		vec3f n = -((v0 - v1) ^ (v1 - v2)).unit();
+		vec3f n = ((v0 - v1) ^ (v1 - v2)).unit();
 		memcpy(&verts[i + 3], &n, sizeof(vec3f));
 		memcpy(&verts[i + x2 + 3], &n, sizeof(vec3f));
 		memcpy(&verts[i + x3 + 3], &n, sizeof(vec3f));

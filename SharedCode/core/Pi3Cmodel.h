@@ -155,7 +155,9 @@ public:
 	bool edit = true;				//model can/not be edited
 	bool selected = false;			//model selected (useful for editing)
 	bool asCollider = false;		//if true, then use this model as a collider as well as rendered
-	bool animated = false;
+
+	bool animated = false;			// animate contents of a group
+	uint32_t frame = 0;				// animated frame in group;
 
 	int32_t choice = -1;			//if set to value 0 and above, this option will choose which model in the group to render - the rest are ignored
 
