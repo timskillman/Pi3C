@@ -142,8 +142,25 @@ void Pi3Cmodel::render(Pi3Cresource *resource, Pi3Cshader &shader, const Pi3Cmat
 		group[choice].render(resource, shader, &newmatrix, materialOverride);
 	}
 	else {
-		if (animated) {
+		if (animgroup) {
 			if (group.size() > 0) {
+				////Create a fractional tween between two frames ...
+				//Pi3Cmesh& m1 = resource->meshes[group[frame].meshRef];
+				//float fd = 0;
+				//int fr = frame, vsz = m1.vc, st = m1.stride;
+				//std::vector<float>& v1 = m1.verts;
+				//std::vector<float>& v2 = resource->meshes[group[(fr + 1) % group.size()].meshRef].verts;
+
+				////copy current frame verts into temp vertex array ...
+				//std::vector<float> vo(v1.size());
+				//memcpy(&vo[0], &v1[0], v1.size() * 4);
+
+				//for (size_t v = 0; v < vsz; v += st) {
+				//	vo[v] += (v2[v] - vo[v]) * fd;
+				//	vo[v + 1] += (v2[v + 1] - vo[v + 1]) * fd;
+				//	vo[v + 2] += (v2[v + 2] - vo[v + 2]) * fd;
+				//}
+
 				group[(int)(frame/2) % group.size()].render(resource, shader, &newmatrix, materialOverride, flags);
 				frame++;
 			}
@@ -190,7 +207,7 @@ void Pi3Cmodel::appendMesh(Pi3Cresource *resource, Pi3Cmesh mesh, int32_t groupI
 	group.push_back(newGroupMesh);
 }
 
-void Pi3Cmodel::appendMeshToGroup(Pi3Cresource* resource, Pi3Cmesh mesh, int32_t groupId, uint32_t diffuseColour, bool deleteVerts)
+int Pi3Cmodel::appendMeshToGroup(Pi3Cresource* resource, Pi3Cmesh mesh, int32_t groupId, uint32_t diffuseColour, bool deleteVerts)
 {
 	int32_t meshRef = resource->addMesh(&mesh, groupId, 0, false);
 	if (mesh.mode == GL_TRIANGLES && mesh.lineIndexes.size() == 0) resource->addMeshOutlines(meshRef); //This is really SLOW on big models!
@@ -200,6 +217,7 @@ void Pi3Cmodel::appendMeshToGroup(Pi3Cresource* resource, Pi3Cmesh mesh, int32_t
 	newGroupMesh.meshRef = meshRef;
 	bbox.update(resource->meshes[meshRef].bbox);
 	group.push_back(newGroupMesh);
+	return group.size() - 1;
 }
 
 //void Pi3Cmodel::updateSelBox(Pi3Cresource *resource)

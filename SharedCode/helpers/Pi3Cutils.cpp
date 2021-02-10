@@ -52,11 +52,11 @@ namespace Pi3Cutils {
 		return triCount;	
 	}
 	
-	void flipImage(std::vector<uint8_t> &src, std::vector<uint8_t> &dest, uint32_t w, uint32_t h)
+	void flipImage(uint8_t* src, uint8_t* dest, uint32_t w, uint32_t h)
 	{
 		uint32_t span = w * 4;
-		uint8_t *pt = &src[0] + 0;
-		uint8_t *pb = &dest[0] + (h - 1) * span;
+		uint8_t *pt = src + 0;
+		uint8_t *pb = dest + (h - 1) * span;
 		for (uint32_t y = 0; y < h; y++) {
 			std::memcpy(pb, pt, span);
 			pb -= span;
@@ -68,7 +68,7 @@ namespace Pi3Cutils {
 	{
 		std::vector<uint8_t> destimage;
 		destimage.resize(snapShot.size());
-		flipImage(snapShot, destimage, width, height);
+		flipImage(&snapShot[0], &destimage[0], width, height);
 
 		SDL_Surface* ss = SDL_CreateRGBSurfaceFrom(&destimage[0], width, height, 32, width * 4, 0x000000ff, 0x0000ff00, 0x00ff0000, 0xff000000);
 		SDL_RWops* fo = SDL_RWFromFile(filename, "wb");
@@ -86,7 +86,7 @@ namespace Pi3Cutils {
 			std::vector<uint8_t> destimage;
 			destimage.resize(snapShot.size());
 			glReadPixels(rect.x, rect.y, rect.width, rect.height, GL_RGBA, GL_UNSIGNED_BYTE, &destimage[0]);
-			flipImage(destimage, snapShot, rect.width, rect.height);
+			flipImage(&destimage[0], &snapShot[0], rect.width, rect.height);
 			//saveBufferToPNG("snapshot.png", snapShot, rect.width, rect.height);
 			return true;
 		}

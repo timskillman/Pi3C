@@ -1,5 +1,6 @@
 #include "Pi3CfileGLTF.h"
 #include "Pi3Cutils.h"
+//#include "Pi3Cquaternion.h"
 
 #define TINYGLTF_IMPLEMENTATION
 #define STB_IMAGE_IMPLEMENTATION
@@ -37,14 +38,16 @@ Pi3Cgltf::Pi3Cgltf(Pi3Cresource* resource, Pi3Cscene* scene, const std::string& 
 //	assert(0);
 //}
 
-//int size = 1;
-//switch (accessor.type) {
-//case TINYGLTF_TYPE_SCALAR: size = 1; break;
-//case TINYGLTF_TYPE_VEC2: size = 2; break;
-//case TINYGLTF_TYPE_VEC3: size = 3; break;
-//case TINYGLTF_TYPE_VEC4: size = 4; break;
-//default: assert(0);
-//}
+static int typeToSize(int type)
+{
+	switch (type) {
+	case TINYGLTF_TYPE_SCALAR: return 1;
+	case TINYGLTF_TYPE_VEC2: return 2;
+	case TINYGLTF_TYPE_VEC3: return 3;
+	case TINYGLTF_TYPE_VEC4: return 4;
+	}
+	return 0;
+}
 
 //SDL_Log("Prim Accessor:%s, accessor:%d, bufferView:%d, byteOffset:%d, count:%d, size:%d",  
 //	it->first.c_str(), it->second, accessor.bufferView, accessor.byteOffset, accessor.count, size);
@@ -69,9 +72,14 @@ static size_t ComponentTypeByteSize(int type) {
 	}
 }
 
+#define getbuff(buftype, mult, offset)								 \
+        *(float*)&buff[buffOffsets[buftype] + index * mult + offset] \
+
+
 enum { VERT_OFFSET, NORM_OFFSET, TANG_OFFSET, TEX0_OFFSET, TEX1_OFFSET, COL_OFFSET, JNT_OFFSET, WGT_OFFSET };
 
-static Pi3Cmesh CreateMesh(tinygltf::Model& model, const tinygltf::Primitive& primitive)
+
+static Pi3Cmesh CreateMesh(Pi3Cresource* resource, tinygltf::Model& model, const tinygltf::Primitive& primitive)
 {
 	int buffOffsets[8] = { -1,-1,-1,-1,-1,-1,-1,-1 };
 	size_t buffElemSizes[8] = { 0,0,0,0,0,0,0,0 };
@@ -95,7 +103,7 @@ static Pi3Cmesh CreateMesh(tinygltf::Model& model, const tinygltf::Primitive& pr
 		if (type >= 0) {
 			const tinygltf::Accessor& accessor = model.accessors[it->second];
 			buffOffsets[type] = model.bufferViews[accessor.bufferView].byteOffset + accessor.byteOffset;
-			buffElemSizes[type] = ComponentTypeByteSize(accessor.componentType);
+			buffElemSizes[type] = typeToSize(accessor.type);
 		}
 		else
 		{
@@ -114,6 +122,7 @@ static Pi3Cmesh CreateMesh(tinygltf::Model& model, const tinygltf::Primitive& pr
 
 	newmesh.verts.resize(indcount * 9);
 	uint32_t& vc = newmesh.vc = 0;
+	float white = Pi3Cutils::colToFloat(0xffffffff);
 
 	for (int i = 0; i < indcount; i++) {
 		unsigned int index = 0;
@@ -132,16 +141,16 @@ static Pi3Cmesh CreateMesh(tinygltf::Model& model, const tinygltf::Primitive& pr
 			break;
 		}
 
-		vec3f point = vec3f(*(float*)&buff[buffOffsets[VERT_OFFSET] + index * 12], *(float*)&buff[buffOffsets[VERT_OFFSET] + index * 12 + 4], *(float*)&buff[buffOffsets[VERT_OFFSET] + index * 12 + 8]);
-		newmesh.verts[vc++] = point.x; // *(float*)&buff[vertOffset + index * 12];
-		newmesh.verts[vc++] = point.y; // *(float*)&buff[vertOffset + index * 12 + 4];
-		newmesh.verts[vc++] = point.z; // *(float*)&buff[vertOffset + index * 12 + 8];
+		vec3f point = vec3f(getbuff(VERT_OFFSET, 12, 0), getbuff(VERT_OFFSET, 12, 4), getbuff(VERT_OFFSET, 12, 8));
+		newmesh.verts[vc++] = point.x;
+		newmesh.verts[vc++] = point.y;
+		newmesh.verts[vc++] = point.z;
 		newmesh.bbox.update(point);
 
 		if (buffOffsets[NORM_OFFSET] > 0) {
-			newmesh.verts[vc++] = *(float*)&buff[buffOffsets[NORM_OFFSET] + index * 12];
-			newmesh.verts[vc++] = *(float*)&buff[buffOffsets[NORM_OFFSET] + index * 12 + 4];
-			newmesh.verts[vc++] = *(float*)&buff[buffOffsets[NORM_OFFSET] + index * 12 + 8];
+			newmesh.verts[vc++] = getbuff(NORM_OFFSET, 12, 0);
+			newmesh.verts[vc++] = getbuff(NORM_OFFSET, 12, 4);
+			newmesh.verts[vc++] = getbuff(NORM_OFFSET, 12, 8);
 		}
 		else {
 			newmesh.verts[vc++] = 0;
@@ -149,8 +158,8 @@ static Pi3Cmesh CreateMesh(tinygltf::Model& model, const tinygltf::Primitive& pr
 			newmesh.verts[vc++] = 0;
 		}
 		if (buffOffsets[TEX0_OFFSET] > 0) {
-			newmesh.verts[vc++] = *(float*)&buff[buffOffsets[TEX0_OFFSET] + index * 8];
-			newmesh.verts[vc++] = *(float*)&buff[buffOffsets[TEX0_OFFSET] + index * 8 + 4];
+			newmesh.verts[vc++] = getbuff(TEX0_OFFSET, 8, 0);
+			newmesh.verts[vc++] = getbuff(TEX0_OFFSET, 8, 4);
 		}
 		else {
 			newmesh.verts[vc++] = 0;
@@ -159,22 +168,22 @@ static Pi3Cmesh CreateMesh(tinygltf::Model& model, const tinygltf::Primitive& pr
 
 		if (buffOffsets[COL_OFFSET] > 0) {
 			uint32_t col = 0;
-			//if (buffElemSizes[COL_OFFSET] == 4) {
-			//	col = (uint8_t)(*(float*)&buff[buffOffsets[COL_OFFSET] + index * 16] * 255.f) |
-			//		((uint8_t)(*(float*)&buff[buffOffsets[COL_OFFSET] + index * 16 + 4] * 255.f) << 8) |
-			//		((uint8_t)(*(float*)&buff[buffOffsets[COL_OFFSET] + index * 16 + 8] * 255.f) << 16) |
-			//		((uint8_t)(*(float*)&buff[buffOffsets[COL_OFFSET] + index * 16 + 12] * 255.f) << 24);
-			//}
-			//else if (buffElemSizes[COL_OFFSET] == 3) {
-				col = (uint8_t)(*(float*)&buff[buffOffsets[COL_OFFSET] + index * 12] * 255.f) |
-					((uint8_t)(*(float*)&buff[buffOffsets[COL_OFFSET] + index * 12 + 4] * 255.f) << 8) |
-					((uint8_t)(*(float*)&buff[buffOffsets[COL_OFFSET] + index * 12 + 8] * 255.f) << 16) |
+			if (buffElemSizes[COL_OFFSET] == 4) {
+				col = (uint8_t)(getbuff(COL_OFFSET, 16, 0) * 255.f) |
+					((uint8_t)(getbuff(COL_OFFSET, 16, 4) * 255.f) << 8) |
+					((uint8_t)(getbuff(COL_OFFSET, 16, 8) * 255.f) << 16) |
+					((uint8_t)(getbuff(COL_OFFSET, 16, 12) * 255.f) << 24);
+			}
+			else if (buffElemSizes[COL_OFFSET] == 3) {
+				col = (uint8_t)(getbuff(COL_OFFSET, 12, 0) * 255.f) |
+					((uint8_t)(getbuff(COL_OFFSET, 12, 4) * 255.f) << 8) |
+					((uint8_t)(getbuff(COL_OFFSET, 12, 8) * 255.f) << 16) |
 					0xff000000;
-			//}
+			}
 			newmesh.verts[vc++] = Pi3Cutils::colToFloat(col);
 		}
 		else {
-			newmesh.verts[vc++] = 0;
+			newmesh.verts[vc++] = white;
 		}
 	}
 
@@ -185,10 +194,11 @@ static Pi3Cmesh CreateMesh(tinygltf::Model& model, const tinygltf::Primitive& pr
 	return newmesh;
 }
 
-static Pi3Cmodel ParseMesh(Pi3Cresource* resource, tinygltf::Model& model, const tinygltf::Mesh& mesh) {
+static Pi3Cmodel ParseMesh(Pi3Cresource* resource, tinygltf::Model& model, const tinygltf::Mesh& mesh, const std::vector<int>& texRefs) {
 
 	Pi3Cmodel newmodel;
-	
+	Pi3Cmaterial newmaterial;
+
 	auto& buff = model.buffers[0].data;
 
 
@@ -198,8 +208,36 @@ static Pi3Cmodel ParseMesh(Pi3Cresource* resource, tinygltf::Model& model, const
 
 		if (primitive.indices < 0) return newmodel;
 
-		Pi3Cmesh newmesh = CreateMesh(model, primitive);
-		newmodel.appendMeshToGroup(resource, newmesh, 1);
+		tinygltf::Material* material = (primitive.material >= 0) ? &model.materials[primitive.material] : nullptr;
+
+		if (material) {
+			newmaterial = *resource->defaultMaterial();
+			newmaterial.name = material->name;
+			newmaterial.groupID = 1;
+
+			const auto& basecol = material->pbrMetallicRoughness.baseColorFactor;
+			if (basecol.size() == 4) {
+				newmaterial.SetColDiffuse(vec4f((float)basecol[0], (float)basecol[1], (float)basecol[2], (float)basecol[3]));
+			}
+
+			//const auto& baseshine = material.pbrMetallicRoughness.metallicFactor;
+
+			int tref = material->pbrMetallicRoughness.baseColorTexture.index;
+			if (tref >= 0 && tref < texRefs.size()) {
+				newmaterial.texRef = texRefs[tref];
+				newmaterial.texID = resource->getTextureID(newmaterial.texRef);
+				std::shared_ptr<Pi3Ctexture> Texture = resource->textures[newmaterial.texRef];
+				newmaterial.texWidth = Texture->GetWidth();
+				newmaterial.texHeight = Texture->GetHeight();
+			}
+		}
+
+		Pi3Cmesh basemesh = CreateMesh(resource, model, primitive);
+		int gref = newmodel.appendMeshToGroup(resource, basemesh, 1);
+		if (material) {
+			Pi3Cmodel& gpmodel = newmodel.group[gref];
+			gpmodel.material = newmaterial;
+		}
 
 		//Check if targets exist, add target meshes to mesh group
 
@@ -208,7 +246,7 @@ static Pi3Cmodel ParseMesh(Pi3Cresource* resource, tinygltf::Model& model, const
 		if (targets > 0) {
 
 			auto prim = primitive;
-			newmodel.animated = true;
+			newmodel.animgroup = true;
 
 			for (int targRef = 0; targRef < targets; targRef++) {
 
@@ -221,14 +259,19 @@ static Pi3Cmodel ParseMesh(Pi3Cresource* resource, tinygltf::Model& model, const
 					if (itf != prim.attributes.end()) itf->second = it->second;
 				}
 
-				Pi3Cmesh targMesh = CreateMesh(model, prim);
+				Pi3Cmesh targMesh = CreateMesh(resource, model, prim);
+				//Add targMesh verts to base mesh verts
 				for (size_t v=0; v < targMesh.vc; v+=targMesh.stride) {
-					targMesh.verts[v] += newmesh.verts[v];
-					targMesh.verts[v + 1] += newmesh.verts[v + 1];
-					targMesh.verts[v + 2] += newmesh.verts[v + 2];
+					targMesh.verts[v] += basemesh.verts[v];
+					targMesh.verts[v + 1] += basemesh.verts[v + 1];
+					targMesh.verts[v + 2] += basemesh.verts[v + 2];
 				}
 				targMesh.updateNormals(0, targMesh.vc);
-				newmodel.appendMeshToGroup(resource, targMesh, 1);
+				int gref = newmodel.appendMeshToGroup(resource, targMesh, 1);
+				if (material) {
+					Pi3Cmodel& gpmodel = newmodel.group[gref];
+					gpmodel.material = newmaterial;
+				}
 			}
 		}
 	}
@@ -237,7 +280,7 @@ static Pi3Cmodel ParseMesh(Pi3Cresource* resource, tinygltf::Model& model, const
 }
 
 
-static Pi3Cmodel ParseNode(Pi3Cresource* resource, tinygltf::Model& model, const tinygltf::Node& node) {
+static Pi3Cmodel ParseNode(Pi3Cresource* resource, tinygltf::Model& model, const tinygltf::Node& node, const std::vector<int>& texRefs) {
 	// Apply xform
 
 	Pi3Cmodel newmodel;
@@ -258,6 +301,9 @@ static Pi3Cmodel ParseNode(Pi3Cresource* resource, tinygltf::Model& model, const
 		}
 
 		if (node.rotation.size() == 4) {
+			//Pi3Cmatrix mtx;
+			//Pi3Cquaternion quat(node.rotation[0], node.rotation[1], node.rotation[2], node.rotation[3]);
+			//matrix = matrix * quat.toMatrix();
 			matrix.rotateAXYZ(node.rotation[0], node.rotation[1], node.rotation[2], node.rotation[3]);
 		}
 
@@ -268,12 +314,12 @@ static Pi3Cmodel ParseNode(Pi3Cresource* resource, tinygltf::Model& model, const
 
 	if (node.mesh > -1) {
 		assert(node.mesh < model.meshes.size());
-		newmodel = ParseMesh(resource, model, model.meshes[node.mesh]);
+		newmodel = ParseMesh(resource, model, model.meshes[node.mesh], texRefs);
 	}
 
 	for (size_t i = 0; i < node.children.size(); i++) {
 		assert(node.children[i] < model.nodes.size());
-		Pi3Cmodel nodemod = ParseNode(resource, model, model.nodes[node.children[i]]);
+		Pi3Cmodel nodemod = ParseNode(resource, model, model.nodes[node.children[i]], texRefs);
 		newmodel.append(resource, nodemod);
 	}
 
@@ -301,12 +347,25 @@ bool Pi3Cgltf::load(Pi3Cresource* resource, Pi3Cscene* piscene, const std::strin
 	if (ret) {
 		assert(model.scenes.size() > 0);
 
+		std::vector<int> texRefs(0);
+
+		if (model.images.size() > 0) {
+			for (size_t i = 0; i < model.images.size(); i++) {
+				auto& image = model.images[i];
+				std::shared_ptr<Pi3Ctexture> Texture;
+				Texture.reset(new Pi3Ctexture(image.width, image.height, image.component));
+				uint8_t* tpix = Texture->GetTexels();
+				//memcpy(tpix, &image.image[0], image.image.size());
+				Pi3Cutils::flipImage(&image.image[0], tpix, image.width, image.height);
+				texRefs.push_back(resource->addTexture(Texture));
+			}
+		}
+
 		Pi3Cmodel rootmodel;
-		Pi3Cmatrix matrix;
 		int scene_to_display = model.defaultScene > -1 ? model.defaultScene : 0;
 		const tinygltf::Scene& scene = model.scenes[scene_to_display];
 		for (size_t i = 0; i < scene.nodes.size(); i++) {
-			rootmodel.append(resource, ParseNode(resource, model, model.nodes[scene.nodes[i]]));
+			rootmodel.append(resource, ParseNode(resource, model, model.nodes[scene.nodes[i]], texRefs));
 		}
 		piscene->append3D(rootmodel);
 	}

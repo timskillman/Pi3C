@@ -77,7 +77,7 @@ public:
 	void renderBasic(Pi3Cresource *resource, Pi3Cshader * shader = nullptr, const Pi3Cmatrix *parent_matrix = nullptr, Pi3Cmaterial *materialOverride = nullptr);
 	void setMesh(Pi3Cresource* resource, Pi3Cmesh mesh, int32_t groupId);
 	void appendMesh(Pi3Cresource *resource, Pi3Cmesh mesh, int32_t groupId);
-	void appendMeshToGroup(Pi3Cresource* resource, Pi3Cmesh mesh, int32_t groupId, uint32_t diffuseColour = 0xffffffff, bool deleteVerts = true);
+	int appendMeshToGroup(Pi3Cresource* resource, Pi3Cmesh mesh, int32_t groupId, uint32_t diffuseColour = 0xffffffff, bool deleteVerts = true);
 	void updateMesh(Pi3Cresource* resource, Pi3Cmesh& umesh);
 	void loadOBJfile(Pi3Cresource *resource, std::string path, std::string modelfile, int32_t groupId, std::function<void(float)> showProgressCB, bool asCollider, bool addColliderGrid = false);
 	void addMeshes(Pi3Cresource* resource, const std::string& modelname, const size_t meshStart, const size_t meshEnd);
@@ -156,7 +156,7 @@ public:
 	bool selected = false;			//model selected (useful for editing)
 	bool asCollider = false;		//if true, then use this model as a collider as well as rendered
 
-	bool animated = false;			// animate contents of a group
+	bool animgroup = false;			// animate contents of a group
 	uint32_t frame = 0;				// animated frame in group;
 
 	int32_t choice = -1;			//if set to value 0 and above, this option will choose which model in the group to render - the rest are ignored
