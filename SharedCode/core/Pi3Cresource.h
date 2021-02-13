@@ -69,6 +69,7 @@ public:
 	int32_t addTexture(const std::shared_ptr<Pi3Ctexture> &Texture, bool smooth = true);
 	int32_t getTextureID(int32_t texRef);
 	void createDefaultMaterial(const std::string &name = "default");
+	int32_t addMaterial(const Pi3Cmaterial& material);
 	Pi3Cmesh createRect(const vec3f& pos, const vec2f& size, const uint32_t col, const vec2f& uvpos = vec2f(0,0), const vec2f& uvsize = vec2f(1.f,1.f));
 	int32_t createDefaultTexture(int32_t &texID);
 	Pi3Cmaterial * defaultMaterial() { return &materials[0]; }
@@ -80,6 +81,8 @@ public:
 	Pi3Ctexture* getTexture(int32_t ref) {
 		return (ref >= 0 && ref <= (int32_t)textures.size()) ? textures[ref].get() : nullptr;
 	}
+	
+	int32_t findTextureByName(const std::string& name);
 
 	//int32_t addMesh(Pi3Cmesh &mesh, const bool deleteVerts = true, const bool dynamicBuffer = false, const uint32_t vertSize = 2000000);		//returns mesh reference (or -1 if failed)
 	int32_t addMesh(Pi3Cmesh * mesh, int32_t groupId, uint32_t maxsize = 500000, bool deleteVerts = true);

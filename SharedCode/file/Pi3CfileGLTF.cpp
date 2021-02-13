@@ -1,6 +1,6 @@
 #include "Pi3CfileGLTF.h"
 #include "Pi3Cutils.h"
-//#include "Pi3Cquaternion.h"
+#include "Pi3Cquaternion.h"
 
 #define TINYGLTF_IMPLEMENTATION
 #define STB_IMAGE_IMPLEMENTATION
@@ -124,22 +124,27 @@ static Pi3Cmesh CreateMesh(Pi3Cresource* resource, tinygltf::Model& model, const
 	uint32_t& vc = newmesh.vc = 0;
 	float white = Pi3Cutils::colToFloat(0xffffffff);
 
+	int itype = 0;
+	switch (indexAccessor.componentType) {
+	case TINYGLTF_COMPONENT_TYPE_BYTE:
+	case TINYGLTF_COMPONENT_TYPE_UNSIGNED_BYTE:
+		itype = 0;
+		break;
+	case TINYGLTF_COMPONENT_TYPE_SHORT:
+	case TINYGLTF_COMPONENT_TYPE_UNSIGNED_SHORT:
+		itype = 1;
+		break;
+	case TINYGLTF_COMPONENT_TYPE_INT:
+	case TINYGLTF_COMPONENT_TYPE_UNSIGNED_INT:
+		itype = 2;
+		break;
+	}
+
 	for (int i = 0; i < indcount; i++) {
-		unsigned int index = 0;
-		switch (indexAccessor.componentType) {
-		case TINYGLTF_COMPONENT_TYPE_BYTE:
-		case TINYGLTF_COMPONENT_TYPE_UNSIGNED_BYTE:
-			index = (unsigned int)buff[byteOffset + i];
-			break;
-		case TINYGLTF_COMPONENT_TYPE_SHORT:
-		case TINYGLTF_COMPONENT_TYPE_UNSIGNED_SHORT:
-			index = (unsigned int)*(unsigned short*)&buff[byteOffset + i * 2];
-			break;
-		case TINYGLTF_COMPONENT_TYPE_INT:
-		case TINYGLTF_COMPONENT_TYPE_UNSIGNED_INT:
-			index = (unsigned int)*(unsigned int*)&buff[byteOffset + i * 4];
-			break;
-		}
+
+		unsigned int index = (itype == 0) ? (unsigned int)buff[byteOffset + i] : 
+			(itype == 1) ? (unsigned int)*(unsigned short*)&buff[byteOffset + i * 2] : 
+			(unsigned int)*(unsigned int*)&buff[byteOffset + i * 4];
 
 		vec3f point = vec3f(getbuff(VERT_OFFSET, 12, 0), getbuff(VERT_OFFSET, 12, 4), getbuff(VERT_OFFSET, 12, 8));
 		newmesh.verts[vc++] = point.x;
@@ -229,6 +234,7 @@ static Pi3Cmodel ParseMesh(Pi3Cresource* resource, tinygltf::Model& model, const
 				std::shared_ptr<Pi3Ctexture> Texture = resource->textures[newmaterial.texRef];
 				newmaterial.texWidth = Texture->GetWidth();
 				newmaterial.texHeight = Texture->GetHeight();
+				newmaterial.alpha = 0.999f;
 			}
 		}
 
@@ -301,10 +307,9 @@ static Pi3Cmodel ParseNode(Pi3Cresource* resource, tinygltf::Model& model, const
 		}
 
 		if (node.rotation.size() == 4) {
-			//Pi3Cmatrix mtx;
-			//Pi3Cquaternion quat(node.rotation[0], node.rotation[1], node.rotation[2], node.rotation[3]);
-			//matrix = matrix * quat.toMatrix();
-			matrix.rotateAXYZ(node.rotation[0], node.rotation[1], node.rotation[2], node.rotation[3]);
+			Pi3Cmatrix mtx;
+			Pi3Cquaternion quat(node.rotation[0], node.rotation[1], node.rotation[2], node.rotation[3]);
+			matrix = matrix * quat.toMatrix();
 		}
 
 		if (node.translation.size() == 3) {
@@ -327,21 +332,23 @@ static Pi3Cmodel ParseNode(Pi3Cresource* resource, tinygltf::Model& model, const
 	return newmodel;
 }
 
-bool Pi3Cgltf::load(Pi3Cresource* resource, Pi3Cscene* piscene, const std::string& filename)
+bool Pi3Cgltf::load(Pi3Cresource* resource, Pi3Cscene* piscene, const std::string& filepath)
 {
 	tinygltf::Model model;
 	tinygltf::TinyGLTF loader;
 	std::string err;
 	std::string warn;
 
-	std::string ext = Pi3Cutils::getExt(filename);
+	std::string ext = Pi3Cutils::getExt(filepath);
+	std::string name = Pi3Cutils::extractName(filepath);
+
 	bool ret = false;
 
 	if (ext == "glb") {
-		ret = loader.LoadBinaryFromFile(&model, &err, &warn, filename);
+		ret = loader.LoadBinaryFromFile(&model, &err, &warn, filepath);
 	}
 	else if (ext == "gltf") {
-		ret = loader.LoadASCIIFromFile(&model, &err, &warn, filename);
+		ret = loader.LoadASCIIFromFile(&model, &err, &warn, filepath);
 	}
 
 	if (ret) {
@@ -349,15 +356,49 @@ bool Pi3Cgltf::load(Pi3Cresource* resource, Pi3Cscene* piscene, const std::strin
 
 		std::vector<int> texRefs(0);
 
-		if (model.images.size() > 0) {
-			for (size_t i = 0; i < model.images.size(); i++) {
-				auto& image = model.images[i];
-				std::shared_ptr<Pi3Ctexture> Texture;
-				Texture.reset(new Pi3Ctexture(image.width, image.height, image.component));
-				uint8_t* tpix = Texture->GetTexels();
-				//memcpy(tpix, &image.image[0], image.image.size());
-				Pi3Cutils::flipImage(&image.image[0], tpix, image.width, image.height);
-				texRefs.push_back(resource->addTexture(Texture));
+		if (model.materials.size() > 0) {
+			for (size_t i = 0; i < model.materials.size(); i++) {
+				int ti = model.materials[i].pbrMetallicRoughness.baseColorTexture.index;
+				if (ti >= 0 && ti < model.images.size()) {
+					auto& image = model.images[ti];
+					std::string texname = (model.materials[i].name != "") ? model.materials[i].name : filepath + "_tex" + std::to_string(i);
+					int32_t ft = resource->findTextureByName(texname);
+					if (ft < 0) {
+						std::shared_ptr<Pi3Ctexture> Texture;
+						int iw = image.width, ih = image.height, sc = 1;
+						while (iw > 2048 || ih > 2048) { iw /= 2; ih /= 2; sc *= 2; }
+						uint32_t* srcimg = (uint32_t*)&image.image[0];
+						Texture.reset(new Pi3Ctexture(iw, ih, image.component));
+						uint32_t* tpix = (uint32_t*)Texture->GetTexels();
+						if (sc > 1) {
+							int q = 0, sp = 0;
+							for (int sy = 0; sy < image.height; sy += sc) {
+								for (int sx = 0; sx < image.width; sx += sc) {
+									int q = sx + sy * image.width;
+									tpix[sp++] = srcimg[q];
+								}
+							}
+						}
+						else
+						{
+							memcpy(tpix, srcimg, iw * ih * 4);
+						}
+
+						Pi3Cutils::flipImage((uint8_t*)tpix, iw, ih);
+						Texture->name = texname;
+						ft = resource->addTexture(Texture);
+						Pi3Cmaterial mat = *resource->defaultMaterial();
+						mat.texRef = ft;
+						mat.texName = texname;
+						mat.texWidth = iw;
+						mat.texHeight = ih;
+						mat.name = texname;
+						mat.alpha = 0.99f;
+						mat.illum = 2;
+						resource->addMaterial(mat);
+					}
+					texRefs.push_back(ft);
+				}
 			}
 		}
 

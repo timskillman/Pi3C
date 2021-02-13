@@ -55,6 +55,7 @@ void Pi3Cquaternion::quaternionXm(Pi3Cmatrix& matx, float ang)
 	a = mtx[Pi3Cmatrix::m21] * x2 + mtx[Pi3Cmatrix::m22] * -wx;
 	mtx[Pi3Cmatrix::m22] = mtx[Pi3Cmatrix::m21] * wx + mtx[Pi3Cmatrix::m22] * x2;
 	mtx[Pi3Cmatrix::m21] = a;
+	matx.identity = false;
 }
 
 void Pi3Cquaternion::quaternionYm(Pi3Cmatrix& matx, float ang)
@@ -73,6 +74,7 @@ void Pi3Cquaternion::quaternionYm(Pi3Cmatrix& matx, float ang)
 	a = mtx[Pi3Cmatrix::m20] * y2 + mtx[Pi3Cmatrix::m22] * wy;
 	mtx[Pi3Cmatrix::m22] = mtx[Pi3Cmatrix::m20] * -wy + mtx[Pi3Cmatrix::m22] * y2;
 	mtx[Pi3Cmatrix::m20] = a;
+	matx.identity = false;
 }
 
 void Pi3Cquaternion::quaternionZm(Pi3Cmatrix& matx, float ang)
@@ -91,6 +93,7 @@ void Pi3Cquaternion::quaternionZm(Pi3Cmatrix& matx, float ang)
 	a = mtx[Pi3Cmatrix::m20] * z2 + mtx[Pi3Cmatrix::m21] * -wz;
 	mtx[Pi3Cmatrix::m21] = mtx[Pi3Cmatrix::m20] * wz + mtx[Pi3Cmatrix::m21] * z2;
 	mtx[Pi3Cmatrix::m20] = a;
+	matx.identity = false;
 }
 
 static void quaternion(Pi3Cmatrix& matx, float x, float y, float z, float w)
@@ -118,6 +121,7 @@ static void quaternion(Pi3Cmatrix& matx, float x, float y, float z, float w)
 	mtx[Pi3Cmatrix::m20] = xz + wy;
 	mtx[Pi3Cmatrix::m21] = yz - wx;
 	mtx[Pi3Cmatrix::m22] = 1.f - x2 - y2;
+	matx.identity = false;
 }
 
 void Pi3Cquaternion::matrixToQuat(Pi3Cmatrix& matx)

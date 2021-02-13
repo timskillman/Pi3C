@@ -8,13 +8,15 @@
 namespace Pi3Cutils
 {
 	int32_t tesselatePath(std::vector<std::vector<float>>& path, std::vector<float>& tris, std::vector<std::vector<float>>& edges);
-	void flipImage(uint8_t* src, uint8_t* dest, uint32_t w, uint32_t h);
+	void flipImage(uint8_t* src, uint32_t w, uint32_t h);
+	void flipToOtherImage(uint8_t* src, uint8_t* dest, uint32_t w, uint32_t h);
 	bool snapShot(const Pi3Crecti &rect, std::vector<uint8_t> &snapShot);
 	void saveBufferToPNG(const char* filename, std::vector<uint8_t>& snapShot, const int width, const int height);
 	std::string ftostrdp(float n, int decimalPlaces);
 	std::string endstr(std::string const& str, size_t const length);
 	std::string filepath(const std::string& path, const std::string& filename, const std::string& ext);
 	std::string extractPath(std::string& file);
+	std::string extractName(const std::string& file);
 	std::string getExt(const std::string& file);
 	std::string lowercase(const std::string& str);
 	float colToFloat(const uint32_t col);

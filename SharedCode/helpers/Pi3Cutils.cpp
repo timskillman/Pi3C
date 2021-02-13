@@ -52,7 +52,7 @@ namespace Pi3Cutils {
 		return triCount;	
 	}
 	
-	void flipImage(uint8_t* src, uint8_t* dest, uint32_t w, uint32_t h)
+	void flipToOtherImage(uint8_t* src, uint8_t* dest, uint32_t w, uint32_t h)
 	{
 		uint32_t span = w * 4;
 		uint8_t *pt = src + 0;
@@ -64,11 +64,29 @@ namespace Pi3Cutils {
 		}
 	}
 
+	void flipImage(uint8_t* src, uint32_t w, uint32_t h)
+	{
+		//Destination can be the same as source...
+		uint8_t* dest = src;
+		uint32_t span = w * 4;
+		uint8_t* pt = src + 0;
+		uint8_t* pb = dest + (h - 1) * span;
+		std::vector<uint8_t> tmp(span);
+
+		for (uint32_t y = 0; y < h / 2; y++) {
+			std::memcpy(&tmp[0], pb, span);
+			std::memcpy(pb, pt, span);
+			std::memcpy(pt, &tmp[0], span);
+			pb -= span;
+			pt += span;
+		}
+	}
+
 	void saveBufferToPNG(const char* filename, std::vector<uint8_t>& snapShot, const int width, const int height)
 	{
 		std::vector<uint8_t> destimage;
 		destimage.resize(snapShot.size());
-		flipImage(&snapShot[0], &destimage[0], width, height);
+		flipToOtherImage(&snapShot[0], &destimage[0], width, height);
 
 		SDL_Surface* ss = SDL_CreateRGBSurfaceFrom(&destimage[0], width, height, 32, width * 4, 0x000000ff, 0x0000ff00, 0x00ff0000, 0xff000000);
 		SDL_RWops* fo = SDL_RWFromFile(filename, "wb");
@@ -86,7 +104,7 @@ namespace Pi3Cutils {
 			std::vector<uint8_t> destimage;
 			destimage.resize(snapShot.size());
 			glReadPixels(rect.x, rect.y, rect.width, rect.height, GL_RGBA, GL_UNSIGNED_BYTE, &destimage[0]);
-			flipImage(&destimage[0], &snapShot[0], rect.width, rect.height);
+			flipToOtherImage(&destimage[0], &snapShot[0], rect.width, rect.height);
 			//saveBufferToPNG("snapshot.png", snapShot, rect.width, rect.height);
 			return true;
 		}
@@ -119,6 +137,12 @@ namespace Pi3Cutils {
 		std::string path = file.substr(0, found);
 		file = file.substr(found + 1);
 		return path;
+	}
+
+	std::string extractName(const std::string& file)
+	{
+		std::size_t found = file.find_last_of("/\\");
+		return file.substr(found + 1);
 	}
 
 	std::string lowercase(const std::string& str)

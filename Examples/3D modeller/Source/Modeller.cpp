@@ -1287,7 +1287,6 @@ void Modeller::renderView(const viewInfo::SceneLayout projection, const Pi3Crect
 {
 	//if (refreshed() && (mx<rect.x || mx>(rect.x + rect.width) || my<rect.y || my>(rect.y + rect.height))) return;
 	//window->clearRect(rect);
-
 	views[projection].viewport = rect;
 	if (views[projection].viewport.touch(mx, my)) currentView = projection;
 	renderScene(views[projection]);
@@ -1318,9 +1317,10 @@ void Modeller::render()
 	currentView = viewInfo::INACTIVE;
 
 	if (fullview >= 0) {
-		views[viewInfo::FULL].viewport = mgui.getRectFull();
-		currentView = viewInfo::FULL;
-		renderScene(views[viewInfo::FULL]);
+		renderView(viewInfo::FULL, mgui.getRectFull(), mx, my);
+		//views[viewInfo::FULL].viewport = mgui.getRectFull();
+		//currentView = viewInfo::FULL;
+		//renderScene(views[viewInfo::FULL]);
 	}
 	else {
 		renderView(viewInfo::BOTTOMRIGHT, mgui.getRectBottomRight(), mx, my); //render perspective view

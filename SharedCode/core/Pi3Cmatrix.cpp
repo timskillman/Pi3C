@@ -385,7 +385,7 @@ void Pi3Cmatrix::rotateAXYZ(const float angle, const float x, const float y, con
 	rotmtx.matrix[m00] = x * x * (1 - cosa) + cosa, rotmtx.matrix[m10] = x * y * (1 - cosa) - z * sina, rotmtx.matrix[m20] = x * z * (1 - cosa) + y * sina;
 	rotmtx.matrix[m01] = y * x * (1 - cosa) + z * sina, rotmtx.matrix[m11] = y * y * (1 - cosa) + cosa, rotmtx.matrix[m21] = y * z * (1 - cosa) - x * sina;
 	rotmtx.matrix[m02] = z * x * (1 - cosa) - y * sina, rotmtx.matrix[m12] = z * y * (1 - cosa) + x * sina, rotmtx.matrix[m22] = z * z * (1 - cosa) + cosa;
-
+	rotmtx.identity = false;
 	//rotmtx.matrix[m11] = rotmtx.matrix[m22] = cosf(angle);
 	//rotmtx.matrix[m21] = -(rotmtx.matrix[m12] = sinf(angle));
 

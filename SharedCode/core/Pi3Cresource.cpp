@@ -60,6 +60,12 @@ void Pi3Cresource::createDefaultMaterial(const std::string &name)
 	materials.push_back(defmaterial);
 }
 
+int32_t Pi3Cresource::addMaterial(const Pi3Cmaterial& material)
+{
+	materials.push_back(material);
+	return materials.size() - 1;
+}
+
 void Pi3Cresource::deleteMaterialTexturesByID(int32_t groupId)
 {
 	for (auto& m: materials)
@@ -128,16 +134,30 @@ int32_t Pi3Cresource::getTextureID(int32_t texRef)
 	return textures[texRef]->textureID;
 }
 
+int32_t Pi3Cresource::findTextureByName(const std::string& name)
+{
+	for (size_t i = 0; i < textures.size(); i++) {
+		if (name == textures[i]->name) return i;
+	}
+	return -1;
+}
+
 int32_t Pi3Cresource::addTexture(const std::shared_ptr<Pi3Ctexture> &Texture, bool smooth)
 {
 	if (Texture.get() != nullptr) {
 		Texture->upload(smooth);
-		//texRef = textures.size();		//Texture reference in resource textures array
+		if (Texture->name == "") Texture->name = "Pi3Tex" + std::to_string(textures.size());
 		textures.push_back(Texture);	//keep texture - don't destroy it
-		return textures.size()-1;		//return texture reference in resource textures array
+		int texref = textures.size() - 1;
+		//Pi3Cmaterial mat = *defaultMaterial();
+		//mat.texRef = texref;
+		//mat.texName = Texture->name;
+		//mat.name = Texture->name;
+		//mat.texWidth = Texture->GetWidth();
+		//mat.texHeight = Texture->GetHeight();
+		//addMaterial(mat);
+		return texref;		//return texture reference in resource textures array
 	}
-
-	//texRef = -1;
 	return -1;
 }
 
