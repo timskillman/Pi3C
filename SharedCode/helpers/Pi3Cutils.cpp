@@ -128,14 +128,14 @@ namespace Pi3Cutils {
 	std::string filepath(const std::string& path, const std::string& filename, const std::string& ext)
 	{
 		const std::string gpath = (path.size() > 0 && *(path.end() - 1) != '/') ? path + "/" : path;
-		return gpath + filename + ((ext[0] == '.') ? ext : "." + ext);
+		return gpath + filename + ((ext=="") ? "" : (ext[0] == '.') ? ext : "." + ext);
 	}
 
-	std::string extractPath(std::string& file)
+	std::string extractPath(const std::string& file)
 	{
 		std::size_t found = file.find_last_of("/\\");
 		std::string path = file.substr(0, found);
-		file = file.substr(found + 1);
+		//file = file.substr(found + 1);
 		return path;
 	}
 
@@ -184,4 +184,18 @@ namespace Pi3Cutils {
 		glDrawElements(GL_TRIANGLE_STRIP, 4, GL_UNSIGNED_SHORT, inds);
 	}
 
+	void storeVNTC(std::vector<float>& verts, uint32_t& vc, const vec3f& pos, const vec3f& norm, const vec2f& texcoords, const uint32_t col)
+	{
+		/* Either creates new vertices or updates them */
+		if (vc + 9 > verts.size()) verts.resize(vc + 9);
+		verts[vc++] = pos.x;
+		verts[vc++] = pos.y;
+		verts[vc++] = pos.z;
+		verts[vc++] = norm.x;
+		verts[vc++] = norm.y;
+		verts[vc++] = norm.z;
+		verts[vc++] = texcoords.x;
+		verts[vc++] = texcoords.y;
+		verts[vc++] = (float)(col & 255) / 256.f + (float)((col >> 8) & 255) + (float)((col >> 16) & 255) * 256.f; //range 65536.255
+	}
 }

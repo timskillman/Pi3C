@@ -2,7 +2,8 @@
 #include "Pi3Cshapes.h"
 #include "Pi3Cblocks.h"
 #include "Pi3CfileFBX.h"
-#include "Pi3CfileGLTF.h"
+//#include "Pi3CfileGLTF.h"
+#include "Pi3CfileFXGLTF.h"
 
 #include <fstream>
 #include <sstream>
@@ -1049,8 +1050,8 @@ bool Modeller::loadModelAt(const std::string& modelfile, const vec3f pos, const 
 		return true;
 	}
 	else if (ext == "gltf" || ext == "glb") {
-		Pi3Cgltf gltf(resource, &scene, modelfile);
-
+		//Pi3Cgltf gltf(resource, &scene, modelfile);
+		Pi3Cfxgltf gltf(resource, &scene, modelfile);
 		return true;
 	}
 	return false;

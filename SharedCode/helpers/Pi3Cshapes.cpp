@@ -19,24 +19,9 @@ namespace Pi3Cshapes {
 		SH_CUBOID,SH_SPHERE,SH_CYLINDER,SH_CONE,SH_TCONE,SH_TUBE,SH_
 	};
 
-	void storeVNTC(std::vector<float>& verts, uint32_t& vc, const vec3f& pos, const vec3f& norm, const vec2f& texcoords, const uint32_t col)
-	{
-		/* Either creates new vertices or updates them */
-		if (vc + 9 > verts.size()) verts.resize(vc + 9);
-		verts[vc++] = pos.x;
-		verts[vc++] = pos.y;
-		verts[vc++] = pos.z;
-		verts[vc++] = norm.x;
-		verts[vc++] = norm.y;
-		verts[vc++] = norm.z;
-		verts[vc++] = texcoords.x;
-		verts[vc++] = texcoords.y;
-		verts[vc++] = (float)(col & 255) / 256.f + (float)((col >> 8) & 255) + (float)((col >> 16) & 255) * 256.f; //range 65536.255
-	}
-
 	void addPoint(vertsPtr& vp, const vec3f& pos)
 	{
-		Pi3Cshapes::storeVNTC(*vp.verts, vp.offset, pos, vec3f(0, 0, 0), vec2f(1.f, 1.f), 0xffffffff);
+		Pi3Cutils::storeVNTC(*vp.verts, vp.offset, pos, vec3f(0, 0, 0), vec2f(1.f, 1.f), 0xffffffff);
 	}
 
 	void rect_verts(std::vector<float>& verts, uint32_t& vc, const vec2f& pos, const vec2f& size, const vec2f& uvpos, const vec2f& uvsize, uint32_t col)
@@ -44,25 +29,25 @@ namespace Pi3Cshapes {
 		vec3f n(0, -1.f, 0);
 		vec3f pos3(pos.x, pos.y, DEPTH2D);
 
-		storeVNTC(verts, vc, pos3 + vec3f(size.x, size.y, 0), n, uvpos + uvsize, col);
-		storeVNTC(verts, vc, pos3 + vec3f(0, size.y, 0), n, vec2f(uvpos.x, uvpos.y + uvsize.y), col);
-		storeVNTC(verts, vc, pos3 + vec3f(0, 0, 0), n, uvpos, col);
+		Pi3Cutils::storeVNTC(verts, vc, pos3 + vec3f(size.x, size.y, 0), n, uvpos + uvsize, col);
+		Pi3Cutils::storeVNTC(verts, vc, pos3 + vec3f(0, size.y, 0), n, vec2f(uvpos.x, uvpos.y + uvsize.y), col);
+		Pi3Cutils::storeVNTC(verts, vc, pos3 + vec3f(0, 0, 0), n, uvpos, col);
 
-		storeVNTC(verts, vc, pos3 + vec3f(size.x, 0, 0), n, vec2f(uvpos.x + uvsize.x, uvpos.y), col);
-		storeVNTC(verts, vc, pos3 + vec3f(size.x, size.y, 0), n, uvpos + uvsize, col);
-		storeVNTC(verts, vc, pos3 + vec3f(0, 0, 0), n, uvpos, col);
+		Pi3Cutils::storeVNTC(verts, vc, pos3 + vec3f(size.x, 0, 0), n, vec2f(uvpos.x + uvsize.x, uvpos.y), col);
+		Pi3Cutils::storeVNTC(verts, vc, pos3 + vec3f(size.x, size.y, 0), n, uvpos + uvsize, col);
+		Pi3Cutils::storeVNTC(verts, vc, pos3 + vec3f(0, 0, 0), n, uvpos, col);
 	}
 
 	void quad_verts(std::vector<float>& verts, uint32_t& vc, const vec3f& p1, const vec3f& p2, const vec3f& p3, const vec3f& p4, const vec2f& uvpos, const vec2f& uvsize, const uint32_t col)
 	{
 		vec3f n = p1.trinormal(p2, p3);
-		storeVNTC(verts, vc, p3, n, uvpos + uvsize, col);
-		storeVNTC(verts, vc, p2, n, uvpos, col);
-		storeVNTC(verts, vc, p1, n, vec2f(uvpos.x, uvpos.y + uvsize.y), col);
+		Pi3Cutils::storeVNTC(verts, vc, p3, n, uvpos + uvsize, col);
+		Pi3Cutils::storeVNTC(verts, vc, p2, n, uvpos, col);
+		Pi3Cutils::storeVNTC(verts, vc, p1, n, vec2f(uvpos.x, uvpos.y + uvsize.y), col);
 
-		storeVNTC(verts, vc, p4, n, vec2f(uvpos.x + uvsize.x, uvpos.y), col);
-		storeVNTC(verts, vc, p3, n, uvpos, col);
-		storeVNTC(verts, vc, p1, n, uvpos + uvsize, col);
+		Pi3Cutils::storeVNTC(verts, vc, p4, n, vec2f(uvpos.x + uvsize.x, uvpos.y), col);
+		Pi3Cutils::storeVNTC(verts, vc, p3, n, uvpos, col);
+		Pi3Cutils::storeVNTC(verts, vc, p1, n, uvpos + uvsize, col);
 	}
 
 	void polyline_verts(std::vector<float>& verts, uint32_t& vc, const std::vector<vec3f>& lines, const vec2f& uvpos, const vec2f& uvsize, const uint32_t col)
@@ -73,7 +58,7 @@ namespace Pi3Cshapes {
 		
 		for (int v=1; v<lines.size(); v++) {
 			vec3f cp = (lines[v] ^ lines[(v+1)%lines.size()]).unit() * 10.f;
-			storeVNTC(verts, vc, lines[v]+cp, n, uvpos, col);
+			Pi3Cutils::storeVNTC(verts, vc, lines[v]+cp, n, uvpos, col);
 
 		}
 	}
@@ -82,11 +67,11 @@ namespace Pi3Cshapes {
 	{
 		vec3f n(0, -1.f, 0);
 		vec3f pos3(pos.x, pos.y, DEPTH2D);
-		storeVNTC(verts, vc, pos3 + vec3f(0, 0, 0), n, uvpos, col);
-		storeVNTC(verts, vc, pos3 + vec3f(size.x, 0, 0), n, vec2f(uvpos.x, uvpos.y + uvsize.y), col);
-		storeVNTC(verts, vc, pos3 + vec3f(size.x, size.y, 0), n, uvpos + uvsize, col);
-		storeVNTC(verts, vc, pos3 + vec3f(0, size.y, 0), n, vec2f(uvpos.x + uvsize.x, uvpos.y), col);
-		storeVNTC(verts, vc, pos3 + vec3f(0, 0, 0), n, uvpos, col);
+		Pi3Cutils::storeVNTC(verts, vc, pos3 + vec3f(0, 0, 0), n, uvpos, col);
+		Pi3Cutils::storeVNTC(verts, vc, pos3 + vec3f(size.x, 0, 0), n, vec2f(uvpos.x, uvpos.y + uvsize.y), col);
+		Pi3Cutils::storeVNTC(verts, vc, pos3 + vec3f(size.x, size.y, 0), n, uvpos + uvsize, col);
+		Pi3Cutils::storeVNTC(verts, vc, pos3 + vec3f(0, size.y, 0), n, vec2f(uvpos.x + uvsize.x, uvpos.y), col);
+		Pi3Cutils::storeVNTC(verts, vc, pos3 + vec3f(0, 0, 0), n, uvpos, col);
 	}
 
 	void rectThickLine_verts(std::vector<float>& verts, uint32_t& vc, const vec2f& pos, const vec2f& size, const float thickness, const vec2f& uvpos, const vec2f& uvsize, const uint32_t col, bool triangles)
@@ -94,44 +79,44 @@ namespace Pi3Cshapes {
 		vec3f n(0, -1.f, 0);
 		vec3f pos3(pos.x, pos.y, DEPTH2D);
 		float uvx = thickness / size.x; float uvy = thickness / size.y;
-		storeVNTC(verts, vc, pos3 + vec3f(thickness, thickness,0), n, uvpos + vec2f(uvx,uvy), col); //0
-		storeVNTC(verts, vc, pos3, n, uvpos, col); //1
-		storeVNTC(verts, vc, pos3 + vec3f(0, size.y, 0), n, vec2f(uvpos.x, uvpos.y + uvsize.y), col); //2
+		Pi3Cutils::storeVNTC(verts, vc, pos3 + vec3f(thickness, thickness,0), n, uvpos + vec2f(uvx,uvy), col); //0
+		Pi3Cutils::storeVNTC(verts, vc, pos3, n, uvpos, col); //1
+		Pi3Cutils::storeVNTC(verts, vc, pos3 + vec3f(0, size.y, 0), n, vec2f(uvpos.x, uvpos.y + uvsize.y), col); //2
 		if (triangles) {
-			storeVNTC(verts, vc, pos3 + vec3f(thickness, thickness, 0), n, uvpos + vec2f(uvx, uvy), col); //0
-			storeVNTC(verts, vc, pos3 + vec3f(0, size.y, 0), n, vec2f(uvpos.x, uvpos.y + uvsize.y), col); //2
+			Pi3Cutils::storeVNTC(verts, vc, pos3 + vec3f(thickness, thickness, 0), n, uvpos + vec2f(uvx, uvy), col); //0
+			Pi3Cutils::storeVNTC(verts, vc, pos3 + vec3f(0, size.y, 0), n, vec2f(uvpos.x, uvpos.y + uvsize.y), col); //2
 		}
-		storeVNTC(verts, vc, pos3 + vec3f(thickness, size.y - thickness, 0), n, uvpos + vec2f(uvx, uvsize.y-uvy), col); //3
+		Pi3Cutils::storeVNTC(verts, vc, pos3 + vec3f(thickness, size.y - thickness, 0), n, uvpos + vec2f(uvx, uvsize.y-uvy), col); //3
 		if (triangles) {
-			storeVNTC(verts, vc, pos3 + vec3f(thickness, size.y - thickness, 0), n, uvpos + vec2f(uvx, uvsize.y - uvy), col); //3
-			storeVNTC(verts, vc, pos3 + vec3f(0, size.y, 0), n, vec2f(uvpos.x, uvpos.y + uvsize.y), col); //2
+			Pi3Cutils::storeVNTC(verts, vc, pos3 + vec3f(thickness, size.y - thickness, 0), n, uvpos + vec2f(uvx, uvsize.y - uvy), col); //3
+			Pi3Cutils::storeVNTC(verts, vc, pos3 + vec3f(0, size.y, 0), n, vec2f(uvpos.x, uvpos.y + uvsize.y), col); //2
 		}
-		storeVNTC(verts, vc, pos3 + vec3f(size.x, size.y, 0), n, uvpos + uvsize, col); //4
+		Pi3Cutils::storeVNTC(verts, vc, pos3 + vec3f(size.x, size.y, 0), n, uvpos + uvsize, col); //4
 		if (triangles) {
-			storeVNTC(verts, vc, pos3 + vec3f(thickness, size.y - thickness, 0), n, uvpos + vec2f(uvx, uvsize.y - uvy), col); //3
-			storeVNTC(verts, vc, pos3 + vec3f(size.x, size.y, 0), n, uvpos + uvsize, col); //4
+			Pi3Cutils::storeVNTC(verts, vc, pos3 + vec3f(thickness, size.y - thickness, 0), n, uvpos + vec2f(uvx, uvsize.y - uvy), col); //3
+			Pi3Cutils::storeVNTC(verts, vc, pos3 + vec3f(size.x, size.y, 0), n, uvpos + uvsize, col); //4
 		}
-		storeVNTC(verts, vc, pos3 + vec3f(size.x-thickness, size.y-thickness, 0), n, uvpos + vec2f(uvsize.x - uvx, uvsize.y - uvy), col); //5
+		Pi3Cutils::storeVNTC(verts, vc, pos3 + vec3f(size.x-thickness, size.y-thickness, 0), n, uvpos + vec2f(uvsize.x - uvx, uvsize.y - uvy), col); //5
 		if (triangles) {
-			storeVNTC(verts, vc, pos3 + vec3f(size.x - thickness, size.y - thickness, 0), n, uvpos + vec2f(uvsize.x - uvx, uvsize.y - uvy), col); //5
-			storeVNTC(verts, vc, pos3 + vec3f(size.x, size.y, 0), n, uvpos + uvsize, col); //4
+			Pi3Cutils::storeVNTC(verts, vc, pos3 + vec3f(size.x - thickness, size.y - thickness, 0), n, uvpos + vec2f(uvsize.x - uvx, uvsize.y - uvy), col); //5
+			Pi3Cutils::storeVNTC(verts, vc, pos3 + vec3f(size.x, size.y, 0), n, uvpos + uvsize, col); //4
 		}
-		storeVNTC(verts, vc, pos3 + vec3f(size.x, 0, 0), n, vec2f(uvpos.x + uvsize.x, uvpos.y), col); //6
+		Pi3Cutils::storeVNTC(verts, vc, pos3 + vec3f(size.x, 0, 0), n, vec2f(uvpos.x + uvsize.x, uvpos.y), col); //6
 		if (triangles) {
-			storeVNTC(verts, vc, pos3 + vec3f(size.x - thickness, size.y - thickness, 0), n, uvpos + vec2f(uvsize.x - uvx, uvsize.y - uvy), col); //5
-			storeVNTC(verts, vc, pos3 + vec3f(size.x, 0, 0), n, vec2f(uvpos.x + uvsize.x, uvpos.y), col); //6
+			Pi3Cutils::storeVNTC(verts, vc, pos3 + vec3f(size.x - thickness, size.y - thickness, 0), n, uvpos + vec2f(uvsize.x - uvx, uvsize.y - uvy), col); //5
+			Pi3Cutils::storeVNTC(verts, vc, pos3 + vec3f(size.x, 0, 0), n, vec2f(uvpos.x + uvsize.x, uvpos.y), col); //6
 		}
-		storeVNTC(verts, vc, pos3 + vec3f(size.x - thickness, thickness, 0), n, vec2f(uvpos.x + uvsize.x - uvx, uvpos.y + uvy), col); //7
+		Pi3Cutils::storeVNTC(verts, vc, pos3 + vec3f(size.x - thickness, thickness, 0), n, vec2f(uvpos.x + uvsize.x - uvx, uvpos.y + uvy), col); //7
 		if (triangles) {
-			storeVNTC(verts, vc, pos3 + vec3f(size.x - thickness, thickness, 0), n, vec2f(uvpos.x + uvsize.x - uvx, uvpos.y + uvy), col); //7
-			storeVNTC(verts, vc, pos3 + vec3f(size.x, 0, 0), n, vec2f(uvpos.x + uvsize.x, uvpos.y), col); //6
+			Pi3Cutils::storeVNTC(verts, vc, pos3 + vec3f(size.x - thickness, thickness, 0), n, vec2f(uvpos.x + uvsize.x - uvx, uvpos.y + uvy), col); //7
+			Pi3Cutils::storeVNTC(verts, vc, pos3 + vec3f(size.x, 0, 0), n, vec2f(uvpos.x + uvsize.x, uvpos.y), col); //6
 		}
-		storeVNTC(verts, vc, pos3, n, uvpos, col); //8
+		Pi3Cutils::storeVNTC(verts, vc, pos3, n, uvpos, col); //8
 		if (triangles) {
-			storeVNTC(verts, vc, pos3 + vec3f(size.x - thickness, thickness, 0), n, vec2f(uvpos.x + uvsize.x - uvx, uvpos.y + uvy), col); //7
-			storeVNTC(verts, vc, pos3, n, uvpos, col); //8
+			Pi3Cutils::storeVNTC(verts, vc, pos3 + vec3f(size.x - thickness, thickness, 0), n, vec2f(uvpos.x + uvsize.x - uvx, uvpos.y + uvy), col); //7
+			Pi3Cutils::storeVNTC(verts, vc, pos3, n, uvpos, col); //8
 		}
-		storeVNTC(verts, vc, pos3 + vec3f(thickness, thickness, 0), n, uvpos + vec2f(uvx, uvy), col); //9
+		Pi3Cutils::storeVNTC(verts, vc, pos3 + vec3f(thickness, thickness, 0), n, uvpos + vec2f(uvx, uvy), col); //9
 	}
 
 	void plane_verts(std::vector<float>& verts, uint32_t& vc, const vec3f& pos, const vec2f& size, const uint32_t xdivs, const uint32_t ydivs, int direction, const vec2f& uvsize, const uint32_t col)
@@ -165,18 +150,18 @@ namespace Pi3Cshapes {
 				float x = xi * sizex; float y = yi * size.y;
 				float xu = (xi + 0.5f) * uvsize.x; float yu = (yi + 0.5f) * uvsize.y;
 				v[a] = x + xd; v[b] = y + yd; memcpy(&vec, &v, 12);
-				storeVNTC(verts, vc, pos + vec, n, vec2f(xu + ux, yu + uy), col);
+				Pi3Cutils::storeVNTC(verts, vc, pos + vec, n, vec2f(xu + ux, yu + uy), col);
 				v[a] = x; v[b] = y + yd; memcpy(&vec, &v, 12);
-				storeVNTC(verts, vc, pos + vec, n, vec2f(xu, yu + uy), col);
+				Pi3Cutils::storeVNTC(verts, vc, pos + vec, n, vec2f(xu, yu + uy), col);
 				v[a] = x; v[b] = y; memcpy(&vec, &v, 12);
-				storeVNTC(verts, vc, pos + vec, n, vec2f(xu, yu), col);
+				Pi3Cutils::storeVNTC(verts, vc, pos + vec, n, vec2f(xu, yu), col);
 
 				v[a] = x + xd; v[b] = y; memcpy(&vec, &v, 12);
-				storeVNTC(verts, vc, pos + vec, n, vec2f(xu + ux, yu), col);
+				Pi3Cutils::storeVNTC(verts, vc, pos + vec, n, vec2f(xu + ux, yu), col);
 				v[a] = x + xd; v[b] = y + yd; memcpy(&vec, &v, 12);
-				storeVNTC(verts, vc, pos + vec, n, vec2f(xu + ux, yu + uy), col);
+				Pi3Cutils::storeVNTC(verts, vc, pos + vec, n, vec2f(xu + ux, yu + uy), col);
 				v[a] = x; v[b] = y; memcpy(&vec, &v, 12);
-				storeVNTC(verts, vc, pos + vec, n, vec2f(xu, yu), col);
+				Pi3Cutils::storeVNTC(verts, vc, pos + vec, n, vec2f(xu, yu), col);
 			}
 		}
 	}
@@ -197,13 +182,13 @@ namespace Pi3Cshapes {
 		{
 			int v = i * 12;
 			vec3f n = vec3f(cnorms[i * 3], cnorms[i * 3 + 1], cnorms[i * 3 + 2]);
-			storeVNTC(verts, vc, pos + vec3f(hsize.x * cubeOffs[v + 6], hsize.y * cubeOffs[v + 7], hsize.z * cubeOffs[v + 8]), n, vec2f(1, 1), col);
-			storeVNTC(verts, vc, pos + vec3f(hsize.x * cubeOffs[v], hsize.y * cubeOffs[v + 1], hsize.z * cubeOffs[v + 2]), n, vec2f(0, 0), col);
-			storeVNTC(verts, vc, pos + vec3f(hsize.x * cubeOffs[v + 3], hsize.y * cubeOffs[v + 4], hsize.z * cubeOffs[v + 5]), n, vec2f(0, 1), col);
+			Pi3Cutils::storeVNTC(verts, vc, pos + vec3f(hsize.x * cubeOffs[v + 6], hsize.y * cubeOffs[v + 7], hsize.z * cubeOffs[v + 8]), n, vec2f(1, 1), col);
+			Pi3Cutils::storeVNTC(verts, vc, pos + vec3f(hsize.x * cubeOffs[v], hsize.y * cubeOffs[v + 1], hsize.z * cubeOffs[v + 2]), n, vec2f(0, 0), col);
+			Pi3Cutils::storeVNTC(verts, vc, pos + vec3f(hsize.x * cubeOffs[v + 3], hsize.y * cubeOffs[v + 4], hsize.z * cubeOffs[v + 5]), n, vec2f(0, 1), col);
 
-			storeVNTC(verts, vc, pos + vec3f(hsize.x * cubeOffs[v + 9], hsize.y * cubeOffs[v + 10], hsize.z * cubeOffs[v + 11]), n, vec2f(1, 0), col);
-			storeVNTC(verts, vc, pos + vec3f(hsize.x * cubeOffs[v], hsize.y * cubeOffs[v + 1], hsize.z * cubeOffs[v + 2]), n, vec2f(0, 0), col);
-			storeVNTC(verts, vc, pos + vec3f(hsize.x * cubeOffs[v + 6], hsize.y * cubeOffs[v + 7], hsize.z * cubeOffs[v + 8]), n, vec2f(1, 1), col);
+			Pi3Cutils::storeVNTC(verts, vc, pos + vec3f(hsize.x * cubeOffs[v + 9], hsize.y * cubeOffs[v + 10], hsize.z * cubeOffs[v + 11]), n, vec2f(1, 0), col);
+			Pi3Cutils::storeVNTC(verts, vc, pos + vec3f(hsize.x * cubeOffs[v], hsize.y * cubeOffs[v + 1], hsize.z * cubeOffs[v + 2]), n, vec2f(0, 0), col);
+			Pi3Cutils::storeVNTC(verts, vc, pos + vec3f(hsize.x * cubeOffs[v + 6], hsize.y * cubeOffs[v + 7], hsize.z * cubeOffs[v + 8]), n, vec2f(1, 1), col);
 		}
 	}
 
@@ -301,12 +286,12 @@ namespace Pi3Cshapes {
 
 		for (int r = 0; r < sides; r++) {
 			float a = rs * (float)r;
-			storeVNTC(vertTemp, tc, pos + vec3f(cos(a) * innerRad, 0, sin(a) * innerRad), vec3f(0, 1.f, 0), vec2f(float(r) * ux, 0.999f), col);
+			Pi3Cutils::storeVNTC(vertTemp, tc, pos + vec3f(cos(a) * innerRad, 0, sin(a) * innerRad), vec3f(0, 1.f, 0), vec2f(float(r) * ux, 0.999f), col);
 		}
 
 		for (int r = 0; r < sides; r++) {
 			float a = rs * (float)r;
-			storeVNTC(vertTemp, tc, pos + vec3f(cos(a) * outerRad, 0, sin(a) * outerRad), vec3f(0, 1.f, 0), vec2f(float(r) * ux, 0.f), col);
+			Pi3Cutils::storeVNTC(vertTemp, tc, pos + vec3f(cos(a) * outerRad, 0, sin(a) * outerRad), vec3f(0, 1.f, 0), vec2f(float(r) * ux, 0.f), col);
 		}
 
 		for (int p = 0; p < sides; p++) {
@@ -621,18 +606,18 @@ namespace Pi3Cshapes {
 				float sinr = sin(ang);
 				float cosr = cos(ang);
 				if (sidePath) {
-					storeVNTC(vertTemp, tc, pos + vec3f(path[p].x * sinr, risey, path[p].x * cosr), vec3f(sinr * normals[p].x, normals[p].y, cosr * normals[p].x), vec2f(tcx * r, tcy), col);
+					Pi3Cutils::storeVNTC(vertTemp, tc, pos + vec3f(path[p].x * sinr, risey, path[p].x * cosr), vec3f(sinr * normals[p].x, normals[p].y, cosr * normals[p].x), vec2f(tcx * r, tcy), col);
 				}
 				else {
-					storeVNTC(vertTemp, tc, pos + vec3f(path[p].x * sinr, path[p].x * cosr, risey), vec3f(sinr * normals[p].x, cosr * normals[p].x, normals[p].y), vec2f(tcx * r, tcy), col);
+					Pi3Cutils::storeVNTC(vertTemp, tc, pos + vec3f(path[p].x * sinr, path[p].x * cosr, risey), vec3f(sinr * normals[p].x, cosr * normals[p].x, normals[p].y), vec2f(tcx * r, tcy), col);
 				}
 				risey += rdiv;
 			}
 			if (sidePath) {
-				storeVNTC(vertTemp, tc, pos + vec3f(0, path[p].y, path[p].x), vec3f(0, normals[p].y, normals[p].x), vec2f(0.9999f, tcy), col);
+				Pi3Cutils::storeVNTC(vertTemp, tc, pos + vec3f(0, path[p].y, path[p].x), vec3f(0, normals[p].y, normals[p].x), vec2f(0.9999f, tcy), col);
 			}
 			else {
-				storeVNTC(vertTemp, tc, pos + vec3f(0, path[p].x, path[p].y), vec3f(0, normals[p].x, normals[p].y), vec2f(0.9999f, tcy), col);
+				Pi3Cutils::storeVNTC(vertTemp, tc, pos + vec3f(0, path[p].x, path[p].y), vec3f(0, normals[p].x, normals[p].y), vec2f(0.9999f, tcy), col);
 			}
 		}
 
@@ -803,16 +788,16 @@ namespace Pi3Cshapes {
 		vec3f n = vec3f(0.f, 1.f, 0.f);
 		for (int i = 0; i < triCount; i++) {  //Top faces
 			int t = i * 9;
-			storeVNTC(verts, vc, pos + vec3f(tris[t], tris[t + 1], depth), n, vec2f(0, 0), col);
-			storeVNTC(verts, vc, pos + vec3f(tris[t + 3], tris[t + 4], depth), n, vec2f(0, 0), col);
-			storeVNTC(verts, vc, pos + vec3f(tris[t + 6], tris[t + 7], depth), n, vec2f(0, 0), col);
+			Pi3Cutils::storeVNTC(verts, vc, pos + vec3f(tris[t], tris[t + 1], depth), n, vec2f(0, 0), col);
+			Pi3Cutils::storeVNTC(verts, vc, pos + vec3f(tris[t + 3], tris[t + 4], depth), n, vec2f(0, 0), col);
+			Pi3Cutils::storeVNTC(verts, vc, pos + vec3f(tris[t + 6], tris[t + 7], depth), n, vec2f(0, 0), col);
 		}
 		n = vec3f(0.f, -1.f, 0.f);
 		for (int i = 0; i < triCount; i++) {  //Bottom faces
 			int t = i * 9;
-			storeVNTC(verts, vc, pos + vec3f(tris[t], tris[t + 1], 0), n, vec2f(0, 0), col);
-			storeVNTC(verts, vc, pos + vec3f(tris[t + 6], tris[t + 7], 0), n, vec2f(0, 0), col);
-			storeVNTC(verts, vc, pos + vec3f(tris[t + 3], tris[t + 4], 0), n, vec2f(0, 0), col);
+			Pi3Cutils::storeVNTC(verts, vc, pos + vec3f(tris[t], tris[t + 1], 0), n, vec2f(0, 0), col);
+			Pi3Cutils::storeVNTC(verts, vc, pos + vec3f(tris[t + 6], tris[t + 7], 0), n, vec2f(0, 0), col);
+			Pi3Cutils::storeVNTC(verts, vc, pos + vec3f(tris[t + 3], tris[t + 4], 0), n, vec2f(0, 0), col);
 		}
 
 		for (size_t i = 0; i < edges.size(); i++) {
@@ -820,13 +805,13 @@ namespace Pi3Cshapes {
 			for (size_t j = 0; j < contour.size(); j += 2) {
 				size_t k = (j + 2) % contour.size();
 				vec2f norm = vec2f(contour[j], contour[j + 1]).dot(vec2f(contour[k], contour[k + 1]));
-				storeVNTC(verts, vc, pos + vec3f(contour[j], contour[j + 1], 0), vec3f(norm.x, norm.y, 0), vec2f(0, 0), col);
-				storeVNTC(verts, vc, pos + vec3f(contour[k], contour[k + 1], 0), vec3f(norm.x, norm.y, 0), vec2f(0, 0), col);
-				storeVNTC(verts, vc, pos + vec3f(contour[k], contour[k + 1], depth), vec3f(norm.x, norm.y, 0), vec2f(0, 0), col);
+				Pi3Cutils::storeVNTC(verts, vc, pos + vec3f(contour[j], contour[j + 1], 0), vec3f(norm.x, norm.y, 0), vec2f(0, 0), col);
+				Pi3Cutils::storeVNTC(verts, vc, pos + vec3f(contour[k], contour[k + 1], 0), vec3f(norm.x, norm.y, 0), vec2f(0, 0), col);
+				Pi3Cutils::storeVNTC(verts, vc, pos + vec3f(contour[k], contour[k + 1], depth), vec3f(norm.x, norm.y, 0), vec2f(0, 0), col);
 
-				storeVNTC(verts, vc, pos + vec3f(contour[k], contour[k + 1], depth), vec3f(norm.x, norm.y, 0), vec2f(0, 0), col);
-				storeVNTC(verts, vc, pos + vec3f(contour[j], contour[j + 1], depth), vec3f(norm.x, norm.y, 0), vec2f(0, 0), col);
-				storeVNTC(verts, vc, pos + vec3f(contour[j], contour[j + 1], 0), vec3f(norm.x, norm.y, 0), vec2f(0, 0), col);
+				Pi3Cutils::storeVNTC(verts, vc, pos + vec3f(contour[k], contour[k + 1], depth), vec3f(norm.x, norm.y, 0), vec2f(0, 0), col);
+				Pi3Cutils::storeVNTC(verts, vc, pos + vec3f(contour[j], contour[j + 1], depth), vec3f(norm.x, norm.y, 0), vec2f(0, 0), col);
+				Pi3Cutils::storeVNTC(verts, vc, pos + vec3f(contour[j], contour[j + 1], 0), vec3f(norm.x, norm.y, 0), vec2f(0, 0), col);
 			}
 		}
 
@@ -914,14 +899,14 @@ namespace Pi3Cshapes {
 				memcpy(&vec4, &v4, sizeof(v4));
 
 				vec3f n = -vec1.trinormal(vec3, vec2);
-				storeVNTC(verts, vc, pos + vec1, n, vec2f(xu + ux, yu ), col);
-				storeVNTC(verts, vc, pos + vec2, n, vec2f(xu, yu + uy), col);
-				storeVNTC(verts, vc, pos + vec3, n, vec2f(xu, yu), col);
+				Pi3Cutils::storeVNTC(verts, vc, pos + vec1, n, vec2f(xu + ux, yu ), col);
+				Pi3Cutils::storeVNTC(verts, vc, pos + vec2, n, vec2f(xu, yu + uy), col);
+				Pi3Cutils::storeVNTC(verts, vc, pos + vec3, n, vec2f(xu, yu), col);
 
 				n = -vec1.trinormal(vec2, vec4);
-				storeVNTC(verts, vc, pos + vec1, n, vec2f(xu + ux, yu), col);
-				storeVNTC(verts, vc, pos + vec4, n, vec2f(xu + ux, yu + uy), col);
-				storeVNTC(verts, vc, pos + vec2, n, vec2f(xu, yu + uy), col);
+				Pi3Cutils::storeVNTC(verts, vc, pos + vec1, n, vec2f(xu + ux, yu), col);
+				Pi3Cutils::storeVNTC(verts, vc, pos + vec4, n, vec2f(xu + ux, yu + uy), col);
+				Pi3Cutils::storeVNTC(verts, vc, pos + vec2, n, vec2f(xu, yu + uy), col);
 
 #else
 				float hh = (h00 + h01 + h10 + h11) / 4.0f; //avg height for centre point
@@ -938,24 +923,24 @@ namespace Pi3Cshapes {
 				memcpy(&vec5, &v5, sizeof(v5));
 
 				vec3f n = vec5.trinormal(vec3, vec2);
-				storeVNTC(verts, vc, pos + vec5, n, vec2f(xu + ux * 0.5f, yu + uy * 0.5f), col);
-				storeVNTC(verts, vc, pos + vec3, n, vec2f(xu, yu), col);
-				storeVNTC(verts, vc, pos + vec2, n, vec2f(xu, yu + uy), col);
+				Pi3Cutils::storeVNTC(verts, vc, pos + vec5, n, vec2f(xu + ux * 0.5f, yu + uy * 0.5f), col);
+				Pi3Cutils::storeVNTC(verts, vc, pos + vec3, n, vec2f(xu, yu), col);
+				Pi3Cutils::storeVNTC(verts, vc, pos + vec2, n, vec2f(xu, yu + uy), col);
 
 				n = vec5.trinormal(vec1, vec3);
-				storeVNTC(verts, vc, pos + vec5, n, vec2f(xu + ux * 0.5f, yu + uy * 0.5f), col);
-				storeVNTC(verts, vc, pos + vec1, n, vec2f(xu, yu + uy), col);
-				storeVNTC(verts, vc, pos + vec3, n, vec2f(xu + ux, yu + uy), col);
+				Pi3Cutils::storeVNTC(verts, vc, pos + vec5, n, vec2f(xu + ux * 0.5f, yu + uy * 0.5f), col);
+				Pi3Cutils::storeVNTC(verts, vc, pos + vec1, n, vec2f(xu, yu + uy), col);
+				Pi3Cutils::storeVNTC(verts, vc, pos + vec3, n, vec2f(xu + ux, yu + uy), col);
 
 				n = vec5.trinormal(vec4, vec1);
-				storeVNTC(verts, vc, pos + vec5, n, vec2f(xu + ux * 0.5f, yu + uy * 0.5f), col);
-				storeVNTC(verts, vc, pos + vec4, n, vec2f(xu + ux, yu + uy), col);
-				storeVNTC(verts, vc, pos + vec1, n, vec2f(xu + ux, yu), col);
+				Pi3Cutils::storeVNTC(verts, vc, pos + vec5, n, vec2f(xu + ux * 0.5f, yu + uy * 0.5f), col);
+				Pi3Cutils::storeVNTC(verts, vc, pos + vec4, n, vec2f(xu + ux, yu + uy), col);
+				Pi3Cutils::storeVNTC(verts, vc, pos + vec1, n, vec2f(xu + ux, yu), col);
 
 				n = vec5.trinormal(vec2, vec4);
-				storeVNTC(verts, vc, pos + vec5, n, vec2f(xu + ux * 0.5f, yu + uy * 0.5f), col);
-				storeVNTC(verts, vc, pos + vec2, n, vec2f(xu + ux, yu), col);
-				storeVNTC(verts, vc, pos + vec4, n, vec2f(xu, yu), col);
+				Pi3Cutils::storeVNTC(verts, vc, pos + vec5, n, vec2f(xu + ux * 0.5f, yu + uy * 0.5f), col);
+				Pi3Cutils::storeVNTC(verts, vc, pos + vec2, n, vec2f(xu + ux, yu), col);
+				Pi3Cutils::storeVNTC(verts, vc, pos + vec4, n, vec2f(xu, yu), col);
 #endif
 
 				xx += xc;
@@ -1021,35 +1006,35 @@ namespace Pi3Cshapes {
 
 		float sw = -sxh;
 		for (float y = -syh; y <= syh; y += minorStep) {
-			storeVNTC(verts, vc, vec3f(sw, 0, y), vec3f(0, 1, 0), vec2f(0, 0), mincol);
+			Pi3Cutils::storeVNTC(verts, vc, vec3f(sw, 0, y), vec3f(0, 1, 0), vec2f(0, 0), mincol);
 			sw = -sw;
-			storeVNTC(verts, vc, vec3f(sw, 0, y), vec3f(0, 1, 0), vec2f(0, 0), mincol);
+			Pi3Cutils::storeVNTC(verts, vc, vec3f(sw, 0, y), vec3f(0, 1, 0), vec2f(0, 0), mincol);
 		}
-		storeVNTC(verts, vc, vec3f(-sw, 0, syh), vec3f(0, 1, 0), vec2f(0, 0), mincol);
+		Pi3Cutils::storeVNTC(verts, vc, vec3f(-sw, 0, syh), vec3f(0, 1, 0), vec2f(0, 0), mincol);
 
 		sw = -syh;
 		for (float x = -sxh; x <= sxh; x += minorStep) {
-			storeVNTC(verts, vc, vec3f(x, 0, sw), vec3f(0, 1, 0), vec2f(0, 0), mincol);
+			Pi3Cutils::storeVNTC(verts, vc, vec3f(x, 0, sw), vec3f(0, 1, 0), vec2f(0, 0), mincol);
 			sw = -sw;
-			storeVNTC(verts, vc, vec3f(x, 0, sw), vec3f(0, 1, 0), vec2f(0, 0), mincol);
+			Pi3Cutils::storeVNTC(verts, vc, vec3f(x, 0, sw), vec3f(0, 1, 0), vec2f(0, 0), mincol);
 		}
-		storeVNTC(verts, vc, vec3f(sxh, 0, -sw), vec3f(0, 1, 0), vec2f(0, 0), mincol);
+		Pi3Cutils::storeVNTC(verts, vc, vec3f(sxh, 0, -sw), vec3f(0, 1, 0), vec2f(0, 0), mincol);
 
 		sw = -sxh;
 		for (float y = -syh; y <= syh; y += majorStep) {
-			storeVNTC(verts, vc, vec3f(sw, 0, y), vec3f(0, 1, 0), vec2f(0, 0), majcol);
+			Pi3Cutils::storeVNTC(verts, vc, vec3f(sw, 0, y), vec3f(0, 1, 0), vec2f(0, 0), majcol);
 			sw = -sw;
-			storeVNTC(verts, vc, vec3f(sw, 0, y), vec3f(0, 1, 0), vec2f(0, 0), majcol);
+			Pi3Cutils::storeVNTC(verts, vc, vec3f(sw, 0, y), vec3f(0, 1, 0), vec2f(0, 0), majcol);
 		}
-		storeVNTC(verts, vc, vec3f(-sw, 0, syh), vec3f(0, 1, 0), vec2f(0, 0), majcol);
+		Pi3Cutils::storeVNTC(verts, vc, vec3f(-sw, 0, syh), vec3f(0, 1, 0), vec2f(0, 0), majcol);
 
 		sw = -syh;
 		for (float x = -sxh; x <= sxh; x += majorStep) {
-			storeVNTC(verts, vc, vec3f(x, 0, sw), vec3f(0, 1, 0), vec2f(0, 0), majcol);
+			Pi3Cutils::storeVNTC(verts, vc, vec3f(x, 0, sw), vec3f(0, 1, 0), vec2f(0, 0), majcol);
 			sw = -sw;
-			storeVNTC(verts, vc, vec3f(x, 0, sw), vec3f(0, 1, 0), vec2f(0, 0), majcol);
+			Pi3Cutils::storeVNTC(verts, vc, vec3f(x, 0, sw), vec3f(0, 1, 0), vec2f(0, 0), majcol);
 		}
-		storeVNTC(verts, vc, vec3f(sxh, 0, -sw), vec3f(0, 1, 0), vec2f(0, 0), majcol);
+		Pi3Cutils::storeVNTC(verts, vc, vec3f(sxh, 0, -sw), vec3f(0, 1, 0), vec2f(0, 0), majcol);
 	}
 
 }

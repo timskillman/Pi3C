@@ -14,14 +14,14 @@ namespace Pi3Cutils
 	void saveBufferToPNG(const char* filename, std::vector<uint8_t>& snapShot, const int width, const int height);
 	std::string ftostrdp(float n, int decimalPlaces);
 	std::string endstr(std::string const& str, size_t const length);
-	std::string filepath(const std::string& path, const std::string& filename, const std::string& ext);
-	std::string extractPath(std::string& file);
+	std::string filepath(const std::string& path, const std::string& filename, const std::string& ext = "");
+	std::string extractPath(const std::string& file);
 	std::string extractName(const std::string& file);
 	std::string getExt(const std::string& file);
 	std::string lowercase(const std::string& str);
 	float colToFloat(const uint32_t col);
 	void drawRect2D(vec3f pos, vec3f size, uint32_t colour);
-
+	void storeVNTC(std::vector<float>& verts, uint32_t& vc, const vec3f& pos, const vec3f& norm, const vec2f& texcoords, const uint32_t col);
 
 	template <typename I> std::string numToHexstr(I w, size_t hex_len = sizeof(I) << 1)
 	{

@@ -40,8 +40,8 @@
     <Filter Include="Shared Code\OpenFBX">
       <UniqueIdentifier>{7aaa0e49-3d75-4a00-98d3-b29a689ef2aa}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Shared Code\gltf">
-      <UniqueIdentifier>{188e4d0e-07de-4956-affa-2e5f01c02755}</UniqueIdentifier>
+    <Filter Include="Shared Code\fxgltf">
+      <UniqueIdentifier>{3f7e7ed2-b5fb-463b-9565-e149acc99d0c}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -210,11 +210,11 @@
     <ClCompile Include="..\..\SharedCode\file\Pi3CfileFBX.cpp">
       <Filter>Shared Code\file</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\SharedCode\file\Pi3CfileGLTF.cpp">
-      <Filter>Shared Code\file</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\SharedCode\helpers\Pi3Cquaternion.cpp">
       <Filter>Shared Code\helpers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\SharedCode\file\Pi3CfileFXGLTF.cpp">
+      <Filter>Shared Code\file</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -416,23 +416,14 @@
     <ClInclude Include="..\..\SharedCode\file\Pi3CfileFBX.h">
       <Filter>Shared Code\file</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\SharedCode\file\Pi3CfileGLTF.h">
-      <Filter>Shared Code\file</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\ThirdParty\gltf\json.hpp">
-      <Filter>Shared Code\gltf</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\ThirdParty\gltf\stb_image.h">
-      <Filter>Shared Code\gltf</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\ThirdParty\gltf\stb_image_write.h">
-      <Filter>Shared Code\gltf</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\ThirdParty\gltf\tiny_gltf.h">
-      <Filter>Shared Code\gltf</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\SharedCode\helpers\Pi3Cquaternion.h">
       <Filter>Shared Code\helpers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\SharedCode\file\Pi3CfileFXGLTF.h">
+      <Filter>Shared Code\file</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ThirdParty\gltf\fx\gltf.h">
+      <Filter>Shared Code\fxgltf</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

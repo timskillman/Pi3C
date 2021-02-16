@@ -1,4 +1,5 @@
 #include "Pi3Cresource.h"
+#include "Pi3Cutils.h"
 
 void Pi3Cresource::init(const uint32_t stride)
 {
@@ -173,7 +174,7 @@ int32_t Pi3Cresource::loadTexture(const std::string &path, const std::string &fi
 	std::shared_ptr<Pi3Ctexture> Texture;
 	Texture.reset(new Pi3Ctexture());
 
-	std::string filename = path + file;
+	std::string filename = Pi3Cutils::filepath(path,file,"");
 	Texture->loadFromFile(filename.c_str());
 	if (Texture.get()==nullptr){
 		SDL_Log("ERROR! texture '%s' not found!!", filename.c_str());
