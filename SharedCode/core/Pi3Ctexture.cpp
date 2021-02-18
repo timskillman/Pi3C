@@ -102,6 +102,28 @@ void Pi3Ctexture::blit(Pi3Crecti *src_rect, Pi3Ctexture *dest_tex, Pi3Crecti *ds
 	rawBlit(pixels, src_rect, pitch, dest_tex->GetTexels(), dst_rect, dest_tex->GetPitch());
 }
 
+void Pi3Ctexture::shrinkPow2(const uint32_t pow2reduce)
+{
+	int step = 1 << pow2reduce;
+	int ys = (height >> pow2reduce);
+	int xs = (width >> pow2reduce);
+	int newsize = ys * xs * 4;
+	std::vector<uint32_t> shrinkpix(newsize);
+	size_t q = 0;
+	for (int y = height - 1; y >=0; y -= step) {
+		int p = y * width;
+		for (int x = 0; x < width; x += step) {
+			shrinkpix[q++] = *(uint32_t*)&pixels[(p + x)*4];
+		}
+	}
+	pixels = new uint8_t[newsize];
+	memcpy(pixels, &shrinkpix[0], newsize);
+	size = newsize;
+	width = xs;
+	height = ys;
+	pitch = width * 4;
+}
+
 bool Pi3Ctexture::resize(const uint32_t new_width, const uint32_t new_height, const bool center)
 {
 	if (new_width > width || new_height > height) return false;
@@ -205,6 +227,17 @@ void Pi3Ctexture::loadFromFile(const char* file)
 	}
 }
 
+void Pi3Ctexture::loadFromMemory(uint8_t* ptr, uint32_t size)
+{
+	SDL_RWops* rw = SDL_RWFromConstMem(ptr, size);
+	SDL_Surface* Surface = IMG_Load_RW(rw, 1);
+
+	if (Surface) {
+		fromSurface(Surface);
+		SDL_FreeSurface(Surface);
+	}
+}
+
 void Pi3Ctexture::saveAsPNG(const char* file)
 {
 	SDL_Surface *pngSurf = SDL_CreateRGBSurface(0, width, height, 32, 0x00ff0000, 0x0000ff00, 0x000000ff, 0xff000000);
@@ -244,4 +277,19 @@ void Pi3Ctexture::mapToTextureUnit(uint32_t unit)
 {
 	glActiveTexture(GL_TEXTURE0 + unit);
 	glBindTexture(GL_TEXTURE_2D, textureID);
+}
+
+void Pi3Ctexture::flip()
+{
+	uint8_t* pt = pixels + 0;
+	uint8_t* pb = pixels + (height - 1) * pitch;
+	std::vector<uint8_t> tmp(pitch);
+
+	for (uint32_t y = 0; y < height / 2; y++) {
+		std::memcpy(&tmp[0], pb, pitch);
+		std::memcpy(pb, pt, pitch);
+		std::memcpy(pt, &tmp[0], pitch);
+		pb -= pitch;
+		pt += pitch;
+	}
 }

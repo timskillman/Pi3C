@@ -43,6 +43,7 @@ public:
 	~Pi3Ctexture();
 
 	void loadFromFile(const char* file);
+	void loadFromMemory(uint8_t* ptr, uint32_t size);
 	void saveAsPNG(const char* file);
 	void fromSurface(SDL_Surface* Surface);
 	//void fromSurfaceXY(SDL_Surface* Surface, const int x, const int y);
@@ -54,6 +55,8 @@ public:
 	void createColour(uint32_t col);
 	void create(uint32_t width, uint32_t height, uint32_t bytesPerPixel);
 	void fromImage(uint32_t width, uint32_t height, std::vector<uint8_t>& image, uint32_t bytesPerPixel);
+	void flip();																				//flips texture on Y axis
+	void shrinkPow2(const uint32_t pow2reduce);													//shrinks the texture by power of 2
 	void pixel(uint32_t x, uint32_t y, uint32_t v) { pixels[x*bpp + y * pitch] = v; }
 	//void rawBlit(uint8_t *src_pixels, const Pi3Crecti *src_rect, const uint32_t src_pitch, 
 	//			uint8_t *dest_pixels, const Pi3Crecti *dst_rect, const uint32_t dest_pitch);	//Just blit the texture into another texture into rect position on the destination texture

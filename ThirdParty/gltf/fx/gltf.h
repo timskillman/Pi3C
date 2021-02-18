@@ -316,7 +316,7 @@ namespace gltf
         };
 
         constexpr uint32_t DefaultMaxBufferCount = 8;
-        constexpr uint32_t DefaultMaxMemoryAllocation = 32 * 1024 * 1024;
+        constexpr uint32_t DefaultMaxMemoryAllocation = 64 * 1024 * 1024;
         constexpr std::size_t HeaderSize{ sizeof(GLBHeader) };
         constexpr std::size_t ChunkHeaderSize{ sizeof(ChunkHeader) };
         constexpr uint32_t GLBHeaderMagic = 0x46546c67u;

@@ -279,49 +279,58 @@ bool Pi3Cfxgltf::load(Pi3Cresource* resource, Pi3Cscene* piscene, const std::str
 		std::vector<int> texRefs(0);
 		if (model.images.size() > 0) {
 			for (size_t i = 0; i < model.images.size(); i++) {
+
 				std::string uri = model.images[i].uri;
-				if (uri != "") {
-					std::string texname = filepath + "-" + uri;
-					int32_t ft = resource->findTextureByName(texname);
-					if (ft < 0) {
-						std::string path = Pi3Cutils::extractPath(filepath);
+				int buffViewRef = model.images[i].bufferView;
+				std::string texname = "";
+				int32_t ft = -1;
+				std::shared_ptr<Pi3Ctexture> texture;
+				texture.reset(new Pi3Ctexture());
 
-						std::shared_ptr<Pi3Ctexture> texture;
-						texture.reset(new Pi3Ctexture());
-						texture->loadFromFile(Pi3Cutils::filepath(path, uri).c_str());
-
-						int iw = texture->GetWidth(), ih = texture->GetHeight(), sc = 1;
-						//while (iw > 2048 || ih > 2048) { iw /= 2; ih /= 2; sc *= 2; }
-
-						uint32_t* tpix = (uint32_t*)texture->GetTexels();
-						//if (sc > 1) {
-						//	int q = 0, sp = 0;
-						//	for (int sy = 0; sy < image.height; sy += sc) {
-						//		for (int sx = 0; sx < image.width; sx += sc) {
-						//			int q = sx + sy * image.width;
-						//			tpix[sp++] = srcimg[q];
-						//		}
-						//	}
-						//}
-						//else
-						//{
-						//	memcpy(tpix, srcimg, iw * ih * 4);
-						//}
-
-						Pi3Cutils::flipImage((uint8_t*)tpix, iw, ih);
-						texture->name = texname;
-						ft = resource->addTexture(texture);
-						Pi3Cmaterial mat = *resource->defaultMaterial();
-						mat.texRef = ft;
-						mat.texName = texname;
-						mat.texWidth = iw;
-						mat.texHeight = ih;
-						mat.name = texname;
-						mat.alpha = 0.99f;
-						mat.illum = 2;
-						resource->addMaterial(mat);
+				if (uri != "" || buffViewRef >=0) {
+					if (uri == "") {
+						texname = filepath + "-" + model.images[i].name;
+						ft = resource->findTextureByName(texname);
+						if (ft < 0) {
+							auto& buff = model.buffers[0].data;
+							int byteOffset = model.bufferViews[buffViewRef].byteOffset;// +indexAccessor.byteOffset;
+							texture->loadFromMemory(&buff[byteOffset], model.bufferViews[buffViewRef].byteLength);
+						}
+					} 
+					else
+					{
+						texname = filepath + "-" + uri;
+						ft = resource->findTextureByName(texname);
+						if (ft < 0) {
+							std::string path = Pi3Cutils::extractPath(filepath);
+							texture->loadFromFile(Pi3Cutils::filepath(path, uri).c_str());
+						}
 					}
+
+					//ensure texture is less than 2048x2048 (max for Pi Zero)
+					int iw = texture->GetWidth(), ih = texture->GetHeight(), sc = 0;
+					while (iw > 2048 || ih > 2048) { iw /= 2; ih /= 2; sc++; }
+					if (sc > 0) texture->shrinkPow2(sc);
+
+					texture->flip();
+
+					texture->name = texname;
+					ft = resource->addTexture(texture);
+					Pi3Cmaterial mat = *resource->defaultMaterial();
+					mat.texRef = ft;
+					mat.texName = texname;
+					mat.texWidth = iw;
+					mat.texHeight = ih;
+					mat.name = texname;
+					mat.alpha = 0.99f;
+					mat.illum = 2;
+					resource->addMaterial(mat);
+					
 					texRefs.push_back(ft);
+				}
+				else
+				{
+
 				}
 			}
 		}
