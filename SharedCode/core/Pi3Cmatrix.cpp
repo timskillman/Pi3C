@@ -404,6 +404,77 @@ void Pi3Cmatrix::scale(const vec3f& scale)
 	identity = false;
 }
 
+void Pi3Cmatrix::fromQuaternion(const float x, const float y, const float z, const float w)
+{
+	/* Setup matrix from quaternion */
+	float x2 = x * x * 2.f;
+	float y2 = y * y * 2.f;
+	float z2 = z * z * 2.f;
+	float xy = x * y * 2.f;
+	float xz = x * z * 2.f;
+	float yz = y * z * 2.f;
+	float wx = w * x * 2.f;
+	float wy = w * y * 2.f;
+	float wz = w * z * 2.f;
+
+	matrix[m00] = 1.f - y2 - z2;
+	matrix[m01] = xy + wz;
+	matrix[m02] = xz - wy;
+
+	matrix[m10] = xy - wz;
+	matrix[m11] = 1.f - x2 - z2;
+	matrix[m12] = yz + wx;
+
+	matrix[m20] = xz + wy;
+	matrix[m21] = yz - wx;
+	matrix[m22] = 1.f - x2 - y2;
+	identity = false;
+}
+
+vec4f Pi3Cmatrix::toQuaternion()
+{
+	float x = 0, y = 0, z = 0, w = 0;
+	float trace = matrix[m00] + matrix[m11] + matrix[m22];
+	if (trace > 0) {
+		float s = 0.5f / sqrtf(trace + 1.0f);
+		x = (matrix[m12] - matrix[m21]) * s;
+		y = (matrix[m20] - matrix[m02]) * s;
+		z = (matrix[m01] - matrix[m10]) * s;
+		w = 0.25f / s;
+	}
+	else {
+		if ((matrix[m00] > matrix[m11]) && (matrix[m00] > matrix[m22])) {
+			float s = 0.5f / sqrtf(1.0f + matrix[m00] - matrix[m11] - matrix[m22]);
+			x = 0.25f / s;
+			y = (matrix[m10] + matrix[m01]) * s;
+			z = (matrix[m20] + matrix[m02]) * s;
+			w = (matrix[m12] - matrix[m21]) * s;
+		}
+		else if (matrix[m11] > matrix[m22]) {
+			float s = 0.5f / sqrtf(1.0f + matrix[m11] - matrix[m00] - matrix[m22]);
+			x = (matrix[m01] + matrix[m10]) * s;
+			y = 0.25f / s;
+			z = (matrix[m12] + matrix[m21]) * s;
+			w = (matrix[m20] - matrix[m02]) * s;
+		}
+		else {
+			float s = 0.5f / sqrtf(1.0f + matrix[m22] - matrix[m00] - matrix[m11]);
+			x = (matrix[m20] + matrix[m02]) * s;
+			y = (matrix[m21] + matrix[m12]) * s;
+			z = 0.25f / s;
+			w = (matrix[m01] - matrix[m10]) * s;
+		}
+	}
+
+	//Normalise output and clear errors
+	float sq = 1.f / sqrtf(x * x + y * y + z * z + w * w);
+	x = x * sq;
+	y = y * sq;
+	z = z * sq;
+	w = w * sq;
+	return vec4f(x, y, z, w);
+}
+
 //This code comes from GLU source with exception of float calcs ...
 
 #define SWAP_ROWS_FLOAT(a, b) { float *_tmp = a; (a) = (b); (b) = _tmp; }

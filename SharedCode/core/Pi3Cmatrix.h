@@ -101,6 +101,9 @@ public:
 	vec3f transposeRotateVec(const vec3f &vec) const;
 	vec3f transposeRotateVec(const float * verts) const;
 
+	void fromQuaternion(const float x, const float y, const float z, const float w);
+	vec4f toQuaternion();
+
 	Pi3Cmatrix inverse();
 
 	const vec3f position() const { return vec3f(matrix[m30], matrix[m31], matrix[m32]); }

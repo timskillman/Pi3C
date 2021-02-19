@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Pi3CfileFXGLTF.h"
-#include "Pi3Cquaternion.h"
+//#include "Pi3Cquaternion.h"
 #include "Pi3Cutils.h"
 
 Pi3Cfxgltf::Pi3Cfxgltf(Pi3Cresource* resource, Pi3Cscene* scene, const std::string& filename)
@@ -10,9 +10,9 @@ Pi3Cfxgltf::Pi3Cfxgltf(Pi3Cresource* resource, Pi3Cscene* scene, const std::stri
 }
 
 #define getbuff(buftype, mult, offset)								 \
-        *(float*)&buff[buffOffsets[buftype] + index * mult + offset] \
+        *(float*)&buffers[buffOffsets[buftype] + index * mult + offset] \
 
-static int typeToSize(fx::gltf::Accessor::Type type)
+int Pi3Cfxgltf::typeToSize(fx::gltf::Accessor::Type type)
 {
 	switch (type) {
 	case fx::gltf::Accessor::Type::Scalar: return 1;
@@ -23,99 +23,117 @@ static int typeToSize(fx::gltf::Accessor::Type type)
 	return 0;
 }
 
-enum { VERT_OFFSET, NORM_OFFSET, TANG_OFFSET, TEX0_OFFSET, TEX1_OFFSET, COL_OFFSET, JNT_OFFSET, WGT_OFFSET };
-
-static Pi3Cmesh CreateMesh(Pi3Cresource* resource, fx::gltf::Document& model, fx::gltf::Mesh& mesh, const fx::gltf::Primitive& primitive)
+uint16_t Pi3Cfxgltf::GetGLmodeFromPrimitiveMode(const fx::gltf::Primitive::Mode& primmode)
 {
-	int buffOffsets[8] = { -1,-1,-1,-1,-1,-1,-1,-1 };
-	size_t buffElemSizes[8] = { 0,0,0,0,0,0,0,0 };
+	switch (primmode) {
+	case fx::gltf::Primitive::Mode::Points: return GL_POINTS;
+	case fx::gltf::Primitive::Mode::Lines: return GL_LINES;
+	case fx::gltf::Primitive::Mode::LineLoop: return GL_LINE_LOOP;
+	case fx::gltf::Primitive::Mode::LineStrip: return GL_LINE_STRIP;
+	case fx::gltf::Primitive::Mode::Triangles: return GL_TRIANGLES;
+	case fx::gltf::Primitive::Mode::TriangleStrip: return GL_TRIANGLE_STRIP;
+	case fx::gltf::Primitive::Mode::TriangleFan: return GL_TRIANGLE_FAN;
+	}
+}
 
-	Pi3Cmesh newmesh;
+int Pi3Cfxgltf::GetAttributeOffset(const std::string& attribstr)
+{
 	int type = -1;
+	if (attribstr == "POSITION") type = VERT_OFFSET;
+	else if (attribstr == "NORMAL") type = NORM_OFFSET;
+	else if (attribstr == "TANGENT") type = TANG_OFFSET;
+	else if (attribstr == "TEXCOORD_0") type = TEX0_OFFSET;
+	else if (attribstr == "TEXCOORD_1") type = TEX1_OFFSET;
+	else if (attribstr == "COLOR_0") type = COL_OFFSET;
+	else if (attribstr == "JOINTS_0") type = JNT_OFFSET;
+	else if (attribstr == "WEIGHTS_0") type = WGT_OFFSET;
+	return type;
+}
 
+int Pi3Cfxgltf::GetComponentType(const fx::gltf::Accessor::ComponentType componentType)
+{
+	switch (componentType) {
+	case fx::gltf::Accessor::ComponentType::Byte:
+	case fx::gltf::Accessor::ComponentType::UnsignedByte:
+		return 0;
+	case fx::gltf::Accessor::ComponentType::Short:
+	case fx::gltf::Accessor::ComponentType::UnsignedShort:
+		return 1;
+	case fx::gltf::Accessor::ComponentType::UnsignedInt:
+	case fx::gltf::Accessor::ComponentType::Int:
+		return 2;
+	}
+	return -1;
+}
+
+unsigned int Pi3Cfxgltf::GetIndexByType(const int itype, std::vector<uint8_t>& buffers, int byteOffset, int index)
+{
+	return (itype == 0) ? (unsigned int)buffers[byteOffset + index] :
+		(itype == 1) ? (unsigned int)*(unsigned short*)&buffers[byteOffset + index * 2] :
+		(unsigned int)*(unsigned int*)&buffers[byteOffset + index * 4];
+}
+
+uint32_t Pi3Cfxgltf::GetColour(const std::vector<int>& buffOffsets, const std::vector<int>& buffElemSizes, unsigned int index, std::vector<uint8_t>& buffers)
+{
+	//TODO - several other variants
+	uint32_t col = Pi3Ccolours::White;
+	if (buffElemSizes[COL_OFFSET] == 4) {
+		col = (uint8_t)(getbuff(COL_OFFSET, 16, 0) * 255.f) |
+			((uint8_t)(getbuff(COL_OFFSET, 16, 4) * 255.f) << 8) |
+			((uint8_t)(getbuff(COL_OFFSET, 16, 8) * 255.f) << 16) |
+			((uint8_t)(getbuff(COL_OFFSET, 16, 12) * 255.f) << 24);
+	}
+	else if (buffElemSizes[COL_OFFSET] == 3) {
+		col = (uint8_t)(getbuff(COL_OFFSET, 12, 0) * 255.f) |
+			((uint8_t)(getbuff(COL_OFFSET, 12, 4) * 255.f) << 8) |
+			((uint8_t)(getbuff(COL_OFFSET, 12, 8) * 255.f) << 16) |
+			0xff000000;
+	}
+	return col;
+}
+
+void Pi3Cfxgltf::SetAttributeOffsets(const fx::gltf::Primitive& primitive, std::vector<int>& buffOffsets, std::vector<int>& buffElemSizes)
+{
 	for (auto const& attrib : primitive.attributes)
 	{
-		if (attrib.first == "POSITION") type = VERT_OFFSET;
-		else if (attrib.first == "NORMAL") type = NORM_OFFSET;
-		else if (attrib.first == "TANGENT") type = TANG_OFFSET;
-		else if (attrib.first == "TEXCOORD_0") type = TEX0_OFFSET;
-		else if (attrib.first == "TEXCOORD_1") type = TEX1_OFFSET;
-		else if (attrib.first == "COLOR_0") type = COL_OFFSET;
-		else if (attrib.first == "JOINTS_0") type = JNT_OFFSET;
-		else if (attrib.first == "WEIGHTS_0") type = WGT_OFFSET;
-
+		int type = GetAttributeOffset(attrib.first);
 		if (type >= 0) {
 			const auto& accessor = model.accessors[attrib.second];
 			buffOffsets[type] = model.bufferViews[accessor.bufferView].byteOffset + accessor.byteOffset;
 			buffElemSizes[type] = typeToSize(accessor.type);
 		}
-
 	}
+}
 
-	switch (primitive.mode) {
-	case fx::gltf::Primitive::Mode::Points: newmesh.mode = GL_POINTS; break;
-	case fx::gltf::Primitive::Mode::Lines: newmesh.mode = GL_LINES; break;
-	case fx::gltf::Primitive::Mode::LineLoop: newmesh.mode = GL_LINE_LOOP; break;
-	case fx::gltf::Primitive::Mode::LineStrip: newmesh.mode = GL_LINE_STRIP; break;
-	case fx::gltf::Primitive::Mode::Triangles: newmesh.mode = GL_TRIANGLES; break;
-	case fx::gltf::Primitive::Mode::TriangleStrip: newmesh.mode = GL_TRIANGLE_STRIP; break;
-	case fx::gltf::Primitive::Mode::TriangleFan: newmesh.mode = GL_TRIANGLE_FAN; break;
-	}
+Pi3Cmesh Pi3Cfxgltf::CreateMesh(Pi3Cresource* resource, fx::gltf::Document& model, fx::gltf::Mesh& mesh, const fx::gltf::Primitive& primitive)
+{
+	auto& buffers = model.buffers[0].data;
 
-	auto& buff = model.buffers[0].data;
+	std::vector<int> buffOffsets(8, -1);
+	std::vector<int> buffElemSizes(8, 0);
+	SetAttributeOffsets(primitive, buffOffsets, buffElemSizes);
 
 	const auto& indexAccessor = model.accessors[primitive.indices];
-	int indcount = indexAccessor.count;
 	int byteOffset = model.bufferViews[indexAccessor.bufferView].byteOffset + indexAccessor.byteOffset;
+	int indcount = indexAccessor.count;
 
+	Pi3Cmesh newmesh;
+	newmesh.mode = GetGLmodeFromPrimitiveMode(primitive.mode);
 	newmesh.verts.resize(indcount * 9);
-	uint32_t& vc = newmesh.vc = 0;
-	float white = Pi3Cutils::colToFloat(0xffffffff);
+	newmesh.vc = 0;
 
-	int itype = 0;
-	switch (indexAccessor.componentType) {
-	case fx::gltf::Accessor::ComponentType::Byte:
-	case fx::gltf::Accessor::ComponentType::UnsignedByte:
-		itype = 0;
-		break;
-	case fx::gltf::Accessor::ComponentType::Short:
-	case fx::gltf::Accessor::ComponentType::UnsignedShort:
-		itype = 1;
-		break;
-	case fx::gltf::Accessor::ComponentType::UnsignedInt:
-	case fx::gltf::Accessor::ComponentType::Int:
-		itype = 2;
-		break;
-	}
+	int itype = GetComponentType(indexAccessor.componentType);
 
 	for (int i = 0; i < indcount; i++) {
 
-		unsigned int index =
-			(itype == 0) ? (unsigned int)buff[byteOffset + i] :
-			(itype == 1) ? (unsigned int)*(unsigned short*)&buff[byteOffset + i * 2] :
-			(unsigned int)*(unsigned int*)&buff[byteOffset + i * 4];
+		unsigned int index = GetIndexByType(itype, buffers, byteOffset, i);
 
 		vec3f point = vec3f(getbuff(VERT_OFFSET, 12, 0), getbuff(VERT_OFFSET, 12, 4), getbuff(VERT_OFFSET, 12, 8));
 		vec3f normal = (buffOffsets[NORM_OFFSET] > 0) ? vec3f(getbuff(NORM_OFFSET, 12, 0), getbuff(NORM_OFFSET, 12, 4), getbuff(NORM_OFFSET, 12, 8)) : vec3f();
 		vec2f uvs = (buffOffsets[TEX0_OFFSET] > 0) ? vec2f(getbuff(TEX0_OFFSET, 8, 0), getbuff(TEX0_OFFSET, 8, 4)) : vec2f();
-		uint32_t col = Pi3Ccolours::White;
+		uint32_t colour = (buffOffsets[COL_OFFSET] > 0) ? GetColour(buffOffsets, buffElemSizes, index, buffers) : Pi3Ccolours::White;
 
-		if (buffOffsets[COL_OFFSET] > 0) {
-			if (buffElemSizes[COL_OFFSET] == 4) {
-				col = (uint8_t)(getbuff(COL_OFFSET, 16, 0) * 255.f) |
-					((uint8_t)(getbuff(COL_OFFSET, 16, 4) * 255.f) << 8) |
-					((uint8_t)(getbuff(COL_OFFSET, 16, 8) * 255.f) << 16) |
-					((uint8_t)(getbuff(COL_OFFSET, 16, 12) * 255.f) << 24);
-			}
-			else if (buffElemSizes[COL_OFFSET] == 3) {
-				col = (uint8_t)(getbuff(COL_OFFSET, 12, 0) * 255.f) |
-					((uint8_t)(getbuff(COL_OFFSET, 12, 4) * 255.f) << 8) |
-					((uint8_t)(getbuff(COL_OFFSET, 12, 8) * 255.f) << 16) |
-					0xff000000;
-			}
-		}
-
-		Pi3Cutils::storeVNTC(newmesh.verts, vc, point, normal, uvs, col);
+		Pi3Cutils::storeVNTC(newmesh.verts, newmesh.vc, point, normal, uvs, colour);
 		newmesh.bbox.update(point);
 	}
 
@@ -126,13 +144,13 @@ static Pi3Cmesh CreateMesh(Pi3Cresource* resource, fx::gltf::Document& model, fx
 	return newmesh;
 }
 
-static Pi3Cmodel ParseMesh(Pi3Cresource* resource, fx::gltf::Document& model, fx::gltf::Mesh& mesh, const std::vector<int>& texRefs) {
+Pi3Cmodel Pi3Cfxgltf::ParseMesh(Pi3Cresource* resource, fx::gltf::Document& model, fx::gltf::Mesh& mesh, const std::vector<int>& texRefs) 
+{
 
 	Pi3Cmodel newmodel;
 	Pi3Cmaterial newmaterial;
 
 	auto& buff = model.buffers[0].data;
-
 
 	for (size_t i = 0; i < mesh.primitives.size(); i++) {
 
@@ -166,6 +184,7 @@ static Pi3Cmodel ParseMesh(Pi3Cresource* resource, fx::gltf::Document& model, fx
 		}
 
 		Pi3Cmesh basemesh = CreateMesh(resource, model, mesh, primitive);
+
 		int gref = newmodel.appendMeshToGroup(resource, basemesh, 1);
 		if (material) {
 			Pi3Cmodel& gpmodel = newmodel.group[gref];
@@ -212,7 +231,8 @@ static Pi3Cmodel ParseMesh(Pi3Cresource* resource, fx::gltf::Document& model, fx
 	return newmodel;
 }
 
-static Pi3Cmodel ParseNode(Pi3Cresource* resource, fx::gltf::Document& model, fx::gltf::Node& node, const std::vector<int>& texRefs) {
+Pi3Cmodel Pi3Cfxgltf::ParseNode(Pi3Cresource* resource, fx::gltf::Document& model, fx::gltf::Node& node, const std::vector<int>& texRefs) 
+{
 	// Apply xform
 
 	Pi3Cmodel newmodel;
@@ -232,9 +252,10 @@ static Pi3Cmodel ParseNode(Pi3Cresource* resource, fx::gltf::Document& model, fx
 		}
 
 		if (node.rotation.size() == 4) {
-			Pi3Cmatrix mtx;
-			Pi3Cquaternion quat(node.rotation[0], node.rotation[1], node.rotation[2], node.rotation[3]);
-			matrix = matrix * quat.toMatrix();
+			Pi3Cmatrix qmtx;
+			qmtx.fromQuaternion(node.rotation[0], node.rotation[1], node.rotation[2], node.rotation[3]);
+			//Pi3Cquaternion quat(node.rotation[0], node.rotation[1], node.rotation[2], node.rotation[3]);
+			matrix = matrix * qmtx; // quat.toMatrix();
 		}
 
 		if (node.translation.size() == 3) {
