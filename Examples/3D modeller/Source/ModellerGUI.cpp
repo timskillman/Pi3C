@@ -382,7 +382,7 @@ void MGui::doMaterialsToolbar(Modeller* md, Pi3Cimgui::rectStyle& iconstyle, boo
 	//if (gui.BeginGroupHorizontal("rendl.png", iconstyle.halfWidth(), iconstyle.minHeight)) {
 		
 		std::vector<Pi3Cmaterial>& materials = md->resource->materials;
-		std::vector<std::shared_ptr<Pi3Ctexture>>& textures = md->resource->textures;
+		//std::vector<Pi3Ctexture>& textures = md->resource->textures;
 		
 		for (size_t m = 0; m < materials.size(); m++) {
 			auto& material = materials[m];

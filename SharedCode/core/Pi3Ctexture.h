@@ -42,16 +42,16 @@ public:
 	Pi3Ctexture(const uint32_t width, const uint32_t height, std::vector<uint8_t>& img, const uint32_t bytesPerPixel) { fromImage(width, height, img, bytesPerPixel); }
 	~Pi3Ctexture();
 
-	void loadFromFile(const char* file);
+	bool loadFromFile(const char* file);
 	void loadFromMemory(uint8_t* ptr, uint32_t size);
 	void saveAsPNG(const char* file);
 	void fromSurface(SDL_Surface* Surface);
 	//void fromSurfaceXY(SDL_Surface* Surface, const int x, const int y);
-	void fromTextSurface(SDL_Surface* Surface);
+	void convertSurface(SDL_Surface* Surface);
 	void upload(bool smooth = true);
+	void updateRect(uint8_t* pTexels, const GLint x = 0, const GLint y = 0, GLint w = 0, GLint h = 0); //update a rectangle of pixels in the texture
 	void update();
 	void Delete();
-	void changeTexels(uint8_t * pTexels, const GLint x = 0, const GLint y = 0, GLint w = 0, GLint h = 0);
 	void createColour(uint32_t col);
 	void create(uint32_t width, uint32_t height, uint32_t bytesPerPixel);
 	void fromImage(uint32_t width, uint32_t height, std::vector<uint8_t>& image, uint32_t bytesPerPixel);
@@ -68,16 +68,16 @@ public:
 	inline uint32_t GetWidth() const { return width; }
 	inline uint32_t GetHeight() const { return height; }
 	inline uint16_t GetDepth() const { return (uint16_t)bpp; }
-	inline uint8_t * GetTexels() { return pixels; };
+	inline uint8_t * GetTexels() { return &pixels[0]; };
 	inline uint32_t  GetPitch() const { return pitch; }
-	inline bool isValid() { return (pixels != nullptr); }
+	inline bool isValid() const { return (pixels.size()>0); }
 	GLuint textureID = 0;	//GL ID returned from upload (uint only)
 	std::string name = "";
 
 private:
 	void init();
 	
-	uint8_t * pixels = nullptr;
+	std::vector<uint8_t> pixels;
 	int bpp = 0;
 	GLenum format = 0;
 	uint32_t width = 0;

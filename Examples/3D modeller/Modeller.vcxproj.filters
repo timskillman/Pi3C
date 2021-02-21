@@ -320,9 +320,6 @@
     <ClInclude Include="..\..\SharedCode\core\Pi3Cvector.h">
       <Filter>Shared Code\core</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\SharedCode\core\Pi3Cwin.h">
-      <Filter>Shared Code\core</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\SharedCode\core\Pi3Csound.h">
       <Filter>Shared Code\core</Filter>
     </ClInclude>
@@ -424,6 +421,9 @@
     </ClInclude>
     <ClInclude Include="..\..\ThirdParty\gltf\fx\gltf.h">
       <Filter>Shared Code\fxgltf</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\SharedCode\core\Pi3Cwin.h">
+      <Filter>Shared Code\file</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -1003,13 +1003,9 @@ void Modeller::handleEvents(std::vector<uint32_t>& eventList)
 		case SDL_DROPFILE: 
 			std::string file = window->dropfile;
 			std::string ext = Pi3Cutils::getExt(file); // .substr(file.size() - 4, 4);
-			//if (ext == ".obj" || ext==".fbx" || ext==".gltf") {
-				//mgui.takeSnapshot();
-				//scene.setup2D();
-				//std::function<void(float)> loadbarCallback = std::bind(&Modeller::loadingBar, this, _1);
+
 			if (loadModelAt(file, touch.touching ? touch.intersection : vec3f(), setCallback())) { }
-				//int32_t modelRef = scene.loadModelOBJ("", file, touch.touching ? touch.intersection : vec3f(), true, modelGroupId, false, setCallback());
-			//}
+
 			else if (ext == "png" || ext == "jpg") {
 				setCurrentSelView(currentView);
 				setMousePosition(window->mouse.x, window->getHeight() - window->mouse.y);
@@ -1051,7 +1047,7 @@ bool Modeller::loadModelAt(const std::string& modelfile, const vec3f pos, const 
 	}
 	else if (ext == "gltf" || ext == "glb") {
 		//Pi3Cgltf gltf(resource, &scene, modelfile);
-		Pi3Cfxgltf gltf(resource, &scene, modelfile);
+		Pi3Cfxgltf gltf(resource, &scene, modelfile, showProgressCB);
 		return true;
 	}
 	return false;

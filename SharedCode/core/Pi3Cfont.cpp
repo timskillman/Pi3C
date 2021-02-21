@@ -14,7 +14,8 @@ Pi3Cfont::Pi3Cfont(const char * path, const char * fontfile, int ptsize) {
 }
 
 Pi3Cfont::~Pi3Cfont() {
-	TTF_CloseFont(font); font = nullptr;
+	TTF_CloseFont(font); 
+	font = nullptr;
 }
 
 TTF_Font * Pi3Cfont::open(const char * path, const char * fontfile, int ptsize) {
@@ -24,15 +25,15 @@ TTF_Font * Pi3Cfont::open(const char * path, const char * fontfile, int ptsize) 
 	return openFont;
 }
 
-std::shared_ptr<Pi3Ctexture> Pi3Cfont::asTexture(const std::string &text, const uint32_t colour)
+Pi3Ctexture Pi3Cfont::asTexture(const std::string &text, const uint32_t colour)
 {
 	SDL_Surface* Surface = nullptr;
 	if (text == "") Surface = SDL_CreateRGBSurface(0, 8, 8, 32, 0x000000ff, 0x0000ff00, 0x00ff0000, 0xff000000);
 	else
 		Surface = TTF_RenderText_Blended_Wrapped(font, text.c_str(), SDL_Color{ (uint8_t)(colour & 255), (uint8_t)((colour >> 8) & 255), (uint8_t)((colour >> 16) & 255) }, 300);
 	if (Surface) {
-		std::shared_ptr<Pi3Ctexture> ttex(new Pi3Ctexture);
-		ttex->fromTextSurface(Surface);
+		Pi3Ctexture ttex;
+		ttex.fromSurface(Surface);
 		SDL_FreeSurface(Surface);
 		return ttex;
 	}
@@ -102,13 +103,12 @@ void Pi3Cfont::createFontSheet(const uint32_t sheetWidth, const uint32_t sheetHe
 	for (int32_t p = 0; p < destSurface->w*destSurface->h; p++) pt[p] = 0xffffff | (pt[p] & 0xff000000);
 
 	//Create texture and material ...
-	fontsheet.sheet.reset(new Pi3Ctexture());
-	fontsheet.sheet->fromTextSurface(destSurface);
-	fontsheet.sheet->upload(); //upload to GPU
-	fontsheet.sheetMaterial.texID = fontsheet.sheet->textureID;
+	fontsheet.sheet = Pi3Ctexture();
+	fontsheet.sheet.fromSurface(destSurface);
+	fontsheet.sheet.upload(); //upload to GPU
+	fontsheet.sheetMaterial.texID = fontsheet.sheet.textureID;
 	fontsheet.sheetMaterial.texRef = 0; //need to validate rendering texture
 	fontsheet.sheetMaterial.SetColDiffuse(0xffffffff);
-	//fontsheet.sheetMaterial.SetColAmbient(0xffffffff);
 	fontsheet.sheetMaterial.alpha = 0.99f;
 	fontsheet.sheetMaterial.illum = 1; //non shaded illuminat
 
@@ -139,7 +139,7 @@ Pi3Ctexture * Pi3Cfont::textSurface(const std::string &text)
 		fontSheetChar &ch = fontsheet.chars[(uint8_t)c];
 		drect.width = ch.recti.width; drect.height = ch.recti.height;
 		//fontsheet.sheet->rawBlit2(&ch.recti, chtex, &drect);
-		fontsheet.sheet->blit(&ch.recti, chtex, &drect);
+		fontsheet.sheet.blit(&ch.recti, chtex, &drect);
 		drect.x += drect.width;
 	}
 	return chtex;

@@ -40,9 +40,9 @@ namespace Pi3CfileOBJ {
 		}
 		else if (objmat.texID >= 0) {
 		//	int32_t bpp = resource->textures[objmat.texRef]->GetDepth();
-			auto& tex = resource->textures[objmat.texRef];
-			objmat.texWidth = tex->GetWidth();
-			objmat.texHeight = tex->GetHeight();
+			auto& tex = *resource->getTexture(objmat.texRef);
+			objmat.texWidth = tex.GetWidth();
+			objmat.texHeight = tex.GetHeight();
 		}
 
 		for (size_t i = 0; i < resource->materials.size(); i++) {

@@ -63,6 +63,7 @@ int32_t Pi3Cscene::loadModelOBJ(const std::string &path, const std::string &mode
 	if (modelfile == "") return -1;
 	std::string newfile = modelfile;
 	std::string newpath = (path == "") ? Pi3Cutils::extractPath(newfile) : path;
+	newfile = Pi3Cutils::extractName(newfile);
 
 	std::string error;
 	size_t meshStart = resource->meshes.size();

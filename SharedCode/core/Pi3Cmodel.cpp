@@ -110,7 +110,7 @@ void Pi3Cmodel::init()
 
 void Pi3Cmodel::deleteTexture(Pi3Cresource *resource)
 {
-	if (material.texRef>=0) resource->textures[material.texRef]->Delete();
+	if (material.texRef>=0) resource->deleteTexture(material.texRef);
 }
 
 void Pi3Cmodel::renderBasic(Pi3Cresource *resource, Pi3Cshader * shader, const Pi3Cmatrix *parent_matrix, Pi3Cmaterial *materialOverride)
@@ -256,11 +256,11 @@ int32_t Pi3Cmodel::addTexture(Pi3Cresource *resource, const std::string &txfile,
 	return material.texID;
 }
 
-int32_t Pi3Cmodel::addTexture(Pi3Cresource *resource, const std::shared_ptr<Pi3Ctexture> &texture)
+int32_t Pi3Cmodel::addTexture(Pi3Cresource *resource, Pi3Ctexture & texture)
 {
-	material.texRef = resource->addTexture(texture); //resource->loadTexture("", txfile, material.texRef);
+	material.texRef = resource->addTexture(texture);
 	if (material.texRef >= 0) {
-		Pi3Ctexture *tx = texture.get();
+		Pi3Ctexture* tx = &texture;
 		material.texID = resource->getTextureID(material.texRef);
 		material.texWidth = tx->GetWidth();
 		material.texHeight = tx->GetHeight();
@@ -271,17 +271,17 @@ int32_t Pi3Cmodel::addTexture(Pi3Cresource *resource, const std::shared_ptr<Pi3C
 
 int32_t Pi3Cmodel::assignTexture(Pi3Cresource* resource, int texRef)
 {
-	material.texRef = texRef; //resource->loadTexture("", txfile, material.texRef);
+	material.texRef = texRef;
 	if (material.texRef >= 0) {
-		Pi3Ctexture* tx = resource->textures[texRef].get();
+		Pi3Ctexture& tx = *resource->getTexture(texRef);
 		material.texID = resource->getTextureID(material.texRef);
-		material.texWidth = tx->GetWidth();
-		material.texHeight = tx->GetHeight();
+		material.texWidth = tx.GetWidth();
+		material.texHeight = tx.GetHeight();
 	}
 	return material.texID;
 }
 
-int32_t Pi3Cmodel::addPicture(Pi3Cresource *resource, const std::shared_ptr<Pi3Ctexture> &texture)
+int32_t Pi3Cmodel::addPicture(Pi3Cresource *resource, Pi3Ctexture & texture)
 {
 	material.SetColDiffuse(0xffffff);
 	material.alpha = 0.99f;

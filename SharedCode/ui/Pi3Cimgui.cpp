@@ -32,11 +32,12 @@ void Pi3Cimgui::setButtonStyle(const rectStyle &style)
 	if (style.font != "") setFont(style.font);
 }
 
-Pi3Cmodel * Pi3Cimgui::createImage(const std::string &text, const std::shared_ptr<Pi3Ctexture> &texture)
+Pi3Cmodel* Pi3Cimgui::createImage(const std::string& text, Pi3Ctexture& texture)
 {
-	if (texture->isValid()) {
+	//Create a 1x1 sized image rectangle that can be scaled to any size
+	if (texture.isValid()) {
 		Pi3Cmodel texrect;
-		texrect.createRect2D(resource, vec2f(0, -1.f), vec2f(1.f, 1.f)); //Create a 1x1 sized image rectangle that can be scaled to any size
+		texrect.createRect2D(resource, vec2f(0, -1.f), vec2f(1.f, 1.f));
 		texrect.addPicture(resource, texture);
 		auto obj = imageRect.emplace(text, texrect);
 		return &obj.first->second;
@@ -44,9 +45,9 @@ Pi3Cmodel * Pi3Cimgui::createImage(const std::string &text, const std::shared_pt
 	return nullptr;
 }
 
-Pi3Cmodel * Pi3Cimgui::createImageRect(const std::string &text, const std::shared_ptr<Pi3Ctexture> &ttex)
+Pi3Cmodel* Pi3Cimgui::createImageRect(const std::string& text, Pi3Ctexture& ttex)
 {
-	return create2ImageRect(text, ttex);
+	return create2ImageRect(text, ttex, Pi3Ctexture());
 }
 
 Pi3Cmodel* Pi3Cimgui::createImageRect2(const std::string& text, const int texRef)
@@ -66,9 +67,9 @@ Pi3Cmodel* Pi3Cimgui::createImageRect2(const std::string& text, const int texRef
 	return nullptr;
 }
 
-Pi3Cmodel * Pi3Cimgui::create2ImageRect(const std::string &text, const std::shared_ptr<Pi3Ctexture> &ttex1, const std::shared_ptr<Pi3Ctexture> &ttex2)
+Pi3Cmodel * Pi3Cimgui::create2ImageRect(const std::string &text, Pi3Ctexture& ttex1, Pi3Ctexture& ttex2)
 {
-	if (ttex1->isValid()) {
+	if (ttex1.isValid()) {
 		//Create an imageRect consisting of Container, Background and 2x Images ...
 		Pi3Cmodel container, texrect1, texrect2, bkgrect;
 
@@ -79,7 +80,7 @@ Pi3Cmodel * Pi3Cimgui::create2ImageRect(const std::string &text, const std::shar
 		container.group.push_back(bkgrect);
 		container.group.push_back(texrect1);
 		
-		if (ttex2) {
+		if (ttex2.isValid()) {
 			texrect2.createRect2D(resource);
 			texrect2.addPicture(resource, ttex2);
 			container.group.push_back(texrect2);
@@ -103,18 +104,18 @@ Pi3Cmodel * Pi3Cimgui::findCreateImageRect(const std::string &str, const ButtonT
 {
 	auto findString = imageRect.find(str);
 	if (findString != imageRect.end()) return &findString->second;
-	std::shared_ptr<Pi3Ctexture> ttex;
-	ttex.reset(new Pi3Ctexture);
+
+	Pi3Ctexture tex;
 
 	if (type == TEXT) {
 		if (!currentFont) return nullptr;
-		ttex.reset(currentFont->textSurface(str));
+		tex = *currentFont->textSurface(str);
 	}
 	else {
-		ttex.reset(new Pi3Ctexture((texturePath + str).c_str(), true));
+		tex.loadFromFile((texturePath + str).c_str());
 	}
-	if (asRect) return createImageRect(str, ttex);
-	return createImage(str, ttex);
+	if (asRect) return createImageRect(str, tex);
+	return createImage(str, tex);
 }
 
 Pi3Cmodel * Pi3Cimgui::findCreateImage(const std::string &str, const ButtonType type)
@@ -922,8 +923,7 @@ void Pi3Cimgui::takeSnapshot()
 	std::vector<uint8_t> snap;
 	Pi3Cutils::snapShot(Pi3Crecti(0, 0, window->getWidth(), window->getHeight()), snap);
 
-	std::shared_ptr<Pi3Ctexture> snaptex;
-	snaptex.reset(new Pi3Ctexture(window->getWidth(), window->getHeight(), snap, 4));
+	Pi3Ctexture snaptex(window->getWidth(), window->getHeight(), snap, 4);
 
 	snapShotPic.deleteTexture(resource); //delete any previous snapshot texture
 	snapShotPic.createRect2D(resource, vec2f(0, 0), vec2f((float)window->getWidth(), (float)window->getHeight()));

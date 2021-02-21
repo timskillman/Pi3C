@@ -78,10 +78,10 @@ public:
 	
 	//texture settings ...
 	std::string texName;
-	int32_t texID;	//GL texture ID
+	int32_t texID;	//GL texture ID (used for textures outside Resources textures pool, e.g. fonts)
 	int32_t texRef; //ref to stored texture in meshpool
-	std::string texBumpName;
-	int32_t texBumpID;	//GL texture ID
+	//std::string texBumpName;
+	int32_t texBumpRef;	//GL texture ID
 	uint32_t texWidth;
 	uint32_t texHeight;
 	

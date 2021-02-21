@@ -16,13 +16,13 @@ void Pi3Cmaterial::init(const std::string &name)
 	shininess = 0.2f;
 	alpha = 1.0f;
 	alphaTestValue = 0.f; //no test
-	texName = ""; 
-	texRef = -1; 
+	//texName = ""; 
 	cullface = true; 
 	illum = 2; 
 	texID = 0;
-	texBumpName = ""; 
-	texBumpID = -1;
+	//texBumpName = ""; 
+	texRef = -1;
+	texBumpRef= -1;
 	animvec = vec2f(0.f,0.f); animoffset = vec2f(0.f,0.f);
 	animsize = vec2f(1.f, 1.f);
 	animFrames = 0;

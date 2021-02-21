@@ -4,12 +4,12 @@
 //#include "Pi3Cquaternion.h"
 #include "Pi3Cutils.h"
 
-Pi3Cfxgltf::Pi3Cfxgltf(Pi3Cresource* resource, Pi3Cscene* scene, const std::string& filename)
+Pi3Cfxgltf::Pi3Cfxgltf(Pi3Cresource* resource, Pi3Cscene* scene, const std::string& filename, const std::function<void(float)> showProgressCB)
 {
-	bool ret = load(resource, scene, filename);
+	bool ret = load(resource, scene, filename, showProgressCB);
 }
 
-#define getbuff(buftype, mult, offset)								 \
+#define getfloat(buftype, mult, offset)								    \
         *(float*)&buffers[buffOffsets[buftype] + index * mult + offset] \
 
 int Pi3Cfxgltf::typeToSize(fx::gltf::Accessor::Type type)
@@ -50,27 +50,28 @@ int Pi3Cfxgltf::GetAttributeOffset(const std::string& attribstr)
 	return type;
 }
 
-int Pi3Cfxgltf::GetComponentType(const fx::gltf::Accessor::ComponentType componentType)
+int Pi3Cfxgltf::GetComponentSize(const fx::gltf::Accessor::ComponentType componentType)
 {
 	switch (componentType) {
 	case fx::gltf::Accessor::ComponentType::Byte:
 	case fx::gltf::Accessor::ComponentType::UnsignedByte:
-		return 0;
+		return 1;
 	case fx::gltf::Accessor::ComponentType::Short:
 	case fx::gltf::Accessor::ComponentType::UnsignedShort:
-		return 1;
+		return 2;
 	case fx::gltf::Accessor::ComponentType::UnsignedInt:
 	case fx::gltf::Accessor::ComponentType::Int:
-		return 2;
+	case fx::gltf::Accessor::ComponentType::Float:
+		return 4;
 	}
-	return -1;
+	return 0;
 }
 
 unsigned int Pi3Cfxgltf::GetIndexByType(const int itype, std::vector<uint8_t>& buffers, int byteOffset, int index)
 {
-	return (itype == 0) ? (unsigned int)buffers[byteOffset + index] :
-		(itype == 1) ? (unsigned int)*(unsigned short*)&buffers[byteOffset + index * 2] :
-		(unsigned int)*(unsigned int*)&buffers[byteOffset + index * 4];
+	unsigned int indexOut = 0;
+	memcpy(&indexOut, &buffers[byteOffset + index * itype], itype);
+	return indexOut;
 }
 
 uint32_t Pi3Cfxgltf::GetColour(const std::vector<int>& buffOffsets, const std::vector<int>& buffElemSizes, unsigned int index, std::vector<uint8_t>& buffers)
@@ -78,15 +79,15 @@ uint32_t Pi3Cfxgltf::GetColour(const std::vector<int>& buffOffsets, const std::v
 	//TODO - several other variants
 	uint32_t col = Pi3Ccolours::White;
 	if (buffElemSizes[COL_OFFSET] == 4) {
-		col = (uint8_t)(getbuff(COL_OFFSET, 16, 0) * 255.f) |
-			((uint8_t)(getbuff(COL_OFFSET, 16, 4) * 255.f) << 8) |
-			((uint8_t)(getbuff(COL_OFFSET, 16, 8) * 255.f) << 16) |
-			((uint8_t)(getbuff(COL_OFFSET, 16, 12) * 255.f) << 24);
+		col = (uint8_t)(getfloat(COL_OFFSET, 16, 0) * 255.f) |
+			((uint8_t)(getfloat(COL_OFFSET, 16, 4) * 255.f) << 8) |
+			((uint8_t)(getfloat(COL_OFFSET, 16, 8) * 255.f) << 16) |
+			((uint8_t)(getfloat(COL_OFFSET, 16, 12) * 255.f) << 24);
 	}
 	else if (buffElemSizes[COL_OFFSET] == 3) {
-		col = (uint8_t)(getbuff(COL_OFFSET, 12, 0) * 255.f) |
-			((uint8_t)(getbuff(COL_OFFSET, 12, 4) * 255.f) << 8) |
-			((uint8_t)(getbuff(COL_OFFSET, 12, 8) * 255.f) << 16) |
+		col = (uint8_t)(getfloat(COL_OFFSET, 12, 0) * 255.f) |
+			((uint8_t)(getfloat(COL_OFFSET, 12, 4) * 255.f) << 8) |
+			((uint8_t)(getfloat(COL_OFFSET, 12, 8) * 255.f) << 16) |
 			0xff000000;
 	}
 	return col;
@@ -118,23 +119,24 @@ Pi3Cmesh Pi3Cfxgltf::CreateMesh(Pi3Cresource* resource, fx::gltf::Document& mode
 	int indcount = indexAccessor.count;
 
 	Pi3Cmesh newmesh;
+	newmesh.stride = 9;
 	newmesh.mode = GetGLmodeFromPrimitiveMode(primitive.mode);
-	newmesh.verts.resize(indcount * 9);
+	newmesh.verts.resize(indcount * newmesh.stride);
 	newmesh.vc = 0;
 
-	int itype = GetComponentType(indexAccessor.componentType);
+	int indexSize = GetComponentSize(indexAccessor.componentType);
 
 	for (int i = 0; i < indcount; i++) {
 
-		unsigned int index = GetIndexByType(itype, buffers, byteOffset, i);
+		unsigned int index = GetIndexByType(indexSize, buffers, byteOffset, i);
 
-		vec3f point = vec3f(getbuff(VERT_OFFSET, 12, 0), getbuff(VERT_OFFSET, 12, 4), getbuff(VERT_OFFSET, 12, 8));
-		vec3f normal = (buffOffsets[NORM_OFFSET] > 0) ? vec3f(getbuff(NORM_OFFSET, 12, 0), getbuff(NORM_OFFSET, 12, 4), getbuff(NORM_OFFSET, 12, 8)) : vec3f();
-		vec2f uvs = (buffOffsets[TEX0_OFFSET] > 0) ? vec2f(getbuff(TEX0_OFFSET, 8, 0), getbuff(TEX0_OFFSET, 8, 4)) : vec2f();
+		vec3f position = vec3f(getfloat(VERT_OFFSET, 12, 0), getfloat(VERT_OFFSET, 12, 4), getfloat(VERT_OFFSET, 12, 8));
+		vec3f normal = (buffOffsets[NORM_OFFSET] > 0) ? vec3f(getfloat(NORM_OFFSET, 12, 0), getfloat(NORM_OFFSET, 12, 4), getfloat(NORM_OFFSET, 12, 8)) : vec3f();
+		vec2f texcoord = (buffOffsets[TEX0_OFFSET] > 0) ? vec2f(getfloat(TEX0_OFFSET, 8, 0), getfloat(TEX0_OFFSET, 8, 4)) : vec2f();
 		uint32_t colour = (buffOffsets[COL_OFFSET] > 0) ? GetColour(buffOffsets, buffElemSizes, index, buffers) : Pi3Ccolours::White;
 
-		Pi3Cutils::storeVNTC(newmesh.verts, newmesh.vc, point, normal, uvs, colour);
-		newmesh.bbox.update(point);
+		Pi3Cutils::storeVNTC(newmesh.verts, newmesh.vc, position, normal, texcoord, colour);
+		newmesh.bbox.update(position);
 	}
 
 	if (buffOffsets[NORM_OFFSET] < 0 && newmesh.mode == GL_TRIANGLES) {
@@ -161,7 +163,13 @@ Pi3Cmodel Pi3Cfxgltf::ParseMesh(Pi3Cresource* resource, fx::gltf::Document& mode
 		auto* material = (primitive.material >= 0) ? &model.materials[primitive.material] : nullptr;
 
 		if (material) {
-			newmaterial = *resource->defaultMaterial();
+			int tref = material->pbrMetallicRoughness.baseColorTexture.index;
+			if (tref >= 0 && tref < texRefs.size()) {
+				newmaterial = resource->createMaterialFromTexture(texRefs[tref]);
+			}
+			else {
+				newmaterial = *resource->defaultMaterial();
+			}
 			newmaterial.name = material->name;
 			newmaterial.groupID = 1;
 
@@ -171,16 +179,6 @@ Pi3Cmodel Pi3Cfxgltf::ParseMesh(Pi3Cresource* resource, fx::gltf::Document& mode
 			}
 
 			//const auto& baseshine = material.pbrMetallicRoughness.metallicFactor;
-
-			int tref = material->pbrMetallicRoughness.baseColorTexture.index;
-			if (tref >= 0 && tref < texRefs.size()) {
-				newmaterial.texRef = texRefs[tref];
-				newmaterial.texID = resource->getTextureID(newmaterial.texRef);
-				std::shared_ptr<Pi3Ctexture> Texture = resource->textures[newmaterial.texRef];
-				newmaterial.texWidth = Texture->GetWidth();
-				newmaterial.texHeight = Texture->GetHeight();
-				newmaterial.alpha = 0.999f;
-			}
 		}
 
 		Pi3Cmesh basemesh = CreateMesh(resource, model, mesh, primitive);
@@ -231,7 +229,7 @@ Pi3Cmodel Pi3Cfxgltf::ParseMesh(Pi3Cresource* resource, fx::gltf::Document& mode
 	return newmodel;
 }
 
-Pi3Cmodel Pi3Cfxgltf::ParseNode(Pi3Cresource* resource, fx::gltf::Document& model, fx::gltf::Node& node, const std::vector<int>& texRefs) 
+Pi3Cmodel Pi3Cfxgltf::ParseNode(Pi3Cresource* resource, fx::gltf::Document& model, fx::gltf::Node& node, const std::vector<int>& texRefs)
 {
 	// Apply xform
 
@@ -245,30 +243,34 @@ Pi3Cmodel Pi3Cfxgltf::ParseNode(Pi3Cresource* resource, fx::gltf::Document& mode
 			nmat[8], nmat[9], nmat[10], nmat[11],
 			nmat[12], nmat[13], nmat[14], nmat[15]);
 	}
-	//else {
-		// Assume Trans x Rotate x Scale order
-		if (node.scale.size() == 3) {
-			matrix.scale(vec3f(node.scale[0], node.scale[1], node.scale[2]));
-		}
 
-		if (node.rotation.size() == 4) {
-			Pi3Cmatrix qmtx;
-			qmtx.fromQuaternion(node.rotation[0], node.rotation[1], node.rotation[2], node.rotation[3]);
-			//Pi3Cquaternion quat(node.rotation[0], node.rotation[1], node.rotation[2], node.rotation[3]);
-			matrix = matrix * qmtx; // quat.toMatrix();
-		}
+	// Assume Trans x Rotate x Scale order
+	if (node.scale.size() == 3) {
+		matrix.scale(vec3f(node.scale[0], node.scale[1], node.scale[2]));
+	}
 
-		if (node.translation.size() == 3) {
-			matrix.Translate(vec3f(node.translation[0], node.translation[1], node.translation[2]));
-		}
-	//}
+	if (node.rotation.size() == 4) {
+		Pi3Cmatrix qmtx;
+		qmtx.fromQuaternion(node.rotation[0], node.rotation[1], node.rotation[2], node.rotation[3]);
+		//Pi3Cquaternion quat(node.rotation[0], node.rotation[1], node.rotation[2], node.rotation[3]);
+		matrix = matrix * qmtx; // quat.toMatrix();
+	}
+
+	if (node.translation.size() == 3) {
+		matrix.Translate(vec3f(node.translation[0], node.translation[1], node.translation[2]));
+	}
 
 	if (node.mesh > -1) {
 		assert(node.mesh < model.meshes.size());
 		newmodel = ParseMesh(resource, model, model.meshes[node.mesh], texRefs);
 	}
 
+	float pstep = 40.f / (float) node.children.size();
+
 	for (size_t i = 0; i < node.children.size(); i++) {
+
+		if (showProgressCB != nullptr) showProgressCB(60.f + i*pstep);
+
 		assert(node.children[i] < model.nodes.size());
 		Pi3Cmodel nodemod = ParseNode(resource, model, model.nodes[node.children[i]], texRefs);
 		newmodel.append(resource, nodemod);
@@ -278,15 +280,65 @@ Pi3Cmodel Pi3Cfxgltf::ParseNode(Pi3Cresource* resource, fx::gltf::Document& mode
 	return newmodel;
 }
 
-bool Pi3Cfxgltf::load(Pi3Cresource* resource, Pi3Cscene* piscene, const std::string& filepath)
+void Pi3Cfxgltf::loadTextures(Pi3Cresource* resource, const std::string& filepath)
 {
-	std::string err;
-	std::string warn;
+	if (model.images.size() > 0) {
+
+		float pstep = 20.f / (float)model.images.size();
+
+		for (size_t i = 0; i < model.images.size(); i++) {
+
+			if (showProgressCB != nullptr) showProgressCB(40.f + i * pstep);
+
+			std::string uri = model.images[i].uri;
+			int buffViewRef = model.images[i].bufferView;
+			std::string texname = "";
+			int32_t texref = -1;
+			Pi3Ctexture texture;
+
+			if (uri != "" || buffViewRef >= 0) {
+				if (uri == "") {
+					texname = filepath + "-" + model.images[i].name;
+					texref = resource->findTextureByName(texname);
+					if (texref < 0) {
+						auto& buff = model.buffers[0].data;
+						int byteOffset = model.bufferViews[buffViewRef].byteOffset;// +indexAccessor.byteOffset;
+						texture.loadFromMemory(&buff[byteOffset], model.bufferViews[buffViewRef].byteLength);
+					}
+				}
+				else
+				{
+					texname = filepath + "-" + uri;
+					texref = resource->findTextureByName(texname);
+					if (texref < 0) {
+						std::string path = Pi3Cutils::extractPath(filepath);
+						texture.loadFromFile(Pi3Cutils::filepath(path, uri).c_str());
+					}
+				}
+
+				//ensure texture is less than 2048x2048 (max for Pi Zero)
+				int iw = texture.GetWidth(), ih = texture.GetHeight(), sc = 0;
+				while (iw > 2048 || ih > 2048) { iw /= 2; ih /= 2; sc++; }
+				if (sc > 0) texture.shrinkPow2(sc);
+
+				texture.flip();
+
+				texture.name = texname;
+				texref = resource->addTexture(texture);
+				Pi3Cmaterial mat = resource->createMaterialFromTexture(texref);
+				resource->addMaterial(mat);
+
+				texRefs.push_back(texref);
+			}
+		}
+	}
+}
+
+bool Pi3Cfxgltf::load(Pi3Cresource* resource, Pi3Cscene* piscene, const std::string& filepath, const std::function<void(float)> showProgress)
+{
+	showProgressCB = showProgress;
 
 	std::string ext = Pi3Cutils::getExt(filepath);
-	std::string name = Pi3Cutils::extractName(filepath);
-
-	bool ret = true;
 
 	if (ext == "glb") {
 		model = fx::gltf::LoadFromBinary(filepath);
@@ -295,75 +347,19 @@ bool Pi3Cfxgltf::load(Pi3Cresource* resource, Pi3Cscene* piscene, const std::str
 		model = fx::gltf::LoadFromText(filepath);
 	}
 
-	if (ret) {
-		//Get textures ...
-		std::vector<int> texRefs(0);
-		if (model.images.size() > 0) {
-			for (size_t i = 0; i < model.images.size(); i++) {
+	if (showProgressCB != nullptr) showProgressCB(40.f);
 
-				std::string uri = model.images[i].uri;
-				int buffViewRef = model.images[i].bufferView;
-				std::string texname = "";
-				int32_t ft = -1;
-				std::shared_ptr<Pi3Ctexture> texture;
-				texture.reset(new Pi3Ctexture());
+	loadTextures(resource, filepath);
 
-				if (uri != "" || buffViewRef >=0) {
-					if (uri == "") {
-						texname = filepath + "-" + model.images[i].name;
-						ft = resource->findTextureByName(texname);
-						if (ft < 0) {
-							auto& buff = model.buffers[0].data;
-							int byteOffset = model.bufferViews[buffViewRef].byteOffset;// +indexAccessor.byteOffset;
-							texture->loadFromMemory(&buff[byteOffset], model.bufferViews[buffViewRef].byteLength);
-						}
-					} 
-					else
-					{
-						texname = filepath + "-" + uri;
-						ft = resource->findTextureByName(texname);
-						if (ft < 0) {
-							std::string path = Pi3Cutils::extractPath(filepath);
-							texture->loadFromFile(Pi3Cutils::filepath(path, uri).c_str());
-						}
-					}
+	if (showProgressCB != nullptr) showProgressCB(60.f);
 
-					//ensure texture is less than 2048x2048 (max for Pi Zero)
-					int iw = texture->GetWidth(), ih = texture->GetHeight(), sc = 0;
-					while (iw > 2048 || ih > 2048) { iw /= 2; ih /= 2; sc++; }
-					if (sc > 0) texture->shrinkPow2(sc);
-
-					texture->flip();
-
-					texture->name = texname;
-					ft = resource->addTexture(texture);
-					Pi3Cmaterial mat = *resource->defaultMaterial();
-					mat.texRef = ft;
-					mat.texName = texname;
-					mat.texWidth = iw;
-					mat.texHeight = ih;
-					mat.name = texname;
-					mat.alpha = 0.99f;
-					mat.illum = 2;
-					resource->addMaterial(mat);
-					
-					texRefs.push_back(ft);
-				}
-				else
-				{
-
-				}
-			}
-		}
-
-		Pi3Cmodel rootmodel;
-		//int scene_to_display = model.defaultScene > -1 ? model.defaultScene : 0;
-		auto& scene = model.scenes[0];
-		for (size_t i = 0; i < scene.nodes.size(); i++) {
-			rootmodel.append(resource, ParseNode(resource, model, model.nodes[scene.nodes[i]], texRefs));
-		}
-		piscene->append3D(rootmodel);
-
+	Pi3Cmodel rootmodel;
+	//int scene_to_display = model.defaultScene > -1 ? model.defaultScene : 0;
+	auto& scene = model.scenes[0];
+	for (size_t i = 0; i < scene.nodes.size(); i++) {
+		rootmodel.append(resource, ParseNode(resource, model, model.nodes[scene.nodes[i]], texRefs));
 	}
-	return ret;
+	piscene->append3D(rootmodel);
+
+	return true;
 }

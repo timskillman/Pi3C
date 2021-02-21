@@ -137,6 +137,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>..\..\Shared\glutess;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <AdditionalDependencies>SDL2.lib;SDL2main.lib;OpenGL32.lib;SDL2_image.lib;SDL2_mixer.lib;SDL2_ttf.lib;glew32s.lib;%(AdditionalDependencies)</AdditionalDependencies>

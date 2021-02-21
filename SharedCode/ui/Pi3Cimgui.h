@@ -187,13 +187,12 @@ private:
 	void scissorRect(const Pi3Crecti& rect);
 	void scissorEnd();
 
-	void loadImage(std::shared_ptr<Pi3Ctexture>& ttex, const std::string& str, const ButtonType type);
 	Pi3Cmodel * findCreateImageRect(const std::string &str, const ButtonType type, bool asRect = true);
 	Pi3Cmodel * findCreateImage(const std::string &str, const ButtonType type);
-	Pi3Cmodel * createImage(const std::string &text, const std::shared_ptr<Pi3Ctexture> &ttex);
-	Pi3Cmodel * createImageRect(const std::string &text, const std::shared_ptr<Pi3Ctexture> &ttex);
+	Pi3Cmodel * createImage(const std::string &text, Pi3Ctexture& ttex);
+	Pi3Cmodel * createImageRect(const std::string &text, Pi3Ctexture& ttex);
 	Pi3Cmodel * createImageRect2(const std::string& text, const int texRef);
-	Pi3Cmodel * create2ImageRect(const std::string &text, const std::shared_ptr<Pi3Ctexture> &ttex1, const std::shared_ptr<Pi3Ctexture> &ttex2 = nullptr);
+	Pi3Cmodel* create2ImageRect(const std::string& text, Pi3Ctexture& ttex1, Pi3Ctexture& ttex2 = Pi3Ctexture());
 
 	Pi3Cwindow *window = nullptr;
 

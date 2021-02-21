@@ -66,17 +66,19 @@ public:
 	size_t meshCount() { return meshes.size(); }
 
 	int32_t loadTexture(const std::string &path, const std::string &file, bool smooth = true);  //loads a texture and returns a texture reference to the textures array (else -1 if failed)
-	int32_t addTexture(const std::shared_ptr<Pi3Ctexture> &Texture, bool smooth = true);
+	int32_t addTexture(const Pi3Ctexture &Texture, const bool smooth = true);
+	void deleteTexture(int32_t texRef) { textures[texRef]->Delete(); }
 	int32_t getTextureID(int32_t texRef);
 	void createDefaultMaterial(const std::string &name = "default");
 	int32_t addMaterial(const Pi3Cmaterial& material);
 	Pi3Cmesh createRect(const vec3f& pos, const vec2f& size, const uint32_t col, const vec2f& uvpos = vec2f(0,0), const vec2f& uvsize = vec2f(1.f,1.f));
 	int32_t createDefaultTexture(int32_t &texID);
+	Pi3Cmaterial createMaterialFromTexture(const int32_t texref);
 	Pi3Cmaterial * defaultMaterial() { return &materials[0]; }
 	void deleteMaterialTexturesByID(int32_t groupId);
 	void deleteMaterialsByID(int32_t groupId);
 	void deleteVertsBuffer(int32_t groupId);
-	void cleanTextures();	//removes empty textures
+	//void cleanTextures();	//removes empty textures
 
 	Pi3Ctexture* getTexture(int32_t ref) {
 		return (ref >= 0 && ref <= (int32_t)textures.size()) ? textures[ref].get() : nullptr;
@@ -117,10 +119,9 @@ public:
 	int32_t addShader(const std::string &vertfile, const std::string &fragfile);
 	void useBasicShader(const uint32_t shaderRef);
 	void addFont(const char * path, const char * fontfile, int ptsize);
+
 	std::shared_ptr<Pi3Cmusic> addMusic(const std::string& path, const std::string& musicfile);
 	std::shared_ptr<Pi3Csound> addSound(const std::string& path, const std::string& soundfile);
-
-
 	std::shared_ptr<Pi3Cfont> findFont(const std::string &ffont) { return findResource(fonts, ffont); }
 	std::shared_ptr<Pi3Cmusic> findMusic(const std::string &fmusic) { return findResource(music, fmusic); }
 	std::shared_ptr<Pi3Csound> findSound(const std::string &sound) { return findResource(sounds, sound); }
@@ -139,8 +140,8 @@ public:
 	//std::vector<uint32_t> vertBufferPtr;				//vertex buffer pointer for each vertex buffer (used for calculating free space in each buffer)
 
 	std::vector<Pi3Cmaterial> materials;
-	std::vector<std::shared_ptr<Pi3Ctexture>> textures;
 	std::vector<Pi3Cshader> shaders;
+	std::vector<std::shared_ptr<Pi3Ctexture>> textures;
 	std::map<std::string, std::shared_ptr<Pi3Cfont>> fonts;
 	std::map<std::string, std::shared_ptr<Pi3Cmusic>> music;
 	std::map<std::string, std::shared_ptr<Pi3Csound>> sounds;
