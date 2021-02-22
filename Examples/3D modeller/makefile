@@ -23,6 +23,7 @@ CPATH = $(TESS_DIR)
 CPATH = $(RJSON_DIR)
 CPATH = $(FBX_DIR)
 CPATH = $(GLTF_DIR)
+CPATH = $(JSON_DIR)
 
 BUILDPATH = ../../../_build/Projects/$(TARGET)/
 
