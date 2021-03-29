@@ -77,13 +77,5 @@ else
 	echo "gpu_mem=64" >> $CONFIG
 fi
 
-#  if [ $ASK_TO_REBOOT -eq 1 ]; then
-#    whiptail --yesno "Would you like to reboot now?" 20 60 2
-#    if [ $? -eq 0 ]; then # yes
-#      sync
-#      reboot
-#    fi
-#  fi
-
 echo "Install complete, please reboot ..."
 #reboot
