@@ -130,6 +130,8 @@ Pi3C will be cloned onto your Pi and a Pi3C directory, with all the necessary co
 
 This will install all the SDL 2.0 libraries, configure your GPU memory and enable the video drivers for your particular Raspberry Pi.
 
+**Automatic Install (preferably a fresh RPi OS install)**
+
 Open a terminal window, navigate to the Pi3C folder and enter:
 
 ~~~~
@@ -141,9 +143,26 @@ sudo sh Installer.sh
  2. *Checks for Pi version (pione, pitwo, pizero, pifour) - (lines 14-37)*
  3. *Sets the OpenGL driver (lines 39-66)*
  4. *Sets the OpenGL memory GPU memory split to 64Mb (lines 69-78)*
- 5. *Reboots*
 
 When prompted, type "Reboot" to restart your Raspberry Pi.
+
+**Manual Install**
+
+If you would like to install manually, then;
+
+1. Enter the following in a terminal;
+~~~
+apt-get update
+apt-get upgrade -y
+apt-get install libsdl2-dev libsdl2-mixer-dev libsdl2-ttf-dev libsdl2-image-dev libsdl2-net-dev -y
+~~~
+2. Select the OpenGL renderer;
+~~~
+Pi 4 - Fake KMS driver
+PiZero to Pi3 - Full KMS driver
+~~~
+3. Ensure you have at least a 64MB for the graphics
+
 
 
 Now you should be setup and ready to play with Pi3C ... **Congratulations!**
