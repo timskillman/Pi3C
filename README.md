@@ -136,13 +136,13 @@ Open a terminal window, navigate to the Pi3C folder and enter:
 sudo sh Installer.sh
 ~~~~
 
-*The installer does the following;
+*The installer does the following;*
 
-* - Install the latest SDL2.0 libraries including Mixer, TTF, Image and Net (lines 9-12)
-* - Checks for Pi version (pione, pitwo, pizero, pifour) - (lines 14-37)
-* - Sets the OpenGL driver (lines 39-66)
-* - Sets the OpenGL memory GPU memory split to 64Mb (lines 69-78)
-* - Reboots
+* - Install the latest SDL2.0 libraries including Mixer, TTF, Image and Net (lines 9-12)*
+* - Checks for Pi version (pione, pitwo, pizero, pifour) - (lines 14-37)*
+* - Sets the OpenGL driver (lines 39-66)*
+* - Sets the OpenGL memory GPU memory split to 64Mb (lines 69-78)*
+* - Reboots*
 
 When prompted, type "Reboot" to restart your Raspberry Pi.
 
