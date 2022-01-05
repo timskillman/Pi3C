@@ -158,8 +158,10 @@ apt-get install libsdl2-dev libsdl2-mixer-dev libsdl2-ttf-dev libsdl2-image-dev 
 ~~~
 2. Select the OpenGL renderer;
 ~~~
+$ sudo raspi-config
 Pi 4 - Fake KMS driver
-PiZero to Pi3 - Full KMS driver
+PiZero to Pi3 - Buster and older: Full KMS driver
+                Bullseye: Enable Glamor
 ~~~
 3. Ensure you have at least a 64MB for the graphics
 
