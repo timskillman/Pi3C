@@ -102,7 +102,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>$(ProjectDir)\..\..\ThirdParty\SDL2\include;$(ProjectDir)\..\..\ThirdParty\SDL2_image\include;$(ProjectDir)\..\..\ThirdParty\SDL2_net\include;$(ProjectDir)\..\..\SharedCode\core;$(ProjectDir)\..\..\ThirdParty\SDL2_mixer\include;$(ProjectDir)\..\..\ThirdParty\glew\include;$(ProjectDir)\..\..\ThirdParty\SDL2_ttf\include;$(ProjectDir)\..\..\SharedCode\ui;$(ProjectDir)\..\..\SharedCode\file;$(ProjectDir)\..\..\SharedCode\helpers;$(ProjectDir)\..\..\SharedCode\glutess;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)\..\..\ThirdParty\SDL2\include;$(ProjectDir)\..\..\ThirdParty\SDL2_image\include;$(ProjectDir)\..\..\ThirdParty\SDL2_net\include;$(ProjectDir)\..\..\SharedCode\core;$(ProjectDir)\..\..\ThirdParty\SDL2_mixer\include;$(ProjectDir)\..\..\ThirdParty\glew\include;$(ProjectDir)\..\..\ThirdParty\SDL2_ttf\include;$(ProjectDir)\..\..\SharedCode\ui;$(ProjectDir)\..\..\SharedCode\file;$(ProjectDir)\..\..\SharedCode\helpers;$(ProjectDir)\..\..\SharedCode\glutess;$(ProjectDir)\..\..\ThirdParty\NanoSVG;$(IncludePath)</IncludePath>
     <LibraryPath>$(ProjectDir)\..\..\ThirdParty\SDL2_image\lib\x86;$(ProjectDir)\..\..\ThirdParty\SDL2\lib\x86;$(ProjectDir)\..\..\ThirdParty\glew\lib\x86;$(ProjectDir)\..\..\ThirdParty\SDL2_mixer\lib\x86;$(ProjectDir)\..\..\ThirdParty\SDL2_ttf\lib\x86;$(LibraryPath)</LibraryPath>
     <SourcePath>$(SourcePath)</SourcePath>
   </PropertyGroup>

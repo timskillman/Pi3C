@@ -66,7 +66,12 @@ void Pi3Ctexture::fromImage(uint32_t width, uint32_t height, std::vector<uint8_t
 	pitch = width * bytesPerPixel;
 	size = height * pitch;
 	pixels.resize(size);
-	if (image.size()>0) memcpy(&pixels[0], &image[0], size);
+	if (image.size() > 0) {
+		memcpy(&pixels[0], &image[0], size);
+	}
+	else {
+		for (int i = 0; i < size; i++) pixels[i] = ((i & 3) == 3) ? 255 : 0;
+	}
 	switch (bytesPerPixel) {
 	//case 1: format = GL_ALPHA8; break; //RPi doesnt understand this
 	case 2: format = GL_RGB565; break;
@@ -267,7 +272,7 @@ void Pi3Ctexture::updateRect(uint8_t * texels, const GLint x, const GLint y, GLi
 	// texels MUST be same format as texture format
 	//if (textureID == 0) return;
 	glBindTexture(GL_TEXTURE_2D, textureID);
-	glTexSubImage2D(GL_TEXTURE_2D, 0, x, y, (w==0) ? width : w, (h==0) ? height : h, format, GL_UNSIGNED_BYTE, texels);
+	glTexSubImage2D(GL_TEXTURE_2D, 0, x, y, (w==0) ? width : w, (h==0) ? height : h, format, GL_UNSIGNED_BYTE, &texels[0]);
 }
 
 void Pi3Ctexture::mapToTextureUnit(uint32_t unit)

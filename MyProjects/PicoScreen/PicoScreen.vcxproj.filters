@@ -34,11 +34,35 @@
     <Filter Include="Shared Code\core">
       <UniqueIdentifier>{56c8bfdf-a7a9-4bd3-b007-cdd71b5aa6fd}</UniqueIdentifier>
     </Filter>
+    <Filter Include="pico_display">
+      <UniqueIdentifier>{95633e6a-653f-4cb1-83bb-7c4751431460}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="pico_graphics">
+      <UniqueIdentifier>{b3214b6b-fe8f-41bf-b425-4ea356b53ded}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Games">
+      <UniqueIdentifier>{311213f7-01c7-40f0-806c-f648de850e93}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Games\BrickBash">
+      <UniqueIdentifier>{ae96cf7e-733b-45b1-b135-36ae7b0484a7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Games\Fire">
+      <UniqueIdentifier>{b3eb9d15-3d1e-4e38-b5dd-83e1c24c066f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Games\PiType">
+      <UniqueIdentifier>{0631512d-0b3b-4ffd-8fa0-d23ae6886d2b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Common">
+      <UniqueIdentifier>{1e670d01-63af-4504-a44c-118cca787d9c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Games\PicoBird">
+      <UniqueIdentifier>{83b9cb66-7b74-4c22-8a18-900d4298233d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Games\VectorMap">
+      <UniqueIdentifier>{71c831f9-bcbd-4bac-b42e-bfc788faa46a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Source\SOLUTION_NAME.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\SharedCode\glutess\dict.c">
       <Filter>Shared Code\glutess</Filter>
     </ClCompile>
@@ -141,7 +165,7 @@
     <ClCompile Include="..\..\SharedCode\helpers\Pi3Cutils.cpp">
       <Filter>Shared Code\helpers</Filter>
     </ClCompile>
-	<ClCompile Include="..\..\SharedCode\helpers\Pi3CfastRead.cpp">
+    <ClCompile Include="..\..\SharedCode\helpers\Pi3CfastRead.cpp">
       <Filter>Shared Code\helpers</Filter>
     </ClCompile>
     <ClCompile Include="..\..\SharedCode\core\Pi3Cbbox2d.cpp">
@@ -158,6 +182,39 @@
     </ClCompile>
     <ClCompile Include="..\..\SharedCode\helpers\Pi3Chtml.cpp">
       <Filter>Shared Code\helpers</Filter>
+    </ClCompile>
+    <ClCompile Include="source\demo.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="pico_graphics\pico_graphics.cpp">
+      <Filter>pico_graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="pico_graphics\types.cpp">
+      <Filter>pico_graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="pico_display\pico_display.cpp">
+      <Filter>pico_display</Filter>
+    </ClCompile>
+    <ClCompile Include="source\games\BrickBash\BrickBash.cpp">
+      <Filter>Source Files\Games\BrickBash</Filter>
+    </ClCompile>
+    <ClCompile Include="source\games\Fire\Fire.cpp">
+      <Filter>Source Files\Games\Fire</Filter>
+    </ClCompile>
+    <ClCompile Include="source\games\PiType\PiType.cpp">
+      <Filter>Source Files\Games\PiType</Filter>
+    </ClCompile>
+    <ClCompile Include="source\games\FlappyBird\sprites.cpp">
+      <Filter>Source Files\Games\PicoBird</Filter>
+    </ClCompile>
+    <ClCompile Include="source\games\FlappyBird\bitmap.cpp">
+      <Filter>Source Files\Games\PicoBird</Filter>
+    </ClCompile>
+    <ClCompile Include="source\games\FlappyBird\PicoBird.cpp">
+      <Filter>Source Files\Games\PicoBird</Filter>
+    </ClCompile>
+    <ClCompile Include="source\games\VectorMap\Vector.cpp">
+      <Filter>Source Files\Games\VectorMap</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -287,7 +344,7 @@
     <ClInclude Include="..\..\SharedCode\helpers\Pi3Cutils.h">
       <Filter>Shared Code\helpers</Filter>
     </ClInclude>
-	<ClInclude Include="..\..\SharedCode\helpers\Pi3CfastRead.h">
+    <ClInclude Include="..\..\SharedCode\helpers\Pi3CfastRead.h">
       <Filter>Shared Code\helpers</Filter>
     </ClInclude>
     <ClInclude Include="..\..\SharedCode\core\Pi3Cbbox2d.h">
@@ -304,6 +361,48 @@
     </ClInclude>
     <ClInclude Include="..\..\SharedCode\helpers\Pi3Chtml.h">
       <Filter>Shared Code\helpers</Filter>
+    </ClInclude>
+    <ClInclude Include="pico_graphics\font.hpp">
+      <Filter>pico_graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="pico_graphics\font6_data.hpp">
+      <Filter>pico_graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="pico_graphics\font8_data.hpp">
+      <Filter>pico_graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="pico_graphics\pico_graphics.hpp">
+      <Filter>pico_graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="pico_display\pico_display.hpp">
+      <Filter>pico_display</Filter>
+    </ClInclude>
+    <ClInclude Include="source\games\BrickBash\BrickBash.h">
+      <Filter>Source Files\Games\BrickBash</Filter>
+    </ClInclude>
+    <ClInclude Include="source\games\Fire\Fire.h">
+      <Filter>Source Files\Games\Fire</Filter>
+    </ClInclude>
+    <ClInclude Include="source\games\PiType\PiType.h">
+      <Filter>Source Files\Games\PiType</Filter>
+    </ClInclude>
+    <ClInclude Include="source\games\PiType\Common.h">
+      <Filter>Source Files\Games\PiType</Filter>
+    </ClInclude>
+    <ClInclude Include="source\games\FlappyBird\sprites.h">
+      <Filter>Source Files\Games\PicoBird</Filter>
+    </ClInclude>
+    <ClInclude Include="source\games\FlappyBird\PicoBird.h">
+      <Filter>Source Files\Games\PicoBird</Filter>
+    </ClInclude>
+    <ClInclude Include="source\games\FlappyBird\bitmap.h">
+      <Filter>Source Files\Games\PicoBird</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Common\Common.h">
+      <Filter>Source Files\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="source\games\VectorMap\Vector.h">
+      <Filter>Source Files\Games\VectorMap</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

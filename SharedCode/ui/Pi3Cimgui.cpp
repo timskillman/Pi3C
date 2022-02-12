@@ -20,10 +20,11 @@ std::string Pi3Cimgui::addFont(const char * path, const char * fontfile, const i
 	return fontname;
 }
 
-void Pi3Cimgui::setFont(const std::string &fontName)
+bool Pi3Cimgui::setFont(const std::string &fontName)
 {
 	auto ff = fonts.find(fontName.c_str());
 	currentFont = (ff != fonts.end()) ? ff->second.get() : nullptr;
+	return (currentFont != nullptr);
 }
 
 void Pi3Cimgui::setButtonStyle(const rectStyle &style)
@@ -47,7 +48,8 @@ Pi3Cmodel* Pi3Cimgui::createImage(const std::string& text, Pi3Ctexture& texture)
 
 Pi3Cmodel* Pi3Cimgui::createImageRect(const std::string& text, Pi3Ctexture& ttex)
 {
-	return create2ImageRect(text, ttex, Pi3Ctexture());
+	Pi3Ctexture tex;
+	return create2ImageRect(text, ttex, tex);
 }
 
 Pi3Cmodel* Pi3Cimgui::createImageRect2(const std::string& text, const int texRef)
@@ -189,6 +191,14 @@ bool Pi3Cimgui::renderButton(Pi3Cmodel *drawObj, const int minwidth, const int m
 	return mouseTouchRect;
 }
 
+struct WHA {
+	WHA(int w, int h) : width(w), height(h) { aspect = (float)width / (float)height; }
+
+	int width = 0;
+	int height = 0;
+	float aspect = 1.f;
+};
+
 bool Pi3Cimgui::renderButton2(Pi3Cmodel *drawObj, const int minwidth, const int minheight)
 {
 	if (!drawObj) return false;
@@ -198,56 +208,64 @@ bool Pi3Cimgui::renderButton2(Pi3Cmodel *drawObj, const int minwidth, const int 
 	Pi3Cmodel &text = drawObj->group[1];
 	Pi3Cmodel &image = drawObj->group[2];
 
-	int tw1 = text.material.texWidth;
-	int th1 = text.material.texHeight;
-	float aspect1 = (float)tw1 / (float)th1;
+	WHA wha1 = WHA(text.material.texWidth, text.material.texHeight);
+	WHA wha2 = WHA(image.material.texWidth, image.material.texHeight);
 
-	int tw2 = image.material.texWidth;
-	int th2 = image.material.texHeight;
-	float aspect2 = (float)tw2 / (float)th2;
+	//int tw1 = text.material.texWidth;
+	//int th1 = text.material.texHeight;
+	//float aspect1 = (float)tw1 / (float)th1;
+
+	//int tw2 = image.material.texWidth;
+	//int th2 = image.material.texHeight;
+	//float aspect2 = (float)tw2 / (float)th2;
+	int butTotalWidth = wha1.width + wha2.width;
+	int butTotalHeight = wha1.height + wha2.height;
 
 	//work out button minimum size ...
-	int mWidth = (minwidth == 0) ? currentParams.minWidth : minwidth; if (mWidth <= 0) mWidth = tw1+tw2;
-	int mHeight = (minheight == 0) ? currentParams.minHeight : minheight; if (mHeight <= 0) mHeight = th1+th2;
+	int mWidth = (minwidth == 0) ? currentParams.minWidth : minwidth; 
+	if (mWidth <= 0) mWidth = butTotalWidth;
+	int mHeight = (minheight == 0) ? currentParams.minHeight : minheight; 
+	if (mHeight <= 0) mHeight = butTotalHeight;
+
 	size = Pi3Cpointi(mWidth, mHeight);
 	bool mouseTouchRect = touched(size);
 
 	//fit image into width/height of button (and retain image aspect ratio)...
 	int slideWidth = mWidth - currentParams.left - currentParams.right;
 	int slideHeight = mHeight - currentParams.top - currentParams.bottom;
-	if ((tw1 + tw2) > slideWidth) { 
-		float f = (float)(tw1 + tw2) / (float)slideWidth;
-		tw1 = (int)((float)tw1 * f); th1 = (int)((float)tw1 / aspect1);
-		tw2 = (int)((float)tw2 * f); th2 = (int)((float)tw2 / aspect2); }
-	if ((th1 + th2) > slideHeight) { 
-		float f = (float)(th1 + th2) / (float)slideHeight;
-		th1 = (int)((float)th1 * f); tw1 = (int)((float)th1 * aspect1);
-		th2 = (int)((float)th2 * f); tw2 = (int)((float)th2 * aspect2); }
+
+	if (butTotalWidth > slideWidth) {
+		float f = (float)(butTotalWidth) / (float)slideWidth;
+		wha1.width = (int)((float)wha1.width * f); wha1.height = (int)((float)wha1.width / wha1.aspect);
+		wha2.width = (int)((float)wha2.width * f); wha2.height = (int)((float)wha2.width / wha2.aspect); }
+	if ((wha1.height + wha2.height) > slideHeight) {
+		float f = (float)(butTotalHeight) / (float)slideHeight;
+		wha1.height = (int)((float)wha1.height * f); wha1.width = (int)((float)wha1.height * wha1.aspect);
+		wha2.height = (int)((float)wha2.height * f); wha2.width = (int)((float)wha2.height * wha2.aspect); }
 
 	//align image into button ...
 	float slx = (currentParams.justify == RIGHT) ? 1.f : (currentParams.justify == CENTRE) ? 0.5f : (currentParams.justify == LEFT) ? 0.f : currentParams.slideX;
 	float sly = (currentParams.align == BOTTOM) ? 1.f : (currentParams.align == CENTRE) ? 0.5f : (currentParams.align == TOP) ? 0.f : currentParams.slideY;
 
-	float xp = (float)(pos.x + currentParams.left + (float)(slideWidth - tw1) * slx);
-	float yp = (float)(pos.y - currentParams.top - (float)(slideHeight - th1) * sly);
+	float xp = (float)(pos.x + currentParams.left + (float)(slideWidth - wha1.width) * slx);
+	float yp = (float)(pos.y - currentParams.top - (float)(slideHeight - wha1.height) * sly);
 
 	//scale image and rectangle into button ...
-	text.matrix.moveScaleXY(xp, yp - (float)th1, (float)tw1, (float)th1);
+	text.matrix.moveScaleXY(xp, yp - (float)wha1.height, (float)wha1.width, (float)wha1.height);
 	setColour(text, currentParams.textColour);
 	text.matrix.setz(zpos);
 
-	xp = (float)(pos.x + currentParams.left + (float)(slideWidth - tw2) * (1.f - slx));
-	yp = (float)(pos.y - currentParams.top - (float)(slideHeight - th2) * (1.f - sly));
+	xp = (float)(pos.x + currentParams.left + (float)(slideWidth - wha2.width) * (1.f - slx));
+	yp = (float)(pos.y - currentParams.top - (float)(slideHeight - wha2.height) * (1.f - sly));
 
 	//scale image and rectangle into button ...
-	image.matrix.moveScaleXY(xp, yp - (float)th2, (float)tw2, (float)th2);
+	image.matrix.moveScaleXY(xp, yp - (float)wha2.height, (float)wha2.width, (float)wha2.height);
 	setColour(image, currentParams.textColour);
 	image.matrix.setz(zpos);
 
 	rect.matrix.moveScaleXY((float)pos.x, (float)(pos.y - size.y), (float)size.x, (float)size.y);
 	rect.matrix.setz(zpos - 0.5f);
 	setButtonBackground(rect, mouseTouchRect);
-
 
 	//render ...
 	rect.renderBasic(resource);

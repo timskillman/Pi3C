@@ -72,7 +72,7 @@ public:
 
 	void setSameLine(bool sameLine) { currentParams.sameLine = sameLine; }
 
-	void setFont(const std::string &fontName);
+	bool setFont(const std::string &fontName);
 
 	std::shared_ptr<Pi3Cfont> getFont(const std::string &fontName) {
 		auto fi = fonts.find(fontName);
@@ -192,7 +192,7 @@ private:
 	Pi3Cmodel * createImage(const std::string &text, Pi3Ctexture& ttex);
 	Pi3Cmodel * createImageRect(const std::string &text, Pi3Ctexture& ttex);
 	Pi3Cmodel * createImageRect2(const std::string& text, const int texRef);
-	Pi3Cmodel* create2ImageRect(const std::string& text, Pi3Ctexture& ttex1, Pi3Ctexture& ttex2 = Pi3Ctexture());
+	Pi3Cmodel * create2ImageRect(const std::string& text, Pi3Ctexture& ttex1, Pi3Ctexture& ttex2);
 
 	Pi3Cwindow *window = nullptr;
 

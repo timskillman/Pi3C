@@ -277,6 +277,8 @@ int32_t Pi3Cmodel::assignTexture(Pi3Cresource* resource, int texRef)
 		material.texID = resource->getTextureID(material.texRef);
 		material.texWidth = tx.GetWidth();
 		material.texHeight = tx.GetHeight();
+		material.alpha = 0.99f;
+		material.illum = 1;
 	}
 	return material.texID;
 }

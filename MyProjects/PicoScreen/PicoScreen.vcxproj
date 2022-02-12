@@ -20,33 +20,33 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{86B9CF91-8738-B044-A7BF-A295F9323D12}</ProjectGuid>
-    <RootNamespace>SOLUTION_NAME</RootNamespace>
-    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
+    <RootNamespace>PicoScreen</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v140</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v140</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v140</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v140</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
@@ -73,7 +73,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>$(ProjectDir)\..\..\ThirdParty\SDL2\include;$(ProjectDir)\..\..\ThirdParty\SDL2_image\include;$(ProjectDir)\..\..\ThirdParty\SDL2_net\include;$(ProjectDir)\..\..\SharedCode\core;$(ProjectDir)\..\..\ThirdParty\SDL2_mixer\include;$(ProjectDir)\..\..\ThirdParty\glew\include;$(ProjectDir)\..\..\ThirdParty\SDL2_ttf\include;$(ProjectDir)\..\..\SharedCode\ui;$(ProjectDir)\..\..\SharedCode\file;$(ProjectDir)\..\..\SharedCode\helpers;$(ProjectDir)\..\..\SharedCode\glutess;$(ProjectDir)\..\..\SharedCode\rapidjson;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)\..\..\ThirdParty\SDL2\include;$(ProjectDir)\..\..\ThirdParty\SDL2_image\include;$(ProjectDir)\..\..\ThirdParty\SDL2_net\include;$(ProjectDir)\..\..\SharedCode\core;$(ProjectDir)\..\..\ThirdParty\SDL2_mixer\include;$(ProjectDir)\..\..\ThirdParty\glew\include;$(ProjectDir)\..\..\ThirdParty\SDL2_ttf\include;$(ProjectDir)\..\..\SharedCode\ui;$(ProjectDir)\..\..\SharedCode\file;$(ProjectDir)\..\..\SharedCode\helpers;$(ProjectDir)\..\..\SharedCode\glutess;$(ProjectDir)\..\..\SharedCode\rapidjson;$(ProjectDir)\pico_display;$(ProjectDir)\pico_graphics;$(IncludePath)</IncludePath>
     <LibraryPath>$(ProjectDir)\..\..\ThirdParty\SDL2_image\lib\x86;$(ProjectDir)\..\..\ThirdParty\SDL2\lib\x86;$(ProjectDir)\..\..\ThirdParty\glew\lib\x86;$(ProjectDir)\..\..\ThirdParty\SDL2_mixer\lib\x86;$(ProjectDir)\..\..\ThirdParty\SDL2_ttf\lib\x86;$(LibraryPath)</LibraryPath>
     <SourcePath>$(SourcePath)</SourcePath>
   </PropertyGroup>
@@ -98,6 +98,9 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>..\..\Shared\glutess;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard_C>Default</LanguageStandard_C>
+      <AdditionalOptions>/std:c++latest %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <AdditionalDependencies>SDL2.lib;SDL2main.lib;OpenGL32.lib;SDL2_image.lib;SDL2_mixer.lib;SDL2_ttf.lib;glew32s.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -184,10 +187,20 @@
     <ClCompile Include="..\..\SharedCode\helpers\Pi3CimageTools.cpp" />
     <ClCompile Include="..\..\SharedCode\helpers\Pi3CloadOptions.cpp" />
     <ClCompile Include="..\..\SharedCode\helpers\Pi3Cutils.cpp" />
-	<ClCompile Include="..\..\SharedCode\helpers\Pi3CfastRead.cpp" />
+    <ClCompile Include="..\..\SharedCode\helpers\Pi3CfastRead.cpp" />
     <ClCompile Include="..\..\SharedCode\ui\Pi3Cimgui.cpp" />
     <ClCompile Include="..\..\SharedCode\ui\Pi3Cstring.cpp" />
-    <ClCompile Include="Source\SOLUTION_NAME.cpp" />
+    <ClCompile Include="pico_display\pico_display.cpp" />
+    <ClCompile Include="pico_graphics\pico_graphics.cpp" />
+    <ClCompile Include="pico_graphics\types.cpp" />
+    <ClCompile Include="source\demo.cpp" />
+    <ClCompile Include="source\games\BrickBash\BrickBash.cpp" />
+    <ClCompile Include="source\games\Fire\Fire.cpp" />
+    <ClCompile Include="source\games\FlappyBird\bitmap.cpp" />
+    <ClCompile Include="source\games\FlappyBird\PicoBird.cpp" />
+    <ClCompile Include="source\games\FlappyBird\sprites.cpp" />
+    <ClCompile Include="source\games\PiType\PiType.cpp" />
+    <ClCompile Include="source\games\VectorMap\Vector.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\SharedCode\core\Pi3Cbbox2d.h" />
@@ -235,9 +248,23 @@
     <ClInclude Include="..\..\SharedCode\helpers\Pi3CimageTools.h" />
     <ClInclude Include="..\..\SharedCode\helpers\Pi3CloadOptions.h" />
     <ClInclude Include="..\..\SharedCode\helpers\Pi3Cutils.h" />
-	<ClInclude Include="..\..\SharedCode\helpers\Pi3CfastRead.h" />
+    <ClInclude Include="..\..\SharedCode\helpers\Pi3CfastRead.h" />
     <ClInclude Include="..\..\SharedCode\ui\Pi3Cimgui.h" />
     <ClInclude Include="..\..\SharedCode\ui\Pi3Cstring.h" />
+    <ClInclude Include="pico_display\pico_display.hpp" />
+    <ClInclude Include="pico_graphics\font.hpp" />
+    <ClInclude Include="pico_graphics\font6_data.hpp" />
+    <ClInclude Include="pico_graphics\font8_data.hpp" />
+    <ClInclude Include="pico_graphics\pico_graphics.hpp" />
+    <ClInclude Include="source\Common\Common.h" />
+    <ClInclude Include="source\games\BrickBash\BrickBash.h" />
+    <ClInclude Include="source\games\Fire\Fire.h" />
+    <ClInclude Include="source\games\FlappyBird\bitmap.h" />
+    <ClInclude Include="source\games\FlappyBird\PicoBird.h" />
+    <ClInclude Include="source\games\FlappyBird\sprites.h" />
+    <ClInclude Include="source\games\PiType\Common.h" />
+    <ClInclude Include="source\games\PiType\PiType.h" />
+    <ClInclude Include="source\games\VectorMap\Vector.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\SharedCode\glutess\LICENSE" />

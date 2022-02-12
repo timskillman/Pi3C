@@ -313,6 +313,7 @@ namespace Pi3Cshapes {
 	{
 		Pi3Cmesh mesh("rect");
 		rect_verts(mesh.verts, mesh.vc, pos, size, uvpos, uvsize, 0xffffffff);
+		mesh.updateBounds();
 		mesh.materialRef = 0;
 		return mesh;
 	}
@@ -321,6 +322,7 @@ namespace Pi3Cshapes {
 	{
 		Pi3Cmesh mesh("quad");
 		quad_verts(mesh.verts, mesh.vc, p1, p2, p3, p4, uvpos, uvsize, 0xffffffff);
+		mesh.updateBounds();
 		mesh.materialRef = 0;
 		return mesh;
 	}
@@ -335,6 +337,7 @@ namespace Pi3Cshapes {
 		else {
 			rectThickLine_verts(mesh.verts, mesh.vc, pos, size, thickness, uvpos, uvsize, 0xffffffff, true);
 		}
+		mesh.updateBounds();
 		mesh.materialRef = 0;
 		return mesh;
 	}

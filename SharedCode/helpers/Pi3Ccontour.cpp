@@ -1,4 +1,4 @@
-#include "Pi3Ccontour.h"
+ #include "Pi3Ccontour.h"
 
 Pi3ClinContour::Pi3ClinContour(const std::vector<vec2f> &points) : closed(true), parent(-1), leftmost(1e20f, 0), hole(-1), points(points)
 {

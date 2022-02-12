@@ -70,6 +70,7 @@ public:
 	inline uint16_t GetDepth() const { return (uint16_t)bpp; }
 	inline uint8_t * GetTexels() { return &pixels[0]; };
 	inline uint32_t  GetPitch() const { return pitch; }
+	inline uint32_t GetSize() const { return pixels.size(); }
 	inline bool isValid() const { return (pixels.size()>0); }
 	GLuint textureID = 0;	//GL ID returned from upload (uint only)
 	std::string name = "";

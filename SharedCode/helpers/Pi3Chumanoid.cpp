@@ -140,6 +140,7 @@ void Pi3Chumanoid::walk(vec3f dir, float speed)
 {
 	//Pi3Cmatrix thighRot;
 	//thighRot.SetRotateX(std::sin(walkPos));
+
 	leftThigh->matrix.SetRotateXbit((std::sin(walkPos) - 0.3f)*0.5f);
 	rightThigh->matrix.SetRotateXbit((std::sin(walkPos + PI) - 0.3f)*0.5f);
 	leftLowerLeg->matrix.SetRotateXbit((std::sin(walkPos) + 0.9f)*0.4f);
@@ -154,3 +155,5 @@ void Pi3Chumanoid::walk(vec3f dir, float speed)
 	//rightThigh->matrix = rightThigh->matrix * thighRot;
 	walkPos += speed;
 }
+
+
