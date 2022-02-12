@@ -293,6 +293,11 @@ std::vector<std::string> Pi3C::get_dropfiles()
 //	return add_model_to_scene3D(rectangles);
 //}
 
+void Pi3C::add_to_model_group(int32_t modelGroupRef, int32_t modelToAddRef)
+{
+	scene.models[modelGroupRef].append(&resource, scene.models[modelToAddRef]);
+}
+
 int32_t Pi3C::create_rect2D(const vec2f& pos, const vec2f& size, const uint32_t colour, const std::string& texfile)
 {
 	Pi3Cmodel rect(&resource, Pi3Cshapes::rect(pos, size), MODEL_GPID, colour);

@@ -495,8 +495,9 @@ void MGui::saveAll(Modeller * md)
 {
 	//startSnapshot();
 	//gui.takeSnapshot();
-	std::string savefile = gui.OpenFileDialog(&bsDialog);
-	if (savefile!="") md->saveFile("../", savefile);
+	std::string folderPath = "../";
+	std::string savefile = gui.OpenFileDialog(folderPath, &bsDialog);
+	if (savefile!="") md->saveFile(folderPath, savefile);
 }
 
 void MGui::showProgressCB(Pi3Cwindow* window, const std::string &message, const float pcnt)

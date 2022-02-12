@@ -1,0 +1,525 @@
+{
+	"title": "Starship",
+	"modelPath": "./",
+	"view": {
+		"perspective": 1200.0,
+		"lightpos": [ 0.0, 1.0, 0.0],
+		"nearzfarz": [1.0, 30000.0],
+		"fogColour": "ffffff",
+		"fogFar": 50000.0,
+		"fogNear": 40000.0,
+		"logo": "maps/logo.png",
+		"skyboxPath": "./skyboxes",
+		"skybox": "miramar2.obj",
+		"skyboxScale": 15.0,
+		"gridlock": [0,0,0],
+	},
+	"avatar": {
+		"fly":true,
+		"position": [10.0, -9.0, 0.0],
+		"rotation": [0.0, 90.0, 0.0],
+		"height":12.0,
+		"fallSpeed":3.0,
+		"walkSpeed":1.0,
+		"runSpeed":2.0
+	},
+	"models": [{
+			"category": "Starship",
+			"flags": "",
+			"name": "StarshipShell",
+			"id": "Shell",
+			"LOD0": { 
+				"file": "StarShipShell.obj",
+				"dist": 10000.0
+				}
+		},
+		{
+			"category": "Starship",
+			"flags": "",
+			"name": "Ring",
+			"id": "Ring",
+			"LOD0": { 
+				"file": "TheRing.obj",
+				"dist": 150.0
+				},
+			"LOD1": { 
+				"file": "TheRing.obj",
+				"dist": 10000.0
+				}
+		},
+		{
+			"category": "Starship",
+			"flags": "",
+			"name": "Round Tower Tall",
+			"id": "RoundTowerTall",
+			"LOD0": { 
+				"file": "RoundTower2.obj",
+				"dist": 200.0
+				},
+			"LOD1": { 
+				"file": "RoundTower2LoPoly2.obj",
+				"dist": 10000.0
+				},
+			"colliderFile": "RoundTowerColl2.obj"
+		},
+		{
+			"category": "Starship",
+			"flags": "g",
+			"name": "Square Tower",
+			"id": "SquareTower",
+			"LOD0": { 
+				"file": "SquareTower1.obj",
+				"dist": 150.0
+				},
+			"LOD1": { 
+				"file": "SquareTower1LoPoly.obj",
+				"dist": 10000.0
+				},
+			"colliderFile": "SquareTower1Coll.obj"
+		},
+		{
+			"category": "Castle",
+			"flags": "g",
+			"name": "Square Tower Tall",
+			"id": "SquareTowerTall",
+			"LOD0": { 
+				"file": "SquareTower2.obj",
+				"dist": 150.0
+				},
+			"LOD1": { 
+				"file": "SquareTower2LoPoly.obj",
+				"dist": 10000.0
+				},
+			"colliderFile": "SquareTower2Coll.obj"
+		},
+		{
+			"category": "Castle",
+			"flags": "g",
+			"name": "Dias",
+			"id": "Dias",
+			"LOD0": { 
+				"file": "Dias.obj",
+				"dist": 150.0
+				},
+			"LOD1": { 
+				"file": "DiasLoPoly.obj",
+				"dist": 10000.0
+				},
+			"colliderFile": "DiasColl.obj"
+		},
+		{
+			"category": "Castle",
+			"flags": "g",
+			"name": "Keep",
+			"id": "Keep",
+			"LOD0": { 
+				"file": "Keep.obj",
+				"dist": 150.0
+				},
+			"LOD1": { 
+				"file": "KeepLoPoly.obj",
+				"dist": 10000.0
+				},
+			"colliderFile": "KeepColl.obj"
+		},
+		{
+			"category": "Castle",
+			"flags": "g",
+			"name": "Wall",
+			"id": "Wall",
+			"LOD0": { 
+				"file": "Wall1.obj",
+				"dist": 10000.0
+				},
+			"colliderFile": "Wall1Coll.obj"
+		},
+		{
+			"category": "Castle",
+			"flags": "g",
+			"name": "Wall lean-to",
+			"id": "WallLeanTo",
+			"LOD0": { 
+				"file": "WallLeanTo1.obj",
+				"dist": 10000.0
+				},
+			"colliderFile": "WallLeanTo1Coll.obj"
+		},
+		{
+			"category": "Castle",
+			"flags": "g",
+			"name": "Wall diagonal",
+			"id": "WallDiagonal",
+			"LOD0": { 
+				"file": "WallDiag1.obj",
+				"dist": 10000.0
+				},
+			"colliderFile": "WallDiag1Coll.obj"
+		},
+		{
+			"category": "Castle",
+			"flags": "g",
+			"name": "Gate",
+			"id": "Gate",
+			"LOD0": { 
+				"file": "Gate1.obj",
+				"dist": 10000.0
+				},
+			"colliderFile": "Gate1Coll.obj"
+		},
+		{
+			"category": "Buildings",
+			"flags": "g",
+			"name": "House 3 story",
+			"id": "ShamblesTall",
+			"LOD0": { 
+				"file": "Shambles.obj",
+				"dist": 500.0
+				},
+			"LOD1": { 
+				"file": "ShamblesLoPoly.obj",
+				"dist": 1000.0
+				},
+			"colliderFile": "ShamblesColl.obj"
+		},
+		{
+			"category": "Buildings",
+			"flags": "g",
+			"name": "House 2 story",
+			"id": "Shambles",
+			"LOD0": { 
+				"file": "Shambles2.obj",
+				"dist": 500.0
+				},
+			"LOD1": { 
+				"file": "Shambles2LoPoly.obj",
+				"dist": 1000.0
+				},
+			"colliderFile": "Shambles2Coll.obj"
+		},
+		{
+			"category": "Buildings",
+			"flags": "g",
+			"name": "Forge",
+			"id": "Forge",
+			"LOD0": { 
+				"file": "forge.obj",
+				"dist": 10000.0
+				},
+			"colliderFile": "forgeColl.obj"
+		},
+		{
+			"category": "Cathedral",
+			"flags": "g",
+			"name": "Cathedral tower stairs",
+			"id": "ChurchTower",
+			"LOD0": { 
+				"file": "ChurchTower.obj",
+				"dist": 10000.0
+				},
+			"colliderFile": "ChurchTowerColl.obj"
+		},
+		{
+			"category": "Cathedral",
+			"flags": "g",
+			"name": "Cathedral section",
+			"id": "ChurchSection",
+			"LOD0": { 
+				"file": "ChurchSection.obj",
+				"dist": 10000.0
+				},
+			"colliderFile": "ChurchSectionColl.obj"
+		},
+		{
+			"category": "Cathedral",
+			"flags": "g",
+			"name": "Cathedral centre",
+			"id": "ChurchCentre",
+			"LOD0": { 
+				"file": "ChurchCentre.obj",
+				"dist": 10000.0
+				},
+			"colliderFile": "ChurchCentreColl.obj"
+		},
+		{
+			"category": "Cathedral",
+			"flags": "g",
+			"name": "Cathedral entrance",
+			"id": "ChurchEntrance",
+			"LOD0": { 
+				"file": "ChurchEntrance.obj",
+				"dist": 10000.0
+				},
+			"colliderFile": "ChurchEntranceColl.obj"
+		},
+		{
+			"category": "Cathedral",
+			"flags": "g",
+			"name": "Cathedral wing entrance",
+			"id": "ChurchWing",
+			"LOD0": { 
+				"file": "ChurchWing.obj",
+				"dist": 10000.0
+				},
+			"colliderFile": "ChurchWingColl.obj"
+		},
+		{
+			"category": "Courtyard",
+			"flags": "g",
+			"name": "Well",
+			"id": "Well",
+			"LOD0": { 
+				"file": "WellStocks.obj",
+				"dist": 10000.0
+				},
+			"colliderFile": "WellStocksColl.obj"
+		},
+		{
+			"category": "Courtyard",
+			"flags": "g",
+			"name": "Stables",
+			"id": "Stables",
+			"LOD0": { 
+				"file": "CattleStall.obj",
+				"dist": 230.0
+				},
+			"LOD1": { 
+				"file": "CattleStallLoPoly.obj",
+				"dist": 10000.0
+				},
+			"colliderFile": "CattleStallColl.obj"
+		},
+		{
+			"category": "Ground",
+			"flags": "g",
+			"name": "Grass",
+			"id": "Grass",
+			"LOD0": { 
+				"file": "grass.obj",
+				"dist": 10000.0
+				},
+			"colliderFile": "grass.obj"
+		},
+		{
+			"category": "Ground",
+			"flags": "g",
+			"name": "Mud",
+			"id": "Mud",
+			"LOD0": { 
+				"file": "muddyGrass.obj",
+				"dist": 10000.0
+				},
+			"colliderFile": "muddyGrass.obj"
+		},
+		{
+			"category": "Ground",
+			"flags": "g",
+			"name": "Cross road",
+			"id": "CrossRoad",
+			"LOD0": { 
+				"file": "cobbleCross.obj",
+				"dist": 10000.0
+				},
+			"colliderFile": "cobbleCross.obj"
+		},
+		{
+			"category": "Ground",
+			"flags": "g",
+			"name": "Tee road",
+			"id": "Tee",
+			"LOD0": { 
+				"file": "cobbleTee.obj",
+				"dist": 10000.0
+				},
+			"colliderFile": "cobbleTee.obj"
+		},
+		{
+			"category": "Ground",
+			"flags": "g",
+			"name": "Road",
+			"id": "Road",
+			"LOD0": { 
+				"file": "cobbleRoad.obj",
+				"dist": 10000.0
+				},
+			"colliderFile": "cobbleRoad.obj"
+		},
+		{
+			"category": "Ground",
+			"flags": "g",
+			"name": "Corner",
+			"id": "Corner",
+			"LOD0": { 
+				"file": "cobbleCorner.obj",
+				"dist": 10000.0
+				},
+			"colliderFile": "cobbleCorner.obj"
+		},
+		{
+			"category": "Ground",
+			"flags": "g",
+			"name": "Landscape",
+			"id": "Landscape",
+			"LOD0": { 
+				"file": "landscape.obj",
+				"dist": 10000.0
+				},
+			"colliderFile": "landscape.obj"
+		},
+		{
+			"category": "Trees",
+			"flags": "g",
+			"name": "Ash tree",
+			"id": "AshTree",
+			"LOD0": { 
+				"file": "AshTree.obj",
+				"dist": 10000.0
+				},
+			"RandomScale": [0.5, 2.0],
+			"RandomRotation": [0.0, 360.0]
+		},
+		{
+			"category": "Trees",
+			"flags": "g",
+			"name": "Oak tree",
+			"id": "OakTree",
+			"LOD0": { 
+				"file": "OakTree.obj",
+				"dist": 10000.0
+				},
+			"RandomScale": [0.5, 2.2],
+			"RandomRotation": [0.0, 360.0]
+		},
+		{
+			"category": "Plants",
+			"flags": "g",
+			"name": "Fern",
+			"id": "Fern",
+			"LOD0": { 
+				"file": "fern.obj",
+				"dist": 10000.0
+				},
+			"RandomScale": [0.5, 3.0],
+			"RandomRotation": [0.0, 360.0]
+		},
+		{
+			"category": "Plants",
+			"flags": "g",
+			"name": "Palm",
+			"id": "Palm",
+			"LOD0": { 
+				"file": "Palm.obj",
+				"dist": 10000.0
+				},
+			"RandomScale": [0.5, 3.0],
+			"RandomRotation": [0.0, 360.0]
+		},
+		{
+			"category": "Courtyard",
+			"flags": "g",
+			"name": "Cart",
+			"id": "Cart",
+			"LOD0": { 
+				"file": "Cart.obj",
+				"dist": 150.0
+				},
+			"LOD1": { 
+				"file": "CartLoPoly.obj",
+				"dist": 10000.0
+				},
+			"colliderFile": "CartColl.obj"
+		},
+		{
+			"category": "Courtyard",
+			"flags": "g",
+			"name": "Wagon",
+			"id": "Wagon",
+			"LOD0": { 
+				"file": "wagon.obj",
+				"dist": 150.0
+				},
+			"LOD1": { 
+				"file": "wagonLoPoly.obj",
+				"dist": 10000.0
+				},
+			"colliderFile": "wagonColl.obj"
+		},
+		{
+			"category": "Items",
+			"flags": "g",
+			"name": "Table & Benches",
+			"id": "TableBenches",
+			"LOD0": { 
+				"file": "tableBenches.obj",
+				"dist": 10000.0
+				},
+			"colliderFile": "tableBenchesColl.obj"
+		},
+		{
+			"category": "Items",
+			"flags": "g",
+			"name": "Table",
+			"id": "Table",
+			"LOD0": { 
+				"file": "table.obj",
+				"dist": 10000.0
+				},
+			"colliderFile": "tableColl.obj"
+		},
+		{
+			"category": "Items",
+			"flags": "g",
+			"name": "Chair",
+			"id": "Chair",
+			"LOD0": { 
+				"file": "chair.obj",
+				"dist": 10000.0
+				},
+			"colliderFile": "chairColl.obj"
+		},
+		{
+			"category": "Items",
+			"flags": "g",
+			"name": "German flag",
+			"id": "GermanFlag",
+			"LOD0": { 
+				"file": "flagGerman.obj",
+				"dist": 10000.0
+				}
+		},
+		{
+			"category": "Items",
+			"flags": "g",
+			"name": "Torch",
+			"id": "Torch",
+			"LOD0": { 
+				"file": "torch.obj",
+				"dist": 10000.0
+				}
+		},
+		{
+			"category": "Items",
+			"flags": "g",
+			"name": "Barrel",
+			"id": "Barrel",
+			"LOD0": { 
+				"file": "Barrel.obj",
+				"dist": 10000.0
+				},
+			"colliderFile": "BarrelColl.obj"
+		},
+		{
+			"category": "Items",
+			"flags": "g",
+			"name": "Water trough",
+			"id": "WaterTrough",
+			"LOD0": { 
+				"file": "WaterTrough.obj",
+				"dist": 10000.0
+				},
+			"colliderFile": "WaterTroughColl.obj"
+		}
+	]
+
+
+
+}

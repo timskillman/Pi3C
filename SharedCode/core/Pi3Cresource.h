@@ -108,6 +108,7 @@ public:
 	void setRenderBuffer(const int bufRef, const uint32_t stride);
 	void renderMesh(const int meshRef, const GLenum rendermode = GL_TRIANGLES);
 	Pi3Crect renderText(const int meshRef, Pi3Cfont *font, const std::string &text, const vec3f &pos, const float wrapWidth, const uint32_t colour = 0xffffffff);
+	Pi3Cpointi getStringSize(const std::string& text, Pi3Cfont* font);
 	int32_t touchMesh(const int meshRef, Pi3Ctouch &touch, const Pi3Cmatrix &tmat) const;
 	
 	int32_t addShader(const std::string &vertfile, const std::string &fragfile);

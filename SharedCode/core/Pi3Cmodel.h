@@ -135,6 +135,10 @@ public:
 	Pi3Cmatrix matrix;				//matrix used to transform mesh/group
 	Pi3Cmaterial material;			//used for rendering mesh - can be modified
 	vec3f rotation;
+	vec3f center;
+
+	vec3f spinRate;
+	vec3f spinAngles;
 
 	vec2f randomScale = { 1.f, 1.f };
 	vec2f randomRotation = { 0,0 };
@@ -149,6 +153,7 @@ public:
 	bool edit = true;				//model can/not be edited
 	bool selected = false;			//model selected (useful for editing)
 	bool asCollider = false;		//if true, then use this model as a collider as well as rendered
+	bool animated = false;
 
 	int32_t choice = -1;			//if set to value 0 and above, this option will choose which model in the group to render - the rest are ignored
 

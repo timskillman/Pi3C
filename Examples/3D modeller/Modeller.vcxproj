@@ -234,6 +234,7 @@
     <ClCompile Include="..\..\SharedCode\file\Pi3CbinStream.cpp" />
     <ClCompile Include="..\..\SharedCode\file\Pi3Cdirectory.cpp" />
     <ClCompile Include="..\..\SharedCode\file\Pi3CfileOBJ.cpp" />
+    <ClCompile Include="..\..\SharedCode\file\Pi3CfileScene.cpp" />
     <ClCompile Include="..\..\SharedCode\file\Pi3Cjson.cpp" />
     <ClCompile Include="..\..\SharedCode\glutess\dict.c" />
     <ClCompile Include="..\..\SharedCode\glutess\geom.c" />
@@ -247,6 +248,7 @@
     <ClCompile Include="..\..\SharedCode\glutess\tessellate.cpp" />
     <ClCompile Include="..\..\SharedCode\glutess\tessmono.c" />
     <ClCompile Include="..\..\SharedCode\helpers\Pi3C.cpp" />
+    <ClCompile Include="..\..\SharedCode\helpers\Pi3Canimate.cpp" />
     <ClCompile Include="..\..\SharedCode\helpers\Pi3Cavatar.cpp" />
     <ClCompile Include="..\..\SharedCode\helpers\Pi3Cblocks.cpp" />
     <ClCompile Include="..\..\SharedCode\helpers\Pi3Ccontour.cpp" />
@@ -292,6 +294,7 @@
     <ClInclude Include="..\..\SharedCode\file\Pi3CbinStream.h" />
     <ClInclude Include="..\..\SharedCode\file\Pi3Cdirectory.h" />
     <ClInclude Include="..\..\SharedCode\file\Pi3CfileOBJ.h" />
+    <ClInclude Include="..\..\SharedCode\file\Pi3CfileScene.h" />
     <ClInclude Include="..\..\SharedCode\file\Pi3Cjson.h" />
     <ClInclude Include="..\..\SharedCode\glutess\dict-list.h" />
     <ClInclude Include="..\..\SharedCode\glutess\dict.h" />
@@ -311,6 +314,7 @@
     <ClInclude Include="..\..\SharedCode\glutess\tessmono.h" />
     <ClInclude Include="..\..\SharedCode\helpers\FastNoiseLite.h" />
     <ClInclude Include="..\..\SharedCode\helpers\Pi3C.h" />
+    <ClInclude Include="..\..\SharedCode\helpers\Pi3Canimate.h" />
     <ClInclude Include="..\..\SharedCode\helpers\Pi3Cavatar.h" />
     <ClInclude Include="..\..\SharedCode\helpers\Pi3Cblocks.h" />
     <ClInclude Include="..\..\SharedCode\helpers\Pi3Ccolours.h" />

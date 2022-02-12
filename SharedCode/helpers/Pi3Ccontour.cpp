@@ -22,17 +22,7 @@ vec2f calcBezierPoint(const vec2f& v1, const vec2f& v2, const vec2f& v3, const v
 	return vec2f(a0 * v1.x + a1 * v2.x + a2 * v3.x + a3 * v4.x, a0 * v1.y + a1 * v2.y + a2 * v3.y + a3 * v4.y);
 }
 
-vec3f calcBezierPoint3d(const vec3f& v1, const vec3f& v2, const vec3f& v3, const vec3f& v4, float p)
-{
-	float ip = 1.f - p;
-	float a0 = ip * ip * ip;
-	float a1 = 3.f * p * ip * ip;
-	float a2 = 3.f * p * p * ip;
-	float a3 = p * p * p;
-	return vec3f(a0 * v1.x + a1 * v2.x + a2 * v3.x + a3 * v4.x, 
-				 a0 * v1.y + a1 * v2.y + a2 * v3.y + a3 * v4.y,
-				 a0 * v1.z + a1 * v2.z + a2 * v3.z + a3 * v4.z);
-}
+
 
 void Pi3ClinContour::calcCurve(vec2f& p0, vec2f& p1, vec2f& p2, vec2f& c0, vec2f& c1)
 {
@@ -64,23 +54,35 @@ void Pi3ClinContour::createBezier(const vec2f& v1, const vec2f& v2, const vec2f&
 	}
 }
 
-float calcBezierAutoStep3d(const vec3f& v1, const vec3f& v2, const vec3f& v3, const vec3f& v4)
-{
-	vec3f p21 = v2 - v1;
-	vec3f p32 = v3 - v2;
-	vec3f p43 = v4 - v3;
-	float astep = (float)sqrtf(p21.x * p21.x + p21.y * p21.y + p21.z * p21.z + p32.x * p32.x + p32.y * p32.y + p32.z * p32.z + p43.x * p43.x + p43.y * p43.y + p43.z * p43.z) * .5f;
-	if (astep < 4) astep = 4; else if (astep > 24) astep = 24;
-	return 1.f / astep;
-}
+//vec3f calcBezierPoint3d(const vec3f& v1, const vec3f& v2, const vec3f& v3, const vec3f& v4, float p)
+//{
+//	float ip = 1.f - p;
+//	float a0 = ip * ip * ip;
+//	float a1 = 3.f * p * ip * ip;
+//	float a2 = 3.f * p * p * ip;
+//	float a3 = p * p * p;
+//	return vec3f(a0 * v1.x + a1 * v2.x + a2 * v3.x + a3 * v4.x,
+//		a0 * v1.y + a1 * v2.y + a2 * v3.y + a3 * v4.y,
+//		a0 * v1.z + a1 * v2.z + a2 * v3.z + a3 * v4.z);
+//}
 
-void Pi3ClinContour::createBezier3d(const vec3f& v1, const vec3f& v2, const vec3f& v3, const vec3f& v4, std::vector<vec3f>& points)
-{
-	float autoStep = calcBezierAutoStep3d(v1, v2, v3, v4);
-	for (float i = autoStep; i < 0.99999f; i += autoStep) {
-		points.push_back(calcBezierPoint3d(v1, v2, v3, v4, i));
-	}
-}
+//float calcBezierAutoStep3d(const vec3f& v1, const vec3f& v2, const vec3f& v3, const vec3f& v4)
+//{
+//	vec3f p21 = v2 - v1;
+//	vec3f p32 = v3 - v2;
+//	vec3f p43 = v4 - v3;
+//	float astep = (float)sqrtf(p21.x * p21.x + p21.y * p21.y + p21.z * p21.z + p32.x * p32.x + p32.y * p32.y + p32.z * p32.z + p43.x * p43.x + p43.y * p43.y + p43.z * p43.z) * .5f;
+//	if (astep < 4) astep = 4; else if (astep > 24) astep = 24;
+//	return 1.f / astep;
+//}
+//
+//void Pi3ClinContour::createBezier3d(const vec3f& v1, const vec3f& v2, const vec3f& v3, const vec3f& v4, std::vector<vec3f>& points)
+//{
+//	float autoStep = calcBezierAutoStep3d(v1, v2, v3, v4);
+//	for (float i = autoStep; i < 0.99999f; i += autoStep) {
+//		points.push_back(calcBezierPoint3d(v1, v2, v3, v4, i));
+//	}
+//}
 
 bool Pi3ClinContour::pointInside(vec2f& point)
 {
@@ -117,6 +119,16 @@ float Pi3ClinContour::area()
 	return a;
 }
 
+std::vector<float> Pi3ClinContour::asFloats()
+{
+	std::vector<float> fpoints;
+	for (auto& point : points) {
+		fpoints.push_back(point.x);
+		fpoints.push_back(point.y);
+	}
+	return fpoints;
+}
+
 void Pi3ClinPath::append(const Pi3ClinContour& lcont)
 {
 	linContours.push_back(lcont);
@@ -137,12 +149,7 @@ std::vector<std::vector<float>> Pi3ClinPath::asFloats()
 {
 	std::vector<std::vector<float>> contours;
 	for (auto& cont : linContours) {
-		std::vector<float> points;
-		for (auto& point : cont.points) {
-			points.push_back(point.x);
-			points.push_back(point.y);
-		}
-		contours.push_back(points);
+		contours.push_back(cont.asFloats());
 	}
 	return contours;
 }

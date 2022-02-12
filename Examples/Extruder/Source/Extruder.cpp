@@ -1,5 +1,8 @@
 #include "Pi3C.h"
 #include "Pi3CmemContour.h"
+#define NANOSVG_IMPLEMENTATION
+#include "../../ThirdParty/NanoSVG/nanosvg.h"
+#include "Pi3CContour.h"
 
 // ==========================================================================
 // Pi3C Graphics Library Example - Extruder 2D example (by Tim Skillman)
@@ -36,9 +39,35 @@ int main(int argc, char *argv[])
 {
 	Pi3C pi3c("Extruded Shape", 800, 600);
 	
-	Pi3CmlinPath lpath("raspberry");
-	std::vector<std::vector<float>> floatPath = lpath.asFloats();
-	vec3f pathCenter = vec3f(-lpath.bbox.centre().x, 0, -lpath.bbox.centre().y);
+	NSVGimage* image;
+	image = nsvgParseFromFile("raspberrypi.svg", "pc", 1);
+
+	std::vector<std::vector<float>> floatPath;
+	Pi3Cbbox2d bbox;
+	for (NSVGshape* shape = image->shapes; shape != NULL; shape = shape->next) {
+		for (NSVGpath* path = shape->paths; path != NULL; path = path->next) {
+			uint32_t col = shape->fill.color;
+			std::vector<float> floatpoints;
+			//Pi3ClinContour lincont;
+			float* b = path->bounds;
+			bbox.update(vec2f(b[0], b[1]));
+			bbox.update(vec2f(b[2], b[3]));
+			for (int i = 0; i < path->npts - 1; i += 3) {
+				float* p = &path->pts[i * 2];
+				floatpoints.push_back(p[0]); floatpoints.push_back(p[1]);
+				floatpoints.push_back(p[2]); floatpoints.push_back(p[3]);
+				floatpoints.push_back(p[4]); floatpoints.push_back(p[5]);
+				floatpoints.push_back(p[6]); floatpoints.push_back(p[7]);
+			}
+			floatPath.push_back(floatpoints);
+		}
+	}
+	nsvgDelete(image);
+	vec3f pathCenter = vec3f(-bbox.centre().x, -bbox.centre().y, 0);
+
+	//Pi3CmlinPath lpath("raspberry");
+	//std::vector<std::vector<float>> floatPath = lpath.asFloats();
+	//vec3f pathCenter = vec3f(-lpath.bbox.centre().x, 0, -lpath.bbox.centre().y);
 	float thickness = 10.f;
 
 	pi3c.create_extrude(pathCenter, floatPath, thickness, Pi3Ccolours::White, "butterflies.png");
@@ -52,7 +81,7 @@ int main(int argc, char *argv[])
 		pi3c.clear_window();
 
 		pi3c.scene.setMatrix(vec3f(0, 0, 0), vec3f(0, 0, -300.f), vec3f(roty,roty,0));
-		roty += 0.003f;
+		roty += 0.03f;
 
 		pi3c.render3D();
 

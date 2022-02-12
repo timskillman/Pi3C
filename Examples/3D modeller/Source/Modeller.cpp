@@ -1,7 +1,6 @@
 #include "Modeller.h"
 #include "Pi3Cshapes.h"
 #include "Pi3Cblocks.h"
-#include "Pi3Cdirectory.h"
 #include <fstream>
 #include <sstream>
 
@@ -18,8 +17,6 @@ Modeller::Modeller(Pi3Cresource *resource, Pi3Cwindow *window)
 
 	this->resource = resource;
 	this->window = window;
-
-	std::vector<std::string> dir = Pi3Cdirectory::readDirectory("../");
 
 	// Setup scene ...
 	scene.init(resource);
@@ -1006,7 +1003,8 @@ void Modeller::handleEvents(std::vector<uint32_t>& eventList)
 				//mgui.takeSnapshot();
 				//scene.setup2D();
 				//std::function<void(float)> loadbarCallback = std::bind(&Modeller::loadingBar, this, _1);
-				int32_t modelRef = scene.loadModelOBJ("", file, touch.touching ? touch.intersection : vec3f(), true, modelGroupId, false, setCallback());
+				loadModelAt(file, touch.touching ? touch.intersection : vec3f(), setCallback());
+				//int32_t modelRef = scene.loadModelOBJ("", file, touch.touching ? touch.intersection : vec3f(), true, modelGroupId, false, setCallback());
 			}
 			else if (ext == ".png" || ext == ".jpg") {
 				setCurrentSelView(currentView);
@@ -1022,6 +1020,17 @@ void Modeller::handleEvents(std::vector<uint32_t>& eventList)
 		}
 	}
 
+}
+
+void Modeller::saveFile(const std::string& path, const std::string& filename, bool selected) 
+{
+	std::string err; 
+	Pi3CfileOBJ::save(path, filename, &scene, selected, nullptr, err);
+}
+
+void Modeller::loadModelAt(const std::string& modelfile, const vec3f pos, const std::function<void(float)> showProgressCB)
+{
+	int32_t modelRef = scene.loadModelOBJ("", modelfile, pos, true, modelGroupId, false, showProgressCB);
 }
 
 void Modeller::moveSelections(const vec3f& vec)
@@ -1215,6 +1224,11 @@ void Modeller::setEditMode(const EditMode mode)
 	createTool = CT_NONE;
 	editMode = mode;
 	//mgui.startSnapshot();
+}
+
+void Modeller::setMousePosition(int x, int y)
+{
+	currentPos = views[currentView].calcMouseXYZ(x, y);
 }
 
 void Modeller::handleIMGUI()

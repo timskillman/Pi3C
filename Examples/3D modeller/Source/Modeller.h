@@ -55,9 +55,8 @@ public:
 	bool initialised() { return (resource != nullptr); }
 	void createModel(const Pi3Cmesh& mesh, const vec3f& pos, int32_t groupId, const uint32_t colour = 0xffffffff, std::string txfile="");
 	void createLandscape(const vec3f pos, const uint32_t colour);
-	void saveFile(const std::string& path, const std::string& filename, bool selected = false) { 
-		std::string err; Pi3CfileOBJ::save(path, filename, &scene, selected, nullptr, err); 
-	}
+	void saveFile(const std::string& path, const std::string& filename, bool selected = false);
+	void loadModelAt(const std::string& modelfile, const vec3f pos, const std::function<void(float)> showProgressCB);
 	Pi3Crecti viewRect(const viewInfo::SceneLayout projection);
 
 	bool currentViewIsActive() { return (currentView != viewInfo::INACTIVE && !mgui.somethingSelected()) || fullscreen; }

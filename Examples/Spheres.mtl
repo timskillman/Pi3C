@@ -1,0 +1,77 @@
+newmtl default_1
+Kd 0.160784 0.419608 0.839216
+Ks 0.2 0.2 0.2
+Ka 0.3 0.3 0.3
+Ke 0 0 0
+illum 2
+
+newmtl default_2
+Kd 0.921569 0.172549 0.662745
+Ks 0.2 0.2 0.2
+Ka 0.3 0.3 0.3
+Ke 0 0 0
+illum 2
+
+newmtl default_3
+Kd 0.0117647 0.129412 0.733333
+Ks 0.2 0.2 0.2
+Ka 0.3 0.3 0.3
+Ke 0 0 0
+illum 2
+
+newmtl default_4
+Kd 0.937255 0.372549 0.372549
+Ks 0.2 0.2 0.2
+Ka 0.3 0.3 0.3
+Ke 0 0 0
+illum 2
+
+newmtl default_5
+Kd 0.298039 0.988235 0.0627451
+Ks 0.2 0.2 0.2
+Ka 0.3 0.3 0.3
+Ke 0 0 0
+illum 2
+
+newmtl default_6
+Kd 0.92549 0.745098 0.831373
+Ks 0.2 0.2 0.2
+Ka 0.3 0.3 0.3
+Ke 0 0 0
+illum 2
+
+newmtl default_7
+Kd 0.929412 0.317647 0.0235294
+Ks 0.2 0.2 0.2
+Ka 0.3 0.3 0.3
+Ke 0 0 0
+illum 2
+
+newmtl default_8
+Kd 0.270588 0.301961 0.6
+Ks 0.2 0.2 0.2
+Ka 0.3 0.3 0.3
+Ke 0 0 0
+illum 2
+
+newmtl default_9
+Kd 0.145098 0.556863 0.317647
+Ks 0.2 0.2 0.2
+Ka 0.3 0.3 0.3
+Ke 0 0 0
+illum 2
+
+newmtl default_10
+Kd 0.396078 0.32549 0.0196078
+Ks 0.2 0.2 0.2
+Ka 0.3 0.3 0.3
+Ke 0 0 0
+illum 2
+
+newmtl default_11
+Kd 0.360784 0.2 0.92549
+Ks 0.2 0.2 0.2
+Ka 0.3 0.3 0.3
+Ke 0 0 0
+illum 2
+

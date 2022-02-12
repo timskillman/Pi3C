@@ -189,6 +189,12 @@
     <ClCompile Include="..\..\SharedCode\file\Pi3CbinStream.cpp">
       <Filter>Shared Code\file</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\SharedCode\file\Pi3CfileScene.cpp">
+      <Filter>Shared Code\file</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\SharedCode\helpers\Pi3Canimate.cpp">
+      <Filter>Shared Code\helpers</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\SharedCode\glutess\dict.h">
@@ -379,6 +385,12 @@
     </ClInclude>
     <ClInclude Include="..\..\SharedCode\file\Pi3CbinStream.h">
       <Filter>Shared Code\file</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\SharedCode\file\Pi3CfileScene.h">
+      <Filter>Shared Code\file</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\SharedCode\helpers\Pi3Canimate.h">
+      <Filter>Shared Code\helpers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

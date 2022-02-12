@@ -34,7 +34,7 @@ public:
 
 	void writeString(const char * key, const char * str);
 	void writeVec3f(const char * key, vec3f& v);
-	void writeMatrix(const char * key, Pi3Cmatrix& matrix);
+	void writeMatrix(const char * key, const Pi3Cmatrix& matrix);
 
 	void Key(const char * key) { json_writer.Key(key); }
 	void StartObject() { json_writer.StartObject(); }

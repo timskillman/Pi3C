@@ -128,9 +128,9 @@ public:
 	bool Radio(const std::string &text, bool &value);
 	bool Combo(const std::string &text, uint32_t &currentSelection, const std::vector<std::string> &values);
 	bool ComboIcons(const std::string &text, const std::string &images, uint32_t &currentSelection, const std::vector<std::string> &values);
-	bool ListBox(const std::string &text, uint32_t &currentSelection, const std::vector<std::string> &values, const int minwidth = 0.f, const int minheight = 0.f, const ListBoxFlags flags = ListBoxFlags::SCROLL_VERTICAL);
+	bool ListBox(std::vector<std::vector<std::string>>& listXY, uint32_t &currentSelection, const int minwidth = 0.f, const int minheight = 0.f, const ListBoxFlags flags = ListBoxFlags::SCROLL_VERTICAL);
 
-	std::string OpenFileDialog(const rectStyle * style = nullptr);
+	std::string OpenFileDialog(const std::string& folderpath, const rectStyle * style = nullptr);
 
 	bool BeginGroupHorizontal(const std::string &icon = "", const int icw = 0, const int ich = 0);
 	bool BeginGroupVertical(const std::string &icon = "", const int icw = 0, const int ich = 0);
@@ -183,6 +183,9 @@ private:
 	void NextPos();
 	Pi3Cpointi calcImageSize(int tw, int th, const int minwidth, const int minheight, bool squash = false);
 	void setButtonBackground(Pi3Cmodel &rect, const bool mouseTouchRect);
+
+	void scissorRect(const Pi3Crecti& rect);
+	void scissorEnd();
 
 	void loadImage(std::shared_ptr<Pi3Ctexture>& ttex, const std::string& str, const ButtonType type);
 	Pi3Cmodel * findCreateImageRect(const std::string &str, const ButtonType type, bool asRect = true);
