@@ -2,7 +2,7 @@
 #include "Pi3Cstring.h"
 
 // ==========================================================================
-// Pi3C Graphics Library Example - Castle Creator (by Tim Skillman)
+// Pi3C Graphics Library Example - MarkDown Viewer (by Tim Skillman)
 // ==========================================================================
 //
 // The MIT License
@@ -45,41 +45,53 @@ int main(int argc, char *argv[])
 	int textRef = pi3c.add_model_to_scene2D(textmodel);
 
 	Pi3Cimgui &gui = pi3c.gui;
+	//gui.init(&pi3c.resource, &pi3c.window);
 
 	while (pi3c.is_running())
 	{
 		pi3c.do_events();
 		pi3c.clear_window(0xF0F0F0);
 
-		gui.Begin();
+		//Pi3Crecti screenRect(0, 0, pi3c.window.getWidth(), pi3c.window.getHeight());
+		//pi3c.scene.setViewport(screenRect);
+		//pi3c.scene.setFixedLight(0xffffff, vec3f(0, 1000.f, 1000.f));
+		//pi3c.scene.setViewport2D(screenRect, 0.1f, 2000.f);
+		//pi3c.scene.setup2D();
 
-		//Menubar ...
-		gui.setButtonStyle(pi3c.bsMenu);
-		if (gui.BeginMenuBar("MenuBar")) {
-			if (gui.BeginMenu("File")) {
-				if (gui.MenuItem("New", "Ctrl+N")) {};
-				if (gui.MenuItem("Open", "Ctrl+O")) {};
-				if (gui.MenuItem("Save", "Ctrl+S")) {}
-				if (gui.MenuItem("Quit", "")) pi3c.window.setquit(true);
-			}
-			if (gui.BeginMenu("Edit")) {
-				if (gui.MenuItem("Copy", "Ctrl+C")) {}
-				if (gui.MenuItem("Paste", "Ctrl+V")) {}
-				if (gui.MenuItem("Delete", "Del")) {}
-				if (gui.MenuItem("Undo", "Ctrl+X")) {}
-				if (gui.MenuItem("Redo", "Ctrl+Y")) {}
-			}
-			if (gui.BeginMenu("Object")) {
-				if (gui.MenuItem("Copy", "Ctrl+C")) {}
-				if (gui.MenuItem("Paste", "Ctrl+V")) {}
-				if (gui.MenuItem("Delete", "Del")) {}
-				if (gui.MenuItem("Undo", "Ctrl+X")) {}
-				if (gui.MenuItem("Redo", "Ctrl+Y")) {}
-			}
-			gui.EndMenuBar("MenuBar");
-		}
+		//gui.Begin();
 
-		gui.setPosition((pi3c.window.getWidth()-mediaWidth)/2, 40);
+		////Menubar ...
+		//gui.setButtonStyle(pi3c.bsMenu);
+		//if (gui.BeginMenuBar("MenuBar")) {
+		//	if (gui.BeginMenu("File")) {
+		//		if (gui.MenuItem("New", "Ctrl+N")) {};
+		//		if (gui.MenuItem("Open", "Ctrl+O")) {};
+		//		if (gui.MenuItem("Save", "Ctrl+S")) {}
+		//		if (gui.MenuItem("Quit", "")) pi3c.window.setquit(true);
+		//		gui.EndMenu();
+		//	}
+		//	if (gui.BeginMenu("Edit")) {
+		//		if (gui.MenuItem("Copy", "Ctrl+C")) {}
+		//		if (gui.MenuItem("Paste", "Ctrl+V")) {}
+		//		if (gui.MenuItem("Delete", "Del")) {}
+		//		if (gui.MenuItem("Undo", "Ctrl+X")) {}
+		//		if (gui.MenuItem("Redo", "Ctrl+Y")) {}
+		//		gui.EndMenu();
+		//	}
+		//	if (gui.BeginMenu("Object")) {
+		//		if (gui.MenuItem("Copy", "Ctrl+C")) {}
+		//		if (gui.MenuItem("Paste", "Ctrl+V")) {}
+		//		if (gui.MenuItem("Delete", "Del")) {}
+		//		if (gui.MenuItem("Undo", "Ctrl+X")) {}
+		//		if (gui.MenuItem("Redo", "Ctrl+Y")) {}
+		//		gui.EndMenu();
+		//	}
+		//	gui.EndMenuBar("MenuBar");
+		//}
+
+		//gui.setPosition((pi3c.window.getWidth()-mediaWidth)/2, 40);
+		//gui.End();
+
 		bool paperTouch = gui.renderRect(mediaWidth, mediaHeight);
 
 		pi3c.scene.models2D[textRef].matrix.move(vec3f((pi3c.window.getWidth() - mediaWidth + 40) / 2, pi3c.window.getHeight()-40, -1.5));
