@@ -24,47 +24,47 @@ public:
 	enum CreateTool { CT_CUBOID, CT_SPHERE, CT_CYLINDER, CT_CONE, CT_TCONE, CT_TUBE, CT_TORUS, CT_WEDGE, CT_EXTRUDE, CT_LATHE, CT_TEXT, CT_LIBSHAPE, CT_LANDSCAPE, CT_LINE, CT_BLOCKS, CT_NONE };
 	enum SceneAction { SA_NONE, SA_PANNING, SA_ZOOMING, SA_ROTATING, SA_DRAGBAR };
 
-	void setupGUI(loadOptions &opts);
-	void setCreateTool(const CreateTool tool);
-	void setEditMode(const EditMode mode);
-	void setMousePosition(int x, int y);
+	void SetupGUI(loadOptions &opts);
+	void SetCreateTool(const CreateTool tool);
+	void SetEditMode(const EditMode mode);
+	void SetMousePosition(int x, int y);
 
-	void handleKeys();
-	void handleEvents(std::vector<uint32_t>& eventList);
-	void handleIMGUI();
-	void touchScene();
+	void HandleKeys();
+	void HandleEvents(std::vector<uint32_t>& eventList);
+	void HandleIMGUI();
+	void TouchScene();
 	//void tweens();
-	void render();
-	void renderScene(viewInfo &view);
-	void animate();
+	void Render();
+	void RenderScene(viewInfo &view);
+	void Animate();
 	//void open();
-	void init();
-	void setCursor(SDL_Cursor *newCursor);
-	void setDragBarH(bool on) { setDragBar(on, WECursor); };
-	void setDragBarV(bool on) { setDragBar(on, NSCursor); };
-	void dropMan();
-	void setFullScreen();
-	void setFullScene();
+	void Init();
+	void SetCursor(SDL_Cursor *newCursor);
+	void setDragBarH(bool on) { SetDragBar(on, WECursor); };
+	void setDragBarV(bool on) { SetDragBar(on, NSCursor); };
+	void DropMan();
+	void SetFullScreen();
+	void SetFullScene();
 
-	void saveScene(const std::string& path, const std::string& filename, bool selected, Pi3Cscene& scene);
-	void clearScene();
-	void clearGizmos();
+	void SaveScene(const std::string& path, const std::string& filename, bool selected, Pi3Cscene& scene);
+	void ClearScene();
+	void ClearGizmos();
 	bool isPerspective() { return views[currentView].projection == viewInfo::PERSPECTIVE;  }
 	bool initialised() { return (resource != nullptr); }
-	void createModel(const Pi3Cmesh& mesh, const vec3f& pos, int32_t groupId, const uint32_t colour = 0xffffffff, std::string txfile="");
-	void createLandscape(const vec3f pos, const uint32_t colour);
-	void saveFile(const std::string& path, const std::string& filename, bool selected = false);
-	bool loadModelAt(const std::string& modelfile, const vec3f pos, const std::function<void(float)> showProgressCB);
+	void CreateModel(const Pi3Cmesh& mesh, const vec3f& pos, int32_t groupId, const uint32_t colour = 0xffffffff, std::string txfile="");
+	void CreateLandscape(const vec3f pos, const uint32_t colour);
+	void SaveFileOBJ(const std::string& path, const std::string& filename, bool selected = false);
+	bool LoadModelAtPosition(const std::string& modelfile, const vec3f pos, const std::function<void(float)> showProgressCB);
 	bool currentViewIsActive() { return (currentView != viewInfo::INACTIVE && !mgui.somethingSelected()) || fullscreen; }
 
-	void snapshot();
-	void clearSelections();
-	void selectAll();
-	void deleteSelection();
-	void duplicateSelection();
+	void Snapshot();
+	void ClearSelections();
+	void SelectAll();
+	void DeleteSelection();
+	void DuplicateSelection();
 
-	viewInfo setupView(const viewInfo::ViewProject view);
-	Pi3Crecti viewRect(const viewInfo::SceneLayout projection);
+	viewInfo SetupView(const viewInfo::ViewProject view);
+	Pi3Crecti ViewRect(const viewInfo::SceneLayout projection);
 
 
 	Pi3Cresource *resource = nullptr;
@@ -172,37 +172,40 @@ private:
 	std::string info;
 	Blocks blockMap;
 
-	void touchView(viewInfo &vi);
-	void touchPerspectiveView(viewInfo &vi);
-	void touchOrthoView(viewInfo &vi);
-	void touchObject(Pi3Cmodel& selmodel);
-	void setDragBar(bool on, SDL_Cursor * newCursor);
-	void setSelectionBox();
-	void setSelectionRect();
-	void moveSelections(const vec3f& vec);
-	void setCurrentSelView(int32_t selview);
-	void handleKeyPresses();
-	void createShapes();
-	void creatingShape();
-	void createBlocks(const vec3f pos);
+	void CreateCursors();
+	void DeleteCursors();
+
+	void TouchView(viewInfo &vi);
+	void TouchPerspectiveView(viewInfo &vi);
+	void TouchOrthoView(viewInfo &vi);
+	void TouchObject(Pi3Cmodel& selmodel);
+	void SetDragBar(bool on, SDL_Cursor * newCursor);
+	void SetSelectionBox();
+	void SetSelectionRect();
+	void MoveSelections(const vec3f& vec);
+	void SetCurrentSelView(int32_t selview);
+	void HandleKeyPresses();
+	void CreateShapes();
+	void CreatingShape();
+	void CreateBlocks(const vec3f pos);
 	void ClickLeftMouseButton(viewInfo& view);
 	void ClickRightMouseButton(viewInfo& view);
 	void MouseButtonUp();
 	void DragLeftMouseButton(viewInfo& view, vec3f& mouseXYZ);
 	void DragMiddleMouseButton(viewInfo& view, vec3f& mouseXYZ);
-	void setTouchFlags(bool val);
-	void resetZoom();
-	void navikeys(SDL_Scancode key, SDL_Scancode keyA, SDL_Scancode KeyB);
-	void addLinePoint(const vec3f point);
-	void delLinePoint();
-	void updateLineIndexes();
-	void finishLine();
-	void transformLines(std::vector<vec3f>& lines, std::vector<vec2f>& contour, Pi3Cmatrix& matrix, int32_t start = 0);
-	float getShapeHeight(vec3f& pos, vec3f& v1, vec3f& v2);
-	void renderView(const viewInfo::SceneLayout projection, const Pi3Crecti& rect, int32_t mx, int32_t my);
-	void resetLineDrawing();
-	void loadingBar(float perc);
-	std::function<void(float)> setCallback();
+	void SetTouchFlags(bool val);
+	void ResetZoom();
+	void Navikeys(SDL_Scancode key, SDL_Scancode keyA, SDL_Scancode KeyB);
+	void AddLinePoint(const vec3f point);
+	void DeleteLinePoint();
+	void UpdateLineIndexes();
+	void FinishLine();
+	void TransformLines(std::vector<vec3f>& lines, std::vector<vec2f>& contour, Pi3Cmatrix& matrix, int32_t start = 0);
+	float GetShapeHeight(vec3f& pos, vec3f& v1, vec3f& v2);
+	void RenderView(const viewInfo::SceneLayout projection, const Pi3Crecti& rect, int32_t mx, int32_t my);
+	void ResetLineDrawing();
+	void ShowLoadingBar(float perc);
+	std::function<void(float)> SetCallback();
 
 	Pi3Cmodel* brush() { return &scene.models[brushref]; }
 	Pi3Cmodel* selRectangle() { return &scene.models2D[selRectRef]; }

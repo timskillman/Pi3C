@@ -2,7 +2,7 @@
 #include "Modeller.h"
 #include "Pi3Cutils.h"
 
-void MGui::init(loadOptions &opts, Pi3Cresource * resource, Pi3Cwindow *window, const std::string& defaultStyle)
+void MGui::Init(loadOptions &opts, Pi3Cresource * resource, Pi3Cwindow *window, const std::string& defaultStyle)
 {
 	gui.init(resource, window);
 
@@ -88,15 +88,15 @@ void MGui::init(loadOptions &opts, Pi3Cresource * resource, Pi3Cwindow *window, 
 	bsDialog.highlightColour = Pi3Ccolours::Yellow;
 }
 
-void MGui::renderBorder(uint32_t currentSelView)
+void MGui::RenderBorder(uint32_t currentSelView)
 {
 	Pi3Crecti rec;
 	switch (currentSelView) {
-	case viewInfo::TOPLEFT: rec = getRectTopLeft(); break;
-	case viewInfo::TOPRIGHT:rec = getRectTopRight(); break;
-	case viewInfo::BOTTOMLEFT:rec = getRectBottomLeft(); break;
-	case viewInfo::BOTTOMRIGHT:rec = getRectBottomRight(); break;
-	case viewInfo::FULL:rec = getRectFull(); break;
+	case viewInfo::TOPLEFT: rec = GetRectTopLeft(); break;
+	case viewInfo::TOPRIGHT:rec = GetRectTopRight(); break;
+	case viewInfo::BOTTOMLEFT:rec = GetRectBottomLeft(); break;
+	case viewInfo::BOTTOMRIGHT:rec = GetRectBottomRight(); break;
+	case viewInfo::FULL:rec = GetRectFull(); break;
 	}
 
 	if (rec.width > 0) {
@@ -104,42 +104,42 @@ void MGui::renderBorder(uint32_t currentSelView)
 	}
 }
 
-Pi3Crecti MGui::getRectBottomRight()
+Pi3Crecti MGui::GetRectBottomRight()
 {
 	return Pi3Crecti(leftbarWidth + (int)((float)workWidth * dragBarX) + dbh, botbarHeight, (int)((float)workWidth * ibx)-dbh, (int)((float)workHeight * iby));
 }
 
-Pi3Crecti MGui::getRectBottomLeft()
+Pi3Crecti MGui::GetRectBottomLeft()
 {
 	return Pi3Crecti(leftbarWidth, botbarHeight, (int)((float)workWidth * dragBarX) - dbh, (int)((float)workHeight * iby));
 }
 
-Pi3Crecti MGui::getRectTopRight()
+Pi3Crecti MGui::GetRectTopRight()
 {
 	return Pi3Crecti(leftbarWidth + (int)((float)workWidth * dragBarX) + dbh, botbarHeight + (int)((float)workHeight * iby) + dbh, (int)((float)workWidth * ibx)-dbh, (int)((float)workHeight * dragBarY) - dbh * 4);
 }
 
-Pi3Crecti MGui::getRectTopLeft()
+Pi3Crecti MGui::GetRectTopLeft()
 {
 	return Pi3Crecti(leftbarWidth, botbarHeight + (int)((float)workHeight * iby) + dbh, (int)((float)workWidth * dragBarX) - dbh, (int)((float)workHeight * dragBarY) - dbh * 4);
 }
 
-Pi3Crecti MGui::getRectFull()
+Pi3Crecti MGui::GetRectFull()
 {
 	return Pi3Crecti(leftbarWidth, botbarHeight, workWidth, workHeight-dbh * 3);
 }
 
-Pi3Cpointi MGui::getTopLeft()
+Pi3Cpointi MGui::GetTopLeft()
 {
 	return Pi3Cpointi(leftbarWidth + dbh, topbarHeight + menuHeight + dbh*2);
 }
 
-bool MGui::draggingBars()
+bool MGui::DraggingBars()
 {
 	return draggingBarX || draggingBarY;
 }
 
-float dragLimit(float& dragPos, float pos)
+float DragLimit(float& dragPos, float pos)
 {
 	dragPos = pos;
 	if (dragPos < 0.02f) dragPos = 0.02f;
@@ -147,19 +147,19 @@ float dragLimit(float& dragPos, float pos)
 	return 1.f - dragPos;
 }
 
-void MGui::updateWorkArea(Modeller* md) {
+void MGui::UpdateWorkArea(Modeller* md) {
 	workWidth = md->window->getWidth() - leftbarWidth - rightbarWidth;
 	workHeight = md->window->getHeight() - menuHeight - topbarHeight - botbarHeight;
 }
 
-void MGui::dragViewportBars(Modeller * md, Pi3Cpointi& wpos, int midht)
+void MGui::DragViewportBars(Modeller * md, Pi3Cpointi& wpos, int midht)
 {
 	bool mb = md->window->mouse.LeftButton;
 	int mx = md->window->mouse.x;
 	int my = md->window->mouse.y;
 	bool notDraggingOthers = md->selectRect || draggingBarX || draggingBarY;
 
-	updateWorkArea(md);
+	UpdateWorkArea(md);
 
 	if (md->fullview == viewInfo::INACTIVE) {
 		//Drag bar horizontal ...
@@ -172,7 +172,7 @@ void MGui::dragViewportBars(Modeller * md, Pi3Cpointi& wpos, int midht)
 			draggingBarX = true;
 		}
 		else if (draggingBarX && mb) {
-			ibx = dragLimit(dragBarX, (float)(mx - leftbarWidth) / (float)workWidth);
+			ibx = DragLimit(dragBarX, (float)(mx - leftbarWidth) / (float)workWidth);
 		}
 		else {
 			draggingBarX = false;
@@ -188,7 +188,7 @@ void MGui::dragViewportBars(Modeller * md, Pi3Cpointi& wpos, int midht)
 			draggingBarY = true;
 		}
 		else if (draggingBarY && mb) {
-			iby = dragLimit(dragBarY, (float)(my - topbarHeight - menuHeight) / (float)workHeight);
+			iby = DragLimit(dragBarY, (float)(my - topbarHeight - menuHeight) / (float)workHeight);
 		}
 		else {
 			draggingBarY = false;
@@ -200,31 +200,31 @@ void MGui::dragViewportBars(Modeller * md, Pi3Cpointi& wpos, int midht)
 	}
 }
 
-void MGui::dragBars(Modeller * md)
+void MGui::DragBars(Modeller * md)
 {
-	Pi3Cpointi wpos = getTopLeft();
+	Pi3Cpointi wpos = GetTopLeft();
 	int midht = md->window->getHeight() - wpos.y - botbarHeight;
-	dragViewportBars(md, wpos, midht);
-	renderBorder(md->currentSelView);
+	DragViewportBars(md, wpos, midht);
+	RenderBorder(md->currentSelView);
 }
 
-void MGui::doMenus(Modeller * md)
+void MGui::DoMenus(Modeller * md)
 {
 	//Menubar ...
 	gui.setButtonStyle(bsMenu);
 	if (gui.BeginMenuBar("MenuBar")) {
 		if (gui.BeginMenu("File")) {
-			if (gui.MenuItem("New", "Ctrl+N")) md->clearScene();
+			if (gui.MenuItem("New", "Ctrl+N")) md->ClearScene();
 			if (gui.MenuItem("Open", "Ctrl+O")) {} // open();
-			if (gui.MenuItem("Save", "Ctrl+S")) saveAll(md);
+			if (gui.MenuItem("Save", "Ctrl+S")) SaveAll(md);
 			if (gui.MenuItem("Quit", "Esc")) md->window->setquit(true);
 			gui.EndMenu();
 		}
 		if (gui.BeginMenu("Edit")) {
-			if (gui.MenuItem("Select All", "Ctrl+A")) md->selectAll();
-			if (gui.MenuItem("Clear selections", "")) md->clearSelections();
-			if (gui.MenuItem("Duplicate", "Ctrl+C")) md->duplicateSelection();
-			if (gui.MenuItem("Delete", "Del")) md->deleteSelection();
+			if (gui.MenuItem("Select All", "Ctrl+A")) md->SelectAll();
+			if (gui.MenuItem("Clear selections", "")) md->ClearSelections();
+			if (gui.MenuItem("Duplicate", "Ctrl+C")) md->DuplicateSelection();
+			if (gui.MenuItem("Delete", "Del")) md->DeleteSelection();
 			if (gui.MenuItem("Undo", "Ctrl+X")) {}
 			if (gui.MenuItem("Redo", "Ctrl+Y")) {}
 			gui.EndMenu();
@@ -239,7 +239,7 @@ void MGui::doMenus(Modeller * md)
 }
 
 
-void MGui::doEditToolbar(Modeller * md, Pi3Cimgui::rectStyle& iconstyle, bool mb, bool mu)
+void MGui::DoEditToolbar(Modeller * md, Pi3Cimgui::rectStyle& iconstyle, bool mb, bool mu)
 {
 	int icw = bsIcons.halfWidth(); // (int)((float)bsIcons.minWidth*0.5f);
 	int ich = bsIcons.minHeight;
@@ -249,21 +249,21 @@ void MGui::doEditToolbar(Modeller * md, Pi3Cimgui::rectStyle& iconstyle, bool mb
 	//if (gui.Container("EditToolbar",400,32)) {
 		if (gui.BeginGroupHorizontal("rendl.png", icw, ich)) {
 
-			if (gui.ButtonImage("butNew.png") && mb && mu) md->clearScene();
+			if (gui.ButtonImage("butNew.png") && mb && mu) md->ClearScene();
 			if (gui.ButtonImage("butOpen.png") && mb && mu) {}
-			if (gui.ButtonImage("butSave.png") && mb && mu) saveAll(md);
+			if (gui.ButtonImage("butSave.png") && mb && mu) SaveAll(md);
 			gui.renderBackIcon("butDiv.png", idw, ich);
 
-			if (gui.ButtonImage("butArrow.png", md->editMode == Modeller::ED_SELECT) && mb && mu) md->setEditMode(Modeller::ED_SELECT);
-			if (gui.ButtonImage("butMove.png", md->editMode == Modeller::ED_MOVE) && mb && mu) md->setEditMode(Modeller::ED_MOVE);
-			if (gui.ButtonImage("butRotate.png", md->editMode == Modeller::ED_ROTATE) && mb && mu) md->setEditMode(Modeller::ED_ROTATE);
-			if (gui.ButtonImage("butScale.png", md->editMode == Modeller::ED_SCALE) && mb && mu) md->setEditMode(Modeller::ED_SCALE);
+			if (gui.ButtonImage("butArrow.png", md->editMode == Modeller::ED_SELECT) && mb && mu) md->SetEditMode(Modeller::ED_SELECT);
+			if (gui.ButtonImage("butMove.png", md->editMode == Modeller::ED_MOVE) && mb && mu) md->SetEditMode(Modeller::ED_MOVE);
+			if (gui.ButtonImage("butRotate.png", md->editMode == Modeller::ED_ROTATE) && mb && mu) md->SetEditMode(Modeller::ED_ROTATE);
+			if (gui.ButtonImage("butScale.png", md->editMode == Modeller::ED_SCALE) && mb && mu) md->SetEditMode(Modeller::ED_SCALE);
 
 			gui.renderBackIcon("butDiv.png", idw, ich);
 
-			if (gui.ButtonImage("butSelectAll.png") && mb && mu) md->selectAll();
-			if (gui.ButtonImage("butDelete.png") && mb && mu) md->deleteSelection();
-			if (gui.ButtonImage("butCopy.png") && mb && mu) md->duplicateSelection(); //  snapshot();
+			if (gui.ButtonImage("butSelectAll.png") && mb && mu) md->SelectAll();
+			if (gui.ButtonImage("butDelete.png") && mb && mu) md->DeleteSelection();
+			if (gui.ButtonImage("butCopy.png") && mb && mu) md->DuplicateSelection(); //  snapshot();
 
 			gui.renderBackIcon("butDiv.png", idw, ich);
 
@@ -282,7 +282,7 @@ void MGui::doEditToolbar(Modeller * md, Pi3Cimgui::rectStyle& iconstyle, bool mb
 	//gui.renderBackIcon("rendr.png", icw, ich);
 }
 
-void MGui::doTransformToolbar(Modeller * md, Pi3Cimgui::rectStyle& iconstyle, bool mb, bool mu)
+void MGui::DoTransformToolbar(Modeller * md, Pi3Cimgui::rectStyle& iconstyle, bool mb, bool mu)
 {
 	if (gui.BeginGroupHorizontal("rendl.png", iconstyle.halfWidth(), iconstyle.minHeight)) {
 		if (gui.ButtonImage("butMirror.png") && mb && mu) {}
@@ -293,43 +293,43 @@ void MGui::doTransformToolbar(Modeller * md, Pi3Cimgui::rectStyle& iconstyle, bo
 	}
 }
 
-void MGui::doSceneToolbar(Modeller * md, Pi3Cimgui::rectStyle& iconstyle, bool mb, bool mu)
+void MGui::DoSceneToolbar(Modeller * md, Pi3Cimgui::rectStyle& iconstyle, bool mb, bool mu)
 {
 	//gui.setButtonStyle(iconstyle);
 
 	if (gui.BeginGroupHorizontal("rendl.png", iconstyle.halfWidth(), iconstyle.minHeight)) {
-		if (gui.ButtonImage("butFullscreen.png") && md->fullscreen==false && mb) md->setFullScreen();
-		if (gui.ButtonImage("butDropMan.png", md->editMode == Modeller::ED_DROPMAN) && mb) md->setEditMode(Modeller::ED_DROPMAN);
-		if (gui.ButtonImage("butBigwin.png") && mu) md->setFullScene();
-		if (gui.ButtonImage("butSceneRot.png", md->editMode == Modeller::ED_ROTATESCENE) && mu) md->setEditMode(Modeller::ED_ROTATESCENE);
+		if (gui.ButtonImage("butFullscreen.png") && md->fullscreen==false && mb) md->SetFullScreen();
+		if (gui.ButtonImage("butDropMan.png", md->editMode == Modeller::ED_DROPMAN) && mb) md->SetEditMode(Modeller::ED_DROPMAN);
+		if (gui.ButtonImage("butBigwin.png") && mu) md->SetFullScene();
+		if (gui.ButtonImage("butSceneRot.png", md->editMode == Modeller::ED_ROTATESCENE) && mu) md->SetEditMode(Modeller::ED_ROTATESCENE);
 		gui.EndGroupHorizontal("rendr.png", iconstyle.halfWidth(), iconstyle.minHeight);
 	}
 }
 
-void MGui::doShapesToolbar(Modeller * md, Pi3Cimgui::rectStyle& iconstyle, bool mb, bool mu)
+void MGui::DoShapesToolbar(Modeller * md, Pi3Cimgui::rectStyle& iconstyle, bool mb, bool mu)
 {
 	int btop = (int)((float)iconstyle.minWidth * .34f);
 	bool mouseClick = mb && mu;
 	if (gui.BeginGroupVertical("butTop2.png", iconstyle.minWidth, btop)) {
-		if (gui.ButtonImage("cuboid.png", md->createTool == Modeller::CT_CUBOID) && mb) md->setCreateTool(Modeller::CT_CUBOID);
-		if (gui.ButtonImage("sphere.png", md->createTool == Modeller::CT_SPHERE) && mb) md->setCreateTool(Modeller::CT_SPHERE);
-		if (gui.ButtonImage("cylinder.png", md->createTool == Modeller::CT_CYLINDER) && mb) md->setCreateTool(Modeller::CT_CYLINDER);
-		if (gui.ButtonImage("cone.png", md->createTool == Modeller::CT_CONE) && mb) md->setCreateTool(Modeller::CT_CONE);
-		if (gui.ButtonImage("tube.png", md->createTool == Modeller::CT_TUBE) && mb) md->setCreateTool(Modeller::CT_TUBE);
-		if (gui.ButtonImage("t-cone.png", md->createTool == Modeller::CT_TCONE) && mb) md->setCreateTool(Modeller::CT_TCONE);
-		if (gui.ButtonImage("wedge.png", md->createTool == Modeller::CT_WEDGE) && mb) md->setCreateTool(Modeller::CT_WEDGE);
-		if (gui.ButtonImage("torus.png", md->createTool == Modeller::CT_TORUS) && mb) md->setCreateTool(Modeller::CT_TORUS);
+		if (gui.ButtonImage("cuboid.png", md->createTool == Modeller::CT_CUBOID) && mb) md->SetCreateTool(Modeller::CT_CUBOID);
+		if (gui.ButtonImage("sphere.png", md->createTool == Modeller::CT_SPHERE) && mb) md->SetCreateTool(Modeller::CT_SPHERE);
+		if (gui.ButtonImage("cylinder.png", md->createTool == Modeller::CT_CYLINDER) && mb) md->SetCreateTool(Modeller::CT_CYLINDER);
+		if (gui.ButtonImage("cone.png", md->createTool == Modeller::CT_CONE) && mb) md->SetCreateTool(Modeller::CT_CONE);
+		if (gui.ButtonImage("tube.png", md->createTool == Modeller::CT_TUBE) && mb) md->SetCreateTool(Modeller::CT_TUBE);
+		if (gui.ButtonImage("t-cone.png", md->createTool == Modeller::CT_TCONE) && mb) md->SetCreateTool(Modeller::CT_TCONE);
+		if (gui.ButtonImage("wedge.png", md->createTool == Modeller::CT_WEDGE) && mb) md->SetCreateTool(Modeller::CT_WEDGE);
+		if (gui.ButtonImage("torus.png", md->createTool == Modeller::CT_TORUS) && mb) md->SetCreateTool(Modeller::CT_TORUS);
 		gui.renderBackIcon("butBot2.png", iconstyle.minWidth, btop);
 
 		gui.renderBackIcon("butTop2.png", iconstyle.minWidth, btop);
-		if (gui.ButtonImage("extrude.png", md->createTool == Modeller::CT_EXTRUDE) && mb) md->setCreateTool(Modeller::CT_EXTRUDE);
-		if (gui.ButtonImage("lathe.png", md->createTool == Modeller::CT_LATHE) && mb) md->setCreateTool(Modeller::CT_LATHE);
-		if (gui.ButtonImage("butLine.png", md->createTool == Modeller::CT_LINE) && mb) md->setCreateTool(Modeller::CT_LINE);
+		if (gui.ButtonImage("extrude.png", md->createTool == Modeller::CT_EXTRUDE) && mb) md->SetCreateTool(Modeller::CT_EXTRUDE);
+		if (gui.ButtonImage("lathe.png", md->createTool == Modeller::CT_LATHE) && mb) md->SetCreateTool(Modeller::CT_LATHE);
+		if (gui.ButtonImage("butLine.png", md->createTool == Modeller::CT_LINE) && mb) md->SetCreateTool(Modeller::CT_LINE);
 		//if (gui.ButtonImage("blocks.png", md->createTool == Modeller::CT_BLOCKS) && mb) md->setCreateTool(Modeller::CT_BLOCKS);
 		gui.renderBackIcon("butBot2.png", iconstyle.minWidth, btop);
 
 		gui.renderBackIcon("butTop2.png", iconstyle.minWidth, btop);
-		if (gui.ButtonImage("landscape.png", md->createTool == Modeller::CT_LANDSCAPE) && mb) md->setCreateTool(Modeller::CT_LANDSCAPE);
+		if (gui.ButtonImage("landscape.png", md->createTool == Modeller::CT_LANDSCAPE) && mb) md->SetCreateTool(Modeller::CT_LANDSCAPE);
 		gui.EndGroupVertical("butBot2.png", iconstyle.minWidth, btop);
 	}
 }
@@ -368,7 +368,7 @@ void MGui::MaterialInfo(Modeller* md, Pi3Cmaterial& material, const Pi3Cpointi& 
 	}
 }
 
-void MGui::doMaterialsToolbar(Modeller* md, Pi3Cimgui::rectStyle& iconstyle, bool mb, bool mu)
+void MGui::DoMaterialsToolbar(Modeller* md, Pi3Cimgui::rectStyle& iconstyle, bool mb, bool mu)
 {
 	int icw = bsIcons.halfWidth();
 	int ich = bsIcons.minHeight;
@@ -410,7 +410,7 @@ void MGui::doMaterialsToolbar(Modeller* md, Pi3Cimgui::rectStyle& iconstyle, boo
 	}
 }
 
-bool MGui::doIMGUI(Modeller * md)
+bool MGui::DoIMGUI(Modeller * md)
 {
 
 	//uint32_t ticks = SDL_GetTicks();
@@ -418,7 +418,7 @@ bool MGui::doIMGUI(Modeller * md)
 	int winHeight = md->window->getHeight();
 	int mx = md->window->mouse.x;
 	int my = md->window->mouse.y;
-	md->setMousePosition(mx, winHeight - my);
+	md->SetMousePosition(mx, winHeight - my);
 	bool mouseOverToolbars = gui.menuOpen || mx<leftbarWidth || mx>(winWidth - rightbarWidth) || my<(topbarHeight + menuHeight) || my>winHeight - botbarHeight;
 
 	//SDL_Log("Menus %s", gui.menuTouch);
@@ -431,8 +431,8 @@ bool MGui::doIMGUI(Modeller * md)
 		return false;
 	}
 	
-	doMenus(md);
-	updateWorkArea(md);
+	DoMenus(md);
+	UpdateWorkArea(md);
 
 	bool mb = md->window->mouse.LeftButton && mouseOverToolbars;
 	bool mu = md->window->mouse.up && mouseOverToolbars;
@@ -454,24 +454,24 @@ bool MGui::doIMGUI(Modeller * md)
 	gui.setButtonStyle(bsIcons);
 
 	gui.setPosition(wpos.x + leftbarWidth, wpos.y - topbarHeight);
-	doEditToolbar(md, bsIcons, mb, mu);
+	DoEditToolbar(md, bsIcons, mb, mu);
 
 	gui.sameLine();
-	doTransformToolbar(md, bsIcons, mb, mu);
+	DoTransformToolbar(md, bsIcons, mb, mu);
 
 	gui.setPosition(winWidth - rightbarWidth - 150, workHeight + topbarHeight + menuHeight + 3);
-	doSceneToolbar(md, bsIcons, mb, mu);
+	DoSceneToolbar(md, bsIcons, mb, mu);
 
 	//Left side create shape buttons ...
 	gui.setPosition(wpos.x + (leftbarWidth - bsButtons.minWidth) / 2, wpos.y);
 	bsButtons.sameLine = false;
 	gui.setButtonStyle(bsButtons);
-	doShapesToolbar(md, bsButtons, mb, mu);
+	DoShapesToolbar(md, bsButtons, mb, mu);
 
 	gui.setPosition(leftbarWidth, workHeight + topbarHeight + menuHeight + 3);
 	//gui.setButtonStyle(bsHeading);
 
-	doMaterialsToolbar(md, bsIcons, mb, mu);
+	DoMaterialsToolbar(md, bsIcons, mb, mu);
 
 	//static double v = 5;
 	//gui.SliderH("Scroll", 0, 10, v, 300, 24);
@@ -484,23 +484,23 @@ bool MGui::doIMGUI(Modeller * md)
 	return true;
 }
 
-void MGui::printText(const std::string& text, int x, int y, uint32_t col)
+void MGui::PrintText(const std::string& text, int x, int y, uint32_t col)
 {
 	gui.setButtonStyle(bsMenu);
 	gui.setPosition(x, y);
 	gui.Text(text, 0,0,Pi3Ccolours::White);
 }
 
-void MGui::saveAll(Modeller * md)
+void MGui::SaveAll(Modeller * md)
 {
 	//startSnapshot();
 	//gui.takeSnapshot();
 	std::string folderPath = "../";
 	std::string savefile = gui.OpenFileDialog(folderPath, &bsDialog);
-	if (savefile!="") md->saveFile(folderPath, savefile);
+	if (savefile!="") md->SaveFileOBJ(folderPath, savefile);
 }
 
-void MGui::showProgressCB(Pi3Cwindow* window, const std::string &message, const float pcnt)
+void MGui::ShowProgressCB(Pi3Cwindow* window, const std::string &message, const float pcnt)
 {
 	//SDL_Log("Loading '%s' %d%% ...", message.c_str(), (int)pcnt);
 	float mWidth = window->getWidth();
@@ -521,7 +521,7 @@ void MGui::showProgressCB(Pi3Cwindow* window, const std::string &message, const 
 	rect.renderBasic(gui.resource);
 
 	std::string text = message + Pi3Cutils::ftostrdp(pcnt, 0)+"%";
-	printText(text, mWidth / 2.f - 110.f, mHeight / 2.f - 50.f, 0xffffffff);
+	PrintText(text, mWidth / 2.f - 110.f, mHeight / 2.f - 50.f, 0xffffffff);
 
 	std::vector<uint32_t> eventList = window->events();
 

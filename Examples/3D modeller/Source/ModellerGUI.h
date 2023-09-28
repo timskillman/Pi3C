@@ -10,22 +10,22 @@ class MGui
 public:
 
 	//Functions ...
-	void init(loadOptions &opts, Pi3Cresource * resource, Pi3Cwindow *window, const std::string& defaultStyle);
-	bool doIMGUI(Modeller * md);
+	void Init(loadOptions &opts, Pi3Cresource * resource, Pi3Cwindow *window, const std::string& defaultStyle);
+	bool DoIMGUI(Modeller * md);
 	bool somethingSelected() { return gui.somethingSelected; }
 	void startSnapshot() { gui.startSnapshot(); }
 	void takeSnapshot() { gui.takenSnapshot = gui.SH_TAKESHOT; gui.takeSnapshot(); }
 	//void stopSnapshot() { gui.stopSnapshot(); }
-	void dragBars(Modeller* md);
-	void printText(const std::string& text, int x, int y, uint32_t col = 0);
-	void showProgressCB(Pi3Cwindow* window, const std::string& message, const float pcnt);
+	void DragBars(Modeller* md);
+	void PrintText(const std::string& text, int x, int y, uint32_t col = 0);
+	void ShowProgressCB(Pi3Cwindow* window, const std::string& message, const float pcnt);
 
-	Pi3Crecti getRectBottomRight();
-	Pi3Crecti getRectBottomLeft();
-	Pi3Crecti getRectTopRight();
-	Pi3Crecti getRectTopLeft();
-	Pi3Crecti getRectFull();
-	Pi3Cpointi getTopLeft();
+	Pi3Crecti GetRectBottomRight();
+	Pi3Crecti GetRectBottomLeft();
+	Pi3Crecti GetRectTopRight();
+	Pi3Crecti GetRectTopLeft();
+	Pi3Crecti GetRectFull();
+	Pi3Cpointi GetTopLeft();
 
 	void resize() { gui.resize(); }
 
@@ -74,20 +74,20 @@ private:
 	float ibx = 1.f - dragBarX;
 	float iby = 1.f - dragBarY;
 
-	void updateWorkArea(Modeller* md);
+	void UpdateWorkArea(Modeller* md);
 
-	void renderBorder(uint32_t currentSelView);
-	void dragViewportBars(Modeller * md, Pi3Cpointi& wposm, int midht);
-	void saveAll(Modeller * md);
-	bool draggingBars();
+	void RenderBorder(uint32_t currentSelView);
+	void DragViewportBars(Modeller * md, Pi3Cpointi& wposm, int midht);
+	void SaveAll(Modeller * md);
+	bool DraggingBars();
 
 
-	void doMenus(Modeller * md);
-	void doEditToolbar(Modeller * md, Pi3Cimgui::rectStyle& iconstyle, bool mb, bool mu);
-	void doTransformToolbar(Modeller * md, Pi3Cimgui::rectStyle& iconstyle, bool mb, bool mu);
-	void doSceneToolbar(Modeller * md, Pi3Cimgui::rectStyle& iconstyle, bool mb, bool mu);
-	void doShapesToolbar(Modeller * md, Pi3Cimgui::rectStyle& iconstyle, bool mb, bool mu);
-	void doMaterialsToolbar(Modeller* md, Pi3Cimgui::rectStyle& iconstyle, bool mb, bool mu);
+	void DoMenus(Modeller * md);
+	void DoEditToolbar(Modeller * md, Pi3Cimgui::rectStyle& iconstyle, bool mb, bool mu);
+	void DoTransformToolbar(Modeller * md, Pi3Cimgui::rectStyle& iconstyle, bool mb, bool mu);
+	void DoSceneToolbar(Modeller * md, Pi3Cimgui::rectStyle& iconstyle, bool mb, bool mu);
+	void DoShapesToolbar(Modeller * md, Pi3Cimgui::rectStyle& iconstyle, bool mb, bool mu);
+	void DoMaterialsToolbar(Modeller* md, Pi3Cimgui::rectStyle& iconstyle, bool mb, bool mu);
 
 	void MaterialInfo(Modeller* md, Pi3Cmaterial& material, const Pi3Cpointi& p);
 };

@@ -49,13 +49,13 @@ int main(int argc, char *argv[])
 	while (pi3c.is_running())
 	{
 		pi3c.do_events();
-		pi3c.clear_window(0x505050);
+		pi3c.clear_window(0xF0F0F0);
 
 		gui.Begin();
 
 		//Menubar ...
 		gui.setButtonStyle(pi3c.bsMenu);
-		if (gui.BeginMenuBar()) {
+		if (gui.BeginMenuBar("MenuBar")) {
 			if (gui.BeginMenu("File")) {
 				if (gui.MenuItem("New", "Ctrl+N")) {};
 				if (gui.MenuItem("Open", "Ctrl+O")) {};
@@ -76,7 +76,7 @@ int main(int argc, char *argv[])
 				if (gui.MenuItem("Undo", "Ctrl+X")) {}
 				if (gui.MenuItem("Redo", "Ctrl+Y")) {}
 			}
-			gui.EndMenuBar();
+			gui.EndMenuBar("MenuBar");
 		}
 
 		gui.setPosition((pi3c.window.getWidth()-mediaWidth)/2, 40);

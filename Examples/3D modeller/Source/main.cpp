@@ -30,12 +30,11 @@
 //
 // =======================================================================
 
-
-int main(int argc, char *argv[])
+Pi3Cwindow::options GetWindowOptions(std::string file)
 {
-	loadOptions opts("options.txt");
+	loadOptions opts(file.c_str());
 
-    // Create and initialize a window
+	// Create and initialize a window
 	Pi3Cwindow::options winopts;
 	winopts.title = opts.asString("title");
 	winopts.fullscreen = opts.asBool("fullscreen");
@@ -43,7 +42,12 @@ int main(int argc, char *argv[])
 	winopts.height = opts.asInt("screenHeight");
 	winopts.antialiasLevel = opts.asInt("antiAliasLevel");
 	winopts.clearColour = 0xffffff;
-	static Pi3Cwindow window(winopts);
+	return winopts;
+}
+
+int main(int argc, char *argv[])
+{
+	static Pi3Cwindow window(GetWindowOptions("options.txt"));
 
 	Pi3CGL::showGLinfo();
 
@@ -53,7 +57,7 @@ int main(int argc, char *argv[])
 	Modeller modeller(&resource, &window);
 	if (!modeller.initialised()) return 1;
 
-	modeller.init();
+	modeller.Init();
 
 	uint32_t frames = 0;
 	uint32_t timer = SDL_GetTicks();
@@ -64,9 +68,9 @@ int main(int argc, char *argv[])
 		std::vector<uint32_t> eventList = window.events(); 
 
 		window.clear();
-		modeller.render();
+		modeller.Render();
 
-		modeller.handleEvents(eventList);
+		modeller.HandleEvents(eventList);
 		
 		frames++;
 		window.SwapBuffers();	
