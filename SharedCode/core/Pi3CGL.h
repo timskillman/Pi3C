@@ -9,28 +9,13 @@
 #pragma comment (lib, "glew32s.lib")
 #endif /* __WINDOWS__ (*** must come before SDL.h ***) */ 
 
-#include <SDL.h>
+#include <SDL2/SDL.h>
 #include <vector>
 #include <string>
 
-#ifdef __IPHONEOS__
-#include <OpenGLES/ES1/gl.h>
-#include <OpenGLES/ES1/glext.h>
-#endif /* __IPHONEOS__ */
-
-#ifdef __WINDOWS__
-#include <GL/gl.h>
-#include <windows.h>
-#elif defined (__LINUX__) && defined(__arm__)
-#include <SDL_opengles.h>
-#include <SDL_opengl_glext.h>
-#include <SDL_opengles2.h>
-#include <SDL_opengles2_gl2ext.h>
-#elif defined (__LINUX__) && defined(__i386__)
 #define GL_GLEXT_PROTOTYPES
 #include <GL/gl.h>
 #include <GL/glut.h>
-#endif
 
 // =======================================================================
 // Pi3C Raspberry Pi Graphics Library

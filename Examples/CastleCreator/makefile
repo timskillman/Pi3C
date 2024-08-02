@@ -24,7 +24,7 @@ CPATH = $(GLTF_DIR)
 
 BUILDPATH = ../../../_build/Projects/$(TARGET)/
 
-GLES_DIR = /opt/vc/include
+GLES_DIR = /usr/include
 CPATH = $(GLES_DIR)
 
 SRC_DIR:= $(SHARED_DIR) $(FILE_DIR) $(UI_DIR) $(HELPS_DIR) $(TESS_DIR) $(GLES_DIR) $(RJSON_DIR) $(FBX_DIR) $(GLTF_DIR) Source
