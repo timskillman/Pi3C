@@ -32,7 +32,7 @@ void Pi3Cwindow::initOptions(const options &opts)
 		SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL, 1);
 
 		GLcontext = SDL_GL_CreateContext(mWindow);
-		SDL_GL_SetSwapInterval(-1);
+		SDL_GL_SetSwapInterval(0);
 		SDL_GL_MakeCurrent(mWindow, GLcontext);
 		glDepthFunc(GL_LEQUAL);
 		glEnable(GL_DEPTH_TEST);
