@@ -368,7 +368,7 @@ void Pi3Cscene::renderOffscreen(const viewInfo& viewinfo, Pi3Cmaterial* outlines
 
 	glGenRenderbuffers(1, &colour_buf);
 	glBindRenderbuffer(GL_RENDERBUFFER, colour_buf);
-	glRenderbufferStorage(GL_RENDERBUFFER, GL_RGBA8_OES, width, height);
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_RGBA8, width, height);
 
 	glGenRenderbuffers(1, &depth_buf);
 	glBindRenderbuffer(GL_RENDERBUFFER, depth_buf);
