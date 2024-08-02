@@ -121,7 +121,7 @@ Git is usually installed with the Raspberry Pi OS, but if not, download Git with
 Make sure you're in the 'home/pi' directory (indicated by the ~ (tilde character) with nothing after it) and enter;
 
 ~~~~
-git clone https://github.com/randomnumgen1/Pi3C_RPI5.git
+git clone https://github.com/randomnumgen1/Pi3C_RPI5.git Pi3C
 ~~~~
 
 Pi3C will be cloned onto your Pi and a Pi3C directory, with all the necessary code and resources, will be downloaded.
