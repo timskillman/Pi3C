@@ -3,7 +3,7 @@
 //https://www.shadertoy.com/view/llsGW7
 // Add texture layers of differing frequencies and magnitudes...
 
-#version 300 es
+#version 310 es
 precision highp float;       	// Set the default precision to medium
 
 uniform float iTime;

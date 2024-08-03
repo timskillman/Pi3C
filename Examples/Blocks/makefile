@@ -2,7 +2,7 @@ TARGET = Blocks
 
 CC = g++
 CFLAGS = -std=c++17 -Wall
-LDLIBS = -lGL -lGLU -lSDL2_image -lSDL2_mixer -lSDL2_ttf
+LDLIBS = -lGLESv2 -lGLU -lSDL2_image -lSDL2_mixer -lSDL2_ttf
 LDFLAGS = $(shell sdl2-config --cflags --libs)
 
 SHARED_DIR:= ../../SharedCode/core
@@ -26,7 +26,7 @@ CPATH = $(GLTF_DIR)
 
 BUILDPATH = ../../../_build/Projects/$(TARGET)/
 
-GLES_DIR = /opt/vc/include
+GLES_DIR = /usr/include
 CPATH = $(GLES_DIR)
 
 SRC_DIR:= $(RJSON_DIR) $(SHARED_DIR) $(FILE_DIR) $(UI_DIR) $(HELPS_DIR) $(EDIT_DIR) $(TESS_DIR) $(GLES_DIR) $(FBX_DIR) $(GLTF_DIR) source

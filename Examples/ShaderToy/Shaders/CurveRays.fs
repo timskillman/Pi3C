@@ -4,7 +4,7 @@
 // License Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License
 // Contact the author for other licensing options
 
-#version 300 es
+#version 310 es
 precision highp float;       	// Set the default precision to medium
 
 uniform float iTime;

@@ -2,7 +2,7 @@ TARGET = PerlinMap
 
 CC = g++
 CFLAGS = -std=c++17 -Wall
-LDLIBS = -lGL -lSDL2_image -lSDL2_mixer -lSDL2_ttf
+LDLIBS = -lGLESv2 -lSDL2_image -lSDL2_mixer -lSDL2_ttf
 LDFLAGS = $(shell sdl2-config --cflags --libs)
 
 SHARED_DIR:= ../../SharedCode/core
@@ -10,18 +10,24 @@ FILE_DIR:= ../../SharedCode/file
 UI_DIR:= ../../SharedCode/ui
 HELPS_DIR:= ../../SharedCode/helpers
 TESS_DIR:= ../../SharedCode/glutess
+RJSON_DIR:= ../../ThirdParty/rapidjson
+FBX_DIR:= ../../ThirdParty/openFBX
+GLTF_DIR:= ../../ThirdParty/gltf
 CPATH = $(SHARED_DIR)
 CPATH = $(FILE_DIR)
 CPATH = $(UI_DIR)
 CPATH = $(HELPS_DIR)
 CPATH = $(TESS_DIR)
+CPATH = $(RJSON_DIR)
+CPATH = $(FBX_DIR)
+CPATH = $(GLTF_DIR)
 
 BUILDPATH = ../../../_build/Projects/$(TARGET)/
 
-GLES_DIR = /opt/vc/include
+GLES_DIR = /usr/include
 CPATH = $(GLES_DIR)
 
-SRC_DIR:= $(SHARED_DIR) $(FILE_DIR) $(UI_DIR) $(HELPS_DIR) $(TESS_DIR) $(GLES_DIR) Source
+SRC_DIR:= $(SHARED_DIR) $(FILE_DIR) $(UI_DIR) $(HELPS_DIR) $(TESS_DIR) $(GLES_DIR) $(RJSON_DIR) $(FBX_DIR) $(GLTF_DIR) Source
 BUILD_DIR:= $(addprefix $(BUILDPATH),$(SRC_DIR))
 
 SRC:= $(foreach sdir,$(SRC_DIR),$(wildcard $(sdir)/*.cpp $(sdir)/*.c))

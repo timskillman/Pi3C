@@ -1,7 +1,7 @@
 // raymarching loop based on "[SH17A] Lava Planet" by P_Malin (https://www.shadertoy.com/view/ldBfDR)
 // https://www.shadertoy.com/view/Md2fWz
 
-#version 300 es
+#version 310 es
 precision highp float;       	// Set the default precision to medium
 
 uniform float iTime;

@@ -1,6 +1,6 @@
 //https://www.shadertoy.com/view/XtlXDM
 
-#version 300 es
+#version 310 es
 precision highp float;       	// Set the default precision to medium
 uniform vec3 iResolution;
 out vec4 fragColor;

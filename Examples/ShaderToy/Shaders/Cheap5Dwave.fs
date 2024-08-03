@@ -1,7 +1,7 @@
 //Cheap 5D wave
 //https://www.shadertoy.com/view/lscyD7
 
-#version 300 es
+#version 310 es
 precision highp float;       	// Set the default precision to medium
 
 uniform float iTime;

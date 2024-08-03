@@ -5,7 +5,7 @@
 
 // A simple and cheap 2D shader to accompany the Pirates of the Caribean music.
 
-#version 300 es
+#version 310 es
 precision highp float;       	// Set the default precision to medium
 
 uniform float iTime;

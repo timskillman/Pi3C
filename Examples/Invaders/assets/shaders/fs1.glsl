@@ -1,9 +1,10 @@
-//precision highp float;       	// Set the default precision to medium
+#version 310 es
+precision highp float; 
 
 uniform sampler2D u_Texture;   	// texture
-varying vec2 v_UV;				// Texture UV coordinate
-varying vec4 v_diffuseColour;	// Diffuse colour
-varying vec4 v_fogColour;		// Fog colour
+in vec2 v_UV;				// Texture UV coordi_nate
+in vec4 v_diffuseColour;	// Diffuse colour
+in vec4 v_fogColour;		// Fog colour
 
 void main()
 {

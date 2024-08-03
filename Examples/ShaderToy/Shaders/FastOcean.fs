@@ -1,7 +1,7 @@
 //afl_ext 2017 
 //https://www.shadertoy.com/view/MdXyzX
 
-#version 300 es
+#version 310 es
 precision highp float;       	// Set the default precision to medium
 
 uniform float iTime;

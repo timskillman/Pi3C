@@ -1,7 +1,7 @@
 //Render final image, compute some lighting using normals generated in previews buffers
 //https://www.shadertoy.com/view/Mt33DH
 
-#version 300 es
+#version 310 es
 precision highp float;       	// Set the default precision to medium
 
 uniform float iTime;

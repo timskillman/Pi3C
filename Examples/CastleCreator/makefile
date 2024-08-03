@@ -1,8 +1,30 @@
-TARGET = CastleCreator
+UNAME := $(shell uname)
+CFLAGS = 
+LDLIBS = 
+ifeq ($(UNAME), Linux)
+	TARGET = CastleCreator.app
+	UNAME_M := $(shell uname -m)
+	ifneq ($(filter %86,$(UNAME_M)),)
+		LDLIBS += -lGL 
+		CFLAGS += -DPI3COPENGL
+	else
+		LDLIBS += -lGLESv2 
+		CFLAGS += -DPI3COPENGLES
+	endif
+else
+	TARGET = CastleCreator.exe
+	LDLIBS += -lGL
+	CFLAGS += -DPI3COPENGL
+endif
+
+
+
+
+#TARGET = CastleCreator
 
 CC = g++
-CFLAGS = -std=c++17 -Wall
-LDLIBS = -lGL -lSDL2_image -lSDL2_mixer -lSDL2_ttf
+CFLAGS += -std=c++17 -Wall
+LDLIBS += -lSDL2_image -lSDL2_mixer -lSDL2_ttf
 LDFLAGS = $(shell sdl2-config --cflags --libs)
 
 SHARED_DIR:= ../../SharedCode/core

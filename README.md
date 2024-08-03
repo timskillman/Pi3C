@@ -4,13 +4,66 @@
 # Pi3C
 *v0.0.2 Alpha*
 
-Pi3C is a fast, C++ graphics engine and toolkit tailored for all models of the Raspberry Pi and works on other platforms such as Windows. It's small size and innovative techniques make it fast enough to run highly detailed 3D games; even on the Pi Zero ... 
+Pi3C is a fast, C++ graphics engine and toolkit tailored for Raspberry Pi 5. It's small size and innovative techniques make it fast enough to run highly detailed 3D games ... 
 
-![alt text](https://github.com/timskillman/Pi3C/blob/master/Resources/images/ShipRear.jpg "Complex 3D models even on the Pi Zero")
+Supported
+
+SBC | Supported | Notes
+--- | --- | --- |
+Raspberry Pi 5 | :white_check_mark: | N/A 
+Raspberry Pi 4 | N/A | N/A 
+Raspberry Pi 3 | :x: | N/A 
+Raspberry Pi 2 | :x: | N/A 
+Rock 5B | :white_check_mark: | N/A 
+Windows | :x: | N/A 
+
+
+
+Examples
+
+
+Example | Working
+--- | --- |
+CastleCreator | :white_check_mark:
+Blocks | :x:
+3D modeller | :x:
+Extruder | :x:
+HelloWorld | :white_check_mark:
+Invaders | :x:
+MD viewer | :x:
+NoahsArk | :x:
+PerlinMap | :x:
+ShaderToy | :white_check_mark:
+Snow | :white_check_mark:
+
+
+
+
+
+
+
+**click image to watch video**
+
+[![IMAGE ALT TEXT](https://github.com/timskillman/Pi3C/blob/master/Resources/images/ShipRear.jpg)](https://www.youtube.com/watch?v=u-quGjXq7Wk "Video Title")
+
+
 
 Or, how about a Minecraft style game? ...
 
-![alt text](https://github.com/timskillman/Pi3C/blob/master/Resources/images/Blocks1.jpg "Or, a Minecraft style game!")
+**click image to watch video**
+
+[![IMAGE ALT TEXT](https://github.com/timskillman/Pi3C/blob/master/Resources/images/Blocks1.jpg)](https://www.youtube.com/watch?v=QW6xsagLT6g "Video Title")
+
+
+
+
+
+
+
+
+
+
+
 
 Pi3C is designed to be simple to use and encourage youngsters (or anyone) new to programming by exploring the basic tutorials, games and apps provided.
 
@@ -18,7 +71,7 @@ These range from a few lines of simple, self explained code to more complex, rea
 
 Pi3C tries to avoid the complexities of C++ by providing a top-level class called Pi3C. This class has simple commands to help you start your journey into the exciting world of C++ programming.  Pi3C's utilizes the 'Simple DirectMedia Layer' (SDL 2.0) cross-platform development library (https://www.libsdl.org/). 
 
-Pi3C provides functions to render Open GLES 2.0 graphics using shaders. It also provides a high speed, Immediate Mode Graphics User Interface (IMGUI) with various buttons, text  and common widgets. Using these functions, complex Apps and games can be made with relative ease.
+Pi3C provides functions to render Open GLES 3.1 graphics using shaders. It also provides a high speed, Immediate Mode Graphics User Interface (IMGUI) with various buttons, text  and common widgets. Using these functions, complex Apps and games can be made with relative ease.
 
 Pi3C will also includes tools for 3D modelling and scene arrangemet with 1st person capabilites for testing scenes such as free flight, point and jump, and full screen renderng.  Other tools planned will include an IMGUI interface designer and C++ code generator that will jump-start your project.
 

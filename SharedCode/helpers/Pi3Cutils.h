@@ -4,6 +4,7 @@
 #include "Pi3Crect.h"
 #include <SDL_image.h>
 #include <vector>
+#include <stdexcept>
 
 namespace Pi3Cutils
 {

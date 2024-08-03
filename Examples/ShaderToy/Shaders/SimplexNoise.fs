@@ -18,7 +18,7 @@
 // Gradient Noise 3D             : https://www.shadertoy.com/view/Xsl3Dl
 // Simplex  Noise 2D             : https://www.shadertoy.com/view/Msf3WH
 
-#version 300 es
+#version 310 es
 precision highp float;       	// Set the default precision to medium
 
 uniform float iTime;

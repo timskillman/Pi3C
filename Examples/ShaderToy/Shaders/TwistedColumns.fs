@@ -5,7 +5,7 @@
 // this effect since around 1999. Only now it's antialiased, motion blurred, texture 
 // filtered and high resolution. Uncomment line 40 to see the columns.
 
-#version 300 es
+#version 310 es
 precision highp float;       	// Set the default precision to medium
 
 uniform float iTime;

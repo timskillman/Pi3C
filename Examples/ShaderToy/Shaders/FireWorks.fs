@@ -3,7 +3,7 @@
 // Based on https://www.shadertoy.com/view/lscGRl
 // Email:countfrolic@gmail.com Twitter:@The_ArtOfCode
 
-#version 300 es
+#version 310 es
 precision highp float;       	// Set the default precision to medium
 
 uniform float iTime;

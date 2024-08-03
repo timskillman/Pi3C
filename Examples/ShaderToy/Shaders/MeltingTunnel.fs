@@ -3,7 +3,7 @@
 // Created by evilryu
 // License Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License.
 
-#version 300 es
+#version 310 es
 precision highp float;       	// Set the default precision to medium
 
 uniform float iTime;

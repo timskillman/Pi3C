@@ -174,7 +174,7 @@ void Pi3Cshader::setupShader()
 	//Set this AFTER shader.Use
 	
 	// Basic rendering handles
-	illuminationModelRef = GetUniformLocation("u_illuminationModel");
+	illuminationModelRef = GetUniformLocation("u_illumi_nationModel");
 	fogColourRef = GetSet3f("u_fogColour", fogColour);
 	fogRangeRef = GetSetf("u_fogRange", 1.f / (fogMaxDist - fogMinDist));
 	fogMaxRef = GetSetf("u_fogMaxDist", fogMaxDist);

@@ -8,7 +8,7 @@
 // STAR/FLARE (mu6k): https://www.shadertoy.com/view/4sX3Rs
 // RAY V SPHERE (reinder): https://www.shadertoy.com/view/4tjGRh
 
-#version 300 es
+#version 310 es
 precision highp float;       	// Set the default precision to medium
 
 uniform float iTime;

@@ -1,6 +1,6 @@
 //https://www.shadertoy.com/view/ld23Rw
 
-#version 300 es
+#version 310 es
 precision highp float;       	// Set the default precision to medium
 
 uniform float iTime;

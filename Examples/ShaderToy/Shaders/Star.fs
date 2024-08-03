@@ -3,7 +3,7 @@
 
 // This content is under the MIT License.
 
-#version 300 es
+#version 310 es
 precision highp float;       	// Set the default precision to medium
 
 uniform float iTime;

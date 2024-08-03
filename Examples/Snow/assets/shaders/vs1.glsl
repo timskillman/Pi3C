@@ -1,11 +1,12 @@
-//precision mediump float;       // Set the default precision to medium. We don't need as high of a
+#version 310 es
+precision mediump float;       	// Set the default precision to medium
 
-uniform mat4 u_ProjMatrix;     // view/projection matrix.
-uniform mat4 u_ModelMatrix;    // model matrix.
-uniform vec3 u_LightPos;       // The position of the light in eye space.
-uniform vec4 u_lightColour;    // The colour of light in eye space.
-uniform int u_illuminationModel;		// If ==2 then apply illumation model
-uniform int u_reflective;		//
+uniform mat4 u_ProjMatrix;
+uniform mat4 u_ModelMatrix;
+uniform vec3 u_LightPos;
+uniform vec4 u_lightColour;
+uniform int u_illumi_nationModel;
+uniform int u_reflective;
 
 uniform vec2 u_animoffset;
 uniform vec4 u_diffuseColour;
@@ -15,15 +16,15 @@ uniform vec4 u_specularColour;
 
 uniform vec3 u_fogColour;
 uniform float u_fogMaxDist;
-uniform float u_fogRange;  	// effectively 1.0 / (fogMaxDist-fogMinDist)
+uniform float u_fogRange;
 
-attribute vec3 a_Position;
-attribute vec3 a_Normal;
-attribute vec2 a_UV;
+in vec3 a_Position;
+in vec3 a_Normal;
+in vec2 a_UV;
  
-varying vec2 v_UV;
-varying vec4 v_diffuseColour;
-varying vec4 v_fogColour;
+out vec2 v_UV;
+out vec4 v_diffuseColour;
+out vec4 v_fogColour;
 //varying vec3 v_Normal;
 ///varying vec3 v_LightPos;
 
@@ -45,7 +46,7 @@ void main()
 	vec4 emitColour = max(u_lightColour, u_emissiveColour);
 	float fogFactor = (Position.z + u_fogMaxDist) * u_fogRange; //  / (fogMaxDist-fogMinDist)
 	fogFactor = clamp(fogFactor, 0.0, 1.0);
-	//if (u_illuminationModel == 1) fogFactor = 1.0;
+	//if (u_illumi_nationModel == 1) fogFactor = 1.0;
 	v_fogColour = vec4((u_fogColour * (1.0 - fogFactor)),0.0) * u_lightColour;
 	
 	// Calc lighting and specular and mix into fogColour
@@ -54,7 +55,7 @@ void main()
 	vec4 diffuseCol = u_diffuseColour * emitColour;
 
 	// apply shade and fog ...
-	if (u_illuminationModel == 2) {
+	if (u_illumi_nationModel == 2) {
 		float rDotV = max(dot(Normal, lightVector), 0.1);
 		fogFactor = fogFactor * rDotV;
 		//rDotV = max(0.0, dot(lightVector, Normal));

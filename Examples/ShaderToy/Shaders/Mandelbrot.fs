@@ -15,7 +15,7 @@
 //
 // More info here: http://www.iquilezles.org/www/articles/distancefractals/distancefractals.htm
 
-#version 300 es
+#version 310 es
 precision highp float;       	// Set the default precision to medium
 
 uniform float iTime;

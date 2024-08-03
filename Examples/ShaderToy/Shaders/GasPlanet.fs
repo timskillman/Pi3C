@@ -4,7 +4,7 @@
 // by Andrew Baldwin.
 // This work is licensed under a Creative Commons Attribution 4.0 International License.
 
-#version 300 es
+#version 310 es
 precision highp float;       	// Set the default precision to medium
 
 uniform float iTime;

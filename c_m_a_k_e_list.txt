@@ -1,0 +1,35 @@
+# CMakeLists.txt
+cmake_minimum_required(VERSION 3.10)
+
+set(PROJECT_NAME castlecreator)
+project(castlecreator)
+
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED True)
+
+# Find package
+find_package(OpenGL)
+find_package(SDL2 REQUIRED)
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(SDL2 REQUIRED sdl2 SDL2_ttf SDL2_mixer SDL2_image)
+pkg_check_modules(GLEW REQUIRED glew)
+
+# Include directories
+target_include_directories(testapp PUBLIC ${SDL2_INCLUDE_DIRS})
+#
+# Find sources recursively
+file(GLOB_RECURSE SOURCE_FILES "src/*.cpp")
+file(GLOB_RECURSE HEADER_FILES "src/*.h")
+file(GLOB_RECURSE DEBUG_SOURCE_FILES "src/*.cc")
+file(GLOB_RECURSE DEBUG_HEADER_FILES "src/*.hpp")
+# Add executable
+add_executable(${PROJECT_NAME} main.cpp)
+
+# Link libraries
+target_link_libraries(${PROJECT_NAME}   ${SDL2_LIBRARIES}
+										${LIB_GLM_LIBRARIES}
+
+										)
+
+# Add compile definitions
+add_definitions(${SDL2_CFLAGS_OTHER})
