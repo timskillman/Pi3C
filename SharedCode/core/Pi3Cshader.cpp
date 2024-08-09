@@ -61,7 +61,7 @@ bool Pi3Cshader::CreateShaderProgram(const GLuint &vertexShader, const GLuint &f
 
 	std::istringstream ss(attribStr);
 	std::string s; uint32_t a = 0;
-	while (ss >> s) glBindAttribLocation(program, a++, s.c_str());
+	//while (ss >> s) glBindAttribLocation(program, a++, s.c_str());
 	stride = DEFAULT_STRIDE;
 
 	glLinkProgram(program); //linking
