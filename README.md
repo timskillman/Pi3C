@@ -54,7 +54,7 @@ Or, how about a Minecraft style game? ...
 
 [![IMAGE ALT TEXT](https://github.com/timskillman/Pi3C/blob/master/Resources/images/Blocks1.jpg)](https://www.youtube.com/watch?v=QW6xsagLT6g "Video Title")
 
-[![IMAGE ALT TEXT](https://github.com/randomnumgen1/Pi3C_RPI5/raw/master/docs/screenshots/castle_example.png)](https://www.youtube.com/watch?v=QW6xsagLT6g "Video Title")
+[![IMAGE ALT TEXT](https://github.com/randomnumgen1/Pi3C_RPI5/raw/master/docs/screenshots/castle_example.png)](https://www.youtube.com/watch?v=UHarQpdyqpg "Video Title")
 
 
 
