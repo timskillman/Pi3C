@@ -55,8 +55,8 @@ void main()
 	
 	// Calc lighting and specular and mix into fogColour
 	vec4 ambcol = u_ambientColour; //vec4(0,0,0,0);
-	//vec4 diffuseCol = vec4(u_diffuseColour.rgb * max(u_lightColour.rgb, u_emissiveColour.rgb*(1.0-fogFactor)), u_diffuseColour.a);
-	vec4 diffuseCol = u_diffuseColour * emitColour * col;
+	vec4 diffuseCol = vec4(u_diffuseColour.rgb * max(u_lightColour.rgb, u_emissiveColour.rgb*(1.0-fogFactor)), u_diffuseColour.a);
+	//vec4 diffuseCol = u_diffuseColour * emitColour * col;
 
 	// apply shade and fog ...
 	if (u_illumi_nationModel == 2) {
