@@ -1,29 +1,29 @@
 TARGET = Extruder
 
 CC = g++
-CFLAGS = -std=c++17 -Wall
-LDLIBS = -lGL -lSDL2_image -lSDL2_mixer -lSDL2_ttf
-LDFLAGS = $(shell sdl2-config --cflags --libs)
+CFLAGS = -std=c++17 -Wall -Wno-narrowing
+LDLIBS = -lGL -lSDL2 -lSDL2_image -lSDL2_mixer -lSDL2_ttf
+LDFLAGS =
 
-SHARED_DIR:= ../../SharedCode/core
-FILE_DIR:= ../../SharedCode/file
-UI_DIR:= ../../SharedCode/ui
-HELPS_DIR:= ../../SharedCode/helpers
-TESS_DIR:= ../../SharedCode/glutess
-RJSON_DIR:= ../../ThirdParty/rapidjson
-CPATH = $(SHARED_DIR)
-CPATH = $(FILE_DIR)
-CPATH = $(UI_DIR)
-CPATH = $(HELPS_DIR)
-CPATH = $(TESS_DIR)
-CPATH = $(RJSON_DIR)
+INC_DIRS:=  ../../SharedCode/core \
+            ../../SharedCode/file \
+            ../../SharedCode/ui \
+            ../../SharedCode/helpers \
+            ../../SharedCode/editing \
+            ../../SharedCode/glutess \
+            ../../ThirdParty/rapidjson \
+            ../../ThirdParty/openFBX \
+            ../../ThirdParty/gltf/fx \
+            ../../ThirdParty/SDL2/include \
+            ../../ThirdParty/SDL2_image/include \
+            ../../ThirdParty/SDL2_ttf/include \
+            ../../ThirdParty/SDL2_mixer/include
 
 BUILDPATH = ../../../_build/Projects/$(TARGET)/
 
 GLES_DIR = /opt/vc/include
-CPATH = $(GLES_DIR)
 
-SRC_DIR:= $(SHARED_DIR) $(FILE_DIR) $(UI_DIR) $(HELPS_DIR) $(TESS_DIR) $(GLES_DIR) $(RJSON_DIR) Source
+SRC_DIR:= $(INC_DIRS) Source
 BUILD_DIR:= $(addprefix $(BUILDPATH),$(SRC_DIR))
 
 SRC:= $(foreach sdir,$(SRC_DIR),$(wildcard $(sdir)/*.cpp $(sdir)/*.c))

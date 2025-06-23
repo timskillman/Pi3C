@@ -23,7 +23,7 @@
 #include <windows.h>
 #elif defined (__LINUX__) && defined(__arm__)
 #include <SDL_opengles.h>
-#include <SDL_opengl_glext.h>
+//#include <SDL_opengl_glext.h>
 #include <SDL_opengles2.h>
 #include <SDL_opengles2_gl2ext.h>
 #elif defined (__LINUX__) && defined(__i386__)

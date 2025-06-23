@@ -102,7 +102,7 @@ int main(int argc, char *argv[])
 	Pi3Cshader& shader = resource.shaders[shaderRefs[shaderSelect]];
 
 	Pi3Cmesh rectmesh = resource.createRect(vec3f(-1.f, -1.f, 0), vec2f(2.f, 2.f), 0xffffffff);
-	int32_t rectmeshref = resource.addMesh(&rectmesh);
+	int32_t rectmeshref = resource.addMesh(&rectmesh, 0);
 
 	uint32_t frames = 0;
 	uint32_t timer = SDL_GetTicks();
@@ -110,7 +110,7 @@ int main(int argc, char *argv[])
 	while (!window.hasquit())
 	{
 	
-		std::vector<uint32_t> eventList = window.event();
+		std::vector<uint32_t> eventList = window.events();
 
 		for (auto& ev : eventList) {
 			switch (ev)

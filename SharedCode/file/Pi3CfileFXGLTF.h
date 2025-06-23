@@ -2,7 +2,7 @@
 
 #include "Pi3Cscene.h"
 #include "Pi3Cresource.h"
-#include <fx/gltf.h>
+#include <gltf.h>
 #include <array>
 #include <memory>
 #include <unordered_map>

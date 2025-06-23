@@ -10,6 +10,7 @@
 #include <string>
 #include <memory>
 #include <map>
+#include <cstring>
 
 #include "Pi3Cfont.h"
 #include "Pi3Csound.h"
