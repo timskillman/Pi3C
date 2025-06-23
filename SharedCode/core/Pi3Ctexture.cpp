@@ -1,5 +1,5 @@
 #include "Pi3Ctexture.h"
-
+#include <cstring>
 
 Pi3Ctexture::Pi3Ctexture()
 {

@@ -47,7 +47,8 @@ Pi3Cmodel* Pi3Cimgui::createImage(const std::string& text, Pi3Ctexture& texture)
 
 Pi3Cmodel* Pi3Cimgui::createImageRect(const std::string& text, Pi3Ctexture& ttex)
 {
-	return create2ImageRect(text, ttex, Pi3Ctexture());
+	Pi3Ctexture ttex2 = Pi3Ctexture();
+	return create2ImageRect(text, ttex, ttex2);
 }
 
 Pi3Cmodel* Pi3Cimgui::createImageRect2(const std::string& text, const int texRef)
