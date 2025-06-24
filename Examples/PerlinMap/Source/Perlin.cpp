@@ -87,7 +87,8 @@ int main(int argc, char *argv[])
 		if (pi3c.window.mouseUp() && updateMap) {
 			pn.createMap(ptex->GetTexels(), width, height, pz, octaves, pamp, freq);
 			ptex->update();
-			pi3c.model3D(mapref)->updateMesh(&pi3c.resource, Pi3Cshapes::elevationMap(*ptex, mapPos, mapSize, 128, 128, 0, vec2f(1,1), 0));
+			Pi3Cmesh newMap = Pi3Cshapes::elevationMap(*ptex, mapPos, mapSize, 128, 128, 0, vec2f(1,1), 0);
+			pi3c.model3D(mapref)->updateMesh(&pi3c.resource, newMap);
 			updateMap = false;
 		}
 
