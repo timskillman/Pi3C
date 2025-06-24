@@ -138,7 +138,7 @@ void Pi3Cimgui::setColour(Pi3Cmodel &model, uint32_t colour)
 	model.material.SetColAmbient(0);
 }
 
-bool Pi3Cimgui::renderButton(Pi3Cmodel *drawObj, const int minwidth, const int minheight)
+bool Pi3Cimgui::renderButton(Pi3Cmodel *drawObj, const int minwidth, const int minheight, const bool inactive)
 {
 	if (!drawObj) return false;
 
@@ -171,7 +171,8 @@ bool Pi3Cimgui::renderButton(Pi3Cmodel *drawObj, const int minwidth, const int m
 
 	//scale image and rectangle into button ...
 	image.matrix.moveScaleXY(xp, yp - (float)th, (float)tw, (float)th);
-	setColour(image, currentParams.textColour);
+	uint32_t greyCol = (inactive) ? 0x808080 : 0x000000;
+	setColour(image, currentParams.textColour | greyCol);
 	image.matrix.setz(zpos);
 	
 	rect.matrix.moveScaleXY((float)pos.x, (float)(pos.y-size.y), (float)size.x, (float)size.y);
@@ -190,7 +191,7 @@ bool Pi3Cimgui::renderButton(Pi3Cmodel *drawObj, const int minwidth, const int m
 	return mouseTouchRect;
 }
 
-bool Pi3Cimgui::renderButton2(Pi3Cmodel *drawObj, const int minwidth, const int minheight)
+bool Pi3Cimgui::renderButton2(Pi3Cmodel *drawObj, const int minwidth, const int minheight, const bool inactive)
 {
 	if (!drawObj) return false;
 
@@ -234,7 +235,8 @@ bool Pi3Cimgui::renderButton2(Pi3Cmodel *drawObj, const int minwidth, const int 
 
 	//scale image and rectangle into button ...
 	text.matrix.moveScaleXY(xp, yp - (float)th1, (float)tw1, (float)th1);
-	setColour(text, currentParams.textColour);
+	uint32_t greyCol = (inactive) ? 0x808080 : 0x000000;
+	setColour(text, currentParams.textColour | greyCol);
 	text.matrix.setz(zpos);
 
 	xp = (float)(pos.x + currentParams.left + (float)(slideWidth - tw2) * (1.f - slx));
@@ -441,11 +443,11 @@ bool Pi3Cimgui::ContainerEnd(const std::string &name)
 	return false;
 }
 
-bool Pi3Cimgui::ButtonText(const std::string &str, const bool selected, const int minWidth, const int minHeight)
+bool Pi3Cimgui::ButtonText(const std::string &str, const bool selected, const int minWidth, const int minHeight, const bool inactive)
 {
 	currentParams.selected = selected;
-	bool touched = renderButton(findCreateImageRect(str, TEXT), minWidth, minHeight);
-	bool clicked = touched && window->mouse.LeftButton;
+	bool touched = renderButton(findCreateImageRect(str, TEXT), minWidth, minHeight, inactive);
+	bool clicked = !inactive && touched && window->mouse.LeftButton;
 	currentParams.selected = false;
 	if (touched) somethingSelected = true;
 	return clicked;
@@ -893,14 +895,14 @@ void Pi3Cimgui::EndMenu()
 
 }
 
-bool Pi3Cimgui::MenuItem(const std::string &menuItem, const std::string &itemHotkey, const int minWidth, const int minheight)
+bool Pi3Cimgui::MenuItem(const std::string &menuItem, const std::string &itemHotkey, const bool inactive, const int minWidth, const int minheight)
 {
 	zpos = -5.f;
 	selectingMenu = true;
-	bool touch = ButtonText(menuItem, false, minWidth, currentParams.minHeight);
+	bool touch = ButtonText(menuItem, false, minWidth, currentParams.minHeight, inactive);
 	sameLine(0);
 	nextPos.x -= 70;
-	renderText(itemHotkey,70, currentParams.minHeight);
+	renderText(itemHotkey,70, currentParams.minHeight, currentParams.textColour | (inactive) ? 0x808080 : 0);
 	//renderIcon("scrollLeft.png");
 	//bool touch2 = Button(itemHotkey, TEXT, 70.f);
 	nextLine(0);

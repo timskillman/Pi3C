@@ -113,7 +113,7 @@ public:
 	bool Text(const std::string &text, const int minwidth = 0, const int minheight = 0, const uint32_t colour = 0);		/* Render dynamic text */
 	bool TextArea(const std::string &text, const int minwidth, const int minheight);
 	Pi3Crect TextAt(const std::string& text, int x, int y, uint32_t col);
-	bool ButtonText(const std::string &text, const bool selected = false, const int minwidth = 0, const int minheight = 0);
+	bool ButtonText(const std::string &text, const bool selected = false, const int minwidth = 0, const int minheight = 0, const bool inactive = false);
 	bool ButtonImage(const std::string &img, const bool selected = false, const int minWidth = 0, const int minHeight = 0);
 	bool ButtonImage(const std::string& str, const int texRef, const bool selected = false, const int minWidth = 0, const int minHeight = 0);
 	bool SliderH(const std::string &text, const double from, const double too, double &value, const int minwidth = 0, const int minheight = 0);
@@ -154,7 +154,7 @@ public:
 	bool BeginMenuBar(const std::string& name);
 	void EndMenuBar(const std::string& name);
 	bool BeginMenu(const std::string &menuHeading);
-	bool MenuItem(const std::string &menuItem, const std::string &itemHotkey, const int minWidth = 200.f, const int minheight = 24.f);
+	bool MenuItem(const std::string &menuItem, const std::string &itemHotkey, const bool inactive = false, const int minWidth = 200.f, const int minheight = 24.f);
 	void EndMenu();
 
 	bool renderRect(const int minwidth, const int minheight, uint32_t colour = 0);
@@ -170,7 +170,7 @@ public:
 	int takenSnapshot = SH_TAKESHOT;   //Force a snapshot at beginning
 	std::string menuTouch;		//Currently touch menu heading (for drawing correct menuItem groups)
 
-
+	
 	Pi3Cresource * resource = nullptr;
 	float zpos = -10.f;			//Uses Z-buffer to place windows/menus in front of each other
 
@@ -178,8 +178,8 @@ private:
 
 	bool touched(const Pi3Cpointi &size);
 	bool renderIconImage(Pi3Cmodel *drawObj, const int minwidth, const int minheight, bool squash, const uint32_t colour);
-	bool renderButton(Pi3Cmodel * drawObj, const int minwidth = 0, const int minheight = 0);
-	bool renderButton2(Pi3Cmodel *drawObj, const int minwidth = 0, const int minheight = 0);
+	bool renderButton(Pi3Cmodel * drawObj, const int minwidth = 0, const int minheight = 0, const bool inactive = false);
+	bool renderButton2(Pi3Cmodel *drawObj, const int minwidth = 0, const int minheight = 0, const bool inactive = false);
 	void NextPos();
 	Pi3Cpointi calcImageSize(int tw, int th, const int minwidth, const int minheight, bool squash = false);
 	void setButtonBackground(Pi3Cmodel &rect, const bool mouseTouchRect);

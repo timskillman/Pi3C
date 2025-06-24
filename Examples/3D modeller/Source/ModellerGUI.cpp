@@ -154,7 +154,7 @@ void MGui::UpdateWorkArea(Modeller* md) {
 
 void MGui::DragViewportBars(Modeller * md, Pi3Cpointi& wpos, int midht)
 {
-	bool mb = md->window->mouse.LeftButton;
+	bool leftClick = md->window->mouse.LeftButton;
 	int mx = md->window->mouse.x;
 	int my = md->window->mouse.y;
 	bool notDraggingOthers = md->selectRect || draggingBarX || draggingBarY;
@@ -168,10 +168,10 @@ void MGui::DragViewportBars(Modeller * md, Pi3Cpointi& wpos, int midht)
 		bool touchDragBarH = gui.renderRect((int)dragBarThickness, midht, 0xffffffff);
 		if (touchDragBarH || draggingBarX) md->setDragBarH(true);
 
-		if (touchDragBarH && mb && !notDraggingOthers) {
+		if (touchDragBarH && leftClick && !notDraggingOthers) {
 			draggingBarX = true;
 		}
-		else if (draggingBarX && mb) {
+		else if (draggingBarX && leftClick) {
 			ibx = DragLimit(dragBarX, (float)(mx - leftbarWidth) / (float)workWidth);
 		}
 		else {
@@ -184,10 +184,10 @@ void MGui::DragViewportBars(Modeller * md, Pi3Cpointi& wpos, int midht)
 		bool touchDragBarV = gui.renderRect(workWidth, (int)dragBarThickness, 0xffffffff);
 		if (touchDragBarV || draggingBarY) md->setDragBarV(true);
 
-		if (touchDragBarV && mb && !notDraggingOthers) {
+		if (touchDragBarV && leftClick && !notDraggingOthers) {
 			draggingBarY = true;
 		}
-		else if (draggingBarY && mb) {
+		else if (draggingBarY && leftClick) {
 			iby = DragLimit(dragBarY, (float)(my - topbarHeight - menuHeight) / (float)workHeight);
 		}
 		else {
@@ -215,7 +215,7 @@ void MGui::DoMenus(Modeller * md)
 	if (gui.BeginMenuBar("MenuBar")) {
 		if (gui.BeginMenu("File")) {
 			if (gui.MenuItem("New", "Ctrl+N")) md->ClearScene();
-			if (gui.MenuItem("Open", "Ctrl+O")) {} // open();
+			if (gui.MenuItem("Open", "Ctrl+O", true)) {} // open();
 			if (gui.MenuItem("Save", "Ctrl+S")) SaveAll(md);
 			if (gui.MenuItem("Quit", "Esc")) md->window->setquit(true);
 			gui.EndMenu();
@@ -230,9 +230,12 @@ void MGui::DoMenus(Modeller * md)
 			gui.EndMenu();
 		}
 		if (gui.BeginMenu("Object")) {
-			if (gui.MenuItem("Create", "Ctrl+C")) {}
-			if (gui.MenuItem("Array tool", "Ctrl+V")) {}
+			if (gui.MenuItem("Create", "Ctrl+C", true)) {}
+			if (gui.MenuItem("Array tool", "Ctrl+V", true)) {}
 			gui.EndMenu();
+		}
+		if (gui.BeginMenu("Help")) {
+			if (gui.MenuItem("Version: 0.2.002", "", true)) {}
 		}
 		gui.EndMenuBar("MenuBar");
 	}
