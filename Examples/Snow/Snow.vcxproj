@@ -35,39 +35,39 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
@@ -122,8 +122,8 @@
     <SourcePath>$(SourcePath)</SourcePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>$(ProjectDir)\..\..\ThirdParty\SDL2\include;$(ProjectDir)\..\..\ThirdParty\SDL2\include;$(ProjectDir)\..\..\ThirdParty\SDL2_image\include;$(ProjectDir)\..\..\ThirdParty\SDL2\include;$(ProjectDir)\..\..\ThirdParty\SDL2\include;$(ProjectDir)\..\..\ThirdParty\SDL2_image\include;$(ProjectDir)\..\..\ThirdParty\SDL2_net\include;$(ProjectDir)\..\..\ThirdParty\SDL2\include;$(ProjectDir)\..\..\ThirdParty\SDL2\include;$(ProjectDir)\..\..\ThirdParty\SDL2_image\include;$(ProjectDir)\..\..\ThirdParty\SDL2\include;$(ProjectDir)\..\..\ThirdParty\SDL2\include;$(ProjectDir)\..\..\ThirdParty\SDL2_image\include;$(ProjectDir)\..\..\ThirdParty\SDL2_net\include;$(ProjectDir)\Shared\SDLwin\include;$(IncludePath)</IncludePath>
-    <LibraryPath>$(ProjectDir)\..\..\ThirdParty\\SDL2_image\lib\x64;$(ProjectDir)\..\..\ThirdParty\\SDL2\lib\x64;$(ProjectDir)\..\..\ThirdParty\\SDL2_net\lib\x64;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(ProjectDir)\..\..\ThirdParty\SDL2\include;$(ProjectDir)\..\..\ThirdParty\SDL2_image\include;$(ProjectDir)\..\..\ThirdParty\SDL2_net\include;$(ProjectDir)\..\..\SharedCode\core;$(ProjectDir)\..\..\ThirdParty\SDL2_mixer\include;$(ProjectDir)\..\..\ThirdParty\glew\include;$(ProjectDir)\..\..\ThirdParty\SDL2_ttf\include;$(ProjectDir)\..\..\SharedCode\ui;$(ProjectDir)\..\..\SharedCode\file;$(ProjectDir)\..\..\SharedCode\helpers;$(ProjectDir)\..\..\SharedCode\glutess;$(IncludePath)</IncludePath>
+    <LibraryPath>$(ProjectDir)\..\..\ThirdParty\\SDL2_image\lib\x64;$(ProjectDir)\..\..\ThirdParty\\SDL2\lib\x64;$(ProjectDir)\..\..\ThirdParty\\SDL2_net\lib\x64;$(ProjectDir)\..\..\ThirdParty\glew\lib\x86;$(ProjectDir)\..\..\ThirdParty\SDL2_mixer\lib\x86;$(ProjectDir)\..\..\ThirdParty\SDL2_ttf\lib\x86;$(LibraryPath)</LibraryPath>
     <SourcePath>$(SourcePath)</SourcePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">

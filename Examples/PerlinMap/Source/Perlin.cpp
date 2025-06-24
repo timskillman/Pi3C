@@ -50,6 +50,7 @@ int main(int argc, char *argv[])
 	uint8_t octaves = 3;
 	float freq = 5.f;
 
+	//Pi3Ctexture ptex = Pi3Ctexture(width, height, 4);
 	ptex->create(width, height, 4);
 	Pi3CperlinNoise pn;
 	uint32_t start_time = SDL_GetTicks();
@@ -61,7 +62,7 @@ int main(int argc, char *argv[])
 	vec3f mapSize = vec3f((float)ptex->GetWidth(), 100.f, (float)ptex->GetHeight());
 
 	int32_t rect = pi3c.create_rect2D(vec2f(30.f, 30.f), vec2f((float)width, (float)height), Pi3Ccolours::White);
-	pi3c.model2D(rect)->addPicture(&pi3c.resource, ptex);
+	pi3c.model2D(rect)->addPicture(&pi3c.resource, *ptex);
 
 	int32_t mapref = pi3c.create_elevationMap(mapPos, mapSize, *ptex, 128, 128, Pi3Ccolours::White,"");
 
@@ -86,7 +87,7 @@ int main(int argc, char *argv[])
 		if (pi3c.window.mouseUp() && updateMap) {
 			pn.createMap(ptex->GetTexels(), width, height, pz, octaves, pamp, freq);
 			ptex->update();
-			pi3c.model3D(mapref)->updateMesh(&pi3c.resource, Pi3Cshapes::elevationMap(*ptex, mapPos, mapSize, 128, 128, 0);
+			pi3c.model3D(mapref)->updateMesh(&pi3c.resource, Pi3Cshapes::elevationMap(*ptex, mapPos, mapSize, 128, 128, 0, vec2f(1,1), 0));
 			updateMap = false;
 		}
 

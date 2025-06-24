@@ -8,7 +8,7 @@ struct Pi3CtextFormat {
 
 	bool italic = false;
 	bool bold = false;
-	bool small = false;
+	bool tiny = false;
 	bool deleted = false;
 	bool subscript = false;
 	bool superscript = false;

@@ -431,25 +431,25 @@ std::string Pi3Cwindow::getSystemInfo()
 
 #ifdef __WINDOWS__
 //windows specific functions
-HWND Pi3Cwindow::getHwnd()
-{
-	struct SDL_SysWMinfo info;
-	SDL_VERSION(&info.version);
-	SDL_GetWindowWMInfo(mWindow, &info);
-	HWND hwnd = info.info.win.window;
-	return hwnd;
-}
-
-void Pi3Cwindow::createWindowsMenu()
-{
-	HWND myWindow;
-	HMENU myMenu;
-
-	myWindow = getHwnd();
-	SDL_Log("HWND = %d", myWindow);
-	myMenu = LoadMenu(NULL, MAKEINTRESOURCE(102));
-	SetMenu(myWindow, myMenu);
-}
+//HWND Pi3Cwindow::getHwnd()
+//{
+//	struct SDL_SysWMinfo info;
+//	SDL_VERSION(&info.version);
+//	SDL_GetWindowWMInfo(mWindow, &info);
+//	HWND hwnd = info.info.win.window;  //NO LONGER SUPPORTED?
+//	return hwnd;
+//}
+//
+//void Pi3Cwindow::createWindowsMenu()
+//{
+//	HWND myWindow;
+//	HMENU myMenu;
+//
+//	myWindow = getHwnd();
+//	SDL_Log("HWND = %d", myWindow);
+//	myMenu = LoadMenu(NULL, MAKEINTRESOURCE(102));
+//	SetMenu(myWindow, myMenu);
+//}
 
 #endif
 

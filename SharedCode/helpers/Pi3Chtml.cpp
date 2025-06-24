@@ -51,7 +51,7 @@ namespace Pi3Chtml {
 			case 's':
 				switch (tag[1]) {
 				case 't': format.bold = val; break;
-				case 'm': format.small = val; break;
+				case 'm': format.tiny = val; break;
 				case 'u': 
 					if (tag[2] == 'b') format.subscript = val; else format.superscript = val;
 					format.scale = (val) ? 0.6f : 1.f;
