@@ -43,7 +43,7 @@ int main(int argc, char *argv[])
 	Pi3C pi3c(opts.asString("title"), screenWidth, screenHeight, opts.asBool("fullscreen"));
 
 	uint32_t width = 256, height = 256;
-	std::shared_ptr<Pi3Ctexture> ptex(new Pi3Ctexture());
+	const std::shared_ptr<Pi3Ctexture> ptex(new Pi3Ctexture());
 
 	float pz = 50.f;
 	float pamp = 1.f;
