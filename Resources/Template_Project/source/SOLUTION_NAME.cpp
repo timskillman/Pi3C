@@ -1,8 +1,11 @@
-#include "Pi3C.h"
+#include <Pi3C.h>
+
+#include SCREEN_WIDTH 800
+#include SCREEN_HEIGHT 600
 
 int main(int argc, char *argv[])
 {
-	Pi3C pi3c("PROJECT_NAME", 800, 600);
+	Pi3C pi3c("PROJECT_NAME", SCREEN_WIDTH, SCREEN_HEIGHT);
 
 	//Setup your scene here ...
 	
@@ -12,6 +15,7 @@ int main(int argc, char *argv[])
 
 		//Draw your scene here ...
 
+		pi3c.update_time();
 		pi3c.swap_buffers();
 	}
 
