@@ -23,6 +23,9 @@ int main(int argc, char *argv[])
 		//Render scene
 		pi3c.render3D();
 
+		pi3c.render2D();
+		pi3c.showFPS();
+
 		pi3c.swap_buffers();
 	}
 
