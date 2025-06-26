@@ -1,7 +1,8 @@
-#include "Pi3C.h"
-#include "Pi3Cavatar.h"
+#include <Pi3C.h>
+#include <Pi3Cavatar.h>
+#include <Pi3CloadOptions.h>
+
 #include "BlockMap.h"
-#include "Pi3CloadOptions.h"
 
 int main(int argc, char *argv[])
 {

@@ -1,11 +1,11 @@
 
-#include "Pi3C.h"
-#include "Pi3Cshapes.h"
-#include "Pi3CfileOBJ.h"
-#include "Pi3CloadOptions.h"
-#include "Pi3Cavatar.h"
-#include "Pi3Cpopulate.h"
-#include "Pi3CperlinNoise.h"
+#include <Pi3C.h>
+#include <Pi3Cshapes.h>
+#include <Pi3CfileOBJ.h>
+#include <Pi3CloadOptions.h>
+#include <Pi3Cavatar.h>
+#include <Pi3Cpopulate.h>
+#include <Pi3CperlinNoise.h>
 
 #include "bullets.h"
 #include "aliens.h"

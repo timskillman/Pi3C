@@ -10,6 +10,7 @@
 .vs
 Debug
 Release
+MyProjects
 
 # Compiled Object files
 *.slo

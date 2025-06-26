@@ -1,7 +1,7 @@
 #include "Editor.h"
-#include "Pi3Cshapes.h"
-#include "Pi3Crect.h"
-#include "Pi3Cdirectory.h"
+#include <Pi3Cshapes.h>
+#include <Pi3Crect.h>
+#include <Pi3Cdirectory.h>
 #include <fstream>
 #include <sstream>
 #include <sys/stat.h>

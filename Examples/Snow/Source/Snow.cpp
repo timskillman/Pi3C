@@ -1,7 +1,7 @@
-#include "Pi3C.h"
-#include "Pi3Cstring.h"
-#include "Pi3Cparticles.h"
-#include "Pi3Csprite.h"
+#include <Pi3C.h>
+#include <Pi3Cstring.h>
+#include <Pi3Cparticles.h>
+#include <Pi3Csprite.h>
 
 // ==========================================================================
 // Pi3C Graphics Library Example - Snow 2D example (by Tim Skillman)

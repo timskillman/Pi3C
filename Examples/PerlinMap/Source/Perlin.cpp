@@ -1,6 +1,6 @@
-#include "Pi3C.h"
-#include "Pi3CperlinNoise.h"
-#include "Pi3CloadOptions.h"
+#include <Pi3C.h>
+#include <Pi3CperlinNoise.h>
+#include <Pi3CloadOptions.h>
 //#include "Pi3Cshapes.h"
 #include "PerlinGUI.h"
 

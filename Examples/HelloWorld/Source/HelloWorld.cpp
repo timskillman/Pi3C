@@ -1,9 +1,8 @@
-#include "Pi3C.h"
+#include <Pi3C.h>
 
 int main(int argc, char *argv[])
 {
-	Pi3C pi3c;
-	pi3c.newWindow("Pi3C", 800, 600);
+	Pi3C pi3c("Pi3C", 800, 600);
 
 	// Your setup stuff goes here ...
 	pi3c.create_cuboid(vec3f(0, 0, 0), vec3f(30, 30, 30), Pi3Ccolours::Green);

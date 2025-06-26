@@ -1,12 +1,12 @@
 #pragma once
 
-#include "Pi3Cjson.h"
-#include "Pi3Cwin.h"
-#include "Pi3Cresource.h"
-#include "Pi3Cscene.h"
-#include "Pi3Cavatar.h"
-#include "Pi3CloadOptions.h"
-#include "Pi3Cimgui.h"
+#include <Pi3Cjson.h>
+#include <Pi3Cwin.h>
+#include <Pi3Cresource.h>
+#include <Pi3Cscene.h>
+#include <Pi3Cavatar.h>
+#include <Pi3CloadOptions.h>
+#include <Pi3Cimgui.h>
 
 class edmodel {
 public:
