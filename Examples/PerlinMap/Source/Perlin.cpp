@@ -98,7 +98,7 @@ int main(int argc, char *argv[])
 		pi3c.swap_buffers();
 	}
 
-	SDL_Log("Average FPS = %f ", pi3c.getAverageFPS());
+	SDL_Log("Average FPS = %f ", pi3c.average_fps);
 
 	delete ptex;
 
