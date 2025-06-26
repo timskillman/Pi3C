@@ -118,6 +118,9 @@ public:
 	inline uint32_t getMilliseconds() { return SDL_GetTicks(); }
 	std::vector<std::string> get_dropfiles();
 
+	//Time functions
+	void update_time();
+
 	//Report functions
 	void showFPS();
 

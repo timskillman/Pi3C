@@ -5,7 +5,7 @@
 
 int main(int argc, char *argv[])
 {
-	Pi3C pi3c("My Project", SCREEN_WIDTH, SCREEN_HEIGHT); // Set up Pi3C using constructor
+	Pi3C pi3c("Hello World", SCREEN_WIDTH, SCREEN_HEIGHT); // Set up Pi3C using constructor
 
 	// Setup your scene here...
 	vec3f cubePosition = vec3f(0, 0, 0); // Position of the cube
@@ -33,6 +33,8 @@ int main(int argc, char *argv[])
 		pi3c.render2D();
 
 		pi3c.showFPS(); // Show the FPS
+
+		pi3c.update_time();
 
 		pi3c.swap_buffers(); // Swap back buffer with front buffer to show result
 	}

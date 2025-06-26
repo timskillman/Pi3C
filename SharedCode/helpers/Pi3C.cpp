@@ -241,9 +241,7 @@ bool Pi3C::keyPress(char key) {
 	return (keys[scancode] != 0);
 }
 
-void Pi3C::swap_buffers() {
-	frames++;
-
+void Pi3C::update_time() {
 	// Calculate deltaTime
 	float ticks = SDL_GetTicks() - last_time;
 	last_time = SDL_GetTicks();
@@ -254,6 +252,10 @@ void Pi3C::swap_buffers() {
 
 	// Calculate average_fps
 	average_fps = (float)frames / SDL_GetTicks() * 1000.0f;
+}
+
+void Pi3C::swap_buffers() {
+	frames++;
 
 	window.SwapBuffers();
 	done_events = false;
