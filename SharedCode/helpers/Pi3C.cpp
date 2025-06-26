@@ -190,29 +190,11 @@ float Pi3C::getFloorHeight(const uint32_t modelRef, const vec3f pos)
 	return ht;
 }
 
-float Pi3C::getAverageFPS()
-{
-	uint32_t ticks = SDL_GetTicks() - start_time;
-	return (float)frames / ((float)ticks / 1000.f);
-}
-
-float Pi3C::getCurrentFPS()
-{
-	uint32_t ticks = SDL_GetTicks() - last_time;
-	if (ticks>1000) {
-		float currentFPS = (float)fps / ((float)ticks / 1000.f);
-		fps = 0; 
-		last_time = SDL_GetTicks();
-		lastFPS = currentFPS;
-	}
-	return lastFPS;
-}
-
 void Pi3C::showFPS()
 {
 	gui.Begin();
-	const std::string fps = "FPS:" + std::to_string((int)getCurrentFPS());
-	gui.Text(fps, 0xffffffff);
+	const std::string fpss = "FPS: " + std::to_string((int)fps);
+	gui.Text(fpss, 0xffffffff);
 }
 
 void Pi3C::resize_window()
@@ -260,7 +242,19 @@ bool Pi3C::keyPress(char key) {
 }
 
 void Pi3C::swap_buffers() {
-	frames++; fps++;
+	frames++;
+
+	// Calculate deltaTime
+	float ticks = SDL_GetTicks() - last_time;
+	last_time = SDL_GetTicks();
+	deltaTime = ticks / 1000.0f;
+
+	// Calculate fps
+	fps = 1.0f / deltaTime;
+
+	// Calculate average_fps
+	average_fps = (float)frames / SDL_GetTicks() * 1000.0f;
+
 	window.SwapBuffers();
 	done_events = false;
 }

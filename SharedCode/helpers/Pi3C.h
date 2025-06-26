@@ -119,8 +119,6 @@ public:
 	std::vector<std::string> get_dropfiles();
 
 	//Report functions
-	float getAverageFPS();
-	float getCurrentFPS();
 	void showFPS();
 
 	//Window functions
@@ -140,16 +138,18 @@ public:
 	std::vector<std::string> guifonts;
 	Pi3Cimgui::rectStyle bsMenu;
 
+	float deltaTime = 0;
+	float fps = 0;
+	float average_fps = 0;
+
 private:
 	std::vector<uint32_t> eventList;
 	bool done_events = false;
 
 	bool has_started = false;
 	uint32_t frames = 0;
-	uint32_t fps = 0;
 	uint32_t start_time = 0;
 	uint32_t last_time = 0;
-	float lastFPS = 0;
 	uint32_t winw = 0;
 	uint32_t winh = 0;
 };
