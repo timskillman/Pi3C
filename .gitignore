@@ -1,3 +1,10 @@
+# Makefiles + RPI Executable
+*
+!Makefile
+!makefile
+!*/
+!*.*
+
 # Prerequisites
 *.d
 .vs
