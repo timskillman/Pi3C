@@ -1,11 +1,11 @@
 
-#include "Pi3C.h"
-#include "Pi3Cshapes.h"
-#include "Pi3CfileOBJ.h"
-#include "Pi3CloadOptions.h"
-#include "Pi3Cavatar.h"
-#include "Pi3Cpopulate.h"
-#include "Pi3CperlinNoise.h"
+#include <Pi3C.h>
+#include <Pi3Cshapes.h>
+#include <Pi3CfileOBJ.h>
+#include <Pi3CloadOptions.h>
+#include <Pi3Cavatar.h>
+#include <Pi3Cpopulate.h>
+#include <Pi3CperlinNoise.h>
 
 #include "bullets.h"
 #include "aliens.h"
@@ -271,12 +271,12 @@ int main(int argc, char *argv[])
 		std::string fps = "Altitude:" + std::to_string((int)ht);
 		gui.Text(fps, 0xff0000ff);
 
+		pi3c.update_time();
 		pi3c.swap_buffers();
-		
 	}
 
 	//resource.clearAll();
-	SDL_Log("Average FPS = %f ", pi3c.getAverageFPS());
+	SDL_Log("Average FPS = %f ", pi3c.average_fps);
 	SDL_ShowCursor(SDL_SYSTEM_CURSOR_ARROW);
 	pi3c.window.destroy();
 

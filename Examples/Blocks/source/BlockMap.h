@@ -1,14 +1,15 @@
 #pragma once
-#include "Pi3Cwin.h"
-#include "Pi3Cresource.h"
-#include "Pi3Cscene.h"
-#include "Pi3Cimgui.h"
-#include "Pi3Cmodel.h"
-#include "Pi3Ccolours.h"
-#include "Pi3Cshapes.h"
+#include <Pi3Cwin.h>
+#include <Pi3Cresource.h>
+#include <Pi3Cscene.h>
+#include <Pi3Cimgui.h>
+#include <Pi3Cmodel.h>
+#include <Pi3Ccolours.h>
+#include <Pi3Cshapes.h>
+#include <Pi3Cblocks.h>
+
 #include <vector>
 #include <cctype>
-#include "Pi3Cblocks.h"
 
 class BlockMap
 {

@@ -1,5 +1,5 @@
-#include "Pi3C.h"
-#include "Pi3CmemContour.h"
+#include <Pi3C.h>
+#include <Pi3CmemContour.h>
 
 // ==========================================================================
 // Pi3C Graphics Library Example - Extruder 2D example (by Tim Skillman)
@@ -59,10 +59,11 @@ int main(int argc, char *argv[])
 		pi3c.render2D();
 		pi3c.showFPS();
 
+		pi3c.update_time();
 		pi3c.swap_buffers();
 	}
 
-	SDL_Log("Average FPS = %f ", pi3c.getAverageFPS());
+	SDL_Log("Average FPS = %f ", pi3c.average_fps);
 
 	pi3c.window.destroy();
 	return 0;

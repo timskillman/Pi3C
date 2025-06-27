@@ -1,8 +1,16 @@
+# Makefiles + RPI Executable
+*
+!Makefile
+!makefile
+!*/
+!*.*
+
 # Prerequisites
 *.d
 .vs
 Debug
 Release
+MyProjects
 
 # Compiled Object files
 *.slo

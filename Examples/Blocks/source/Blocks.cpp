@@ -1,7 +1,8 @@
-#include "Pi3C.h"
-#include "Pi3Cavatar.h"
+#include <Pi3C.h>
+#include <Pi3Cavatar.h>
+#include <Pi3CloadOptions.h>
+
 #include "BlockMap.h"
-#include "Pi3CloadOptions.h"
 
 int main(int argc, char *argv[])
 {
@@ -153,7 +154,7 @@ int main(int argc, char *argv[])
 		//pi3c.showFPS();
 
 		pi3c.gui.Begin();
-		const std::string fps = "FPS:" + std::to_string((int)pi3c.getCurrentFPS());
+		const std::string fps = "FPS:" + std::to_string((int)pi3c.fps);
 		pi3c.gui.Text(fps, 0xffffffff);
 
 		vec3f offset = -ppos;
@@ -195,10 +196,11 @@ int main(int argc, char *argv[])
 			ocz = cz;
 		}
 
+		pi3c.update_time();
 		pi3c.swap_buffers();
 	}
 
-	SDL_Log("Average FPS:%f", pi3c.getAverageFPS());
+	SDL_Log("Average FPS:%f", pi3c.average_fps);
 	SDL_ShowCursor(SDL_SYSTEM_CURSOR_ARROW);
 	pi3c.window.destroy();
 	

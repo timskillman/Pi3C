@@ -1,6 +1,6 @@
 #include "Editor.h"
-#include "Pi3Cwin.h"
-#include "Pi3CloadOptions.h"
+#include <Pi3Cwin.h>
+#include <Pi3CloadOptions.h>
 
 // ==========================================================================
 // Pi3C Graphics Library Example - Castle Creator (by Tim Skillman)
